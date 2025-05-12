@@ -23,6 +23,19 @@ And more!
 
 To keep this app maintained and up-to-date please consider sponsoring it on GitHub. Or if you are looking for a private support or help in customizing the experience, then reach out to me on Telegram [@voidboost](https://t.me/voidboost).
 
+## Troubleshooting
+
+### Error during installation/launch of the application
+These two commands usually help — you need to run them in the terminal (when entering the password, it will be hidden — that’s normal).
+
+```
+sudo xattr -cr /Applications/HDrezka.app
+```
+and
+```
+sudo codesign --force --deep --sign - /Applications/HDrezka.app
+```
+
 ## Screenshots
 
 <img width="49%" src="https://github.com/user-attachments/assets/717fce79-2084-4fed-ac8c-64ae601cd581" />
