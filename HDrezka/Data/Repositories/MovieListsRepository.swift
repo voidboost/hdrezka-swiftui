@@ -1,0 +1,269 @@
+import Alamofire
+import Combine
+import Foundation
+
+protocol MovieListsRepository {
+    func getPopularMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
+
+//    func getFeaturedMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
+
+    func getWatchingNowMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
+
+    func getLatestMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
+
+    func getSoonMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
+
+    func getHotMovies(genre: Int) -> AnyPublisher<[MovieSimple], Error>
+
+    func getMovieList(listId: String, page: Int) -> AnyPublisher<(String, [MovieSimple]), Error>
+
+    func getPopularMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error>
+
+    func getLatestMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error>
+
+    func getSoonMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error>
+
+    func getWatchingNowMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error>
+
+    func getPopularMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error>
+
+    func getLatestMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error>
+
+    func getSoonMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error>
+
+    func getWatchingNowMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error>
+
+    func getLatestNewestMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
+
+    func getPopularNewestMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
+
+    func getWatchingNowNewestMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
+}
+
+struct MovieListsRepositoryImpl: MovieListsRepository {
+    func getPopularMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
+        Const.session.request(MovieListsService.getMovieList1(page: page, filter: "popular", genre: genre))
+            .validate(statusCode: 200 ..< 400)
+            .publishString()
+            .value()
+            .tryMap(MovieListsParser.parse)
+            .map(\.1)
+            .handleError()
+            .eraseToAnyPublisher()
+    }
+
+//    func getFeaturedMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
+//        Const.session.request(MovieListsService.getMovieList1(page: page, filter: "recommendation", genre: genre))
+//            .validate(statusCode: 200 ..< 400)
+//            .publishString()
+//            .value()
+//            .tryMap(MovieListsParser.parse)
+//            .map(\.1)
+//            .handleError()
+////            .eraseToAnyPublisher()
+//    }
+
+    func getWatchingNowMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
+        Const.session.request(MovieListsService.getMovieList1(page: page, filter: "watching", genre: genre))
+            .validate(statusCode: 200 ..< 400)
+            .publishString()
+            .value()
+            .tryMap(MovieListsParser.parse)
+            .map(\.1)
+            .handleError()
+            .eraseToAnyPublisher()
+    }
+
+    func getLatestMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
+        Const.session.request(MovieListsService.getMovieList1(page: page, filter: "last", genre: genre))
+            .validate(statusCode: 200 ..< 400)
+            .publishString()
+            .value()
+            .tryMap(MovieListsParser.parse)
+            .map(\.1)
+            .handleError()
+            .eraseToAnyPublisher()
+    }
+
+    func getSoonMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
+        Const.session.request(MovieListsService.getMovieList1(page: page, filter: "soon", genre: genre))
+            .validate(statusCode: 200 ..< 400)
+            .publishString()
+            .value()
+            .tryMap(MovieListsParser.parse)
+            .map(\.1)
+            .handleError()
+            .eraseToAnyPublisher()
+    }
+
+    func getHotMovies(genre: Int) -> AnyPublisher<[MovieSimple], Error> {
+        Const.session.request(MovieListsService.getHotMovies(genre: genre))
+            .validate(statusCode: 200 ..< 400)
+            .publishString()
+            .value()
+            .tryMap(MovieListsParser.parseHotMovies)
+            .handleError()
+            .eraseToAnyPublisher()
+    }
+
+    func getMovieList(listId: String, page: Int) -> AnyPublisher<(String, [MovieSimple]), Error> {
+        let list = listId.split(separator: "/").map { String($0) }
+        let type = list[0]
+        let listType = list[1]
+        let genre = list.count > 2 && !list[2].isNumber ? list[2] : nil
+        let year = list.count > 3 ? list[3] : (list.count > 2 && list[2].isNumber ? list[2] : nil)
+
+        return Const.session.request(MovieListsService.getMovieList2(type: type, listType: listType, genre: genre, year: year, page: page))
+            .validate(statusCode: 200 ..< 400)
+            .publishString()
+            .value()
+            .tryMap(MovieListsParser.parse)
+            .handleError()
+            .eraseToAnyPublisher()
+    }
+
+    func getPopularMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
+        let type = String(countryId.split(separator: "/")[0])
+        let category = String(countryId.split(separator: "/")[1])
+
+        return Const.session.request(MovieListsService.getMovieList4(type: type, category: category, page: page, genre: genre, filter: "popular"))
+            .validate(statusCode: 200 ..< 400)
+            .publishString()
+            .value()
+            .tryMap(MovieListsParser.parse)
+            .map(\.1)
+            .handleError()
+            .eraseToAnyPublisher()
+    }
+
+    func getLatestMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
+        let type = String(countryId.split(separator: "/")[0])
+        let category = String(countryId.split(separator: "/")[1])
+
+        return Const.session.request(MovieListsService.getMovieList4(type: type, category: category, page: page, genre: genre, filter: "last"))
+            .validate(statusCode: 200 ..< 400)
+            .publishString()
+            .value()
+            .tryMap(MovieListsParser.parse)
+            .map(\.1)
+            .handleError()
+            .eraseToAnyPublisher()
+    }
+
+    func getSoonMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
+        let type = String(countryId.split(separator: "/")[0])
+        let category = String(countryId.split(separator: "/")[1])
+
+        return Const.session.request(MovieListsService.getMovieList4(type: type, category: category, page: page, genre: genre, filter: "soon"))
+            .validate(statusCode: 200 ..< 400)
+            .publishString()
+            .value()
+            .tryMap(MovieListsParser.parse)
+            .map(\.1)
+            .handleError()
+            .eraseToAnyPublisher()
+    }
+
+    func getWatchingNowMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
+        let type = String(countryId.split(separator: "/")[0])
+        let category = String(countryId.split(separator: "/")[1])
+
+        return Const.session.request(MovieListsService.getMovieList4(type: type, category: category, page: page, genre: genre, filter: "watching"))
+            .validate(statusCode: 200 ..< 400)
+            .publishString()
+            .value()
+            .tryMap(MovieListsParser.parse)
+            .map(\.1)
+            .handleError()
+            .eraseToAnyPublisher()
+    }
+
+    func getPopularMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
+        let type = String(genreId.split(separator: "/")[0])
+        let genre = genreId.split(separator: "/").count > 1 ? String(genreId.split(separator: "/")[1]) : nil
+
+        return Const.session.request(MovieListsService.getMovieList3(type: type, genre: genre, page: page, filter: "popular"))
+            .validate(statusCode: 200 ..< 400)
+            .publishString()
+            .value()
+            .tryMap(MovieListsParser.parse)
+            .map(\.1)
+            .handleError()
+            .eraseToAnyPublisher()
+    }
+
+    func getLatestMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
+        let type = String(genreId.split(separator: "/")[0])
+        let genre = genreId.split(separator: "/").count > 1 ? String(genreId.split(separator: "/")[1]) : nil
+
+        return Const.session.request(MovieListsService.getMovieList3(type: type, genre: genre, page: page, filter: "last"))
+            .validate(statusCode: 200 ..< 400)
+            .publishString()
+            .value()
+            .tryMap(MovieListsParser.parse)
+            .map(\.1)
+            .handleError()
+            .eraseToAnyPublisher()
+    }
+
+    func getSoonMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
+        let type = String(genreId.split(separator: "/")[0])
+        let genre = genreId.split(separator: "/").count > 1 ? String(genreId.split(separator: "/")[1]) : nil
+
+        return Const.session.request(MovieListsService.getMovieList3(type: type, genre: genre, page: page, filter: "soon"))
+            .validate(statusCode: 200 ..< 400)
+            .publishString()
+            .value()
+            .tryMap(MovieListsParser.parse)
+            .map(\.1)
+            .handleError()
+            .eraseToAnyPublisher()
+    }
+
+    func getWatchingNowMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
+        let type = String(genreId.split(separator: "/")[0])
+        let genre = genreId.split(separator: "/").count > 1 ? String(genreId.split(separator: "/")[1]) : nil
+
+        return Const.session.request(MovieListsService.getMovieList3(type: type, genre: genre, page: page, filter: "watching"))
+            .validate(statusCode: 200 ..< 400)
+            .publishString()
+            .value()
+            .tryMap(MovieListsParser.parse)
+            .map(\.1)
+            .handleError()
+            .eraseToAnyPublisher()
+    }
+
+    func getLatestNewestMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
+        Const.session.request(MovieListsService.getNewestMovies(page: page, filter: "last", genre: genre))
+            .validate(statusCode: 200 ..< 400)
+            .publishString()
+            .value()
+            .tryMap(MovieListsParser.parse)
+            .map(\.1)
+            .handleError()
+            .eraseToAnyPublisher()
+    }
+
+    func getPopularNewestMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
+        Const.session.request(MovieListsService.getNewestMovies(page: page, filter: "popular", genre: genre))
+            .validate(statusCode: 200 ..< 400)
+            .publishString()
+            .value()
+            .tryMap(MovieListsParser.parse)
+            .map(\.1)
+            .handleError()
+            .eraseToAnyPublisher()
+    }
+
+    func getWatchingNowNewestMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
+        Const.session.request(MovieListsService.getNewestMovies(page: page, filter: "watching", genre: genre))
+            .validate(statusCode: 200 ..< 400)
+            .publishString()
+            .value()
+            .tryMap(MovieListsParser.parse)
+            .map(\.1)
+            .handleError()
+            .eraseToAnyPublisher()
+    }
+}
