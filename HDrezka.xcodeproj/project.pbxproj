@@ -1,0 +1,647 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 70;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		043A2B722C036C7C0057721E /* OrderedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = 043A2B712C036C7C0057721E /* OrderedCollections */; };
+		04B25FD82BA46F9C00200341 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 04B25FD72BA46F9C00200341 /* Algorithms */; };
+		04B3CA8A2BA06CAC0039F76E /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 04B3CA892BA06CAC0039F76E /* SwiftSoup */; };
+		04E5DC0A2C120C4200BF1B7A /* Flow in Frameworks */ = {isa = PBXBuildFile; productRef = 04E5DC092C120C4200BF1B7A /* Flow */; };
+		04E9EB462C047F19001CBBCA /* YouTubePlayerKit in Frameworks */ = {isa = PBXBuildFile; productRef = 04E9EB452C047F19001CBBCA /* YouTubePlayerKit */; };
+		DE188EE52CA6AB3100E7B1AE /* Pow in Frameworks */ = {isa = PBXBuildFile; productRef = DE188EE42CA6AB3100E7B1AE /* Pow */; };
+		DE2D67382DC3D5E900A9187C /* LicensesList in Frameworks */ = {isa = PBXBuildFile; productRef = DE2D67372DC3D5E900A9187C /* LicensesList */; };
+		DE3EF0392CFF04CA0022C311 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DE3EF0382CFF04CA0022C311 /* Alamofire */; };
+		DEB035B52C89E1DB004ABFA1 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B42C89E1DB004ABFA1 /* FirebaseAnalytics */; };
+		DEB035B72C89E1DB004ABFA1 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B62C89E1DB004ABFA1 /* FirebaseCrashlytics */; };
+		DEB035BA2C89E57A004ABFA1 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B92C89E57A004ABFA1 /* Defaults */; };
+		DEE64D0B2C8869D0002C2F2F /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = DEE64D0A2C8869D0002C2F2F /* Sparkle */; };
+		DEED52722CEF8E500070EA87 /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = DEED52712CEF8E500070EA87 /* Factory */; };
+		DEFEB4BA2C807831008869A0 /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = DEFEB4B92C807831008869A0 /* Nuke */; };
+		DEFEB4BC2C807831008869A0 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = DEFEB4BB2C807831008869A0 /* NukeUI */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		04B3CA742BA06C9C0039F76E /* HDrezka.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HDrezka.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DE2D67352DC3D13700A9187C /* LicensesList */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = LicensesList; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		DE2A628C2CC443F500301282 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Resources/Info.plist,
+			);
+			target = 04B3CA732BA06C9C0039F76E /* HDrezka */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		DE2A62132CC443F500301282 /* HDrezka */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (DE2A628C2CC443F500301282 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = HDrezka; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		04B3CA712BA06C9C0039F76E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DEB035BA2C89E57A004ABFA1 /* Defaults in Frameworks */,
+				043A2B722C036C7C0057721E /* OrderedCollections in Frameworks */,
+				04E9EB462C047F19001CBBCA /* YouTubePlayerKit in Frameworks */,
+				04B25FD82BA46F9C00200341 /* Algorithms in Frameworks */,
+				DEFEB4BC2C807831008869A0 /* NukeUI in Frameworks */,
+				DEB035B52C89E1DB004ABFA1 /* FirebaseAnalytics in Frameworks */,
+				04B3CA8A2BA06CAC0039F76E /* SwiftSoup in Frameworks */,
+				DE3EF0392CFF04CA0022C311 /* Alamofire in Frameworks */,
+				DEE64D0B2C8869D0002C2F2F /* Sparkle in Frameworks */,
+				DE188EE52CA6AB3100E7B1AE /* Pow in Frameworks */,
+				DEFEB4BA2C807831008869A0 /* Nuke in Frameworks */,
+				04E5DC0A2C120C4200BF1B7A /* Flow in Frameworks */,
+				DEB035B72C89E1DB004ABFA1 /* FirebaseCrashlytics in Frameworks */,
+				DE2D67382DC3D5E900A9187C /* LicensesList in Frameworks */,
+				DEED52722CEF8E500070EA87 /* Factory in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		04B3CA6B2BA06C9C0039F76E = {
+			isa = PBXGroup;
+			children = (
+				DE2D67352DC3D13700A9187C /* LicensesList */,
+				DE2A62132CC443F500301282 /* HDrezka */,
+				04B3CA752BA06C9C0039F76E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		04B3CA752BA06C9C0039F76E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				04B3CA742BA06C9C0039F76E /* HDrezka.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		04B3CA732BA06C9C0039F76E /* HDrezka */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 04B3CA852BA06C9D0039F76E /* Build configuration list for PBXNativeTarget "HDrezka" */;
+			buildPhases = (
+				04B3CA702BA06C9C0039F76E /* Sources */,
+				04B3CA712BA06C9C0039F76E /* Frameworks */,
+				04B3CA722BA06C9C0039F76E /* Resources */,
+				0420A1212BE3ECAC00975EC4 /* Run Script */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				DE2A62132CC443F500301282 /* HDrezka */,
+			);
+			name = HDrezka;
+			packageProductDependencies = (
+				04B3CA892BA06CAC0039F76E /* SwiftSoup */,
+				04B25FD72BA46F9C00200341 /* Algorithms */,
+				043A2B712C036C7C0057721E /* OrderedCollections */,
+				04E9EB452C047F19001CBBCA /* YouTubePlayerKit */,
+				04E5DC092C120C4200BF1B7A /* Flow */,
+				DEFEB4B92C807831008869A0 /* Nuke */,
+				DEFEB4BB2C807831008869A0 /* NukeUI */,
+				DEE64D0A2C8869D0002C2F2F /* Sparkle */,
+				DEB035B42C89E1DB004ABFA1 /* FirebaseAnalytics */,
+				DEB035B62C89E1DB004ABFA1 /* FirebaseCrashlytics */,
+				DEB035B92C89E57A004ABFA1 /* Defaults */,
+				DE188EE42CA6AB3100E7B1AE /* Pow */,
+				DEED52712CEF8E500070EA87 /* Factory */,
+				DE3EF0382CFF04CA0022C311 /* Alamofire */,
+				DE2D67372DC3D5E900A9187C /* LicensesList */,
+			);
+			productName = HDRezka;
+			productReference = 04B3CA742BA06C9C0039F76E /* HDrezka.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		04B3CA6C2BA06C9C0039F76E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1530;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					04B3CA732BA06C9C0039F76E = {
+						CreatedOnToolsVersion = 15.3;
+					};
+				};
+			};
+			buildConfigurationList = 04B3CA6F2BA06C9C0039F76E /* Build configuration list for PBXProject "HDrezka" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				uk,
+				ru,
+				Base,
+			);
+			mainGroup = 04B3CA6B2BA06C9C0039F76E;
+			packageReferences = (
+				04B3CA882BA06CAC0039F76E /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+				04B25FD62BA46F9C00200341 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
+				043A2B702C036C7C0057721E /* XCRemoteSwiftPackageReference "swift-collections" */,
+				04E9EB442C047F19001CBBCA /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */,
+				04E5DC082C120C4200BF1B7A /* XCRemoteSwiftPackageReference "SwiftUI-Flow" */,
+				DEFEB4B82C807831008869A0 /* XCRemoteSwiftPackageReference "Nuke" */,
+				DEE64D092C8869D0002C2F2F /* XCRemoteSwiftPackageReference "Sparkle" */,
+				DEB035B32C89E1DB004ABFA1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				DEB035B82C89E57A004ABFA1 /* XCRemoteSwiftPackageReference "Defaults" */,
+				DE188EE32CA6AB3100E7B1AE /* XCRemoteSwiftPackageReference "Pow" */,
+				DEED52702CEF8E500070EA87 /* XCRemoteSwiftPackageReference "Factory" */,
+				DE3EF0372CFF04CA0022C311 /* XCRemoteSwiftPackageReference "Alamofire" */,
+			);
+			productRefGroup = 04B3CA752BA06C9C0039F76E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				04B3CA732BA06C9C0039F76E /* HDrezka */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		04B3CA722BA06C9C0039F76E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0420A1212BE3ECAC00975EC4 /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 12;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${PRODUCT_NAME}",
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+				"$(TARGET_BUILD_DIR)/$(EXECUTABLE_PATH)",
+			);
+			name = "Run Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		04B3CA702BA06C9C0039F76E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		04B3CA832BA06C9D0039F76E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_OPTIMIZATION = time;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		04B3CA842BA06C9D0039F76E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD)";
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_OPTIMIZATION = time;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		04B3CA862BA06C9D0039F76E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CLANG_USE_OPTIMIZATION_PROFILE = YES;
+				CODE_SIGN_ENTITLEMENTS = HDrezka/Resources/HDrezka.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = 68ZUK4XR7F;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HDrezka/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = HDrezka;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0.0;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_BUNDLE_IDENTIFIER = io.silentsea.hdrezka;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		04B3CA872BA06C9D0039F76E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				ASSETCATALOG_COMPILER_OPTIMIZATION = time;
+				CLANG_USE_OPTIMIZATION_PROFILE = YES;
+				CODE_SIGN_ENTITLEMENTS = HDrezka/Resources/HDrezka.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GCC_OPTIMIZATION_LEVEL = fast;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = HDrezka/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = HDrezka;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0.0;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_BUNDLE_IDENTIFIER = io.silentsea.hdrezka;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		04B3CA6F2BA06C9C0039F76E /* Build configuration list for PBXProject "HDrezka" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04B3CA832BA06C9D0039F76E /* Debug */,
+				04B3CA842BA06C9D0039F76E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		04B3CA852BA06C9D0039F76E /* Build configuration list for PBXNativeTarget "HDrezka" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04B3CA862BA06C9D0039F76E /* Debug */,
+				04B3CA872BA06C9D0039F76E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		043A2B702C036C7C0057721E /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 999.0.0;
+				minimumVersion = 0.0.1;
+			};
+		};
+		04B25FD62BA46F9C00200341 /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-algorithms.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 999.0.0;
+				minimumVersion = 0.0.1;
+			};
+		};
+		04B3CA882BA06CAC0039F76E /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 999.0.0;
+				minimumVersion = 0.0.1;
+			};
+		};
+		04E5DC082C120C4200BF1B7A /* XCRemoteSwiftPackageReference "SwiftUI-Flow" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tevelee/SwiftUI-Flow.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 999.0.0;
+				minimumVersion = 0.0.1;
+			};
+		};
+		04E9EB442C047F19001CBBCA /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SvenTiigi/YouTubePlayerKit.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 999.0.0;
+				minimumVersion = 0.0.1;
+			};
+		};
+		DE188EE32CA6AB3100E7B1AE /* XCRemoteSwiftPackageReference "Pow" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/EmergeTools/Pow.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 999.0.0;
+				minimumVersion = 0.0.1;
+			};
+		};
+		DE3EF0372CFF04CA0022C311 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 999.0.0;
+				minimumVersion = 0.0.1;
+			};
+		};
+		DEB035B32C89E1DB004ABFA1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 999.0.0;
+				minimumVersion = 0.0.1;
+			};
+		};
+		DEB035B82C89E57A004ABFA1 /* XCRemoteSwiftPackageReference "Defaults" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/Defaults.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 999.0.0;
+				minimumVersion = 0.0.1;
+			};
+		};
+		DEE64D092C8869D0002C2F2F /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 999.0.0;
+				minimumVersion = 0.0.1;
+			};
+		};
+		DEED52702CEF8E500070EA87 /* XCRemoteSwiftPackageReference "Factory" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hmlongco/Factory.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 999.0.0;
+				minimumVersion = 0.0.1;
+			};
+		};
+		DEFEB4B82C807831008869A0 /* XCRemoteSwiftPackageReference "Nuke" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/Nuke.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 999.0.0;
+				minimumVersion = 0.0.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		043A2B712C036C7C0057721E /* OrderedCollections */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 043A2B702C036C7C0057721E /* XCRemoteSwiftPackageReference "swift-collections" */;
+			productName = OrderedCollections;
+		};
+		04B25FD72BA46F9C00200341 /* Algorithms */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04B25FD62BA46F9C00200341 /* XCRemoteSwiftPackageReference "swift-algorithms" */;
+			productName = Algorithms;
+		};
+		04B3CA892BA06CAC0039F76E /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04B3CA882BA06CAC0039F76E /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
+		};
+		04E5DC092C120C4200BF1B7A /* Flow */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04E5DC082C120C4200BF1B7A /* XCRemoteSwiftPackageReference "SwiftUI-Flow" */;
+			productName = Flow;
+		};
+		04E9EB452C047F19001CBBCA /* YouTubePlayerKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04E9EB442C047F19001CBBCA /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */;
+			productName = YouTubePlayerKit;
+		};
+		DE188EE42CA6AB3100E7B1AE /* Pow */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DE188EE32CA6AB3100E7B1AE /* XCRemoteSwiftPackageReference "Pow" */;
+			productName = Pow;
+		};
+		DE2D67372DC3D5E900A9187C /* LicensesList */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LicensesList;
+		};
+		DE3EF0382CFF04CA0022C311 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DE3EF0372CFF04CA0022C311 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		DEB035B42C89E1DB004ABFA1 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEB035B32C89E1DB004ABFA1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		DEB035B62C89E1DB004ABFA1 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEB035B32C89E1DB004ABFA1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		DEB035B92C89E57A004ABFA1 /* Defaults */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEB035B82C89E57A004ABFA1 /* XCRemoteSwiftPackageReference "Defaults" */;
+			productName = Defaults;
+		};
+		DEE64D0A2C8869D0002C2F2F /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEE64D092C8869D0002C2F2F /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+		DEED52712CEF8E500070EA87 /* Factory */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEED52702CEF8E500070EA87 /* XCRemoteSwiftPackageReference "Factory" */;
+			productName = Factory;
+		};
+		DEFEB4B92C807831008869A0 /* Nuke */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEFEB4B82C807831008869A0 /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = Nuke;
+		};
+		DEFEB4BB2C807831008869A0 /* NukeUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEFEB4B82C807831008869A0 /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = NukeUI;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 04B3CA6C2BA06C9C0039F76E /* Project object */;
+}
