@@ -4,7 +4,7 @@ Unofficial macOS client for HDrezka. Requires macOS 14 Sonoma or later.
 
 ## Features
 
--   ⭐️ Custom player!
+-   ⭐️ Custom player
 -   Account authorization
 -   Bookmarks
 -   Comments
