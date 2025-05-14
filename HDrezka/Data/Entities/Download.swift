@@ -1,22 +1,20 @@
-import Combine
+import Alamofire
 import Foundation
 
 struct Download: Identifiable, Hashable {
     let id: String
-    let name: String
-    private let task: URLSessionDownloadTask
+    private let request: DownloadRequest
     let progress: Progress
 
-    init(id: String, name: String, task: URLSessionDownloadTask) {
+    init(id: String, request: DownloadRequest) {
         self.id = id
-        self.name = name
-        self.task = task
-        self.progress = task.progress
+        self.request = request
+        self.progress = self.request.downloadProgress
     }
 }
 
 extension Download {
     func cancel() {
-        task.cancel()
+        request.cancel()
     }
 }

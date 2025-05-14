@@ -23,9 +23,6 @@ class Downloader {
     private var subscriptions: Set<AnyCancellable> = []
     
     @ObservationIgnored
-    private let session = URLSession(configuration: .ephemeral, delegate: nil, delegateQueue: .main)
-
-    @ObservationIgnored
     @Injected(\.account)
     private var account
     @ObservationIgnored
@@ -173,63 +170,45 @@ class Downloader {
                                         ([movieUrl], [movieDestination])
                                     }
                                     
-                                    let task = self.session.downloadTask(with: urls[0]) { location, _, error in
-                                        DispatchQueue.main.async {
+                                    let request = Const.session.download(urls[0], method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (destinations[0], [.createIntermediateDirectories, .removePreviousFile]) })
+                                        .validate(statusCode: 200 ..< 400)
+                                        .responseURL(queue: .main) { response in
                                             self.downloads.removeAll(where: { $0.id == id })
-                                        }
-                                        
-                                        if let error {
-                                            if (error as NSError).domain == NSURLErrorDomain, (error as NSError).code == NSURLErrorCancelled {
-                                                self.notificate(id, String(localized: "key.download.canceled"), String(localized: "key.download.canceled.notification-\(name)-\(s)-\(e)-\(qualityName)-\(actingName)"), "retry", ["data": retryData])
-                                            } else {
-                                                self.notificate(id, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(name)-\(s)-\(e)-\(qualityName)-\(actingName)-\(error.localizedDescription)"), "retry", ["data": retryData])
-                                            }
-                                        } else if let location {
-                                            do {
-                                                try? self.fileManager.removeItem(at: destinations[0])
-
-                                                try? self.fileManager.createDirectory(at: destinations[0].deletingLastPathComponent(), withIntermediateDirectories: true)
-
-                                                try self.fileManager.moveItem(at: location, to: destinations[0])
-
-                                                self.notificate(id, String(localized: "key.download.success"), String(localized: "key.download.success.notification-\(name)-\(s)-\(e)-\(qualityName)-\(actingName)"), "open", ["url": destinations[0].absoluteString])
-                                                        
+                                            
+                                            if let error = response.error {
+                                                if error.isExplicitlyCancelledError {
+                                                    self.notificate(id, String(localized: "key.download.canceled"), String(localized: "key.download.canceled.notification-\(name)-\(s)-\(e)-\(qualityName)-\(actingName)"), "retry", ["data": retryData])
+                                                } else {
+                                                    self.notificate(id, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(name)-\(s)-\(e)-\(qualityName)-\(actingName)-\(error.localizedDescription)"), "retry", ["data": retryData])
+                                                }
+                                            } else if let destination = response.value {
+                                                self.notificate(id, String(localized: "key.download.success"), String(localized: "key.download.success.notification-\(name)-\(s)-\(e)-\(qualityName)-\(actingName)"), "open", ["url": destination.absoluteString])
+                                                    
                                                 if data.all, let nextEpisode = season.episodes.element(after: episode) {
                                                     self.download(data.newEpisede(nextEpisode))
                                                 }
-                                            } catch {
-                                                self.notificate(id, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(name)-\(s)-\(e)-\(qualityName)-\(actingName)-\(error.localizedDescription)"), "retry", ["data": retryData])
                                             }
                                         }
-                                    }
-                                    
-                                    task.priority = URLSessionTask.highPriority
-                                    
+                                           
                                     if urls.count > 1, destinations.count > 1 {
-                                        let task = self.session.downloadTask(with: urls[1]) { location, _, _ in
-                                            if let location {
-                                                try? self.fileManager.removeItem(at: destinations[1])
-                                                
-                                                try? self.fileManager.createDirectory(at: destinations[1].deletingLastPathComponent(), withIntermediateDirectories: true)
-
-                                                try? self.fileManager.moveItem(at: location, to: destinations[1])
-                                            }
-                                        }
-                                        
-                                        task.resume()
+                                        let request = Const.session.download(urls[1], method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (destinations[1], [.createIntermediateDirectories, .removePreviousFile]) })
+                                            .validate(statusCode: 200 ..< 400)
+                                            
+                                        request.resume()
                                     }
                                     
-                                    DispatchQueue.main.async {
-                                        self.downloads.append(
-                                            .init(
-                                                id: id,
-                                                name: "\(name) \(s) \(e)\(qualityName)\(actingName)",
-                                                task: task
-                                            )
+                                    request.downloadProgress.localizedDescription = "\(name) \(s) \(e)\(qualityName)\(actingName)"
+                                    request.downloadProgress.kind = .file
+                                    request.downloadProgress.fileOperationKind = .downloading
+                                    
+                                    self.downloads.append(
+                                        .init(
+                                            id: id,
+                                            request: request
                                         )
-                                    }
-                                    
-                                    task.resume()
+                                    )
+
+                                    request.resume()
                                 }
                             }
                         }
@@ -305,61 +284,42 @@ class Downloader {
                                         ([movieUrl], [movieDestination])
                                     }
                                     
-                                    let task = self.session.downloadTask(with: urls[0]) { location, _, error in
-                                        DispatchQueue.main.async {
+                                    let request = Const.session.download(urls[0], method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (destinations[0], [.createIntermediateDirectories, .removePreviousFile]) })
+                                        .validate(statusCode: 200 ..< 400)
+                                        .responseURL(queue: .main) { response in
                                             self.downloads.removeAll(where: { $0.id == id })
-                                        }
 
-                                        if let error {
-                                            if (error as NSError).domain == NSURLErrorDomain, (error as NSError).code == NSURLErrorCancelled {
-                                                self.notificate(id, String(localized: "key.download.canceled"), String(localized: "key.download.canceled.notification-\(name)-\(qualityName)-\(actingName)"), "retry", ["data": retryData])
-                                            } else {
-                                                self.notificate(id, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(name)-\(qualityName)-\(actingName)-\(error.localizedDescription)"), "retry", ["data": retryData])
-                                            }
-                                        } else if let location {
-                                            do {
-                                                try? self.fileManager.removeItem(at: destinations[0])
-                                                
-                                                try? self.fileManager.createDirectory(at: destinations[0].deletingLastPathComponent(), withIntermediateDirectories: true)
-
-                                                try self.fileManager.moveItem(at: location, to: destinations[0])
-
+                                            if let error = response.error {
+                                                if error.isExplicitlyCancelledError {
+                                                    self.notificate(id, String(localized: "key.download.canceled"), String(localized: "key.download.canceled.notification-\(name)-\(qualityName)-\(actingName)"), "retry", ["data": retryData])
+                                                } else {
+                                                    self.notificate(id, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(name)-\(qualityName)-\(actingName)-\(error.localizedDescription)"), "retry", ["data": retryData])
+                                                }
+                                            } else if let destination = response.value {
                                                 self.notificate(id, String(localized: "key.download.success"), String(localized:
-                                                    "key.download.success.notification-\(name)-\(qualityName)-\(actingName)"), "open", ["url": movieDestination.absoluteString])
-                                                        
-                                            } catch {
-                                                self.notificate(id, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(name)-\(qualityName)-\(actingName)-\(error.localizedDescription)"), "retry", ["data": retryData])
+                                                    "key.download.success.notification-\(name)-\(qualityName)-\(actingName)"), "open", ["url": destination.absoluteString])
                                             }
                                         }
-                                    }
                                     
-                                    task.priority = URLSessionTask.highPriority
-
                                     if urls.count > 1, destinations.count > 1 {
-                                        let task = self.session.downloadTask(with: urls[1]) { location, _, _ in
-                                            if let location {
-                                                try? self.fileManager.removeItem(at: destinations[1])
-
-                                                try? self.fileManager.createDirectory(at: destinations[1].deletingLastPathComponent(), withIntermediateDirectories: true)
-                                                
-                                                try? self.fileManager.moveItem(at: location, to: destinations[1])
-                                            }
-                                        }
-                                        
-                                        task.resume()
+                                        let request = Const.session.download(urls[1], method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (destinations[1], [.createIntermediateDirectories, .removePreviousFile]) })
+                                            .validate(statusCode: 200 ..< 400)
+                                            
+                                        request.resume()
                                     }
                                     
-                                    DispatchQueue.main.async {
-                                        self.downloads.append(
-                                            .init(
-                                                id: id,
-                                                name: "\(name)\(qualityName)\(actingName)",
-                                                task: task
-                                            )
+                                    request.downloadProgress.localizedDescription = "\(name)\(qualityName)\(actingName)"
+                                    request.downloadProgress.kind = .file
+                                    request.downloadProgress.fileOperationKind = .downloading
+                                    
+                                    self.downloads.append(
+                                        .init(
+                                            id: id,
+                                            request: request
                                         )
-                                    }
+                                    )
                                     
-                                    task.resume()
+                                    request.resume()
                                 }
                             }
                         }
