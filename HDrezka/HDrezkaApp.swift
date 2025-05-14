@@ -242,14 +242,14 @@ struct HDrezkaApp: App {
 
                     let credits = NSMutableAttributedString(attachment: imageAttachment)
                     credits.addAttribute(.link, value: Const.helpUkraine, range: NSRange(location: 0, length: credits.length))
-                    credits.append(NSAttributedString(string: "\n\n© 2024 "))
-                    credits.append(NSAttributedString(string: "HDrezka macOS", attributes: [.link: Const.telegram]))
+                    credits.append(NSAttributedString(string: "\n\n© 2025 "))
+                    credits.append(NSAttributedString(string: "HDrezka macOS", attributes: [.link: Const.github]))
                     credits.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: credits.length))
 
                     NSApp.orderFrontStandardAboutPanel(options: [NSApplication.AboutPanelOptionKey.credits: credits])
                 } else {
-                    let credits = NSMutableAttributedString(string: "© 2024 ")
-                    credits.append(NSAttributedString(string: "HDrezka macOS", attributes: [.link: Const.telegram]))
+                    let credits = NSMutableAttributedString(string: "© 2025 ")
+                    credits.append(NSAttributedString(string: "HDrezka macOS", attributes: [.link: Const.github]))
                     credits.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: credits.length))
 
                     NSApp.orderFrontStandardAboutPanel(options: [NSApplication.AboutPanelOptionKey.credits: credits])
@@ -269,11 +269,11 @@ struct HDrezkaApp: App {
         }
 
         CommandGroup(replacing: .help) {
-            if let telegram = URL(string: Const.telegram) {
+            if let github = URL(string: Const.github) {
                 Button {
-                    openURL(telegram)
+                    openURL(github)
                 } label: {
-                    Text("key.telegram")
+                    Text("key.github")
                 }
             } else {
                 EmptyView()
