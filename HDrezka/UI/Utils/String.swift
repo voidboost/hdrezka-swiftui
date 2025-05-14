@@ -15,8 +15,8 @@ extension String {
 
 extension LocalizedStringKey {
     func toString() -> String? {
-        guard let attributeLabelAndValue = Mirror(reflecting: self).children.first(where: { $0.label == "key" }) else { return nil }
+        guard let attributeLabelAndValue = Mirror(reflecting: self).children.first(where: { $0.label == "key" })?.value as? String else { return nil }
 
-        return String.localizedStringWithFormat(NSLocalizedString(attributeLabelAndValue.value as! String, comment: ""))
+        return String.localizedStringWithFormat(NSLocalizedString(attributeLabelAndValue, comment: ""))
     }
 }

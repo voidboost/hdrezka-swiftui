@@ -53,6 +53,6 @@ private extension Element {
     }
 
     func getCollectionId() throws -> String {
-        try String(attr("data-url").removeMirror().replacingOccurrences(of: "collections/", with: ""))
+        try attr("data-url").removeMirror().replacingOccurrences(of: "collections/", with: "")
     }
 }

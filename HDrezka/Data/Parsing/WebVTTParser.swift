@@ -81,31 +81,35 @@ class WebVTTParser {
             lineCount += 1
             seenEOF = scanner.isAtEnd
             
-            if line?.contains("-->") == true {
-                if !inHeader, lineCount == 1 || (lineCount == 2 && !seenArrow) {
-                    seenArrow = true
-                    prevPosition = scanner.scanLocation
-                    cueTiming = CueInfoParser(string: line!).parse()
-                    blockType = .cue
-                    buffer = ""
-                    seenCue = true
-                } else {
-                    scanner.scanLocation = prevPosition
+            if let line {
+                if line.isEmpty {
                     break
+                } else if line.contains("-->") {
+                    if !inHeader, lineCount == 1 || (lineCount == 2 && !seenArrow) {
+                        seenArrow = true
+                        prevPosition = scanner.scanLocation
+                        cueTiming = CueInfoParser(string: line).parse()
+                        blockType = .cue
+                        buffer = ""
+                        seenCue = true
+                    } else {
+                        scanner.scanLocation = prevPosition
+                        break
+                    }
+                } else {
+                    if !inHeader, lineCount == 2, !seenCue, buffer.hasPrefix("STYLE") || buffer.hasPrefix("REGION") {
+                        buffer = ""
+                    }
+                    
+                    if !buffer.isEmpty {
+                        buffer += "\u{000A}"
+                    }
+                    
+                    buffer += line
+                    prevPosition = scanner.scanLocation
                 }
-            } else if line == nil || line!.isEmpty {
-                break
             } else {
-                if !inHeader, lineCount == 2, !seenCue, buffer.hasPrefix("STYLE") || buffer.hasPrefix("REGION") {
-                    buffer = ""
-                }
-               
-                if !buffer.isEmpty {
-                    buffer += "\u{000A}"
-                }
-                
-                buffer += line ?? ""
-                prevPosition = scanner.scanLocation
+                break
             }
         }
         

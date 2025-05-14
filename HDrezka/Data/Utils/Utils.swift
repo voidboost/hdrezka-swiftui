@@ -35,10 +35,10 @@ extension String {
             self
         }
 
-        let split = string.split(separator: "/")
+        let parts = string.components(separatedBy: "/")
 
-        if split.count == 3, !split[2].components(separatedBy: "-")[0].isEmpty, split[2].components(separatedBy: "-")[0].isNumber, split[2].hasSuffix(".html") {
-            return split[2].components(separatedBy: "-")[0]
+        if parts.count == 3, let id = parts[2].components(separatedBy: "-").first, !id.isEmpty, id.isNumber, parts[2].hasSuffix(".html") {
+            return id
         }
 
         return nil
@@ -60,7 +60,7 @@ extension String {
 
             let startValue = Double(abs(number))
             var abbreviation: Abbrevation {
-                var prevAbbreviation = abbreviations[0]
+                var prevAbbreviation: Abbrevation = (0, 1, "")
                 for tmpAbbreviation in abbreviations {
                     if startValue < tmpAbbreviation.threshold {
                         break
@@ -91,7 +91,7 @@ extension String {
 
     func removeMirror(_ scheme: String = "http") -> String {
         return if hasPrefix(scheme) {
-            split(separator: "/").dropFirst(2).joined(separator: "/")
+            components(separatedBy: "/").dropFirst(3).joined(separator: "/")
         } else if hasPrefix("/") {
             String(dropFirst())
         } else {

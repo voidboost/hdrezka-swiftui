@@ -65,7 +65,7 @@ extension DataResponse {
 
 private enum DebugDescription {
     static func description(of request: URLRequest) -> String {
-        let requestSummary = "\(request.httpMethod!) \(request)"
+        let requestSummary = "\(request.httpMethod ?? "Unknown") \(request)"
         let requestHeadersDescription = DebugDescription.description(for: request.headers)
         let requestBodyDescription = DebugDescription.description(for: request.httpBody, headers: request.headers)
 
