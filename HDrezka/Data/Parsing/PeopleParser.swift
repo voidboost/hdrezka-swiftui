@@ -120,8 +120,8 @@ private extension Document {
                 let td = try tr.select("td")
 
                 if td.count == 2 {
-                    let name = try td[0].select("h2").text()
-                    let value = try td[1].text()
+                    let name = try td.first().orThrow().select("h2").text()
+                    let value = try td.last().orThrow().text()
                     onGot(name, value)
                 }
             }

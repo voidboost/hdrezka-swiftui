@@ -60,7 +60,7 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
 //            .tryMap(MovieListsParser.parse)
 //            .map(\.1)
 //            .handleError()
-////            .eraseToAnyPublisher()
+    ////            .eraseToAnyPublisher()
 //    }
 
     func getWatchingNowMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
@@ -107,7 +107,14 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     }
 
     func getMovieList(listId: String, page: Int) -> AnyPublisher<(String, [MovieSimple]), Error> {
-        let list = listId.split(separator: "/").map { String($0) }
+        let list = listId.components(separatedBy: "/")
+
+        guard list.count > 1 else {
+            return Fail(error: HDrezkaError.null(#function, #line, #column))
+                .handleError()
+                .eraseToAnyPublisher()
+        }
+
         let type = list[0]
         let listType = list[1]
         let genre = list.count > 2 && !list[2].isNumber ? list[2] : nil
@@ -123,8 +130,16 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     }
 
     func getPopularMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let type = String(countryId.split(separator: "/")[0])
-        let category = String(countryId.split(separator: "/")[1])
+        let parts = countryId.components(separatedBy: "/")
+
+        guard parts.count == 2 else {
+            return Fail(error: HDrezkaError.null(#function, #line, #column))
+                .handleError()
+                .eraseToAnyPublisher()
+        }
+
+        let type = parts[0]
+        let category = parts[1]
 
         return Const.session.request(MovieListsService.getMovieList4(type: type, category: category, page: page, genre: genre, filter: "popular"))
             .validate(statusCode: 200 ..< 400)
@@ -137,8 +152,16 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     }
 
     func getLatestMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let type = String(countryId.split(separator: "/")[0])
-        let category = String(countryId.split(separator: "/")[1])
+        let parts = countryId.components(separatedBy: "/")
+
+        guard parts.count == 2 else {
+            return Fail(error: HDrezkaError.null(#function, #line, #column))
+                .handleError()
+                .eraseToAnyPublisher()
+        }
+
+        let type = parts[0]
+        let category = parts[1]
 
         return Const.session.request(MovieListsService.getMovieList4(type: type, category: category, page: page, genre: genre, filter: "last"))
             .validate(statusCode: 200 ..< 400)
@@ -151,8 +174,16 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     }
 
     func getSoonMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let type = String(countryId.split(separator: "/")[0])
-        let category = String(countryId.split(separator: "/")[1])
+        let parts = countryId.components(separatedBy: "/")
+
+        guard parts.count == 2 else {
+            return Fail(error: HDrezkaError.null(#function, #line, #column))
+                .handleError()
+                .eraseToAnyPublisher()
+        }
+
+        let type = parts[0]
+        let category = parts[1]
 
         return Const.session.request(MovieListsService.getMovieList4(type: type, category: category, page: page, genre: genre, filter: "soon"))
             .validate(statusCode: 200 ..< 400)
@@ -165,8 +196,16 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     }
 
     func getWatchingNowMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let type = String(countryId.split(separator: "/")[0])
-        let category = String(countryId.split(separator: "/")[1])
+        let parts = countryId.components(separatedBy: "/")
+
+        guard parts.count == 2 else {
+            return Fail(error: HDrezkaError.null(#function, #line, #column))
+                .handleError()
+                .eraseToAnyPublisher()
+        }
+
+        let type = parts[0]
+        let category = parts[1]
 
         return Const.session.request(MovieListsService.getMovieList4(type: type, category: category, page: page, genre: genre, filter: "watching"))
             .validate(statusCode: 200 ..< 400)
@@ -179,8 +218,16 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     }
 
     func getPopularMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let type = String(genreId.split(separator: "/")[0])
-        let genre = genreId.split(separator: "/").count > 1 ? String(genreId.split(separator: "/")[1]) : nil
+        let parts = genreId.components(separatedBy: "/")
+
+        guard parts.count > 0 else {
+            return Fail(error: HDrezkaError.null(#function, #line, #column))
+                .handleError()
+                .eraseToAnyPublisher()
+        }
+
+        let type = parts[0]
+        let genre = parts.count > 1 ? parts[1] : nil
 
         return Const.session.request(MovieListsService.getMovieList3(type: type, genre: genre, page: page, filter: "popular"))
             .validate(statusCode: 200 ..< 400)
@@ -193,8 +240,16 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     }
 
     func getLatestMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let type = String(genreId.split(separator: "/")[0])
-        let genre = genreId.split(separator: "/").count > 1 ? String(genreId.split(separator: "/")[1]) : nil
+        let parts = genreId.components(separatedBy: "/")
+
+        guard parts.count > 0 else {
+            return Fail(error: HDrezkaError.null(#function, #line, #column))
+                .handleError()
+                .eraseToAnyPublisher()
+        }
+
+        let type = parts[0]
+        let genre = parts.count > 1 ? parts[1] : nil
 
         return Const.session.request(MovieListsService.getMovieList3(type: type, genre: genre, page: page, filter: "last"))
             .validate(statusCode: 200 ..< 400)
@@ -207,8 +262,16 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     }
 
     func getSoonMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let type = String(genreId.split(separator: "/")[0])
-        let genre = genreId.split(separator: "/").count > 1 ? String(genreId.split(separator: "/")[1]) : nil
+        let parts = genreId.components(separatedBy: "/")
+
+        guard parts.count > 0 else {
+            return Fail(error: HDrezkaError.null(#function, #line, #column))
+                .handleError()
+                .eraseToAnyPublisher()
+        }
+
+        let type = parts[0]
+        let genre = parts.count > 1 ? parts[1] : nil
 
         return Const.session.request(MovieListsService.getMovieList3(type: type, genre: genre, page: page, filter: "soon"))
             .validate(statusCode: 200 ..< 400)
@@ -221,8 +284,16 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     }
 
     func getWatchingNowMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let type = String(genreId.split(separator: "/")[0])
-        let genre = genreId.split(separator: "/").count > 1 ? String(genreId.split(separator: "/")[1]) : nil
+        let parts = genreId.components(separatedBy: "/")
+
+        guard parts.count > 0 else {
+            return Fail(error: HDrezkaError.null(#function, #line, #column))
+                .handleError()
+                .eraseToAnyPublisher()
+        }
+
+        let type = parts[0]
+        let genre = parts.count > 1 ? parts[1] : nil
 
         return Const.session.request(MovieListsService.getMovieList3(type: type, genre: genre, page: page, filter: "watching"))
             .validate(statusCode: 200 ..< 400)

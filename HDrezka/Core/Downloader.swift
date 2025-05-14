@@ -158,19 +158,7 @@ class Downloader {
                                 {
                                     self.notificate(id, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(name)-\(s)-\(e)-\(qualityName)-\(actingName)"), "cancel", ["id": id])
                                             
-                                    let (urls, destinations): ([URL], [URL]) = if let subtitles = data.subtitles,
-                                                                                  let sub = movie.subtitles.first(where: { $0.name == subtitles.name }),
-                                                                                  let subtitlesUrl = URL(string: sub.link)
-                                    {
-                                        (
-                                            [movieUrl, subtitlesUrl],
-                                            [movieDestination, movieDestination.deletingLastPathComponent().appending(path: movieFile.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":").replacingOccurrences(of: ".mp4", with: " [\(sub.name)].\(subtitlesUrl.pathExtension)"), directoryHint: .notDirectory)]
-                                        )
-                                    } else {
-                                        ([movieUrl], [movieDestination])
-                                    }
-                                    
-                                    let request = Const.session.download(urls[0], method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (destinations[0], [.createIntermediateDirectories, .removePreviousFile]) })
+                                    let request = Const.session.download(movieUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination, [.createIntermediateDirectories, .removePreviousFile]) })
                                         .validate(statusCode: 200 ..< 400)
                                         .responseURL(queue: .main) { response in
                                             self.downloads.removeAll(where: { $0.id == id })
@@ -190,8 +178,11 @@ class Downloader {
                                             }
                                         }
                                            
-                                    if urls.count > 1, destinations.count > 1 {
-                                        let request = Const.session.download(urls[1], method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (destinations[1], [.createIntermediateDirectories, .removePreviousFile]) })
+                                    if let subtitles = data.subtitles,
+                                       let sub = movie.subtitles.first(where: { $0.name == subtitles.name }),
+                                       let subtitlesUrl = URL(string: sub.link)
+                                    {
+                                        let request = Const.session.download(subtitlesUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination.deletingLastPathComponent().appending(path: movieFile.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":").replacingOccurrences(of: ".mp4", with: " [\(sub.name)].\(subtitlesUrl.pathExtension)"), directoryHint: .notDirectory), [.createIntermediateDirectories, .removePreviousFile]) })
                                             .validate(statusCode: 200 ..< 400)
                                             
                                         request.resume()
@@ -272,19 +263,7 @@ class Downloader {
                                     self.notificate(id, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(name)-\(qualityName)-\(actingName)"
                                     ), "cancel", ["id": id])
                                             
-                                    let (urls, destinations): ([URL], [URL]) = if let subtitles = data.subtitles,
-                                                                                  let sub = movie.subtitles.first(where: { $0.name == subtitles.name }),
-                                                                                  let subtitlesUrl = URL(string: sub.link)
-                                    {
-                                        (
-                                            [movieUrl, subtitlesUrl],
-                                            [movieDestination, movieDestination.deletingLastPathComponent().appending(path: file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":").replacingOccurrences(of: ".mp4", with: " [\(sub.name)].\(subtitlesUrl.pathExtension)"), directoryHint: .notDirectory)]
-                                        )
-                                    } else {
-                                        ([movieUrl], [movieDestination])
-                                    }
-                                    
-                                    let request = Const.session.download(urls[0], method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (destinations[0], [.createIntermediateDirectories, .removePreviousFile]) })
+                                    let request = Const.session.download(movieUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination, [.createIntermediateDirectories, .removePreviousFile]) })
                                         .validate(statusCode: 200 ..< 400)
                                         .responseURL(queue: .main) { response in
                                             self.downloads.removeAll(where: { $0.id == id })
@@ -301,8 +280,11 @@ class Downloader {
                                             }
                                         }
                                     
-                                    if urls.count > 1, destinations.count > 1 {
-                                        let request = Const.session.download(urls[1], method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (destinations[1], [.createIntermediateDirectories, .removePreviousFile]) })
+                                    if let subtitles = data.subtitles,
+                                       let sub = movie.subtitles.first(where: { $0.name == subtitles.name }),
+                                       let subtitlesUrl = URL(string: sub.link)
+                                    {
+                                        let request = Const.session.download(subtitlesUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination.deletingLastPathComponent().appending(path: file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":").replacingOccurrences(of: ".mp4", with: " [\(sub.name)].\(subtitlesUrl.pathExtension)"), directoryHint: .notDirectory), [.createIntermediateDirectories, .removePreviousFile]) })
                                             .validate(statusCode: 200 ..< 400)
                                             
                                         request.resume()

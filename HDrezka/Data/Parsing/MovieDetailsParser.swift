@@ -69,23 +69,23 @@ class MovieDetailsParser {
                     link: chunk.getDetailsKpLink()
                 )
             case "Дата выхода":
-                releaseDate = try chunk[1].text()
+                releaseDate = try chunk.last().orThrow().text()
             case "Режиссер":
                 producer = try chunk.getDetailsProducers()
             case "Возраст":
                 ageRestriction = try chunk.getDetailsAgeRestriction()
             case "Страна":
-                countries = try chunk[1].getDetailsCountries()
+                countries = try chunk.last().orThrow().getDetailsCountries()
             case "Жанр":
-                genres = try chunk[1].getDetailsGenres()
+                genres = try chunk.last().orThrow().getDetailsGenres()
             case "Время":
-                duration = try Int(chunk[1].text().trimmingCharacters(in: .decimalDigits.inverted))
+                duration = try Int(chunk.last().orThrow().text().trimmingCharacters(in: .decimalDigits.inverted))
             case "Входит в списки":
-                lists = try chunk[1].getDetailsMovieLists()
+                lists = try chunk.last().orThrow().getDetailsMovieLists()
             case "Из серии":
-                collections = try chunk[1].getDetailsMovieCollections()
+                collections = try chunk.last().orThrow().getDetailsMovieCollections()
             case "Слоган":
-                slogan = try chunk[1].text()
+                slogan = try chunk.last().orThrow().text()
 //            case "В переводе":
             default:
                 if let act = try chunk.getDetailsActors() {
@@ -456,14 +456,14 @@ private extension Element {
 
     func getDetailsMovieLists() throws -> [MovieList] {
         try html()
-            .split(separator: "<br />")
+            .components(separatedBy: "<br />")
             .map {
-                let listItem = try SwiftSoup.parse(String($0)).body().orThrow()
+                let listItem = try SwiftSoup.parse($0).body().orThrow()
 
                 return try MovieList(
                     name: listItem.select("a").first().orThrow().text(),
                     listId: listItem.select("a").first().orThrow().attr("href").removeMirror(),
-                    moviePosition: Int(listItem.text().split(separator: "(").last?.trimmingCharacters(in: .decimalDigits.inverted) ?? "").orThrow()
+                    moviePosition: Int(listItem.text().components(separatedBy: "(").last?.trimmingCharacters(in: .decimalDigits.inverted) ?? "").orThrow()
                 )
             }
     }
@@ -471,7 +471,7 @@ private extension Element {
     func getDetailsMovieCollections() throws -> [MoviesCollection] {
         try select("a").map {
             try MoviesCollection(
-                collectionId: String($0.attr("href").removeMirror().replacingOccurrences(of: "collections/", with: "")),
+                collectionId: $0.attr("href").removeMirror().replacingOccurrences(of: "collections/", with: ""),
                 name: $0.text(),
                 poster: nil,
                 count: nil
@@ -768,11 +768,11 @@ private extension String {
 
         let streams = decrypt(encrypted: url)
 
-        let videoMap = try streams.split(separator: ",").reduce(into: OrderedDictionary<String, String>()) { videoMap, stream in
-            let video = String(stream).replacingOccurrences(of: "[", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-            let name = try SwiftSoup.parse(String(video.split(separator: "]")[0])).text()
-            let videos = String(video[(video.lastIndex(of: "]") ?? video.startIndex)...].dropFirst()).split(separator: " or ")
-            let link = String(videos.first?.split(separator: ":hls:manifest.m3u8")[0] ?? "")
+        let videoMap = try streams.components(separatedBy: ",").reduce(into: OrderedDictionary<String, String>()) { videoMap, stream in
+            let video = stream.replacingOccurrences(of: "[", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let name = try SwiftSoup.parse(video.components(separatedBy: "]").first.orThrow()).text()
+            let videos = video[(video.lastIndex(of: "]") ?? video.startIndex)...].dropFirst().components(separatedBy: " or ")
+            let link = videos.first?.components(separatedBy: ":hls:manifest.m3u8").first ?? ""
 
             if link != "null", !link.isEmpty, link.linkIsBroken {
                 throw HDrezkaError.skipLink(link)
@@ -782,9 +782,9 @@ private extension String {
         }
 
         let subtitles: [MovieSubtitles] = if let subtitles = (jsonObject["subtitle"] as? String), let subtitles_lns = (jsonObject["subtitle_lns"] as? [String: Any]) {
-            subtitles.split(separator: ",").compactMap {
-                let name = String($0.split(separator: "]")[0]).replacingOccurrences(of: "[", with: "")
-                let link = String($0.split(separator: "]")[1])
+            try subtitles.components(separatedBy: ",").compactMap {
+                let name = try $0.components(separatedBy: "]").first.orThrow().replacingOccurrences(of: "[", with: "")
+                let link = try $0.components(separatedBy: "]").last.orThrow()
                 let lang = subtitles_lns[name] as? String
 
                 if let lang {

@@ -35,9 +35,17 @@ protocol MovieDetailsRepository {
 
 struct MovieDetailsRepositoryImpl: MovieDetailsRepository {
     func getMovieDetails(movieId: String) -> AnyPublisher<MovieDetailed, Error> {
-        let type = String(movieId.split(separator: "/")[0])
-        let genre = String(movieId.split(separator: "/")[1])
-        let name = String(movieId.split(separator: "/")[2])
+        let parts = movieId.components(separatedBy: "/")
+
+        guard parts.count == 3 else {
+            return Fail(error: HDrezkaError.null(#function, #line, #column))
+                .handleError()
+                .eraseToAnyPublisher()
+        }
+
+        let type = parts[0]
+        let genre = parts[1]
+        let name = parts[2]
 
         return Const.session.request(MovieDetailsService.getMovieDetails(type: type, genre: genre, name: name))
             .validate(statusCode: 200 ..< 400)
@@ -51,9 +59,17 @@ struct MovieDetailsRepositoryImpl: MovieDetailsRepository {
     }
 
     func getBookmarks(movieId: String) -> AnyPublisher<[Bookmark], Error> {
-        let type = String(movieId.split(separator: "/")[0])
-        let genre = String(movieId.split(separator: "/")[1])
-        let name = String(movieId.split(separator: "/")[2])
+        let parts = movieId.components(separatedBy: "/")
+
+        guard parts.count == 3 else {
+            return Fail(error: HDrezkaError.null(#function, #line, #column))
+                .handleError()
+                .eraseToAnyPublisher()
+        }
+
+        let type = parts[0]
+        let genre = parts[1]
+        let name = parts[2]
 
         return Const.session.request(MovieDetailsService.getMovieDetails(type: type, genre: genre, name: name))
             .validate(statusCode: 200 ..< 400)

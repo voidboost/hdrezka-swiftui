@@ -104,7 +104,13 @@ class NSTextViewWrapper: NSTextView {
 
     override var intrinsicContentSize: CGSize {
         let width = frame.width
-        let height = layoutManager?.usedRect(for: textContainer!).size.height ?? 0
+
+        let height: CGFloat = if let layoutManager, let textContainer {
+            layoutManager.usedRect(for: textContainer).size.height
+        } else {
+            0
+        }
+
         return CGSize(width: width, height: height)
     }
 

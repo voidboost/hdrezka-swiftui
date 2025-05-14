@@ -114,7 +114,11 @@ private extension Element {
     func getWatchingLaterInfo() throws -> String {
         let tdInfo = try select(".td.info").first().orThrow()
 
-        return try tdInfo.text().replacingOccurrences(of: tdInfo.select("span").first()?.text() ?? "", with: "")
+        if let temp = try tdInfo.select("span").first()?.text() {
+            return try tdInfo.text().replacingOccurrences(of: temp, with: "")
+        } else {
+            return try tdInfo.text()
+        }
     }
 
     func getWatchingLaterDataId() throws -> String {

@@ -20,9 +20,13 @@ final class SourcePackagesParser {
 
         let checkoutsURL = sourcePackagesURL.appending(path: "checkouts")
         let libraries: [Library] = workspaceState.object.dependencies.compactMap { dependency in
-            let repositoryName = dependency.packageRef.location
-                .components(separatedBy: "/").last!
+            guard let repositoryName = dependency.packageRef.location
+                .components(separatedBy: "/").last?
                 .replacingOccurrences(of: ".git", with: "")
+            else {
+                return nil
+            }
+
             let directoryURL = checkoutsURL.appending(path: repositoryName)
 
             guard let licenseBody = extractLicenseBody(directoryURL) else {

@@ -104,7 +104,11 @@ class CustomAVAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelega
     }
     
     private func getDuration(forEXTINFLine line: String) -> Double {
-        Double(line.components(separatedBy: ":")[1].dropLast()) ?? 0.0
+        let parts = line.components(separatedBy: ":")
+        
+        guard parts.count > 1 else { return 0.0 }
+      
+        return Double(parts[1].dropLast()) ?? 0.0
     }
     
     private func appendBasePath(to string: String) -> String {

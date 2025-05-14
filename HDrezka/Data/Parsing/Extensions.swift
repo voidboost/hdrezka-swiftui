@@ -53,7 +53,7 @@ extension Element {
         } else if info.contains("В ожидании") {
             return .wait
         } else if info.contains("сезон"), info.contains("серия") {
-            let parts = info.contains(",") ? info.split(separator: ", ") : info.split(separator: "<br />")
+            let parts = info.contains(",") ? info.components(separatedBy: ", ") : info.components(separatedBy: "<br />")
 
             if parts.count == 2 {
                 let season = Int(parts[0].trimmingCharacters(in: .decimalDigits.inverted))
