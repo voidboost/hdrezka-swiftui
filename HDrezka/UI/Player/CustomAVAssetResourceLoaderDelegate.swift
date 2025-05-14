@@ -41,6 +41,7 @@ class CustomAVAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelega
             .responseString { [weak self] response in
                 guard let self,
                       let string = response.value,
+                      !string.isEmpty,
                       response.error == nil
                 else {
                     request.finishLoading(with: response.error)
