@@ -10,7 +10,7 @@ class Const {
 
     static let details = "hdrezka://details/"
 
-    static let telegram = "https://hdrezka_macos.t.me/"
+    static let github = "https://github.com/voidboost/hdrezka-macos"
 
     static let helpUkraine = "https://u24.gov.ua/"
 

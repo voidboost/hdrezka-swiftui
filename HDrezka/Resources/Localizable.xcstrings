@@ -2474,6 +2474,28 @@
         }
       }
     },
+    "key.github" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Github"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Github"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Github"
+          }
+        }
+      }
+    },
     "key.go" : {
       "localizations" : {
         "en" : {
@@ -5980,28 +6002,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Виберіть субтитри"
-          }
-        }
-      }
-    },
-    "key.telegram" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Telegram"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Telegram"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Telegram"
           }
         }
       }
