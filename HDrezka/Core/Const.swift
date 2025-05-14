@@ -52,14 +52,15 @@ class Const {
     static var headers: HTTPHeaders {
         HTTPHeaders(
             Defaults[.useHeaders] ? [
-                "X-Hdrezka-Android-App": "1",
-                "X-Hdrezka-Android-App-Version": Defaults[.lastHdrezkaAppVersion],
-                "User-Agent": userAgent
-            ] : ["User-Agent": userAgent]
+                .init(name: "X-Hdrezka-Android-App", value: "1"),
+                .init(name: "X-Hdrezka-Android-App-Version", value: Defaults[.lastHdrezkaAppVersion]),
+                .userAgent(userAgent)
+            ] : [.userAgent(userAgent)]
         )
     }
 
     static let session = Session(
+        rootQueue: .main,
         startRequestsImmediately: false,
         interceptor: CustomInterceptor(),
         redirectHandler: .modify { task, request, _ in

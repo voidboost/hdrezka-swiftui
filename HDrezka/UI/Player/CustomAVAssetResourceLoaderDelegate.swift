@@ -36,20 +36,22 @@ class CustomAVAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelega
     }
     
     private func handleMainRequest(_ request: AVAssetResourceLoadingRequest) -> Bool {
-        let task = URLSession.shared.dataTask(with: m3u8) { [weak self] data, _, error in
-            guard let self,
-                  let data,
-                  error == nil
-            else {
-                request.finishLoading(with: error)
-                return
+        let request = Const.session.request(m3u8, method: .get, headers: [.userAgent(Const.userAgent)])
+            .validate(statusCode: 200 ..< 400)
+            .responseString { [weak self] response in
+                guard let self,
+                      let string = response.value,
+                      response.error == nil
+                else {
+                    request.finishLoading(with: response.error)
+                    return
+                }
+            
+                self.processPlaylist(string)
+                self.finishRequestWithMainPlaylist(request)
             }
-
-            self.processPlaylistWithData(data)
-            self.finishRequestWithMainPlaylist(request)
-        }
         
-        task.resume()
+        request.resume()
         
         return true
     }
@@ -81,11 +83,7 @@ class CustomAVAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelega
         return true
     }
     
-    private func processPlaylistWithData(_ data: Data) {
-        guard let string = String(data: data, encoding: .utf8) else {
-            return
-        }
-
+    private func processPlaylist(_ string: String) {
         let lines = string.components(separatedBy: .newlines)
         var newLines = [String]()
         var iterator = lines.makeIterator()
