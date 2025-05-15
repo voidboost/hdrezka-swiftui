@@ -2,14 +2,15 @@
 <p>Unofficial macOS client for HDrezka. Requires macOS 14 Sonoma or later.</p>
 <h2>Features</h2>
 <ul>
-    <li>⭐️ Custom player</li>
-    <li>Account authorization</li>
-    <li>Bookmarks</li>
-    <li>Comments</li>
-    <li>Comfortable films list</li>
-    <li>Light/dark theme</li>
-    <li>English, Ukrainian and Russian localization</li>
+    <li>⭐️ Custom video player</li>
+    <li>User account authentication</li>
+    <li>Bookmark your favorite content</li>
+    <li>Commenting system</li>
+    <li>Organized and intuitive movie list</li>
+    <li>Light and dark theme support</li>
+    <li>Localization: English, Ukrainian, and Russian</li>
     <li>Search</li>
+    <li>Video download support</li>
 </ul>
 <p>And more!</p>
 <h2>Releases</h2>
@@ -75,11 +76,3 @@
 </p>
 <h2>License</h2>
 <a href="./LICENSE">MIT</a>
-<h2>Star History</h2>
-<a href="https://www.star-history.com/#voidboost/hdrezka-macos&Date">
-    <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=voidboost/hdrezka-macos&type=Date&theme=dark" />
-        <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=voidboost/hdrezka-macos&type=Date" />
-        <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=voidboost/hdrezka-macos&type=Date" />
-    </picture>
-</a>
