@@ -1,6 +1,6 @@
 import Combine
 import Defaults
-import Factory
+import FactoryKit
 import SwiftUI
 
 @Observable

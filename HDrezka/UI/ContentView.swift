@@ -1,7 +1,7 @@
 import Alamofire
 import Combine
 import Defaults
-import Factory
+import FactoryKit
 import Pow
 import SwiftSoup
 import SwiftUI
