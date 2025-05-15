@@ -1,7 +1,7 @@
 import AVKit
 import Combine
 import Defaults
-import Factory
+import FactoryKit
 import MediaPlayer
 import Nuke
 import SwiftData

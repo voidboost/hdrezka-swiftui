@@ -19,7 +19,7 @@
 		DEB035B72C89E1DB004ABFA1 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B62C89E1DB004ABFA1 /* FirebaseCrashlytics */; };
 		DEB035BA2C89E57A004ABFA1 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B92C89E57A004ABFA1 /* Defaults */; };
 		DEE64D0B2C8869D0002C2F2F /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = DEE64D0A2C8869D0002C2F2F /* Sparkle */; };
-		DEED52722CEF8E500070EA87 /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = DEED52712CEF8E500070EA87 /* Factory */; };
+		DEF920382DD5CAF20087C32C /* FactoryKit in Frameworks */ = {isa = PBXBuildFile; productRef = DEF920372DD5CAF20087C32C /* FactoryKit */; };
 		DEFEB4BA2C807831008869A0 /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = DEFEB4B92C807831008869A0 /* Nuke */; };
 		DEFEB4BC2C807831008869A0 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = DEFEB4BB2C807831008869A0 /* NukeUI */; };
 /* End PBXBuildFile section */
@@ -60,9 +60,9 @@
 				DE188EE52CA6AB3100E7B1AE /* Pow in Frameworks */,
 				DEFEB4BA2C807831008869A0 /* Nuke in Frameworks */,
 				04E5DC0A2C120C4200BF1B7A /* Flow in Frameworks */,
+				DEF920382DD5CAF20087C32C /* FactoryKit in Frameworks */,
 				DEB035B72C89E1DB004ABFA1 /* FirebaseCrashlytics in Frameworks */,
 				DE2D67382DC3D5E900A9187C /* LicensesList in Frameworks */,
-				DEED52722CEF8E500070EA87 /* Factory in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,9 +119,9 @@
 				DEB035B62C89E1DB004ABFA1 /* FirebaseCrashlytics */,
 				DEB035B92C89E57A004ABFA1 /* Defaults */,
 				DE188EE42CA6AB3100E7B1AE /* Pow */,
-				DEED52712CEF8E500070EA87 /* Factory */,
 				DE3EF0382CFF04CA0022C311 /* Alamofire */,
 				DE2D67372DC3D5E900A9187C /* LicensesList */,
+				DEF920372DD5CAF20087C32C /* FactoryKit */,
 			);
 			productName = HDRezka;
 			productReference = 04B3CA742BA06C9C0039F76E /* HDrezka.app */;
@@ -164,8 +164,8 @@
 				DEB035B32C89E1DB004ABFA1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				DEB035B82C89E57A004ABFA1 /* XCRemoteSwiftPackageReference "Defaults" */,
 				DE188EE32CA6AB3100E7B1AE /* XCRemoteSwiftPackageReference "Pow" */,
-				DEED52702CEF8E500070EA87 /* XCRemoteSwiftPackageReference "Factory" */,
 				DE3EF0372CFF04CA0022C311 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				DEF920362DD5CAF20087C32C /* XCRemoteSwiftPackageReference "Factory" */,
 			);
 			productRefGroup = 04B3CA752BA06C9C0039F76E /* Products */;
 			projectDirPath = "";
@@ -546,7 +546,7 @@
 				minimumVersion = 0.0.1;
 			};
 		};
-		DEED52702CEF8E500070EA87 /* XCRemoteSwiftPackageReference "Factory" */ = {
+		DEF920362DD5CAF20087C32C /* XCRemoteSwiftPackageReference "Factory" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/hmlongco/Factory.git";
 			requirement = {
@@ -626,10 +626,10 @@
 			package = DEE64D092C8869D0002C2F2F /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
 		};
-		DEED52712CEF8E500070EA87 /* Factory */ = {
+		DEF920372DD5CAF20087C32C /* FactoryKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = DEED52702CEF8E500070EA87 /* XCRemoteSwiftPackageReference "Factory" */;
-			productName = Factory;
+			package = DEF920362DD5CAF20087C32C /* XCRemoteSwiftPackageReference "Factory" */;
+			productName = FactoryKit;
 		};
 		DEFEB4B92C807831008869A0 /* Nuke */ = {
 			isa = XCSwiftPackageProductDependency;
