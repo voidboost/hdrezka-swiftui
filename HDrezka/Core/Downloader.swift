@@ -23,11 +23,14 @@ class Downloader {
     private var subscriptions: Set<AnyCancellable> = []
     
     @ObservationIgnored
-    @Injected(\.account)
-    private var account
+    @Injected(\.session)
+    private var session
     @ObservationIgnored
-    @Injected(\.movieDetails)
-    private var movieDetails
+    @Injected(\.saveWatchingStateUseCase)
+    private var saveWatchingStateUseCase
+    @ObservationIgnored
+    @Injected(\.getMovieVideoUseCase)
+    private var getMovieVideoUseCase
 
     var downloads: [Download] = []
 
@@ -114,8 +117,7 @@ class Downloader {
                     .appending(path: seasonFolder.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .isDirectory)
                     .appending(path: movieFile.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .notDirectory)
                 {
-                    movieDetails
-                        .getMovieVideo(voiceActing: data.acting, season: season, episode: episode, favs: data.details.favs)
+                    getMovieVideoUseCase(voiceActing: data.acting, season: season, episode: episode, favs: data.details.favs)
                         .receive(on: DispatchQueue.main)
                         .sink { completion in
                             guard case let .failure(error) = completion else { return }
@@ -126,8 +128,7 @@ class Downloader {
                                 self.notificate(id, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(name)-\(s)-\(e)-\(qualityName)-\(actingName)"), "need_premium")
                             } else {
                                 if Defaults[.isLoggedIn] {
-                                    self.account
-                                        .saveWatchingState(voiceActing: data.acting, season: season, episode: episode, position: 0, total: 0)
+                                    self.saveWatchingStateUseCase(voiceActing: data.acting, season: season, episode: episode, position: 0, total: 0)
                                         .sink { _ in } receiveValue: { _ in }
                                         .store(in: &self.subscriptions)
                                 }
@@ -158,7 +159,7 @@ class Downloader {
                                 {
                                     self.notificate(id, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(name)-\(s)-\(e)-\(qualityName)-\(actingName)"), "cancel", ["id": id])
                                             
-                                    let request = Const.session.download(movieUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination, [.createIntermediateDirectories, .removePreviousFile]) })
+                                    let request = self.session.download(movieUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination, [.createIntermediateDirectories, .removePreviousFile]) })
                                         .validate(statusCode: 200 ..< 400)
                                         .responseURL(queue: .main) { response in
                                             self.downloads.removeAll(where: { $0.id == id })
@@ -182,7 +183,7 @@ class Downloader {
                                        let sub = movie.subtitles.first(where: { $0.name == subtitles.name }),
                                        let subtitlesUrl = URL(string: sub.link)
                                     {
-                                        let request = Const.session.download(subtitlesUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination.deletingLastPathComponent().appending(path: movieFile.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":").replacingOccurrences(of: ".mp4", with: " [\(sub.name)].\(subtitlesUrl.pathExtension)"), directoryHint: .notDirectory), [.createIntermediateDirectories, .removePreviousFile]) })
+                                        let request = self.session.download(subtitlesUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination.deletingLastPathComponent().appending(path: movieFile.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":").replacingOccurrences(of: ".mp4", with: " [\(sub.name)].\(subtitlesUrl.pathExtension)"), directoryHint: .notDirectory), [.createIntermediateDirectories, .removePreviousFile]) })
                                             .validate(statusCode: 200 ..< 400)
                                             
                                         request.resume()
@@ -220,8 +221,7 @@ class Downloader {
                     .appending(path: "HDrezka", directoryHint: .isDirectory)
                     .appending(path: file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .notDirectory)
                 {
-                    movieDetails
-                        .getMovieVideo(voiceActing: data.acting, season: nil, episode: nil, favs: data.details.favs)
+                    getMovieVideoUseCase(voiceActing: data.acting, season: nil, episode: nil, favs: data.details.favs)
                         .receive(on: DispatchQueue.main)
                         .sink { completion in
                             guard case let .failure(error) = completion else { return }
@@ -234,8 +234,7 @@ class Downloader {
                                 self.notificate(id, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(name)-\(qualityName)-\(actingName)"), "need_premium")
                             } else {
                                 if Defaults[.isLoggedIn] {
-                                    self.account
-                                        .saveWatchingState(voiceActing: data.acting, season: nil, episode: nil, position: 0, total: 0)
+                                    self.saveWatchingStateUseCase(voiceActing: data.acting, season: nil, episode: nil, position: 0, total: 0)
                                         .sink { _ in } receiveValue: { _ in }
                                         .store(in: &self.subscriptions)
                                 }
@@ -263,7 +262,7 @@ class Downloader {
                                     self.notificate(id, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(name)-\(qualityName)-\(actingName)"
                                     ), "cancel", ["id": id])
                                             
-                                    let request = Const.session.download(movieUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination, [.createIntermediateDirectories, .removePreviousFile]) })
+                                    let request = self.session.download(movieUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination, [.createIntermediateDirectories, .removePreviousFile]) })
                                         .validate(statusCode: 200 ..< 400)
                                         .responseURL(queue: .main) { response in
                                             self.downloads.removeAll(where: { $0.id == id })
@@ -284,7 +283,7 @@ class Downloader {
                                        let sub = movie.subtitles.first(where: { $0.name == subtitles.name }),
                                        let subtitlesUrl = URL(string: sub.link)
                                     {
-                                        let request = Const.session.download(subtitlesUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination.deletingLastPathComponent().appending(path: file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":").replacingOccurrences(of: ".mp4", with: " [\(sub.name)].\(subtitlesUrl.pathExtension)"), directoryHint: .notDirectory), [.createIntermediateDirectories, .removePreviousFile]) })
+                                        let request = self.session.download(subtitlesUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination.deletingLastPathComponent().appending(path: file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":").replacingOccurrences(of: ".mp4", with: " [\(sub.name)].\(subtitlesUrl.pathExtension)"), directoryHint: .notDirectory), [.createIntermediateDirectories, .removePreviousFile]) })
                                             .validate(statusCode: 200 ..< 400)
                                             
                                         request.resume()

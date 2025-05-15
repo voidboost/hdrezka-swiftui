@@ -58,17 +58,4 @@ class Const {
             ] : [.userAgent(userAgent)]
         )
     }
-
-    static let session = Session(
-        rootQueue: .main,
-        startRequestsImmediately: false,
-        interceptor: CustomInterceptor(),
-        redirectHandler: .modify { task, request, _ in
-            var newRequest = task.originalRequest ?? task.currentRequest ?? request
-            newRequest.url = request.url
-
-            return newRequest
-        },
-        eventMonitors: [CustomMonitor()]
-    )
 }
