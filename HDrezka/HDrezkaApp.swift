@@ -275,23 +275,21 @@ struct HDrezkaApp: App {
                 } label: {
                     Text("key.github")
                 }
-            } else {
-                EmptyView()
             }
         }
     }
 
     @CommandsBuilder
     func removed() -> some Commands {
-        CommandGroup(replacing: .importExport) { EmptyView() }
-        CommandGroup(replacing: .newItem) { EmptyView() }
-        CommandGroup(replacing: .printItem) { EmptyView() }
-        CommandGroup(replacing: .saveItem) { EmptyView() }
-        CommandGroup(replacing: .sidebar) { EmptyView() }
-        CommandGroup(replacing: .singleWindowList) { EmptyView() }
-        CommandGroup(replacing: .systemServices) { EmptyView() }
-        CommandGroup(replacing: .toolbar) { EmptyView() }
-        CommandGroup(replacing: .windowList) { EmptyView() }
+        CommandGroup(replacing: .importExport) {}
+        CommandGroup(replacing: .newItem) {}
+        CommandGroup(replacing: .printItem) {}
+        CommandGroup(replacing: .saveItem) {}
+        CommandGroup(replacing: .sidebar) {}
+        CommandGroup(replacing: .singleWindowList) {}
+        CommandGroup(replacing: .systemServices) {}
+        CommandGroup(replacing: .toolbar) {}
+        CommandGroup(replacing: .windowList) {}
     }
 }
 
