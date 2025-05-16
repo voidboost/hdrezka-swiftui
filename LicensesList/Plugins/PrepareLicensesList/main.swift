@@ -35,7 +35,7 @@ struct PrepareLicensesList: BuildToolPlugin {
 
     func makeBuildCommand(executableURL: URL, sourcePackagesURL: URL, outputURL: URL) -> Command {
         .buildCommand(
-            displayName: "Prepare LicenseList",
+            displayName: "Prepare LicensesList",
             executable: executableURL,
             arguments: [
                 outputURL.absoluteURL.path(),

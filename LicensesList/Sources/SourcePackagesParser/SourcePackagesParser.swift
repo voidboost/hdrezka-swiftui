@@ -43,7 +43,7 @@ final class SourcePackagesParser {
         }
         .sorted { $0.name.lowercased() < $1.name.lowercased() }
 
-        try exportLicenseList(libraries)
+        try exportLicensesList(libraries)
     }
 
     private func extractLicenseBody(_ directoryURL: URL) -> String? {
@@ -96,7 +96,7 @@ final class SourcePackagesParser {
         return "var \(variableName): String {\n\(switchSelf)\n}"
     }
 
-    private func exportLicenseList(_ libraries: [Library]) throws {
+    private func exportLicensesList(_ libraries: [Library]) throws {
         var text = ""
 
         if libraries.isEmpty {
@@ -121,7 +121,7 @@ final class SourcePackagesParser {
         do {
             try text.data(using: .utf8)?.write(to: outputURL)
         } catch {
-            throw SourcePackagesParserError.couldNotExportLicenseList
+            throw SourcePackagesParserError.couldNotExportLicensesList
         }
     }
 }
