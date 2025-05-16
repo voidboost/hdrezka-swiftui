@@ -1,11 +1,11 @@
 import Defaults
 import SwiftUI
 
-struct NavigationBar: ViewModifier {
+struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
     private let title: String
     private let showBar: Bool
-    private let navbar: () -> AnyView
-    private let toolbar: () -> AnyView
+    private let navbar: Navbar?
+    private let toolbar: Toolbar?
     
     private let height: CGFloat = 52
     
@@ -20,16 +20,39 @@ struct NavigationBar: ViewModifier {
     init(
         title: String,
         showBar: Bool,
-        @ViewBuilder navbar: @escaping () -> some View,
-        @ViewBuilder toolbar: @escaping () -> some View
+        navbar: (() -> Navbar)?,
+        toolbar: (() -> Toolbar)?
     ) {
         self.title = title
         self.showBar = showBar
-        self.navbar = { AnyView(navbar()) }
-        self.toolbar = { AnyView(toolbar()) }
+        self.navbar = navbar?()
+        self.toolbar = toolbar?()
         self.index = AppState.shared.path.count
     }
     
+    init(
+        title: String,
+        showBar: Bool,
+        navbar: (() -> Navbar)?,
+    ) where Toolbar == EmptyView {
+        self.init(title: title, showBar: showBar, navbar: navbar, toolbar: nil)
+    }
+    
+    init(
+        title: String,
+        showBar: Bool,
+        toolbar: (() -> Toolbar)?,
+    ) where Navbar == EmptyView {
+        self.init(title: title, showBar: showBar, navbar: nil, toolbar: toolbar)
+    }
+    
+    init(
+        title: String,
+        showBar: Bool,
+    ) where Navbar == EmptyView, Toolbar == EmptyView {
+        self.init(title: title, showBar: showBar, navbar: nil, toolbar: nil)
+    }
+
     func body(content: Content) -> some View {
         content
             .navigationTitle("HDrezka - \(title)")
@@ -55,7 +78,9 @@ struct NavigationBar: ViewModifier {
                                     .buttonStyle(NavbarButtonStyle(width: 22, height: 22))
                                 }
                                 
-                                navbar()
+                                if let navbar {
+                                    navbar
+                                }
                             }
                             
                             Spacer()
@@ -68,8 +93,10 @@ struct NavigationBar: ViewModifier {
                             
                             Spacer()
                             
-                            HStack(alignment: .center, spacing: 5) {
-                                toolbar()
+                            if let toolbar {
+                                HStack(alignment: .center, spacing: 5) {
+                                    toolbar
+                                }
                             }
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -151,12 +178,35 @@ extension View {
         }
     }
     
-    func navigationBar(
+    func navigationBar<Navbar: View, Toolbar: View>(
         title: String,
         showBar: Bool,
-        @ViewBuilder navbar: @escaping () -> some View = { EmptyView() },
-        @ViewBuilder toolbar: @escaping () -> some View = { EmptyView() }
+        @ViewBuilder navbar: @escaping () -> Navbar,
+        @ViewBuilder toolbar: @escaping () -> Toolbar
     ) -> some View {
         modifier(NavigationBar(title: title, showBar: showBar, navbar: navbar, toolbar: toolbar))
+    }
+    
+    func navigationBar<Navbar: View>(
+        title: String,
+        showBar: Bool,
+        @ViewBuilder navbar: @escaping () -> Navbar
+    ) -> some View {
+        modifier(NavigationBar(title: title, showBar: showBar, navbar: navbar))
+    }
+    
+    func navigationBar<Toolbar: View>(
+        title: String,
+        showBar: Bool,
+        @ViewBuilder toolbar: @escaping () -> Toolbar
+    ) -> some View {
+        modifier(NavigationBar(title: title, showBar: showBar, toolbar: toolbar))
+    }
+    
+    func navigationBar(
+        title: String,
+        showBar: Bool
+    ) -> some View {
+        modifier(NavigationBar(title: title, showBar: showBar))
     }
 }

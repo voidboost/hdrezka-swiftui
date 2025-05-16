@@ -530,16 +530,11 @@ struct DetailsView: View {
                     .textSelection(.enabled)
                                 
                 if let trailer {
-                    YouTubePlayerView(
-                        trailer
-                    ) { state in
-                        switch state {
-                        case .idle:
+                    YouTubePlayerView(trailer, transaction: .init(animation: .easeInOut)) { state in
+                        if state.isIdle {
                             ProgressView()
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        case .ready:
-                            EmptyView()
-                        case .error(let error):
+                        } else if let error = state.error {
                             switch error {
                             case .embeddedVideoPlayingNotAllowed:
                                 EmptyView()
