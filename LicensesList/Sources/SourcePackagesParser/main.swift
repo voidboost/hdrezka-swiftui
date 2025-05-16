@@ -10,8 +10,8 @@ func exitWithSourcePackagesParserError(_ sourcePackagesParserError: SourcePackag
     switch sourcePackagesParserError {
     case let .couldNotReadFile(fileName):
         print("Error: Could not read \(fileName).")
-    case .couldNotExportLicenseList:
-        print("Error: Could not export LicenseList.swift.")
+    case .couldNotExportLicensesList:
+        print("Error: Could not export LicensesList.swift.")
     }
 
     exit(1)
