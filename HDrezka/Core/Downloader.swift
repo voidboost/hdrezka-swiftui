@@ -13,11 +13,6 @@ class Downloader {
     private var modelContext: ModelContext?
 
     @ObservationIgnored
-    private let notification = UNUserNotificationCenter.current()
-    @ObservationIgnored
-    private let encoder = JSONEncoder()
-
-    @ObservationIgnored
     private var subscriptions: Set<AnyCancellable> = []
     
     @ObservationIgnored
@@ -45,7 +40,7 @@ class Downloader {
         let needPremium = UNNotificationAction(identifier: "need_premium", title: String(localized: "key.buy"))
         let needPremiumCategory = UNNotificationCategory(identifier: "need_premium", actions: [needPremium], intentIdentifiers: [])
 
-        notification.setNotificationCategories([openCategory, cancelCategory, retryCategory, needPremiumCategory])
+        UNUserNotificationCenter.current().setNotificationCategories([openCategory, cancelCategory, retryCategory, needPremiumCategory])
     }
     
     func setModelContext(modelContext: ModelContext) {
@@ -53,7 +48,7 @@ class Downloader {
     }
     
     private func notificate(_ id: String, _ title: String, _ subtitle: String? = nil, _ category: String? = nil, _ userInfo: [AnyHashable: Any] = [:]) {
-        notification.getNotificationSettings { settings in
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
             if settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional {
                 let content = UNMutableNotificationContent()
                 content.title = title
@@ -68,9 +63,9 @@ class Downloader {
                 
                 let request = UNNotificationRequest(identifier: id, content: content, trigger: nil)
                 
-                self.notification.add(request)
+                UNUserNotificationCenter.current().add(request)
             } else if settings.authorizationStatus == .notDetermined {
-                self.notification.requestAuthorization(options: [.alert, .badge, .sound]) { granted, _ in
+                UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, _ in
                     if granted {
                         self.notificate(id, title, subtitle, category, userInfo)
                     }
@@ -80,7 +75,7 @@ class Downloader {
     }
     
     func download(_ data: DownloadData) {
-        if let retryData = try? encoder.encode(data) {
+        if let retryData = try? JSONEncoder().encode(data) {
             let name = data.details.nameRussian
             
             let actingName = if !data.acting.name.isEmpty {
