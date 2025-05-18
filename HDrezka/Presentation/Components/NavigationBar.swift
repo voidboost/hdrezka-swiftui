@@ -38,21 +38,6 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
         self.init(title: title, showBar: showBar, navbar: navbar, toolbar: nil)
     }
     
-    init(
-        title: String,
-        showBar: Bool,
-        toolbar: (() -> Toolbar)?,
-    ) where Navbar == EmptyView {
-        self.init(title: title, showBar: showBar, navbar: nil, toolbar: toolbar)
-    }
-    
-    init(
-        title: String,
-        showBar: Bool,
-    ) where Navbar == EmptyView, Toolbar == EmptyView {
-        self.init(title: title, showBar: showBar, navbar: nil, toolbar: nil)
-    }
-
     func body(content: Content) -> some View {
         content
             .navigationTitle("HDrezka - \(title)")
@@ -193,20 +178,5 @@ extension View {
         @ViewBuilder navbar: @escaping () -> Navbar
     ) -> some View {
         modifier(NavigationBar(title: title, showBar: showBar, navbar: navbar))
-    }
-    
-    func navigationBar<Toolbar: View>(
-        title: String,
-        showBar: Bool,
-        @ViewBuilder toolbar: @escaping () -> Toolbar
-    ) -> some View {
-        modifier(NavigationBar(title: title, showBar: showBar, toolbar: toolbar))
-    }
-    
-    func navigationBar(
-        title: String,
-        showBar: Bool
-    ) -> some View {
-        modifier(NavigationBar(title: title, showBar: showBar))
     }
 }

@@ -83,7 +83,7 @@ extension Container {
 }
 
 extension Container {
-    var getFeaturedMoviesUseCase: Factory<GetFeaturedMoviesUseCase> { self { GetFeaturedMoviesUseCase(repository: self.movieListsRepository()) }.singleton }
+//    var getFeaturedMoviesUseCase: Factory<GetFeaturedMoviesUseCase> { self { GetFeaturedMoviesUseCase(repository: self.movieListsRepository()) }.singleton }
     var getHotMoviesUseCase: Factory<GetHotMoviesUseCase> { self { GetHotMoviesUseCase(repository: self.movieListsRepository()) }.singleton }
     var getLatestMoviesByCountryUseCase: Factory<GetLatestMoviesByCountryUseCase> { self { GetLatestMoviesByCountryUseCase(repository: self.movieListsRepository()) }.singleton }
     var getLatestMoviesByGenreUseCase: Factory<GetLatestMoviesByGenreUseCase> { self { GetLatestMoviesByGenreUseCase(repository: self.movieListsRepository()) }.singleton }

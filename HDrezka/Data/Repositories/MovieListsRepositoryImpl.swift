@@ -17,16 +17,16 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
             .eraseToAnyPublisher()
     }
 
-    func getFeaturedMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
-        session.request(MovieListsService.getMovieList1(page: page, filter: "recommendation", genre: genre))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
-    }
+//    func getFeaturedMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
+//        session.request(MovieListsService.getMovieList1(page: page, filter: "recommendation", genre: genre))
+//            .validate(statusCode: 200 ..< 400)
+//            .publishString()
+//            .value()
+//            .tryMap(MovieListsParser.parse)
+//            .map(\.1)
+//            .handleError()
+//            .eraseToAnyPublisher()
+//    }
 
     func getWatchingNowMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
         session.request(MovieListsService.getMovieList1(page: page, filter: "watching", genre: genre))

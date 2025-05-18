@@ -15,8 +15,6 @@ class Downloader {
     @ObservationIgnored
     private let notification = UNUserNotificationCenter.current()
     @ObservationIgnored
-    private let fileManager = FileManager.default
-    @ObservationIgnored
     private let encoder = JSONEncoder()
 
     @ObservationIgnored
