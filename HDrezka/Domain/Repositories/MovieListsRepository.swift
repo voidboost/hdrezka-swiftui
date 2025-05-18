@@ -3,7 +3,7 @@ import Combine
 protocol MovieListsRepository {
     func getPopularMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
 
-    func getFeaturedMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
+//    func getFeaturedMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
 
     func getWatchingNowMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
 
