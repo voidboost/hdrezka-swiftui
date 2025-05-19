@@ -51,6 +51,7 @@ struct SignInSheetView: View {
                                 TextField("key.username", text: $username, prompt: Text(String(localized: "key.username.full").lowercased()))
                                     .textFieldStyle(.plain)
                                     .multilineTextAlignment(.trailing)
+                                    .textContentType(.emailAddress)
                                     .focused($focusedField, equals: .username)
                                     .onChange(of: username) {
                                         let newValue = String(username.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
@@ -73,6 +74,7 @@ struct SignInSheetView: View {
                                     TextField("key.password", text: $password, prompt: Text(String(localized: "key.password").lowercased()))
                                         .textFieldStyle(.plain)
                                         .multilineTextAlignment(.trailing)
+                                        .textContentType(.password)
                                         .focused($focusedField, equals: .password)
                                         .onChange(of: password) {
                                             let newValue = String(password.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
@@ -118,6 +120,7 @@ struct SignInSheetView: View {
                                     SecureField("key.password", text: $password, prompt: Text(String(localized: "key.password").lowercased()))
                                         .textFieldStyle(.plain)
                                         .multilineTextAlignment(.trailing)
+                                        .textContentType(.password)
                                         .focused($focusedField, equals: .password)
                                         .onChange(of: password) {
                                             let newValue = String(password.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
