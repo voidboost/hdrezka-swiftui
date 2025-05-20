@@ -1,5 +1,4 @@
 import Foundation
-import OrderedCollections
 
 struct MovieDetailed: Identifiable, Codable, Hashable {
     let movieId: String
