@@ -279,8 +279,8 @@ struct DownloadSheetView: View {
                             HStack {
                                 Text("key.quality")
                                 
-                                if let selectedQuality, let movie, let link = movie.getClosestTo(quality: selectedQuality), let url = URL(string: link) {
-                                    CustomShareLink(items: [url]) {
+                                if let selectedQuality, let movie, let link = movie.getClosestTo(quality: selectedQuality) {
+                                    CustomShareLink(items: [link]) {
                                         Image(systemName: "square.and.arrow.up")
                                             .foregroundStyle(.secondary)
                                             .font(.system(size: 11))

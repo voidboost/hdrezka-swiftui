@@ -147,9 +147,7 @@ class Downloader {
                                     }
                                 }
                                 
-                                if let string = movie.getClosestTo(quality: data.quality),
-                                   let movieUrl = URL(string: string)
-                                {
+                                if let movieUrl = movie.getClosestTo(quality: data.quality) {
                                     self.notificate(id, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(name)-\(s)-\(e)-\(qualityName)-\(actingName)"), "cancel", ["id": id])
                                             
                                     let request = self.session.download(movieUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination, [.createIntermediateDirectories, .removePreviousFile]) })
@@ -249,9 +247,7 @@ class Downloader {
                                     }
                                 }
                                 
-                                if let string = movie.getClosestTo(quality: data.quality),
-                                   let movieUrl = URL(string: string)
-                                {
+                                if let movieUrl = movie.getClosestTo(quality: data.quality) {
                                     self.notificate(id, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(name)-\(qualityName)-\(actingName)"
                                     ), "cancel", ["id": id])
                                             

@@ -15,7 +15,7 @@ final class CustomMonitor: EventMonitor {
     }
 
     private func check() {
-        let isLoggedIn = HTTPCookieStorage.shared.cookies(for: URL(string: Defaults[.mirror]) ?? URL(string: Const.mirror)!)?.first { $0.name == "dle_password" }?.value.isNotEqualAndNotEmpty("deleted") ?? false
+        let isLoggedIn = HTTPCookieStorage.shared.cookies(for: Defaults[.mirror])?.first { $0.name == "dle_password" }?.value.isNotEqualAndNotEmpty("deleted") ?? false
 
         Defaults[.isLoggedIn] = isLoggedIn
 
@@ -23,7 +23,7 @@ final class CustomMonitor: EventMonitor {
             Defaults[.isUserPremium] = nil
         }
 
-        Defaults[.allowedComments] = HTTPCookieStorage.shared.cookies(for: URL(string: Defaults[.mirror]) ?? URL(string: Const.mirror)!)?.first { $0.name == "allowed_comments" }?.value.isEqual("1") ?? false
+        Defaults[.allowedComments] = HTTPCookieStorage.shared.cookies(for: Defaults[.mirror])?.first { $0.name == "allowed_comments" }?.value.isEqual("1") ?? false
     }
 }
 

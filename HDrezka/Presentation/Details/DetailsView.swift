@@ -97,15 +97,13 @@ struct DetailsView: View {
                         .padding(.vertical, 18)
                 }
                              
-                if let url = URL(string: mirror != _mirror.defaultValue ? mirror : Const.redirectMirror), let detailsUrl = URL(string: Const.details) {
-                    CustomShareLink(items: [
-                        url.appending(path: movie.movieId, directoryHint: .notDirectory),
-                        detailsUrl.appending(queryItems: [.init(name: "id", value: movie.movieId)])
-                    ]) {
-                        Image(systemName: "square.and.arrow.up")
-                    }
-                    .buttonStyle(NavbarButtonStyle(width: 30, height: 22))
+                CustomShareLink(items: [
+                    (mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: movie.movieId, directoryHint: .notDirectory),
+                    Const.details.appending(queryItems: [.init(name: "id", value: movie.movieId)])
+                ]) {
+                    Image(systemName: "square.and.arrow.up")
                 }
+                .buttonStyle(NavbarButtonStyle(width: 30, height: 22))
             }
         })
         .load(isLoggedIn) {

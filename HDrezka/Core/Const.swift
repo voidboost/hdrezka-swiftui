@@ -4,17 +4,17 @@ import Foundation
 import SwiftUI
 
 class Const {
-    static let mirror = "https://hdrzk.org/"
+    static let mirror = URL(string: "https://hdrzk.org/")!
 
-    static let redirectMirror = "https://rzk.link/"
+    static let redirectMirror = URL(string: "https://rzk.link/")!
 
-    static let details = "hdrezka://details/"
+    static let details = URL(string: "hdrezka://details/")!
 
-    static let github = "https://github.com/voidboost/hdrezka-macos"
+    static let github = URL(string: "https://github.com/voidboost/hdrezka-macos")!
 
-    static let helpUkraine = "https://u24.gov.ua/"
+    static let helpUkraine = URL(string: "https://u24.gov.ua/")!
 
-    static let fakeUpdate = "https://api.hdrezka.tech/"
+    static let fakeUpdate = URL(string: "https://api.hdrezka.tech/")!
 
     static let lastHdrezkaAppVersion = "2.2.2"
 

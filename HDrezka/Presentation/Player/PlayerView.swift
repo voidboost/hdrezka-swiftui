@@ -711,7 +711,7 @@ struct PlayerView: View {
 
     private func setupPlayer(seek: CMTime? = nil, isPlaying playing: Bool = true, isMuted muted: Bool = false, subtitles: String? = nil, completion: (() -> Void)? = nil, volume vol: Float = 1.0) {
         guard let link = movie.getClosestTo(quality: quality),
-              let url = URL(string: "\(link):hls:manifest.m3u8")
+              let url = URL(string: "\(link.absoluteString):hls:manifest.m3u8")
         else {
             return
         }

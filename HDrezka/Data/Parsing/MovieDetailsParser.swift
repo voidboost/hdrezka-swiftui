@@ -327,7 +327,7 @@ private extension Element {
                         } else {
                             false
                         }
-                    }), let url = URL(string: childTextNode.getWholeText()), let host = url.host(), Const.mirror.contains(host), let redirectUrl = URL(string: Const.redirectMirror), let redirectHost = redirectUrl.host() {
+                    }), let url = URL(string: childTextNode.getWholeText()), let host = url.host(), Const.mirror.host() == host, let redirectHost = Const.redirectMirror.host() {
                         childTextNode.getWholeText().replacingOccurrences(of: host, with: redirectHost)
                     } else {
                         childTextNode.getWholeText()
@@ -341,7 +341,7 @@ private extension Element {
                                 false
                             }
                         }), let url = URL(string: link) {
-                            if let host = url.host(), Const.mirror.contains(host), let redirectUrl = URL(string: Const.redirectMirror), let redirectHost = redirectUrl.host() {
+                            if let host = url.host(), Const.mirror.host() == host, let redirectHost = Const.redirectMirror.host() {
                                 link.replacingOccurrences(of: host, with: redirectHost)
                             } else {
                                 link
@@ -768,17 +768,23 @@ private extension String {
 
         let streams = decrypt(encrypted: url)
 
-        let videoMap = try streams.components(separatedBy: ",").reduce(into: OrderedDictionary<String, String>()) { videoMap, stream in
+        let videoMap = try streams.components(separatedBy: ",").reduce(into: OrderedDictionary<String, URL?>()) { videoMap, stream in
             let video = stream.replacingOccurrences(of: "[", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
             let name = try SwiftSoup.parse(video.components(separatedBy: "]").first.orThrow()).text()
             let videos = video[(video.lastIndex(of: "]") ?? video.startIndex)...].dropFirst().components(separatedBy: " or ")
-            let link = videos.first?.components(separatedBy: ":hls:manifest.m3u8").first ?? ""
+            let link = videos.first?.components(separatedBy: ":hls:manifest.m3u8").first
 
-            if link != "null", !link.isEmpty, link.linkIsBroken {
-                throw HDrezkaError.skipLink(link)
+            let url: URL? = if let link, link != "null" {
+                URL(string: link)
+            } else {
+                nil
             }
 
-            videoMap[name] = link
+            if let url, url.pathExtension != "mp4" || url.isFileURL {
+                throw HDrezkaError.skipLink(url)
+            }
+
+            videoMap[name] = url
         }
 
         let subtitles: [MovieSubtitles] = if let subtitles = (jsonObject["subtitle"] as? String), let subtitles_lns = (jsonObject["subtitle_lns"] as? [String: Any]) {
