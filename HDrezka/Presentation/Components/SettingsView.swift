@@ -18,8 +18,7 @@ struct SettingsView: View {
     @Query(animation: .easeInOut) private var playerPositions: [PlayerPosition]
     @Query(animation: .easeInOut) private var selectPositions: [SelectPosition]
 
-    @State private var mirror = ""
-
+    @State private var mirror: URL?
     @State private var mirrorValid: Bool?
     @State private var mirrorCheck: DispatchWorkItem?
 
@@ -42,31 +41,34 @@ struct SettingsView: View {
                 HStack(alignment: .center, spacing: 8) {
                     Text("key.mirror")
 
-                    TextField("key.mirror", text: $mirror, prompt: Text(String(localized: "key.mirror").lowercased()))
+                    TextField("key.mirror", value: $mirror, format: .url, prompt: Text(currentMirror.absoluteString))
                         .textFieldStyle(.plain)
                         .multilineTextAlignment(.trailing)
                         .autocorrectionDisabled()
                         .onChange(of: mirror) {
-                            let newValue = String(mirror.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
-                            if newValue != mirror {
-                                mirror = newValue
-                            } else {
-                                withAnimation(.easeInOut) {
-                                    mirrorValid = nil
-                                }
+                            withAnimation(.easeInOut) {
+                                mirrorValid = nil
+                            }
 
-                                mirrorCheck?.cancel()
+                            mirrorCheck?.cancel()
 
-                                if !mirror.isEmpty {
-                                    mirrorCheck = DispatchWorkItem {
-                                        withAnimation(.easeInOut) {
-                                            mirrorValid = mirror.contains(/^(https?:\/\/)?[\da-z\.-]+\.[a-z]{2,6}\/?$/) && currentMirror != mirror
+                            if mirror != nil {
+                                mirrorCheck = DispatchWorkItem {
+                                    withAnimation(.easeInOut) {
+                                        mirrorValid = if let mirror,
+                                                         !mirror.isFileURL,
+                                                         let host = mirror.host(),
+                                                         host != currentMirror.host()
+                                        {
+                                            true
+                                        } else {
+                                            false
                                         }
                                     }
+                                }
 
-                                    if let mirrorCheck {
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: mirrorCheck)
-                                    }
+                                if let mirrorCheck {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: mirrorCheck)
                                 }
                             }
                         }
@@ -77,8 +79,6 @@ struct SettingsView: View {
 
                             _currentMirror.reset()
                         }
-
-                        mirror = currentMirror
 
                         mirrorValid = nil
                         mirrorCheck?.cancel()
@@ -96,11 +96,17 @@ struct SettingsView: View {
                         .stroke(.tertiary, lineWidth: 1)
                 }
 
-                if mirrorValid == true {
+                if mirrorValid == true, let mirror, var urlComponents = URLComponents(url: mirror, resolvingAgainstBaseURL: false) {
                     Button {
-                        let newMirror = "\(mirror.hasPrefix("http") ? "" : "https://")\(mirror)\(mirror.hasSuffix("/") ? "" : "/")"
+                        urlComponents.scheme = "https"
+                        urlComponents.path = "/"
+                        urlComponents.port = nil
+                        urlComponents.query = nil
+                        urlComponents.fragment = nil
+                        urlComponents.user = nil
+                        urlComponents.password = nil
 
-                        if currentMirror != newMirror {
+                        if let newMirror = urlComponents.url, currentMirror != newMirror {
                             migrateCookies(currentMirror, newMirror)
 
                             currentMirror = newMirror
@@ -109,6 +115,7 @@ struct SettingsView: View {
                         withAnimation(.easeInOut) {
                             mirrorValid = nil
                         }
+
                         mirrorCheck?.cancel()
                     } label: {
                         Image(systemName: "checkmark")
@@ -364,20 +371,20 @@ struct SettingsView: View {
         }
         .padding(25)
         .background(.background)
-        .task(id: currentMirror) {
-            mirror = currentMirror
+        .onChange(of: currentMirror) {
+            mirror = nil
         }
     }
 
-    private func migrateCookies(_ from: String, _ to: String) {
-        if isLoggedIn, let url = URL(string: from), URL(string: to) != nil {
-            HTTPCookieStorage.shared.cookies(for: url)?.forEach { cookie in
+    private func migrateCookies(_ from: URL, _ to: URL) {
+        if isLoggedIn {
+            HTTPCookieStorage.shared.cookies(for: from)?.forEach { cookie in
                 var cookieProperties = [HTTPCookiePropertyKey: Any]()
                 cookieProperties[.version] = cookie.version
                 cookieProperties[.name] = cookie.name
                 cookieProperties[.value] = cookie.value
                 cookieProperties[.expires] = cookie.expiresDate
-                cookieProperties[.domain] = ".\(to.replacingOccurrences(of: "/", with: "").components(separatedBy: ":").last ?? "")"
+                cookieProperties[.domain] = ".\(to.host() ?? "")"
                 cookieProperties[.path] = cookie.path
 
                 if let newCookie = HTTPCookie(properties: cookieProperties) {

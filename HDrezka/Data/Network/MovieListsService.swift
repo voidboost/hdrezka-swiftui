@@ -12,7 +12,7 @@ enum MovieListsService {
 }
 
 extension MovieListsService: URLRequestConvertible {
-    var baseURL: URL { URL(string: Defaults[.mirror]) ?? URL(string: Const.mirror)! }
+    var baseURL: URL { Defaults[.mirror] }
 
     var path: String {
         switch self {

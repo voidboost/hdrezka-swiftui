@@ -29,9 +29,9 @@ extension AccountService: URLRequestConvertible {
     var baseURL: URL {
         switch self {
         case .getVersion:
-            URL(string: Const.fakeUpdate)!
+            Const.fakeUpdate
         default:
-            URL(string: Defaults[.mirror]) ?? URL(string: Const.mirror)!
+            Defaults[.mirror]
         }
     }
 

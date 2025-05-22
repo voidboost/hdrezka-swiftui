@@ -57,8 +57,8 @@ struct PersonView: View {
                 .keyboardShortcut("r", modifiers: .command)
             }
         }, toolbar: {
-            if case .data = vm.state, let url = URL(string: mirror != _mirror.defaultValue ? mirror : Const.redirectMirror) {
-                CustomShareLink(items: [url.appending(path: person.personId, directoryHint: .notDirectory)]) {
+            if case .data = vm.state {
+                CustomShareLink(items: [(mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: person.personId, directoryHint: .notDirectory)]) {
                     Image(systemName: "square.and.arrow.up")
                 }
                 .buttonStyle(NavbarButtonStyle(width: 30, height: 22))

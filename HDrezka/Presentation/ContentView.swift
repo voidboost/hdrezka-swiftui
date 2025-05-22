@@ -201,9 +201,7 @@ struct ContentView: View {
 
                             if let isUserPremium {
                                 Button {
-                                    if let url = URL(string: mirror != _mirror.defaultValue ? mirror : Const.redirectMirror) {
-                                        openURL(url.appending(path: "payments", directoryHint: .notDirectory))
-                                    }
+                                    openURL((mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
                                 } label: {
                                     HStack(spacing: 3) {
                                         Image("Premium")
@@ -378,9 +376,7 @@ struct ContentView: View {
         .dialogSeverity(.critical)
         .confirmationDialog("key.premium_content", isPresented: $appState.isPremiumPresented) {
             Button("key.buy") {
-                if let url = URL(string: mirror != _mirror.defaultValue ? mirror : Const.redirectMirror) {
-                    openURL(url.appending(path: "payments", directoryHint: .notDirectory))
-                }
+                openURL((mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
             }
         } message: {
             Text("key.premium.description")

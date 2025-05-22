@@ -78,9 +78,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 Downloader.shared.download(data)
             }
         case "need_premium":
-            if let url = URL(string: Defaults[.mirror] != Defaults.Keys.mirror.defaultValue ? Defaults[.mirror] : Const.redirectMirror) {
-                NSWorkspace.shared.open(url.appending(path: "payments", directoryHint: .notDirectory))
-            }
+            NSWorkspace.shared.open((Defaults[.mirror] != Defaults.Keys.mirror.defaultValue ? Defaults[.mirror] : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
         default:
             break
         }
@@ -131,14 +129,13 @@ struct HDrezkaApp: App {
                 }
                 .background(WindowAccessor(window: $appState.window))
                 .onOpenURL { url in
-                    guard let detailsUrl = URL(string: Const.details),
-                          let scheme = detailsUrl.scheme,
+                    guard let scheme = Const.details.scheme,
                           url.scheme == scheme
                     else {
                         return
                     }
 
-                    if let host = detailsUrl.host(), url.host() == host, let movieId = URLComponents(url: url, resolvingAgainstBaseURL: true)?.queryItems?.first(where: { $0.name == "id" })?.value, movieId.id != nil {
+                    if let host = Const.details.host(), url.host() == host, let movieId = URLComponents(url: url, resolvingAgainstBaseURL: true)?.queryItems?.first(where: { $0.name == "id" })?.value, movieId.id != nil {
                         appState.path.append(.details(.init(movieId: movieId)))
                     } else if url.absoluteString.removeMirror(scheme).id != nil {
                         appState.path.append(.details(.init(movieId: url.absoluteString.removeMirror(scheme))))
@@ -269,12 +266,10 @@ struct HDrezkaApp: App {
         }
 
         CommandGroup(replacing: .help) {
-            if let github = URL(string: Const.github) {
-                Button {
-                    openURL(github)
-                } label: {
-                    Text("key.github")
-                }
+            Button {
+                openURL(Const.github)
+            } label: {
+                Text("key.github")
             }
         }
     }

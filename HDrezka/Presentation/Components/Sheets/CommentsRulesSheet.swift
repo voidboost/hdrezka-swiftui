@@ -128,7 +128,7 @@ struct CommentsRulesSheet: View {
                     if let cookie = HTTPCookie(properties: [
                         .name: "allowed_comments",
                         .value: "1",
-                        .domain: ".\(mirror.replacingOccurrences(of: "/", with: "").components(separatedBy: ":").last ?? "")",
+                        .domain: ".\(mirror.host() ?? "")",
                         .path: "/",
                         .expires: Date.now.addingTimeInterval(30 * 24 * 60 * 60)
                     ]) {
