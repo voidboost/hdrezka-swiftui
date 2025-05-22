@@ -34,12 +34,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     }
 
     func applicationWillTerminate(_ notification: Notification) {
-        if let urls = try? FileManager.default.contentsOfDirectory(at: FileManager.default.temporaryDirectory, includingPropertiesForKeys: nil) {
-            for url in urls {
-                try? FileManager.default.removeItem(at: url)
-            }
-        }
-
         if !Downloader.shared.downloads.isEmpty {
             let notificationCenter = UNUserNotificationCenter.current()
 
