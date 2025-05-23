@@ -261,8 +261,10 @@ struct BookmarksSheetView: View {
                 .store(in: &subscriptions)
         }
         .alert("key.ops", isPresented: $isErrorPresented) {
-            Button("key.ok", role: .cancel) {
+            Button(role: .cancel) {
                 dismiss()
+            } label: {
+                Text("key.ok")
             }
         } message: {
             if let error {

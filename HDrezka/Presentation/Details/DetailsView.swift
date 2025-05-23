@@ -126,7 +126,9 @@ struct DetailsView: View {
             }
         }
         .alert("key.ops", isPresented: $vm.isErrorPresented) {
-            Button("key.ok", role: .cancel) {}
+            Button(role: .cancel) {} label: {
+                Text("key.ok")
+            }
         } message: {
             if let error = vm.error {
                 Text(error.localizedDescription)
@@ -162,7 +164,6 @@ struct DetailsView: View {
         @State private var blurHeght: CGFloat = .zero
         @State private var showImage: Bool = false
 
-        @Environment(\.openURL) private var openURL
         @Environment(\.colorScheme) private var colorScheme
         @Environment(\.openWindow) private var openWindow
         @Environment(\.dismissWindow) private var dismissWindow
@@ -430,11 +431,7 @@ struct DetailsView: View {
                                     .blended(withFraction: CGFloat(imdbRating.value / 10.0), of: NSColor.green) ?? NSColor.labelColor
                             )
                             
-                            InfoColumn("IMDb", imdbRating.value.description, StarsView(rating: imdbRating.value * 0.5, color: color), valueColor: color, hover: imdbRating.votesCount) {
-                                if let url = URL(string: imdbRating.link) {
-                                    openURL(url)
-                                }
-                            }
+                            InfoColumn("IMDb", imdbRating.value.description, StarsView(rating: imdbRating.value * 0.5, color: color), valueColor: color, hover: imdbRating.votesCount, url: URL(string: imdbRating.link))
                         }
                     
                         if let kpRating = details.kpRating {
@@ -444,11 +441,7 @@ struct DetailsView: View {
                                     .blended(withFraction: CGFloat(kpRating.value / 10.0), of: NSColor.green) ?? NSColor.labelColor
                             )
                             
-                            InfoColumn("КиноПоиск", kpRating.value.description, StarsView(rating: kpRating.value * 0.5, color: color), valueColor: color, hover: kpRating.votesCount) {
-                                if let url = URL(string: kpRating.link) {
-                                    openURL(url)
-                                }
-                            }
+                            InfoColumn("КиноПоиск", kpRating.value.description, StarsView(rating: kpRating.value * 0.5, color: color), valueColor: color, hover: kpRating.votesCount, url: URL(string: kpRating.link))
                         }
                     
                         if let duration = details.duration, duration > 0 {
@@ -1147,27 +1140,25 @@ struct DetailsView: View {
             private let subtitle: T
             private let hover: String?
             private let valueColor: Color?
-            private let action: (() -> Void)?
+            private let url: URL?
             
             @State private var show: Bool = false
 
-            init(_ title: String, _ value: String, _ subtitle: T, valueColor: Color? = nil, hover: String? = nil, action: (() -> Void)? = nil) {
+            init(_ title: String, _ value: String, _ subtitle: T, valueColor: Color? = nil, hover: String? = nil, url: URL? = nil) {
                 self.title = title
                 self.value = value
                 self.subtitle = subtitle
                 self.hover = hover
                 self.valueColor = valueColor
-                self.action = action
+                self.url = url
             }
             
             var body: some View {
                 HStack(alignment: .center, spacing: 0) {
                     Spacer()
                 
-                    if let action {
-                        Button {
-                            action()
-                        } label: {
+                    if let url {
+                        Link(destination: url) {
                             VStack(alignment: .center, spacing: 2) {
                                 Text(title).font(.system(size: 13).weight(.medium))
                                 

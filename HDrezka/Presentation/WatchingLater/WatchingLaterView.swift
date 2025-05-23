@@ -169,7 +169,9 @@ struct WatchingLaterView: View {
             }
         }
         .alert("key.ops", isPresented: $isErrorPresented) {
-            Button("key.ok", role: .cancel) {}
+            Button(role: .cancel) {} label: {
+                Text("key.ok")
+            }
         } message: {
             if let error {
                 Text(error.localizedDescription)

@@ -249,10 +249,12 @@ struct RestoreSheetView: View {
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
         .alert("key.restore.success", isPresented: $isSuccessPresented) {
-            Button("key.ok", role: .cancel) {
+            Button(role: .cancel) {
                 dismiss()
 
                 appState.isSignInPresented = true
+            } label: {
+                Text("key.ok")
             }
         } message: {
             Text("key.restore.success.message-\(email)")
