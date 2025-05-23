@@ -87,8 +87,6 @@ struct HDrezkaApp: App {
     @State private var appState: AppState = .shared
     @State private var downloader: Downloader = .shared
     @Environment(\.dismissWindow) private var dismissWindow
-    @Environment(\.openSettings) private var openSettings
-    @Environment(\.openURL) private var openURL
     @Environment(\.openWindow) private var openWindow
 
     private let updaterController: SPUStandardUpdaterController
@@ -201,9 +199,7 @@ struct HDrezkaApp: App {
     @CommandsBuilder
     func customCommands() -> some Commands {
         CommandGroup(replacing: .appSettings) {
-            Button {
-                openSettings()
-            } label: {
+            SettingsLink {
                 Text("key.settings")
             }
             .keyboardShortcut(",", modifiers: .command)
@@ -260,9 +256,7 @@ struct HDrezkaApp: App {
         }
 
         CommandGroup(replacing: .help) {
-            Button {
-                openURL(Const.github)
-            } label: {
+            Link(destination: Const.github) {
                 Text("key.github")
             }
         }

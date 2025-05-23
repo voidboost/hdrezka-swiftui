@@ -143,7 +143,7 @@ struct CommentsView: View {
             }
         }
         .alert("key.ops", isPresented: $vm.isErrorPresented) {
-            Button("key.ok", role: .cancel) {}
+            Button(role: .cancel) {} label: { Text("key.ok") }
         } message: {
             if let message = vm.message {
                 Text(message)
@@ -153,7 +153,7 @@ struct CommentsView: View {
         }
         .dialogSeverity(.critical)
         .alert("key.comments.success", isPresented: $vm.isOnModerationPresented) {
-            Button("key.ok", role: .cancel) {}
+            Button(role: .cancel) {} label: { Text("key.ok") }
         } message: {
             if let message = vm.message {
                 Text(message)
@@ -199,8 +199,10 @@ struct CommentsView: View {
             }
         }) {
             if let comment = vm.deleteComment {
-                Button("key.comment.delete.confirm") {
+                Button {
                     vm.deleteComment(comment: comment)
+                } label: {
+                    Text("key.comment.delete.confirm")
                 }
             }
         } message: {

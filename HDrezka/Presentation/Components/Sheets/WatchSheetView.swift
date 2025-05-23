@@ -427,15 +427,19 @@ struct WatchSheetView: View {
         }
         .alert("key.ops", isPresented: $isErrorPresented) {
             if let hdrezkaError = error as? HDrezkaError, case .loginRequired = hdrezkaError {
-                Button("key.sign_in", role: .destructive) {
+                Button(role: .destructive) {
                     dismiss()
                     
                     appState.isSignInPresented = true
+                } label: {
+                    Text("key.sign_in")
                 }
             }
             
-            Button("key.ok", role: .cancel) {
+            Button(role: .cancel) {
                 dismiss()
+            } label: {
+                Text("key.ok")
             }
         } message: {
             if let error {
@@ -444,10 +448,12 @@ struct WatchSheetView: View {
         }
         .dialogSeverity(.critical)
         .confirmationDialog("key.sign_in.label", isPresented: $isLoginPresented) {
-            Button("key.sign_in") {
+            Button {
                 dismiss()
                 
                 appState.isSignInPresented = true
+            } label: {
+                Text("key.sign_in")
             }
         } message: {
             Text("key.sign_in.access")

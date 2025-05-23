@@ -17,7 +17,6 @@ struct ContentView: View {
     @Default(.lastHdrezkaAppVersion) private var lastHdrezkaAppVersion
 
     @Environment(AppState.self) private var appState
-    @Environment(\.openURL) private var openURL
 
     @Namespace var mainNamespace
     @Environment(\.resetFocus) var resetFocus
@@ -200,9 +199,7 @@ struct ContentView: View {
                             Spacer()
 
                             if let isUserPremium {
-                                Button {
-                                    openURL((mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
-                                } label: {
+                                Link(destination: (mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory)) {
                                     HStack(spacing: 3) {
                                         Image("Premium")
                                             .renderingMode(.template)
@@ -367,17 +364,17 @@ struct ContentView: View {
             RestoreSheetView()
         }
         .confirmationDialog("key.sign_out.label", isPresented: $appState.isSignOutPresented) {
-            Button("key.yes", role: .destructive) {
+            Button(role: .destructive) {
                 logoutUseCase()
+            } label: {
+                Text("key.yes")
             }
         } message: {
             Text("key.sign_out.q")
         }
         .dialogSeverity(.critical)
         .confirmationDialog("key.premium_content", isPresented: $appState.isPremiumPresented) {
-            Button("key.buy") {
-                openURL((mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
-            }
+            Link("key.buy", destination: (mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
         } message: {
             Text("key.premium.description")
         }
