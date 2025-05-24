@@ -86,10 +86,9 @@ struct HDrezkaApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @State private var appState: AppState = .shared
     @State private var downloader: Downloader = .shared
+    @State private var persistenceController: PersistenceController = .shared
     @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.openWindow) private var openWindow
-
-    private let persistenceController = PersistenceController.shared
 
     private let updaterController: SPUStandardUpdaterController
 
