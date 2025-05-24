@@ -586,8 +586,14 @@ struct DetailsView: View {
                                                                 .red
                                                                 .blended(withFraction: CGFloat(rating / 10.0), of: NSColor.green) ?? NSColor.labelColor
                                                         )
-        
-                                                        Text("\(String(localized: "key.franchise.year-\(fr.year)")) • \(Text(rating.description).foregroundStyle(color)) \(Text(Image(systemName: "star.fill")).font(.system(size: 9)).foregroundStyle(color))").font(.system(size: 11)).foregroundStyle(.secondary)
+                                                        
+                                                        HStack(spacing: 3) {
+                                                            Text("key.franchise.year-\(fr.year)")
+                                                            Text("•")
+                                                            Text(rating.description).foregroundStyle(color)
+                                                            Image(systemName: "star.fill").font(.system(size: 9)).foregroundStyle(color)
+                                                        }
+                                                        .font(.system(size: 11)).foregroundStyle(.secondary)
                                                     } else {
                                                         Text("key.franchise.year-\(fr.year)").font(.system(size: 11)).foregroundStyle(.secondary)
                                                     }
@@ -625,8 +631,14 @@ struct DetailsView: View {
                                                             .red
                                                             .blended(withFraction: CGFloat(rating / 10.0), of: NSColor.green) ?? NSColor.labelColor
                                                     )
-    
-                                                    Text("\(String(localized: "key.franchise.year-\(fr.year)")) • \(Text(rating.description).foregroundStyle(color)) \(Text(Image(systemName: "star.fill")).font(.system(size: 9)).foregroundStyle(color))").font(.system(size: 11)).foregroundStyle(.secondary)
+                                                    
+                                                    HStack(spacing: 3) {
+                                                        Text("key.franchise.year-\(fr.year)")
+                                                        Text("•")
+                                                        Text(rating.description).foregroundStyle(color)
+                                                        Image(systemName: "star.fill").font(.system(size: 9)).foregroundStyle(color)
+                                                    }
+                                                    .font(.system(size: 11)).foregroundStyle(.secondary)
                                                 } else {
                                                     Text("key.franchise.year-\(fr.year)").font(.system(size: 11)).foregroundStyle(.secondary)
                                                 }
