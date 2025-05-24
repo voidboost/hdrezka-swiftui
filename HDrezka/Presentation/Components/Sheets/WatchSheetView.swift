@@ -1,7 +1,7 @@
 import Combine
+import CoreData
 import Defaults
 import FactoryKit
-import SwiftData
 import SwiftUI
 
 struct WatchSheetView: View {
@@ -15,11 +15,11 @@ struct WatchSheetView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
-    @Environment(\.modelContext) private var modelContext
+    @Environment(\.managedObjectContext) private var viewContext
     @Environment(AppState.self) private var appState
 
-    @Query private var selectPositions: [SelectPosition]
-    
+    @FetchRequest(fetchRequest: SelectPosition.fetch()) private var selectPositions: FetchedResults<SelectPosition>
+
     @Default(.isUserPremium) private var isUserPremium
     @Default(.isLoggedIn) private var isLoggedIn
     @Default(.defaultQuality) private var defaultQuality
@@ -380,15 +380,16 @@ struct WatchSheetView: View {
                             position.acting = selectedActing.translatorId
                             position.season = selectedSeason?.seasonId
                             position.episode = selectedEpisode?.episodeId
+                            
+                            position.managedObjectContext?.saveContext()
                         } else {
-                            let position = SelectPosition(
-                                id: selectedActing.voiceId,
-                                acting: selectedActing.translatorId,
-                                season: selectedSeason?.seasonId,
-                                episode: selectedEpisode?.episodeId
-                            )
+                            let position = SelectPosition(context: viewContext)
+                            position.id = selectedActing.voiceId
+                            position.acting = selectedActing.translatorId
+                            position.season = selectedSeason?.seasonId
+                            position.episode = selectedEpisode?.episodeId
 
-                            modelContext.insert(position)
+                            viewContext.saveContext()
                         }
                             
                         if !isLoggedIn {

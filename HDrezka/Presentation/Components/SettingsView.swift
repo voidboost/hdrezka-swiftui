@@ -1,7 +1,7 @@
 import AVFoundation
+import CoreData
 import Defaults
 import Sparkle
-import SwiftData
 import SwiftUI
 
 struct SettingsView: View {
@@ -13,10 +13,10 @@ struct SettingsView: View {
     @Default(.defaultQuality) private var defaultQuality
     @Default(.spatialAudio) private var spatialAudio
 
-    @Environment(\.modelContext) private var modelContext
+    @Environment(\.managedObjectContext) private var viewContext
 
-    @Query(animation: .easeInOut) private var playerPositions: [PlayerPosition]
-    @Query(animation: .easeInOut) private var selectPositions: [SelectPosition]
+    @FetchRequest(fetchRequest: PlayerPosition.fetch(), animation: .easeInOut) private var playerPositions: FetchedResults<PlayerPosition>
+    @FetchRequest(fetchRequest: SelectPosition.fetch(), animation: .easeInOut) private var selectPositions: FetchedResults<SelectPosition>
 
     @State private var mirror: URL?
     @State private var mirrorValid: Bool?
@@ -236,9 +236,9 @@ struct SettingsView: View {
                     Spacer()
 
                     Button {
-                        for position in playerPositions {
-                            modelContext.delete(position)
-                        }
+                        playerPositions.forEach(viewContext.delete)
+
+                        viewContext.saveContext()
                     } label: {
                         Image(systemName: "trash")
                             .foregroundStyle(.accent)
@@ -268,9 +268,9 @@ struct SettingsView: View {
                         Spacer()
 
                         Button {
-                            for position in selectPositions {
-                                modelContext.delete(position)
-                            }
+                            selectPositions.forEach(viewContext.delete)
+
+                            viewContext.saveContext()
                         } label: {
                             Image(systemName: "trash")
                                 .foregroundStyle(.accent)

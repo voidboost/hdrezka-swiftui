@@ -1,10 +1,10 @@
 import Combine
+import CoreData
 import Defaults
 import FirebaseAnalytics
 import FirebaseCore
 import FirebaseCrashlytics
 import Sparkle
-import SwiftData
 import SwiftUI
 import UserNotifications
 
@@ -89,22 +89,12 @@ struct HDrezkaApp: App {
     @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.openWindow) private var openWindow
 
+    private let persistenceController = PersistenceController.shared
+
     private let updaterController: SPUStandardUpdaterController
-    private let modelContainer: ModelContainer
 
     init() {
         updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
-
-        do {
-            let schema = Schema([PlayerPosition.self, SelectPosition.self])
-            let modelContainer = try ModelContainer(for: schema)
-            modelContainer.mainContext.autosaveEnabled = true
-            self.modelContainer = modelContainer
-
-            Downloader.shared.setModelContext(modelContext: modelContainer.mainContext)
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
     }
 
     var body: some Scene {
@@ -112,6 +102,7 @@ struct HDrezkaApp: App {
             ContentView()
                 .environment(appState)
                 .environment(downloader)
+                .environment(\.managedObjectContext, persistenceController.viewContext)
                 .task {
                     if #unavailable(macOS 15) {
                         dismissWindow(id: "player")
@@ -134,7 +125,6 @@ struct HDrezkaApp: App {
                     }
                 }
         }
-        .modelContainer(modelContainer)
         .windowResizability(.contentMinSize)
         .defaultPosition(.center)
         .windowStyle(.hiddenTitleBar)
@@ -145,9 +135,9 @@ struct HDrezkaApp: App {
             if let data {
                 PlayerView(data: data)
                     .environment(appState)
+                    .environment(\.managedObjectContext, persistenceController.viewContext)
             }
         }
-        .modelContainer(modelContainer)
         .defaultPosition(.center)
         .windowStyle(.hiddenTitleBar)
         .applyRestorationBehavior()
@@ -176,8 +166,8 @@ struct HDrezkaApp: App {
 
         Settings {
             SettingsView(updater: updaterController.updater)
+                .environment(\.managedObjectContext, persistenceController.viewContext)
         }
-        .modelContainer(modelContainer)
         .windowResizability(.contentSize)
         .defaultPosition(.center)
         .commands(content: customCommands)

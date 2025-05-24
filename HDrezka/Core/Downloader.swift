@@ -1,16 +1,13 @@
 import Combine
+import CoreData
 import Defaults
 import FactoryKit
-import SwiftData
 import UserNotifications
 
 @Observable
 class Downloader {
     @ObservationIgnored
     static let shared = Downloader()
-    
-    @ObservationIgnored
-    private var modelContext: ModelContext?
 
     @ObservationIgnored
     private var subscriptions: Set<AnyCancellable> = []
@@ -41,10 +38,6 @@ class Downloader {
         let needPremiumCategory = UNNotificationCategory(identifier: "need_premium", actions: [needPremium], intentIdentifiers: [])
 
         UNUserNotificationCenter.current().setNotificationCategories([openCategory, cancelCategory, retryCategory, needPremiumCategory])
-    }
-    
-    func setModelContext(modelContext: ModelContext) {
-        self.modelContext = modelContext
     }
     
     private func notificate(_ id: String, _ title: String, _ subtitle: String? = nil, _ category: String? = nil, _ userInfo: [AnyHashable: Any] = [:]) {
@@ -126,25 +119,24 @@ class Downloader {
                                         .store(in: &self.subscriptions)
                                 }
                                 
-                                if let modelContext = self.modelContext {
-                                    if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: nil)).first(where: { position in
-                                        position.id == data.acting.voiceId
-                                    }) {
-                                        position.acting = data.acting.translatorId
-                                        position.season = season.seasonId
-                                        position.episode = episode.episodeId
-                                        position.subtitles = data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
-                                    } else {
-                                        let position = SelectPosition(
-                                            id: data.acting.voiceId,
-                                            acting: data.acting.translatorId,
-                                            season: season.seasonId,
-                                            episode: episode.episodeId,
-                                            subtitles: data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
-                                        )
+                                if let position = try? PersistenceController.shared.viewContext.fetch(SelectPosition.fetchRequest()).first(where: { position in
+                                    position.id == data.acting.voiceId
+                                }) {
+                                    position.acting = data.acting.translatorId
+                                    position.season = season.seasonId
+                                    position.episode = episode.episodeId
+                                    position.subtitles = data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
+                                    
+                                    position.managedObjectContext?.saveContext()
+                                } else {
+                                    let position = SelectPosition(context: PersistenceController.shared.viewContext)
+                                    position.id = data.acting.voiceId
+                                    position.acting = data.acting.translatorId
+                                    position.season = season.seasonId
+                                    position.episode = episode.episodeId
+                                    position.subtitles = data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
                                         
-                                        modelContext.insert(position)
-                                    }
+                                    PersistenceController.shared.viewContext.saveContext()
                                 }
                                 
                                 if let movieUrl = movie.getClosestTo(quality: data.quality) {
@@ -230,21 +222,20 @@ class Downloader {
                                         .store(in: &self.subscriptions)
                                 }
                                 
-                                if let modelContext = self.modelContext {
-                                    if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: nil)).first(where: { position in
-                                        position.id == data.acting.voiceId
-                                    }) {
-                                        position.acting = data.acting.translatorId
-                                        position.subtitles = data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
-                                    } else {
-                                        let position = SelectPosition(
-                                            id: data.acting.voiceId,
-                                            acting: data.acting.translatorId,
-                                            subtitles: data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
-                                        )
-                                        
-                                        modelContext.insert(position)
-                                    }
+                                if let position = try? PersistenceController.shared.viewContext.fetch(SelectPosition.fetchRequest()).first(where: { position in
+                                    position.id == data.acting.voiceId
+                                }) {
+                                    position.acting = data.acting.translatorId
+                                    position.subtitles = data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
+                                    
+                                    position.managedObjectContext?.saveContext()
+                                } else {
+                                    let position = SelectPosition(context: PersistenceController.shared.viewContext)
+                                    position.id = data.acting.voiceId
+                                    position.acting = data.acting.translatorId
+                                    position.subtitles = data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
+                                   
+                                    PersistenceController.shared.viewContext.saveContext()
                                 }
                                 
                                 if let movieUrl = movie.getClosestTo(quality: data.quality) {

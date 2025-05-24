@@ -23,9 +23,9 @@ struct WatchingLaterView: View {
 
     @Default(.isLoggedIn) private var isLoggedIn
 
-    @Environment(\.modelContext) private var modelContext
+    @Environment(\.managedObjectContext) private var viewContext
 
-    @Query private var playerPositions: [PlayerPosition]
+    @FetchRequest(fetchRequest: PlayerPosition.fetch()) private var playerPositions: FetchedResults<PlayerPosition>
 
     private let title = String(localized: "key.watching_later")
 
@@ -114,12 +114,10 @@ struct WatchingLaterView: View {
                                                             }
 
                                                             playerPositions
-                                                                .filter {
-                                                                    $0.id == movie.watchLaterId.id
-                                                                }
-                                                                .forEach {
-                                                                    modelContext.delete($0)
-                                                                }
+                                                                .filter { $0.id == movie.watchLaterId.id }
+                                                                .forEach(viewContext.delete)
+
+                                                            viewContext.saveContext()
                                                         }
                                                     }
                                                     .store(in: &subscriptions)
