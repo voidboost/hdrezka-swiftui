@@ -1,7 +1,7 @@
 import Combine
+import CoreData
 import Defaults
 import FactoryKit
-import SwiftData
 import SwiftUI
 
 struct WatchingLaterView: View {

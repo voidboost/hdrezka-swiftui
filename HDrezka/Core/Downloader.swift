@@ -119,7 +119,7 @@ class Downloader {
                                         .store(in: &self.subscriptions)
                                 }
                                 
-                                if let position = try? PersistenceController.shared.viewContext.fetch(SelectPosition.fetchRequest()).first(where: { position in
+                                if let position = try? PersistenceController.shared.viewContext.fetch(SelectPosition.fetch()).first(where: { position in
                                     position.id == data.acting.voiceId
                                 }) {
                                     position.acting = data.acting.translatorId
@@ -222,7 +222,7 @@ class Downloader {
                                         .store(in: &self.subscriptions)
                                 }
                                 
-                                if let position = try? PersistenceController.shared.viewContext.fetch(SelectPosition.fetchRequest()).first(where: { position in
+                                if let position = try? PersistenceController.shared.viewContext.fetch(SelectPosition.fetch()).first(where: { position in
                                     position.id == data.acting.voiceId
                                 }) {
                                     position.acting = data.acting.translatorId
