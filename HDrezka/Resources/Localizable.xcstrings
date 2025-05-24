@@ -29,17 +29,6 @@
       },
       "shouldTranslate" : false
     },
-    "%@ • %@ %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ • %2$@ %3$@"
-          }
-        }
-      },
-      "shouldTranslate" : false
-    },
     "%@:" : {
       "shouldTranslate" : false
     },
@@ -50,6 +39,9 @@
       "shouldTranslate" : false
     },
     "%@x" : {
+      "shouldTranslate" : false
+    },
+    "•" : {
       "shouldTranslate" : false
     },
     "1" : {
