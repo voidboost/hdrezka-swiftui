@@ -1,5 +1,5 @@
 <h1>HDrezka macOS (unofficial)</h1>
-<p>Unofficial macOS client for HDrezka. Requires macOS 14 Sonoma or later.</p>
+<p>Unofficial macOS client for HDrezka. Requires macOS 13 Ventura or later.</p>
 <h2>Features</h2>
 <ul>
     <li>⭐️ Custom video player</li>
