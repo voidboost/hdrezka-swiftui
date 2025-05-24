@@ -123,322 +123,325 @@ struct PlayerView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
 
                 VStack(alignment: .center) {
-                    if isMaskShow {
-                        VStack {
-                            HStack(alignment: .center) {
-                                if let pipController, AVPictureInPictureController.isPictureInPictureSupported() {
-                                    Button {
-                                        pipController.startPictureInPicture()
-                                    } label: {
-                                        Image(systemName: "pip.enter")
-                                            .font(.system(size: 17))
-                                    }
-                                    .buttonStyle(.plain)
-                                    .disabled(isPictureInPictureActive || !isPictureInPicturePossible)
+                    VStack {
+                        HStack(alignment: .center) {
+                            if let pipController, AVPictureInPictureController.isPictureInPictureSupported() {
+                                Button {
+                                    pipController.startPictureInPicture()
+                                } label: {
+                                    Image(systemName: "pip.enter")
+                                        .font(.system(size: 17))
                                 }
-
-                                Spacer()
-
-                                HStack(alignment: .center) {
-                                    SliderWithoutText(value: Binding {
-                                        volume
-                                    } set: { volume in
-                                        player.volume = volume
-                                    }, inRange: 0 ... 1, activeFillColor: .primary, fillColor: .primary.opacity(0.7), emptyColor: .primary.opacity(0.3), height: 8) { onEditingChanged in
-                                        if onEditingChanged, isMuted {
-                                            player.isMuted.toggle()
-                                        }
-                                    }
-                                    .frame(width: 120, height: 10)
-                                    .onHover { hovering in
-                                        guard let window = playerLayer.window else { return }
-
-                                        window.isMovableByWindowBackground = !hovering
-                                    }
-
-                                    VStack(alignment: .center) {
-                                        Button {
-                                            player.isMuted.toggle()
-
-                                            resetTimer()
-                                        } label: {
-                                            if #available(macOS 14.0, *) {
-                                                Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(volume))
-                                                    .font(.system(size: 17))
-                                                    .contentTransition(.symbolEffect(.replace))
-                                            } else {
-                                                Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(volume))
-                                                    .font(.system(size: 17))
-                                            }
-                                        }
-                                        .buttonStyle(.plain)
-                                        .keyboardShortcut("m", modifiers: [])
-                                    }
-                                    .frame(width: 30)
-                                }
-                                .frame(height: 30)
+                                .buttonStyle(.plain)
+                                .disabled(isPictureInPictureActive || !isPictureInPicturePossible)
                             }
 
                             Spacer()
-                        }
-
-                        VStack {
-                            Spacer()
 
                             HStack(alignment: .center) {
-                                if let seasons, let season, let episode {
-                                    Button {
-                                        prevTrack(seasons, season, episode)
-                                    } label: {
-                                        Image(systemName: "backward.fill")
-                                            .font(.system(size: 18))
+                                SliderWithoutText(value: Binding {
+                                    volume
+                                } set: { volume in
+                                    player.volume = volume
+                                }, inRange: 0 ... 1, activeFillColor: .primary, fillColor: .primary.opacity(0.7), emptyColor: .primary.opacity(0.3), height: 8) { onEditingChanged in
+                                    if onEditingChanged, isMuted {
+                                        player.isMuted.toggle()
                                     }
-                                    .buttonStyle(.plain)
-                                    .disabled(seasons.element(before: season) == nil && season.episodes.element(before: episode) == nil)
+                                }
+                                .frame(width: 120, height: 10)
+                                .onHover { hovering in
+                                    guard let window = playerLayer.window else { return }
+
+                                    window.isMovableByWindowBackground = !hovering
                                 }
 
-                                Spacer()
-
-                                if isLoading {
-                                    ProgressView()
-                                } else {
+                                VStack(alignment: .center) {
                                     Button {
+                                        resetTimer()
+
+                                        if !isPictureInPictureActive {
+                                            player.isMuted.toggle()
+                                        }
+                                    } label: {
+                                        if #available(macOS 14.0, *) {
+                                            Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(volume))
+                                                .font(.system(size: 17))
+                                                .contentTransition(.symbolEffect(.replace))
+                                        } else {
+                                            Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(volume))
+                                                .font(.system(size: 17))
+                                        }
+                                    }
+                                    .buttonStyle(.plain)
+                                    .keyboardShortcut("m", modifiers: [])
+                                }
+                                .frame(width: 30)
+                            }
+                            .frame(height: 30)
+                        }
+
+                        Spacer()
+                    }
+
+                    VStack {
+                        Spacer()
+
+                        HStack(alignment: .center) {
+                            if let seasons, let season, let episode {
+                                Button {
+                                    prevTrack(seasons, season, episode)
+                                } label: {
+                                    Image(systemName: "backward.fill")
+                                        .font(.system(size: 18))
+                                }
+                                .buttonStyle(.plain)
+                                .disabled(seasons.element(before: season) == nil && season.episodes.element(before: episode) == nil)
+                            }
+
+                            Spacer()
+
+                            if isLoading {
+                                ProgressView()
+                            } else {
+                                Button {
+                                    resetTimer()
+
+                                    if !isPictureInPictureActive {
                                         if isPlaying {
                                             player.pause()
                                         } else {
                                             player.playImmediately(atRate: rate)
                                         }
-
-                                        resetTimer()
-                                    } label: {
-                                        if #available(macOS 14.0, *) {
-                                            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                                                .font(.system(size: 43))
-                                                .contentTransition(.symbolEffect(.replace))
-                                        } else {
-                                            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                                                .font(.system(size: 43))
-                                        }
                                     }
-                                    .buttonStyle(.plain)
-                                    .keyboardShortcut(.space, modifiers: [])
+                                } label: {
+                                    if #available(macOS 14.0, *) {
+                                        Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                                            .font(.system(size: 43))
+                                            .contentTransition(.symbolEffect(.replace))
+                                    } else {
+                                        Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                                            .font(.system(size: 43))
+                                    }
+                                }
+                                .buttonStyle(.plain)
+                                .keyboardShortcut(.space, modifiers: [])
+                            }
+
+                            Spacer()
+
+                            if let seasons, let season, let episode {
+                                Button {
+                                    nextTrack(seasons, season, episode)
+                                } label: {
+                                    Image(systemName: "forward.fill")
+                                        .font(.system(size: 18))
+                                }
+                                .buttonStyle(.plain)
+                                .disabled(seasons.element(after: season) == nil && season.episodes.element(after: episode) == nil)
+                            }
+                        }
+                        .frame(width: 160)
+
+                        Spacer()
+                    }
+
+                    VStack {
+                        Spacer()
+
+                        VStack(alignment: .center, spacing: 8) {
+                            HStack(alignment: .bottom) {
+                                VStack(alignment: .leading) {
+                                    HStack(alignment: .center) {
+                                        if let season, let episode {
+                                            Text("key.season-\(season.name).episode-\(episode.name)")
+                                                .font(.title2.bold())
+                                                .lineLimit(1)
+                                        }
+
+                                        Text(voiceActing.name)
+                                            .font(.title2.bold())
+                                            .foregroundStyle(.secondary)
+                                            .lineLimit(1)
+                                    }
+
+                                    Text(name)
+                                        .font(.largeTitle.bold())
+                                        .lineLimit(1)
+                                        .help(name)
                                 }
 
                                 Spacer()
 
-                                if let seasons, let season, let episode {
+                                HStack(alignment: .center) {
                                     Button {
-                                        nextTrack(seasons, season, episode)
+                                        withAnimation(.easeInOut) {
+                                            if videoGravity == .resizeAspect {
+                                                playerLayer.videoGravity = .resizeAspectFill
+                                            } else {
+                                                playerLayer.videoGravity = .resizeAspect
+                                            }
+                                        }
                                     } label: {
-                                        Image(systemName: "forward.fill")
-                                            .font(.system(size: 18))
+                                        if #available(macOS 14.0, *) {
+                                            Label("key.video_gravity", systemImage: videoGravity == .resizeAspect ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
+                                                .labelStyle(.iconOnly)
+                                                .font(.system(size: 17))
+                                                .contentTransition(.symbolEffect(.replace))
+                                        } else {
+                                            Label("key.video_gravity", systemImage: videoGravity == .resizeAspect ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
+                                                .labelStyle(.iconOnly)
+                                                .font(.system(size: 17))
+                                        }
                                     }
                                     .buttonStyle(.plain)
-                                    .disabled(seasons.element(after: season) == nil && season.episodes.element(after: episode) == nil)
-                                }
-                            }
-                            .frame(width: 160)
 
-                            Spacer()
-                        }
-
-                        VStack {
-                            Spacer()
-
-                            VStack(alignment: .center, spacing: 8) {
-                                HStack(alignment: .bottom) {
-                                    VStack(alignment: .leading) {
-                                        HStack(alignment: .center) {
-                                            if let season, let episode {
-                                                Text("key.season-\(season.name).episode-\(episode.name)")
-                                                    .font(.title2.bold())
-                                                    .lineLimit(1)
-                                            }
-
-                                            Text(voiceActing.name)
-                                                .font(.title2.bold())
-                                                .foregroundStyle(.secondary)
-                                                .lineLimit(1)
-                                        }
-
-                                        Text(name)
-                                            .font(.largeTitle.bold())
-                                            .lineLimit(1)
-                                            .help(name)
-                                    }
-
-                                    Spacer()
-
-                                    HStack(alignment: .center) {
-                                        Button {
-                                            withAnimation(.easeInOut) {
-                                                if videoGravity == .resizeAspect {
-                                                    playerLayer.videoGravity = .resizeAspectFill
-                                                } else {
-                                                    playerLayer.videoGravity = .resizeAspect
-                                                }
-                                            }
-                                        } label: {
-                                            if #available(macOS 14.0, *) {
-                                                Label("key.video_gravity", systemImage: videoGravity == .resizeAspect ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
-                                                    .labelStyle(.iconOnly)
-                                                    .font(.system(size: 17))
-                                                    .contentTransition(.symbolEffect(.replace))
-                                            } else {
-                                                Label("key.video_gravity", systemImage: videoGravity == .resizeAspect ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
-                                                    .labelStyle(.iconOnly)
-                                                    .font(.system(size: 17))
-                                            }
-                                        }
-                                        .buttonStyle(.plain)
-
-                                        if !subtitlesOptions.isEmpty {
-                                            Menu {
-                                                Picker(selection: Binding {
-                                                    subtitles
-                                                } set: { subtitles in
-                                                    self.subtitles = subtitles
-
-                                                    selectSubtitles(subtitles)
-                                                }) {
-                                                    Text("key.off").tag(nil as String?)
-
-                                                    ForEach(subtitlesOptions, id: \.self) { subtitles in
-                                                        Text(subtitles.displayName(with: Locale.current)).tag(subtitles.extendedLanguageTag)
-                                                    }
-                                                } label: {
-                                                    EmptyView()
-                                                }
-                                                .pickerStyle(.inline)
-                                            } label: {
-                                                Label("key.subtitles", systemImage: "captions.bubble")
-                                                    .labelStyle(.iconOnly)
-                                                    .font(.system(size: 17))
-                                            }
-                                            .buttonStyle(.plain)
-                                        }
-
+                                    if !subtitlesOptions.isEmpty {
                                         Menu {
-                                            Menu {
-                                                Picker(selection: Binding {
-                                                    timer
-                                                } set: {
-                                                    timer = $0
+                                            Picker(selection: Binding {
+                                                subtitles
+                                            } set: { subtitles in
+                                                self.subtitles = subtitles
 
-                                                    resetTimer()
-                                                }) {
-                                                    Text("key.off").tag(nil as Int?)
+                                                selectSubtitles(subtitles)
+                                            }) {
+                                                Text("key.off").tag(nil as String?)
 
-                                                    ForEach(times, id: \.self) { time in
-                                                        let name = switch time {
-                                                        case 900:
-                                                            String(localized: "key.timer.15m")
-                                                        case 1800:
-                                                            String(localized: "key.timer.30m")
-                                                        case 2700:
-                                                            String(localized: "key.timer.45m")
-                                                        case 3600:
-                                                            String(localized: "key.timer.1h")
-                                                        case -1:
-                                                            String(localized: "key.timer.end")
-                                                        default:
-                                                            String(localized: "key.off")
-                                                        }
-
-                                                        Text(name).tag(time)
-                                                    }
-                                                } label: {
-                                                    EmptyView()
+                                                ForEach(subtitlesOptions, id: \.self) { subtitles in
+                                                    Text(subtitles.displayName(with: Locale.current)).tag(subtitles.extendedLanguageTag)
                                                 }
-                                                .pickerStyle(.inline)
                                             } label: {
-                                                Label("key.timer", systemImage: "timer")
-                                                    .labelStyle(.titleOnly)
-                                                    .font(.system(size: 17))
+                                                EmptyView()
                                             }
-                                            .buttonStyle(.plain)
-
-                                            Menu {
-                                                Picker(selection: Binding {
-                                                    rate
-                                                } set: { rate in
-                                                    self.rate = rate
-                                                    self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = rate
-
-                                                    if isPlaying {
-                                                        player.playImmediately(atRate: rate)
-                                                    }
-                                                }) {
-                                                    ForEach(rates, id: \.self) { value in
-                                                        Text("\(value.description)x").tag(value)
-                                                    }
-                                                } label: {
-                                                    EmptyView()
-                                                }
-                                                .pickerStyle(.inline)
-                                            } label: {
-                                                Label("key.speed", systemImage: "gauge.with.dots.needle.33percent")
-                                                    .labelStyle(.titleOnly)
-                                                    .font(.system(size: 17))
-                                            }
-                                            .buttonStyle(.plain)
-
-                                            if !movie.getAvailableQualities().isEmpty {
-                                                Menu {
-                                                    Picker(selection: Binding {
-                                                        quality
-                                                    } set: {
-                                                        self.quality = $0
-
-                                                        let currentSeek = player.currentTime()
-
-                                                        resetPlayer {
-                                                            setupPlayer(seek: currentSeek, isPlaying: isPlaying, isMuted: isMuted, subtitles: subtitles, volume: volume)
-                                                        }
-                                                    }) {
-                                                        ForEach(movie.getAvailableQualities(), id: \.self) { value in
-                                                            Text(value).tag(value)
-                                                        }
-                                                    } label: {
-                                                        EmptyView()
-                                                    }
-                                                    .pickerStyle(.inline)
-                                                } label: {
-                                                    Label("key.quality", systemImage: "gearshape")
-                                                        .labelStyle(.titleOnly)
-                                                        .font(.system(size: 17))
-                                                }
-                                                .buttonStyle(.plain)
-                                            }
+                                            .pickerStyle(.inline)
                                         } label: {
-                                            Label("key.settings", systemImage: "ellipsis.circle")
+                                            Label("key.subtitles", systemImage: "captions.bubble")
                                                 .labelStyle(.iconOnly)
                                                 .font(.system(size: 17))
                                         }
                                         .buttonStyle(.plain)
                                     }
-                                }
 
-                                SliderWithText(value: Binding {
-                                    currentTime
-                                } set: { time in
-                                    player.seek(to: CMTime(seconds: time, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { success in
-                                        if success {
-                                            updateNextTimer()
+                                    Menu {
+                                        Menu {
+                                            Picker(selection: Binding {
+                                                timer
+                                            } set: {
+                                                timer = $0
+
+                                                resetTimer()
+                                            }) {
+                                                Text("key.off").tag(nil as Int?)
+
+                                                ForEach(times, id: \.self) { time in
+                                                    let name = switch time {
+                                                    case 900:
+                                                        String(localized: "key.timer.15m")
+                                                    case 1800:
+                                                        String(localized: "key.timer.30m")
+                                                    case 2700:
+                                                        String(localized: "key.timer.45m")
+                                                    case 3600:
+                                                        String(localized: "key.timer.1h")
+                                                    case -1:
+                                                        String(localized: "key.timer.end")
+                                                    default:
+                                                        String(localized: "key.off")
+                                                    }
+
+                                                    Text(name).tag(time)
+                                                }
+                                            } label: {
+                                                EmptyView()
+                                            }
+                                            .pickerStyle(.inline)
+                                        } label: {
+                                            Label("key.timer", systemImage: "timer")
+                                                .labelStyle(.titleOnly)
+                                                .font(.system(size: 17))
                                         }
-                                    }
-                                }, inRange: 0 ... duration, buffers: loadedTimeRanges, activeFillColor: .primary, fillColor: .primary.opacity(0.7), emptyColor: .primary.opacity(0.3), height: 6, thumbnails: thumbnails) { _ in }
-                                    .frame(height: 23)
-                                    .onHover { hovering in
-                                        guard let window = playerLayer.window else { return }
+                                        .buttonStyle(.plain)
 
-                                        window.isMovableByWindowBackground = !hovering
+                                        Menu {
+                                            Picker(selection: Binding {
+                                                rate
+                                            } set: { rate in
+                                                self.rate = rate
+                                                self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = rate
+
+                                                if isPlaying {
+                                                    player.playImmediately(atRate: rate)
+                                                }
+                                            }) {
+                                                ForEach(rates, id: \.self) { value in
+                                                    Text("\(value.description)x").tag(value)
+                                                }
+                                            } label: {
+                                                EmptyView()
+                                            }
+                                            .pickerStyle(.inline)
+                                        } label: {
+                                            Label("key.speed", systemImage: "gauge.with.dots.needle.33percent")
+                                                .labelStyle(.titleOnly)
+                                                .font(.system(size: 17))
+                                        }
+                                        .buttonStyle(.plain)
+
+                                        if !movie.getAvailableQualities().isEmpty {
+                                            Menu {
+                                                Picker(selection: Binding {
+                                                    quality
+                                                } set: {
+                                                    self.quality = $0
+
+                                                    let currentSeek = player.currentTime()
+
+                                                    resetPlayer {
+                                                        setupPlayer(seek: currentSeek, isPlaying: isPlaying, isMuted: isMuted, subtitles: subtitles, volume: volume)
+                                                    }
+                                                }) {
+                                                    ForEach(movie.getAvailableQualities(), id: \.self) { value in
+                                                        Text(value).tag(value)
+                                                    }
+                                                } label: {
+                                                    EmptyView()
+                                                }
+                                                .pickerStyle(.inline)
+                                            } label: {
+                                                Label("key.quality", systemImage: "gearshape")
+                                                    .labelStyle(.titleOnly)
+                                                    .font(.system(size: 17))
+                                            }
+                                            .buttonStyle(.plain)
+                                        }
+                                    } label: {
+                                        Label("key.settings", systemImage: "ellipsis.circle")
+                                            .labelStyle(.iconOnly)
+                                            .font(.system(size: 17))
                                     }
+                                    .buttonStyle(.plain)
+                                }
                             }
+
+                            SliderWithText(value: Binding {
+                                currentTime
+                            } set: { time in
+                                player.seek(to: CMTime(seconds: time, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { success in
+                                    if success {
+                                        updateNextTimer()
+                                    }
+                                }
+                            }, inRange: 0 ... duration, buffers: loadedTimeRanges, activeFillColor: .primary, fillColor: .primary.opacity(0.7), emptyColor: .primary.opacity(0.3), height: 6, thumbnails: thumbnails) { _ in }
+                                .frame(height: 23)
+                                .onHover { hovering in
+                                    guard let window = playerLayer.window else { return }
+
+                                    window.isMovableByWindowBackground = !hovering
+                                }
                         }
                     }
                 }
                 .padding(36)
+                .opacity(isMaskShow ? 1 : 0)
 
                 if let nextTimer, let seasons, let season, let episode {
                     VStack(alignment: .trailing) {
