@@ -16,7 +16,7 @@ struct ContentView: View {
     @Default(.isUserPremium) private var isUserPremium
     @Default(.lastHdrezkaAppVersion) private var lastHdrezkaAppVersion
 
-    @Environment(AppState.self) private var appState
+    @EnvironmentObject private var appState: AppState
 
     @Namespace var mainNamespace
     @Environment(\.resetFocus) var resetFocus
@@ -29,8 +29,6 @@ struct ContentView: View {
     @State private var subscriptions: Set<AnyCancellable> = []
 
     var body: some View {
-        @Bindable var appState = appState
-
         HStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 20) {
                 TextField("key.search", text: $query)
@@ -240,7 +238,6 @@ struct ContentView: View {
             .background(BlurredView())
 
             Divider()
-                .background(.windowBackground)
 
             NavigationStack(path: $appState.path.animationIf(navigationAnimation)) {
                 HomeView()
@@ -324,7 +321,7 @@ struct ContentView: View {
                 }
                 .store(in: &subscriptions)
         }
-        .onChange(of: query.trimmingCharacters(in: .whitespacesAndNewlines)) {
+        .customOnChange(of: query.trimmingCharacters(in: .whitespacesAndNewlines)) {
             searchWork?.cancel()
 
             searchWork = DispatchWorkItem {
@@ -349,7 +346,7 @@ struct ContentView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: searchWork)
             }
         }
-        .onChange(of: isLoggedIn) {
+        .customOnChange(of: isLoggedIn) {
             while !isLoggedIn, appState.path.last == .watchingLater || appState.path.last == .bookmarks {
                 appState.path.removeLast()
             }

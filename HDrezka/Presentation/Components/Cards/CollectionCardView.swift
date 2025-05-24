@@ -4,7 +4,7 @@ import SwiftUI
 struct CollectionCardView: View {
     private let collection: MoviesCollection
 
-    @Environment(AppState.self) private var appState
+    @EnvironmentObject private var appState: AppState
 
     init(collection: MoviesCollection) {
         self.collection = collection

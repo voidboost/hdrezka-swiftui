@@ -2,37 +2,22 @@ import Combine
 import FactoryKit
 import SwiftUI
 
-@Observable
-class CommentsViewModel {
-    @ObservationIgnored
-    @Injected(\.getCommentsPageUseCase)
-    private var getCommentsPageUseCase
-    @ObservationIgnored
-    @Injected(\.getCommentUseCase)
-    private var getCommentUseCase
-    @ObservationIgnored
-    @Injected(\.toggleLikeCommentUseCase)
-    private var toggleLikeCommentUseCase
-    @ObservationIgnored
-    @Injected(\.deleteCommentUseCase)
-    private var deleteCommentUseCase
-    @ObservationIgnored
-    @Injected(\.sendCommentUseCase)
-    private var sendCommentUseCase
-    @ObservationIgnored
-    @Injected(\.getLikesUseCase)
-    private var getLikesUseCase
+class CommentsViewModel: ObservableObject {
+    @Injected(\.getCommentsPageUseCase) private var getCommentsPageUseCase
+    @Injected(\.getCommentUseCase) private var getCommentUseCase
+    @Injected(\.toggleLikeCommentUseCase) private var toggleLikeCommentUseCase
+    @Injected(\.deleteCommentUseCase) private var deleteCommentUseCase
+    @Injected(\.sendCommentUseCase) private var sendCommentUseCase
+    @Injected(\.getLikesUseCase) private var getLikesUseCase
 
-    @ObservationIgnored
     private var subscriptions: Set<AnyCancellable> = []
 
-    var reply: String?
-    var reportComment: Comment?
-    var deleteComment: Comment?
-    var state: DataState<[Comment]> = .loading
-    var paginationState: DataPaginationState = .idle
+    @Published var reply: String?
+    @Published var reportComment: Comment?
+    @Published var deleteComment: Comment?
+    @Published var state: DataState<[Comment]> = .loading
+    @Published var paginationState: DataPaginationState = .idle
 
-    @ObservationIgnored
     private var page = 1
 
     func getComments(movieId: String) {
@@ -104,8 +89,8 @@ class CommentsViewModel {
         }
     }
 
-    var comment: Comment?
-    var isCommentPresented: Bool = false
+    @Published var comment: Comment?
+    @Published var isCommentPresented: Bool = false
 
     func getComment(movieId: String, commentId: String) {
         comment = nil
@@ -132,8 +117,8 @@ class CommentsViewModel {
         }
     }
 
-    var error: Error?
-    var isErrorPresented: Bool = false
+    @Published var error: Error?
+    @Published var isErrorPresented: Bool = false
 
     func like(comment: Comment) {
         toggleLikeCommentUseCase(id: comment.commentId)
@@ -159,8 +144,8 @@ class CommentsViewModel {
             .store(in: &subscriptions)
     }
 
-    var isOnModerationPresented: Bool = false
-    var message: String?
+    @Published var isOnModerationPresented: Bool = false
+    @Published var message: String?
 
     func sendComment(name: String?, text: String, postId: String, adb: String?, type: String?) {
         if let postId = postId.id {
@@ -191,7 +176,7 @@ class CommentsViewModel {
         }
     }
 
-    var likes: [String: (Bool, [Like])] = [:]
+    @Published var likes: [String: (Bool, [Like])] = [:]
 
     func getLikes(hovering: Bool, comment: Comment) {
         if comment.likesCount > 0 {

@@ -2,15 +2,11 @@ import Combine
 import FactoryKit
 import SwiftUI
 
-@Observable
-class PersonViewModel {
-    @ObservationIgnored
-    @Injected(\.getPersonDetailsUseCase)
-    private var getPersonDetailsUseCase
+class PersonViewModel: ObservableObject {
+    @Injected(\.getPersonDetailsUseCase) private var getPersonDetailsUseCase
 
-    var state: DataState<PersonDetailed> = .loading
+    @Published var state: DataState<PersonDetailed> = .loading
 
-    @ObservationIgnored
     private var subscriptions: Set<AnyCancellable> = []
 
     func getDetails(id: String) {

@@ -3,23 +3,15 @@ import FactoryKit
 import SwiftUI
 import YouTubePlayerKit
 
-@Observable
-class DetailsViewModel {
-    @ObservationIgnored
-    @Injected(\.getMovieDetailsUseCase)
-    private var getMovieDetailsUseCase
-    @ObservationIgnored
-    @Injected(\.getMovieTrailerIdUseCase)
-    private var getMovieTrailerIdUseCase
-    @ObservationIgnored
-    @Injected(\.rateUseCase)
-    private var rateUseCase
+class DetailsViewModel: ObservableObject {
+    @Injected(\.getMovieDetailsUseCase) private var getMovieDetailsUseCase
+    @Injected(\.getMovieTrailerIdUseCase) private var getMovieTrailerIdUseCase
+    @Injected(\.rateUseCase) private var rateUseCase
 
-    @ObservationIgnored
     private var subscriptions: Set<AnyCancellable> = []
 
-    var state: DataState<MovieDetailed> = .loading
-    var trailer: YouTubePlayer?
+    @Published var state: DataState<MovieDetailed> = .loading
+    @Published var trailer: YouTubePlayer?
 
     func getDetails(id: String) {
         state = .loading
@@ -35,7 +27,9 @@ class DetailsViewModel {
             } receiveValue: { detail in
                 withAnimation(.easeInOut) {
                     self.state = .data(detail)
-                } completion: {
+                }
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                     if let movieId = detail.movieId.id {
                         self.getMovieTrailerIdUseCase(movieId: movieId)
                             .receive(on: DispatchQueue.main)
@@ -71,8 +65,8 @@ class DetailsViewModel {
             .store(in: &subscriptions)
     }
 
-    var isErrorPresented: Bool = false
-    var error: Error?
+    @Published var isErrorPresented: Bool = false
+    @Published var error: Error?
 
     func rate(id: String, rating: Int) {
         rateUseCase(id: id, rating: rating)

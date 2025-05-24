@@ -242,7 +242,7 @@ struct CommentReportSheet: View {
             }
             .onTapGesture { isSelected = true }
             .animation(.easeInOut, value: isSelected)
-            .onChange(of: isSelected) {
+            .customOnChange(of: isSelected) {
                 if isSelected, tag == .other {
                     focused = true
                 } else {

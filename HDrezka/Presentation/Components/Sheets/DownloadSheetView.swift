@@ -12,8 +12,9 @@ struct DownloadSheetView: View {
     @State private var subscriptions: Set<AnyCancellable> = []
 
     @Environment(\.dismiss) private var dismiss
-    @Environment(AppState.self) private var appState
-    @Environment(Downloader.self) private var downloader
+
+    @EnvironmentObject private var appState: AppState
+    @EnvironmentObject private var downloader: Downloader
 
     @FetchRequest(fetchRequest: SelectPosition.fetch()) private var selectPositions: FetchedResults<SelectPosition>
     
@@ -538,7 +539,7 @@ struct DownloadSheetView: View {
                 }
                 .store(in: &subscriptions)
         }
-        .onChange(of: details) {
+        .customOnChange(of: details) {
             if let details, let acting = details.voiceActing {
                 withAnimation(.easeInOut) {
                     selectedActing = if !isLoggedIn,
@@ -562,7 +563,7 @@ struct DownloadSheetView: View {
                 }
             }
         }
-        .onChange(of: selectedActing) {
+        .customOnChange(of: selectedActing) {
             withAnimation(.easeInOut) {
                 selectedSeason = nil
                 selectedEpisode = nil
@@ -645,7 +646,7 @@ struct DownloadSheetView: View {
                 }
             }
         }
-        .onChange(of: selectedSeason) {
+        .customOnChange(of: selectedSeason) {
             withAnimation(.easeInOut) {
                 selectedQuality = nil
                 movie = nil
@@ -668,7 +669,7 @@ struct DownloadSheetView: View {
                 }
             }
         }
-        .onChange(of: selectedEpisode) {
+        .customOnChange(of: selectedEpisode) {
             withAnimation(.easeInOut) {
                 selectedQuality = nil
                 movie = nil

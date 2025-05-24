@@ -9,12 +9,13 @@ import YouTubePlayerKit
 struct DetailsView: View {
     private let movie: MovieSimple
     
-    @State private var vm = DetailsViewModel()
+    @StateObject private var vm = DetailsViewModel()
     
     @Default(.isLoggedIn) private var isLoggedIn
     @Default(.mirror) private var mirror
-    @Environment(AppState.self) private var appState
-    
+
+    @EnvironmentObject private var appState: AppState
+
     @State private var isBookmarksPresented = false
     @State private var isCreateBookmarkPresented = false
     @State private var isSchedulePresented = false
@@ -42,15 +43,16 @@ struct DetailsView: View {
                             }
                         }
                     }
-                }
-                .scrollIndicators(.never)
-                .onGeometryChange(for: Bool.self) { geometry in
-                    -geometry.frame(in: .scrollView).origin.y / 52 >= 1
-                } action: { showBar in
-                    withAnimation(.easeInOut(duration: 0.15)) {
-                        self.showBar = showBar
+                    .onGeometryChange(for: Bool.self) { geometry in
+                        -geometry.frame(in: .named("scroll")).origin.y / 52 >= 1
+                    } action: { showBar in
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            self.showBar = showBar
+                        }
                     }
                 }
+                .scrollIndicators(.never)
+                .coordinateSpace(name: "scroll")
             } else {
                 LoadingStateView(movie.name)
                     .padding(.vertical, 52)
@@ -135,7 +137,7 @@ struct DetailsView: View {
             }
         }
         .dialogSeverity(.critical)
-        .onChange(of: isCreateBookmarkPresented) {
+        .customOnChange(of: isCreateBookmarkPresented) {
             isBookmarksPresented = !isCreateBookmarkPresented
         }
         .background(.background)
@@ -147,7 +149,7 @@ struct DetailsView: View {
         @Binding private var isSchedulePresented: Bool
         private let rate: (Int) -> Void
         
-        @Environment(AppState.self) private var appState
+        @EnvironmentObject private var appState: AppState
 
         init(details: MovieDetailed, trailer: YouTubePlayer?, isSchedulePresented: Binding<Bool>, rate: @escaping (Int) -> Void) {
             self.details = details
@@ -166,7 +168,6 @@ struct DetailsView: View {
 
         @Environment(\.colorScheme) private var colorScheme
         @Environment(\.openWindow) private var openWindow
-        @Environment(\.dismissWindow) private var dismissWindow
         
         var body: some View {
             VStack(spacing: 18) {
@@ -800,7 +801,7 @@ struct DetailsView: View {
             
             @State private var isPresented: Bool = false
             
-            @Environment(AppState.self) private var appState
+            @EnvironmentObject private var appState: AppState
 
             init(_ title: String, _ description: String, _ data: [T]) {
                 self.title = title
@@ -1016,16 +1017,28 @@ struct DetailsView: View {
                             .foregroundStyle(.tertiary)
                         
                         HStack(alignment: .firstTextBaseline, spacing: 2) {
-                            Text(rating.description)
-                                .font(.system(size: 13).monospacedDigit())
-                                .foregroundStyle(.secondary)
-                                .contentTransition(.numericText(value: Double(rating)))
-                                
-                            if let votes, vote {
-                                Text("(\(votes))")
-                                    .font(.system(size: 9).monospacedDigit())
+                            if #available(macOS 14.0, *) {
+                                Text(rating.description)
+                                    .font(.system(size: 13).monospacedDigit())
                                     .foregroundStyle(.secondary)
-                                    .contentTransition(.numericText())
+                                    .contentTransition(.numericText(value: Double(rating)))
+                                
+                                if let votes, vote {
+                                    Text("(\(votes))")
+                                        .font(.system(size: 9).monospacedDigit())
+                                        .foregroundStyle(.secondary)
+                                        .contentTransition(.numericText())
+                                }
+                            } else {
+                                Text(rating.description)
+                                    .font(.system(size: 13).monospacedDigit())
+                                    .foregroundStyle(.secondary)
+                                
+                                if let votes, vote {
+                                    Text("(\(votes))")
+                                        .font(.system(size: 9).monospacedDigit())
+                                        .foregroundStyle(.secondary)
+                                }
                             }
                         }
                         .ifLet(votes) { view, _ in
@@ -1226,6 +1239,8 @@ struct DetailsView: View {
 
 private extension PlatformImage {
     func removeBackground() -> PlatformImage? {
+        guard #available(macOS 14.0, *) else { return self }
+
         func processImage(image: CGImage) -> PlatformImage? {
             let inputImage = CIImage(cgImage: image)
             let handler = VNImageRequestHandler(ciImage: inputImage)

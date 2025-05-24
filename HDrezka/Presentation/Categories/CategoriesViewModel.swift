@@ -2,16 +2,12 @@ import Combine
 import FactoryKit
 import SwiftUI
 
-@Observable
-class CategoriesViewModel {
-    @ObservationIgnored
-    @Injected(\.categoriesUseCase)
-    private var categoriesUseCase
+class CategoriesViewModel: ObservableObject {
+    @Injected(\.categoriesUseCase) private var categoriesUseCase
 
-    var selection: UUID?
-    var state: DataState<[MovieType]> = .loading
+    @Published var selection: UUID?
+    @Published var state: DataState<[MovieType]> = .loading
 
-    @ObservationIgnored
     private var subscriptions: Set<AnyCancellable> = []
 
     private func getTypes() {

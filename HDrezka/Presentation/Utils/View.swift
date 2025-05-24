@@ -37,4 +37,16 @@ extension View {
             }
         }
     }
+
+    @ViewBuilder func customOnChange<V: Equatable>(of value: V, _ action: @escaping () -> Void) -> some View {
+        if #available(macOS 14.0, *) {
+            onChange(of: value) {
+                action()
+            }
+        } else {
+            onChange(of: value) { _ in
+                action()
+            }
+        }
+    }
 }

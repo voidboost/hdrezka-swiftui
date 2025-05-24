@@ -13,7 +13,8 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
     @State private var width: CGFloat = .zero
     @State private var parallax = false
     
-    @Environment(AppState.self) private var appState
+    @EnvironmentObject private var appState: AppState
+
     @Default(.isLoggedIn) private var isLoggedIn
     @Default(.navigationAnimation) private var navigationAnimation
     
@@ -41,7 +42,7 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
     func body(content: Content) -> some View {
         content
             .navigationTitle("HDrezka - \(title)")
-            .onChange(of: appState.path) {
+            .customOnChange(of: appState.path) {
                 if parallax != (appState.path.count != index) {
                     withAnimation(.easeInOut) {
                         parallax = appState.path.count > index
@@ -88,9 +89,7 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
                         .padding(.horizontal, 15)
                         
                         if showBar {
-                            Rectangle()
-                                .frame(height: 0.4)
-                                .foregroundColor(.primary.opacity(0.25))
+                            Divider()
                         }
                     }
                     .frame(maxWidth: .infinity)

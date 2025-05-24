@@ -2,19 +2,14 @@ import Combine
 import FactoryKit
 import SwiftUI
 
-@Observable
-class SearchViewModel {
-    @ObservationIgnored
-    @Injected(\.searchUseCase)
-    private var searchUseCase
+class SearchViewModel: ObservableObject {
+    @Injected(\.searchUseCase) private var searchUseCase
 
-    var state: DataState<[MovieSimple]> = .loading
-    var paginationState: DataPaginationState = .idle
+    @Published var state: DataState<[MovieSimple]> = .loading
+    @Published var paginationState: DataPaginationState = .idle
 
-    @ObservationIgnored
     private var subscriptions: Set<AnyCancellable> = []
 
-    @ObservationIgnored
     private var page = 1
 
     private func getMovies(query: String) {

@@ -5,7 +5,7 @@ import SwiftUI
 struct PersonView: View {
     private let person: PersonSimple
         
-    @State private var vm = PersonViewModel()
+    @StateObject private var vm = PersonViewModel()
     
     @State private var showBar: Bool = false
     
@@ -32,13 +32,14 @@ struct PersonView: View {
                     .padding(.vertical, 52)
                     .padding(.vertical, 18)
                     .onGeometryChange(for: Bool.self) { geometry in
-                        -geometry.frame(in: .scrollView).origin.y / 52 >= 1
+                        -geometry.frame(in: .named("scroll")).origin.y / 52 >= 1
                     } action: { showBar in
                         withAnimation(.easeInOut(duration: 0.15)) {
                             self.showBar = showBar
                         }
                     }
                 }
+                .coordinateSpace(name: "scroll")
                 .scrollIndicators(.never)
             } else {
                 LoadingStateView(person.name)
@@ -79,7 +80,6 @@ struct PersonView: View {
         private let details: PersonDetailed
         
         @Environment(\.openWindow) private var openWindow
-        @Environment(\.dismissWindow) private var dismissWindow
         
         init(details: PersonDetailed) {
             self.details = details
@@ -323,8 +323,8 @@ struct PersonView: View {
             private let title: String
             private let movies: [MovieSimple]
             
-            @Environment(AppState.self) private var appState
-            
+            @EnvironmentObject private var appState: AppState
+
             init(_ title: String, _ movies: [MovieSimple]) {
                 self.title = title
                 self.movies = movies

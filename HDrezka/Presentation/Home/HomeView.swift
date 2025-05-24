@@ -2,7 +2,7 @@ import Defaults
 import SwiftUI
 
 struct HomeView: View {
-    @State private var vm = HomeViewModel()
+    @StateObject private var vm = HomeViewModel()
 
     @State private var isSeriesUpdatesPresented: Bool = false
 
@@ -63,13 +63,14 @@ struct HomeView: View {
                             }
                             .padding(.vertical, 52)
                             .onGeometryChange(for: Bool.self) { geometry in
-                                -geometry.frame(in: .scrollView).origin.y / 52 >= 1
+                                -geometry.frame(in: .named("scroll")).origin.y / 52 >= 1
                             } action: { showBar in
                                 withAnimation(.easeInOut(duration: 0.15)) {
                                     self.showBar = showBar
                                 }
                             }
                         }
+                        .coordinateSpace(name: "scroll")
                         .scrollIndicators(.never)
 
                         if let error = vm.paginationState.error {
@@ -145,7 +146,7 @@ struct HomeView: View {
 
         private let movies: [MovieSimple]
 
-        @Environment(AppState.self) private var appState
+        @EnvironmentObject private var appState: AppState
 
         init(title: String, category: Categories, movies: [MovieSimple]) {
             self.title = title

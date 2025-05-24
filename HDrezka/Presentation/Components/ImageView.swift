@@ -4,9 +4,8 @@ import SwiftUI
 struct ImageView: View {
     private let url: URL
 
-    @Environment(\.dismissWindow) private var dismissWindow
-
     @State private var window: NSWindow?
+    @State private var monitorID: Any?
 
     init(url: URL) {
         self.url = url
@@ -59,20 +58,24 @@ struct ImageView: View {
             if !window.styleMask.contains(.fullScreen) {
                 window.toggleFullScreen(nil)
             }
+
+            monitorID = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                if event.keyCode == .escape {
+                    dismissWindow(id: "imageViewer")
+
+                    return nil
+                }
+
+                return event
+            }
+        }
+        .onDisappear {
+            if let monitorID {
+                NSEvent.removeMonitor(monitorID)
+            }
         }
         .ignoresSafeArea()
         .focusable()
-        .focusEffectDisabled()
-        .onKeyPress {
-            switch $0.key {
-            case .escape:
-                dismissWindow(id: "imageViewer")
-
-                return .handled
-            default:
-                return .ignored
-            }
-        }
         .frame(minWidth: 300 * (16 / 9), maxWidth: .infinity, minHeight: 300, maxHeight: .infinity)
         .background(WindowAccessor(window: $window))
         .background {

@@ -1,17 +1,13 @@
 import CoreData
 import SwiftUI
 
-@Observable
-class PersistenceController {
-    @ObservationIgnored
+class PersistenceController: ObservableObject {
     static let shared = PersistenceController()
 
-    @ObservationIgnored
     var viewContext: NSManagedObjectContext {
         container.viewContext
     }
 
-    @ObservationIgnored
     private let container: NSPersistentContainer
 
     init() {
