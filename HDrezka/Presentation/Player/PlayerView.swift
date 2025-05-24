@@ -1509,14 +1509,3 @@ extension AVPlayerLayer {
         return nil
     }
 }
-
-// https://gist.github.com/rdev/627a254417687a90c493528639465943
-extension UInt16 {
-    static let space: UInt16 = 0x31
-    static let escape: UInt16 = 0x35
-    static let leftArrow: UInt16 = 0x7b
-    static let rightArrow: UInt16 = 0x7c
-    static let downArrow: UInt16 = 0x7d
-    static let upArrow: UInt16 = 0x7e
-    static let m: UInt16 = 0x2e
-}
