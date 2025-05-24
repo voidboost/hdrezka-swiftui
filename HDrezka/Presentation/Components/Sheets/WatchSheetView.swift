@@ -396,8 +396,6 @@ struct WatchSheetView: View {
                             dismiss()
                         }
                         
-                        dismissWindow(id: "player")
-                        
                         openWindow(
                             id: "player",
                             value: PlayerData(details: details, selectedActing: selectedActing, seasons: seasons, selectedSeason: selectedSeason, selectedEpisode: selectedEpisode, selectedQuality: selectedQuality, movie: movie)

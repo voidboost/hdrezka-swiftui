@@ -89,8 +89,6 @@ struct PersonView: View {
             HStack(alignment: .bottom, spacing: 27) {
                 Button {
                     if let url = URL(string: details.hphoto) ?? URL(string: details.photo) {
-                        dismissWindow(id: "imageViewer")
-                        
                         openWindow(id: "imageViewer", value: url)
                     }
                 } label: {
@@ -103,13 +101,6 @@ struct PersonView: View {
                                         removal: .wipe(reversed: true, blurRadius: 10)
                                     )
                                 )
-                                .onTapGesture {
-                                    if let url = URL(string: details.hphoto) {
-                                        dismissWindow(id: "imageViewer")
-                                        
-                                        openWindow(id: "imageViewer", value: url)
-                                    }
-                                }
                         } else {
                             LazyImage(url: URL(string: details.photo), transaction: .init(animation: .easeInOut)) { state in
                                 if let image = state.image {

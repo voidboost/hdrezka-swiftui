@@ -17,6 +17,7 @@ struct PlayerView: View {
     @Default(.spatialAudio) private var spatialAudio
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.dismiss) private var dismiss
 
     @EnvironmentObject private var appState: AppState
 
@@ -67,7 +68,6 @@ struct PlayerView: View {
     @State private var delayHide: DispatchWorkItem?
     @State private var subtitlesOptions: [AVMediaSelectionOption] = []
     @State private var thumbnails: WebVTT?
-    @State private var monitorID: Any?
 
     init(data: PlayerData) {
         self.poster = data.details.poster
@@ -159,6 +159,8 @@ struct PlayerView: View {
                                     VStack(alignment: .center) {
                                         Button {
                                             player.isMuted.toggle()
+
+                                            resetTimer()
                                         } label: {
                                             if #available(macOS 14.0, *) {
                                                 Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(volume))
@@ -170,6 +172,7 @@ struct PlayerView: View {
                                             }
                                         }
                                         .buttonStyle(.plain)
+                                        .keyboardShortcut("m", modifiers: [])
                                     }
                                     .frame(width: 30)
                                 }
@@ -205,6 +208,8 @@ struct PlayerView: View {
                                         } else {
                                             player.playImmediately(atRate: rate)
                                         }
+
+                                        resetTimer()
                                     } label: {
                                         if #available(macOS 14.0, *) {
                                             Image(systemName: isPlaying ? "pause.fill" : "play.fill")
@@ -216,6 +221,7 @@ struct PlayerView: View {
                                         }
                                     }
                                     .buttonStyle(.plain)
+                                    .keyboardShortcut(.space, modifiers: [])
                                 }
 
                                 Spacer()
@@ -512,6 +518,34 @@ struct PlayerView: View {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+
+//            KeyAwareView { event in
+//                self.resetTimer()
+//
+//                if event.keyCode == .m {
+//                    guard let player = self.playerLayer.player,
+//                          player.status == .readyToPlay
+//                    else {
+//                        return
+//                    }
+//
+//                    player.isMuted.toggle()
+//                } else if event.keyCode == .space {
+//                    guard let player = self.playerLayer.player,
+//                          player.status == .readyToPlay,
+//                          !self.isPictureInPictureActive,
+//                          !self.isLoading
+//                    else {
+//                        return
+//                    }
+//
+//                    if self.isPlaying {
+//                        player.pause()
+//                    } else {
+//                        player.playImmediately(atRate: self.rate)
+//                    }
+//                }
+//            }
         }
         .navigationTitle("Player - \(name)")
         .padding(1)
@@ -524,110 +558,6 @@ struct PlayerView: View {
                     window.animationBehavior = animation
                 }
             }
-
-            monitorID = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                self.resetTimer()
-
-                if event.keyCode == .m {
-                    guard let player = self.playerLayer.player,
-                          player.status == .readyToPlay
-                    else {
-                        return event
-                    }
-
-                    player.isMuted.toggle()
-
-                    return nil
-                } else if event.keyCode == .space {
-                    guard let player = self.playerLayer.player,
-                          player.status == .readyToPlay,
-                          !self.isPictureInPictureActive,
-                          !self.isLoading
-                    else {
-                        return event
-                    }
-
-                    if self.isPlaying {
-                        player.pause()
-                    } else {
-                        player.playImmediately(atRate: self.rate)
-                    }
-
-                    return nil
-                } else if event.keyCode == .leftArrow {
-                    guard let player = self.playerLayer.player,
-                          player.status == .readyToPlay,
-                          !self.isPictureInPictureActive
-                    else {
-                        return event
-                    }
-
-                    player.seek(to: CMTime(seconds: max(self.currentTime - 10.0, 0.0), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { complete in
-                        if self.isPlaying, complete {
-                            player.playImmediately(atRate: self.rate)
-                        }
-                    }
-
-                    self.currentTime = max(self.currentTime - 10.0, 0.0)
-
-                    return nil
-                } else if event.keyCode == .upArrow {
-                    guard let player = self.playerLayer.player,
-                          player.status == .readyToPlay,
-                          !self.isPictureInPictureActive,
-                          player.volume < 1.0
-                    else {
-                        return event
-                    }
-
-                    player.volume = min(player.volume + 0.05, 1.0)
-
-                    return nil
-                } else if event.keyCode == .rightArrow {
-                    guard let player = self.playerLayer.player,
-                          player.status == .readyToPlay,
-                          !self.isPictureInPictureActive
-                    else {
-                        return event
-                    }
-
-                    player.seek(to: CMTime(seconds: min(self.currentTime + 10.0, self.duration), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { complete in
-                        if self.isPlaying, complete {
-                            player.playImmediately(atRate: self.rate)
-                        }
-                    }
-
-                    self.currentTime = min(self.currentTime + 10.0, self.duration)
-
-                    return nil
-                } else if event.keyCode == .downArrow {
-                    guard let player = self.playerLayer.player,
-                          player.status == .readyToPlay,
-                          !self.isPictureInPictureActive,
-                          player.volume > 0.0
-                    else {
-                        return event
-                    }
-
-                    player.volume = max(player.volume - 0.05, 0.0)
-
-                    return nil
-                } else if event.keyCode == .escape {
-                    guard let player = self.playerLayer.player,
-                          player.status == .readyToPlay,
-                          let window = self.playerLayer.window,
-                          window.styleMask.contains(.fullScreen)
-                    else {
-                        return event
-                    }
-
-                    window.toggleFullScreen(nil)
-
-                    return nil
-                }
-
-                return event
-            }
         }
         .onDisappear {
             resetPlayer {
@@ -637,10 +567,6 @@ struct PlayerView: View {
                     window.orderFront(nil)
                     window.animationBehavior = animation
                 }
-            }
-
-            if let monitorID {
-                NSEvent.removeMonitor(monitorID)
             }
         }
         .onContinuousHover { phase in
@@ -686,11 +612,66 @@ struct PlayerView: View {
         .ignoresSafeArea()
         .focusable()
         .frame(minWidth: 900, minHeight: 900 / 16 * 9)
+        .background(WindowAccessor { window in
+            window.contentView?.focusRingType = .none
+        })
         .preferredColorScheme(.dark)
         .tint(.primary)
         .background(Color.black)
         .contentShape(Rectangle())
         .toolbar(.hidden)
+        .onExitCommand {
+            resetTimer()
+
+            guard let player = playerLayer.player,
+                  player.status == .readyToPlay,
+                  let window = playerLayer.window,
+                  window.styleMask.contains(.fullScreen)
+            else {
+                return
+            }
+
+            window.toggleFullScreen(nil)
+        }
+        .onMoveCommand { direction in
+            resetTimer()
+
+            guard let player = playerLayer.player,
+                  player.status == .readyToPlay,
+                  !isPictureInPictureActive
+            else {
+                return
+            }
+
+            switch direction {
+            case .up:
+                guard player.volume < 1.0 else { return }
+
+                player.volume = min(player.volume + 0.05, 1.0)
+            case .down:
+                guard player.volume > 0.0 else { return }
+
+                player.volume = max(player.volume - 0.05, 0.0)
+            case .left:
+                player.seek(to: CMTime(seconds: max(currentTime - 10.0, 0.0), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { complete in
+                    if isPlaying, complete {
+                        player.playImmediately(atRate: rate)
+                    }
+                }
+
+                currentTime = max(currentTime - 10.0, 0.0)
+            case .right:
+                player.seek(to: CMTime(seconds: min(currentTime + 10.0, duration), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { complete in
+                    if isPlaying, complete {
+                        player.playImmediately(atRate: rate)
+                    }
+                }
+
+                currentTime = min(currentTime + 10.0, duration)
+            default:
+                break
+            }
+        }
         .gesture(
             DragGesture()
                 .exclusively(before:
@@ -1309,7 +1290,7 @@ struct PlayerView: View {
                         }
                     } receiveValue: { movie in
                         if movie.needPremium {
-                            dismissWindow(id: "player")
+                            dismiss()
 
                             appState.isPremiumPresented = true
                         } else {
@@ -1364,7 +1345,7 @@ struct PlayerView: View {
                         }
                     } receiveValue: { movie in
                         if movie.needPremium {
-                            dismissWindow(id: "player")
+                            dismiss()
 
                             appState.isPremiumPresented = true
                         } else {
@@ -1424,7 +1405,7 @@ struct PlayerView: View {
                         }
                     } receiveValue: { movie in
                         if movie.needPremium {
-                            dismissWindow(id: "player")
+                            dismiss()
 
                             appState.isPremiumPresented = true
                         } else {
@@ -1479,7 +1460,7 @@ struct PlayerView: View {
                         }
                     } receiveValue: { movie in
                         if movie.needPremium {
-                            dismissWindow(id: "player")
+                            dismiss()
 
                             appState.isPremiumPresented = true
                         } else {

@@ -175,8 +175,6 @@ struct DetailsView: View {
                     HStack(alignment: .bottom, spacing: 27) {
                         Button {
                             if let url = URL(string: details.hposter) ?? URL(string: details.poster) {
-                                dismissWindow(id: "imageViewer")
-                                
                                 openWindow(id: "imageViewer", value: url)
                             }
                         } label: {
