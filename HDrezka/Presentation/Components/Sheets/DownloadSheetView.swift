@@ -1,7 +1,7 @@
 import Combine
+import CoreData
 import Defaults
 import FactoryKit
-import SwiftData
 import SwiftUI
 
 struct DownloadSheetView: View {
@@ -15,7 +15,7 @@ struct DownloadSheetView: View {
     @Environment(AppState.self) private var appState
     @Environment(Downloader.self) private var downloader
 
-    @Query private var selectPositions: [SelectPosition]
+    @FetchRequest(fetchRequest: SelectPosition.fetch()) private var selectPositions: FetchedResults<SelectPosition>
     
     @Default(.isUserPremium) private var isUserPremium
     @Default(.isLoggedIn) private var isLoggedIn
