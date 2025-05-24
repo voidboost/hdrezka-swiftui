@@ -16,9 +16,9 @@ struct PlayerView: View {
     @Default(.playerFullscreen) private var playerFullscreen
     @Default(.spatialAudio) private var spatialAudio
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.managedObjectContext) private var viewContext
-    @Environment(AppState.self) private var appState
+
+    @EnvironmentObject private var appState: AppState
 
     @FetchRequest(fetchRequest: PlayerPosition.fetch()) private var playerPositions: FetchedResults<PlayerPosition>
     @FetchRequest(fetchRequest: SelectPosition.fetch()) private var selectPositions: FetchedResults<SelectPosition>
@@ -67,6 +67,7 @@ struct PlayerView: View {
     @State private var delayHide: DispatchWorkItem?
     @State private var subtitlesOptions: [AVMediaSelectionOption] = []
     @State private var thumbnails: WebVTT?
+    @State private var monitorID: Any?
 
     init(data: PlayerData) {
         self.poster = data.details.poster
@@ -88,11 +89,12 @@ struct PlayerView: View {
     var body: some View {
         ZStack(alignment: .center) {
             if let error {
-                ContentUnavailableView {
+                VStack(alignment: .center) {
                     Label("key.ops", systemImage: "play.slash")
-                } description: {
+
                     Text(error.localizedDescription)
-                } actions: {
+                        .foregroundStyle(.secondary)
+
                     Button {
                         resetPlayer {
                             setupPlayer(isMuted: isMuted, subtitles: subtitles, volume: volume)
@@ -158,9 +160,14 @@ struct PlayerView: View {
                                         Button {
                                             player.isMuted.toggle()
                                         } label: {
-                                            Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(volume))
-                                                .font(.system(size: 17))
-                                                .contentTransition(.symbolEffect(.replace))
+                                            if #available(macOS 14.0, *) {
+                                                Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(volume))
+                                                    .font(.system(size: 17))
+                                                    .contentTransition(.symbolEffect(.replace))
+                                            } else {
+                                                Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(volume))
+                                                    .font(.system(size: 17))
+                                            }
                                         }
                                         .buttonStyle(.plain)
                                     }
@@ -199,9 +206,14 @@ struct PlayerView: View {
                                             player.playImmediately(atRate: rate)
                                         }
                                     } label: {
-                                        Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                                            .font(.system(size: 43))
-                                            .contentTransition(.symbolEffect(.replace))
+                                        if #available(macOS 14.0, *) {
+                                            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                                                .font(.system(size: 43))
+                                                .contentTransition(.symbolEffect(.replace))
+                                        } else {
+                                            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                                                .font(.system(size: 43))
+                                        }
                                     }
                                     .buttonStyle(.plain)
                                 }
@@ -261,10 +273,16 @@ struct PlayerView: View {
                                                 }
                                             }
                                         } label: {
-                                            Label("key.video_gravity", systemImage: videoGravity == .resizeAspect ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
-                                                .labelStyle(.iconOnly)
-                                                .font(.system(size: 17))
-                                                .contentTransition(.symbolEffect(.replace))
+                                            if #available(macOS 14.0, *) {
+                                                Label("key.video_gravity", systemImage: videoGravity == .resizeAspect ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
+                                                    .labelStyle(.iconOnly)
+                                                    .font(.system(size: 17))
+                                                    .contentTransition(.symbolEffect(.replace))
+                                            } else {
+                                                Label("key.video_gravity", systemImage: videoGravity == .resizeAspect ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
+                                                    .labelStyle(.iconOnly)
+                                                    .font(.system(size: 17))
+                                            }
                                         }
                                         .buttonStyle(.plain)
 
@@ -459,15 +477,15 @@ struct PlayerView: View {
 
                                             Group {
                                                 Circle()
-                                                    .stroke(.accent.opacity(0.3), style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round), antialiased: true)
+                                                    .stroke(.accent.opacity(0.3), style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
 
                                                 Circle()
                                                     .trim(from: 0.0, to: nextTimer)
-                                                    .stroke(.ultraThickMaterial, style: StrokeStyle(lineWidth: 8, lineCap: .round, lineJoin: .round), antialiased: true)
+                                                    .stroke(.ultraThickMaterial, style: StrokeStyle(lineWidth: 8, lineCap: .round, lineJoin: .round))
 
                                                 Circle()
                                                     .trim(from: 0.0, to: nextTimer)
-                                                    .stroke(.accent, style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round), antialiased: true)
+                                                    .stroke(.accent, style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round))
                                             }
                                             .padding(4)
                                             .rotationEffect(.degrees(-90))
@@ -506,6 +524,110 @@ struct PlayerView: View {
                     window.animationBehavior = animation
                 }
             }
+
+            monitorID = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                self.resetTimer()
+
+                if event.keyCode == .m {
+                    guard let player = self.playerLayer.player,
+                          player.status == .readyToPlay
+                    else {
+                        return event
+                    }
+
+                    player.isMuted.toggle()
+
+                    return nil
+                } else if event.keyCode == .space {
+                    guard let player = self.playerLayer.player,
+                          player.status == .readyToPlay,
+                          !self.isPictureInPictureActive,
+                          !self.isLoading
+                    else {
+                        return event
+                    }
+
+                    if self.isPlaying {
+                        player.pause()
+                    } else {
+                        player.playImmediately(atRate: self.rate)
+                    }
+
+                    return nil
+                } else if event.keyCode == .leftArrow {
+                    guard let player = self.playerLayer.player,
+                          player.status == .readyToPlay,
+                          !self.isPictureInPictureActive
+                    else {
+                        return event
+                    }
+
+                    player.seek(to: CMTime(seconds: max(self.currentTime - 10.0, 0.0), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { complete in
+                        if self.isPlaying, complete {
+                            player.playImmediately(atRate: self.rate)
+                        }
+                    }
+
+                    self.currentTime = max(self.currentTime - 10.0, 0.0)
+
+                    return nil
+                } else if event.keyCode == .upArrow {
+                    guard let player = self.playerLayer.player,
+                          player.status == .readyToPlay,
+                          !self.isPictureInPictureActive,
+                          player.volume < 1.0
+                    else {
+                        return event
+                    }
+
+                    player.volume = min(player.volume + 0.05, 1.0)
+
+                    return nil
+                } else if event.keyCode == .rightArrow {
+                    guard let player = self.playerLayer.player,
+                          player.status == .readyToPlay,
+                          !self.isPictureInPictureActive
+                    else {
+                        return event
+                    }
+
+                    player.seek(to: CMTime(seconds: min(self.currentTime + 10.0, self.duration), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { complete in
+                        if self.isPlaying, complete {
+                            player.playImmediately(atRate: self.rate)
+                        }
+                    }
+
+                    self.currentTime = min(self.currentTime + 10.0, self.duration)
+
+                    return nil
+                } else if event.keyCode == .downArrow {
+                    guard let player = self.playerLayer.player,
+                          player.status == .readyToPlay,
+                          !self.isPictureInPictureActive,
+                          player.volume > 0.0
+                    else {
+                        return event
+                    }
+
+                    player.volume = max(player.volume - 0.05, 0.0)
+
+                    return nil
+                } else if event.keyCode == .escape {
+                    guard let player = self.playerLayer.player,
+                          player.status == .readyToPlay,
+                          let window = self.playerLayer.window,
+                          window.styleMask.contains(.fullScreen)
+                    else {
+                        return event
+                    }
+
+                    window.toggleFullScreen(nil)
+
+                    return nil
+                }
+
+                return event
+            }
         }
         .onDisappear {
             resetPlayer {
@@ -515,6 +637,10 @@ struct PlayerView: View {
                     window.orderFront(nil)
                     window.animationBehavior = animation
                 }
+            }
+
+            if let monitorID {
+                NSEvent.removeMonitor(monitorID)
             }
         }
         .onContinuousHover { phase in
@@ -531,7 +657,7 @@ struct PlayerView: View {
                 setMask((isLoading || !isPlaying) && !isPictureInPictureActive)
             }
         }
-        .onChange(of: scenePhase) {
+        .customOnChange(of: scenePhase) {
             guard let player = playerLayer.player,
                   player.status == .readyToPlay
             else {
@@ -547,7 +673,7 @@ struct PlayerView: View {
                 }
             }
         }
-        .onChange(of: spatialAudio) {
+        .customOnChange(of: spatialAudio) {
             guard let player = playerLayer.player,
                   player.status == .readyToPlay,
                   let currentItem = player.currentItem
@@ -559,113 +685,6 @@ struct PlayerView: View {
         }
         .ignoresSafeArea()
         .focusable()
-        .focusEffectDisabled()
-        .onKeyPress {
-            resetTimer()
-
-            if $0.key.character.lowercased() == "m" || $0.key.character.lowercased() == "ь" {
-                guard let player = playerLayer.player,
-                      player.status == .readyToPlay
-                else {
-                    return .ignored
-                }
-
-                player.isMuted.toggle()
-
-                return .handled
-            } else {
-                switch $0.key {
-                case .space:
-                    guard let player = playerLayer.player,
-                          player.status == .readyToPlay,
-                          !isPictureInPictureActive,
-                          !isLoading
-                    else {
-                        return .ignored
-                    }
-
-                    if isPlaying {
-                        player.pause()
-                    } else {
-                        player.playImmediately(atRate: rate)
-                    }
-
-                    return .handled
-                case .leftArrow:
-                    guard let player = playerLayer.player,
-                          player.status == .readyToPlay,
-                          !isPictureInPictureActive
-                    else {
-                        return .ignored
-                    }
-
-                    player.seek(to: CMTime(seconds: max(currentTime - 10.0, 0.0), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { complete in
-                        if isPlaying, complete {
-                            player.playImmediately(atRate: rate)
-                        }
-                    }
-
-                    currentTime = max(currentTime - 10.0, 0.0)
-
-                    return .handled
-                case .upArrow:
-                    guard let player = playerLayer.player,
-                          player.status == .readyToPlay,
-                          !isPictureInPictureActive,
-                          player.volume < 1.0
-                    else {
-                        return .ignored
-                    }
-
-                    player.volume = min(player.volume + 0.05, 1.0)
-
-                    return .handled
-                case .rightArrow:
-                    guard let player = playerLayer.player,
-                          player.status == .readyToPlay,
-                          !isPictureInPictureActive
-                    else {
-                        return .ignored
-                    }
-
-                    player.seek(to: CMTime(seconds: min(currentTime + 10.0, duration), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { complete in
-                        if isPlaying, complete {
-                            player.playImmediately(atRate: rate)
-                        }
-                    }
-
-                    currentTime = min(currentTime + 10.0, duration)
-
-                    return .handled
-                case .downArrow:
-                    guard let player = playerLayer.player,
-                          player.status == .readyToPlay,
-                          !isPictureInPictureActive,
-                          player.volume > 0.0
-                    else {
-                        return .ignored
-                    }
-
-                    player.volume = max(player.volume - 0.05, 0.0)
-
-                    return .handled
-                case .escape:
-                    guard let player = playerLayer.player,
-                          player.status == .readyToPlay,
-                          let window = playerLayer.window,
-                          window.styleMask.contains(.fullScreen)
-                    else {
-                        return .ignored
-                    }
-
-                    window.toggleFullScreen(nil)
-
-                    return .handled
-                default:
-                    return .ignored
-                }
-            }
-        }
         .frame(minWidth: 900, minHeight: 900 / 16 * 9)
         .preferredColorScheme(.dark)
         .tint(.primary)
@@ -778,7 +797,9 @@ struct PlayerView: View {
 
                                 withAnimation(.easeInOut(duration: 0.15)) {
                                     subtitlesOptions = mediaSelectionGroup.options.filter { $0.extendedLanguageTag != nil }
-                                } completion: {
+                                }
+
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                                     self.subtitles = subtitles
                                 }
                             }
@@ -1121,7 +1142,9 @@ struct PlayerView: View {
             withAnimation(.easeInOut) {
                 self.playerLayer.player = player
                 self.pipController = pipController
-            } completion: {
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                 completion?()
             }
         }
@@ -1155,6 +1178,7 @@ struct PlayerView: View {
 
         playerLayer.player?.pause()
         playerLayer.player?.replaceCurrentItem(with: nil)
+
         withAnimation(.easeInOut) {
             playerLayer.player = nil
             pipController = nil
@@ -1162,9 +1186,12 @@ struct PlayerView: View {
             nextTimer = nil
             subtitlesOptions = []
             isLoading = true
-        } completion: {
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
             completion?()
         }
+
         duration = .greatestFiniteMagnitude
         currentTime = 0.0
     }
@@ -1528,4 +1555,15 @@ extension AVPlayerLayer {
 
         return nil
     }
+}
+
+// https://gist.github.com/rdev/627a254417687a90c493528639465943
+extension UInt16 {
+    static let space: UInt16 = 0x31
+    static let escape: UInt16 = 0x35
+    static let leftArrow: UInt16 = 0x7b
+    static let rightArrow: UInt16 = 0x7c
+    static let downArrow: UInt16 = 0x7d
+    static let upArrow: UInt16 = 0x7e
+    static let m: UInt16 = 0x2e
 }

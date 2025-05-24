@@ -4,25 +4,16 @@ import Defaults
 import FactoryKit
 import UserNotifications
 
-@Observable
-class Downloader {
-    @ObservationIgnored
+class Downloader: ObservableObject {
     static let shared = Downloader()
 
-    @ObservationIgnored
     private var subscriptions: Set<AnyCancellable> = []
     
-    @ObservationIgnored
-    @Injected(\.session)
-    private var session
-    @ObservationIgnored
-    @Injected(\.saveWatchingStateUseCase)
-    private var saveWatchingStateUseCase
-    @ObservationIgnored
-    @Injected(\.getMovieVideoUseCase)
-    private var getMovieVideoUseCase
+    @Injected(\.session) private var session
+    @Injected(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
+    @Injected(\.getMovieVideoUseCase) private var getMovieVideoUseCase
 
-    var downloads: [Download] = []
+    @Published var downloads: [Download] = []
 
     init() {
         let open = UNNotificationAction(identifier: "open", title: String(localized: "key.open"))

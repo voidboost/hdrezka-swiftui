@@ -2,25 +2,15 @@ import Combine
 import FactoryKit
 import SwiftUI
 
-@Observable
-class BookmarksViewModel {
-    @ObservationIgnored
-    @Injected(\.getBookmarksUseCase)
-    private var getBookmarksUseCase
-    @ObservationIgnored
-    @Injected(\.getBookmarksByCategoryAddedUseCase)
-    private var getBookmarksByCategoryAddedUseCase
-    @ObservationIgnored
-    @Injected(\.getBookmarksByCategoryPopularUseCase)
-    private var getBookmarksByCategoryPopularUseCase
-    @ObservationIgnored
-    @Injected(\.getBookmarksByCategoryYearUseCase)
-    private var getBookmarksByCategoryYearUseCase
+class BookmarksViewModel: ObservableObject {
+    @Injected(\.getBookmarksUseCase) private var getBookmarksUseCase
+    @Injected(\.getBookmarksByCategoryAddedUseCase) private var getBookmarksByCategoryAddedUseCase
+    @Injected(\.getBookmarksByCategoryPopularUseCase) private var getBookmarksByCategoryPopularUseCase
+    @Injected(\.getBookmarksByCategoryYearUseCase) private var getBookmarksByCategoryYearUseCase
 
-    @ObservationIgnored
     private var subscriptions: Set<AnyCancellable> = []
 
-    var bookmarksState: DataState<[Bookmark]> = .loading
+    @Published var bookmarksState: DataState<[Bookmark]> = .loading
 
     private func getBookmarks() {
         bookmarksState = .loading
@@ -45,10 +35,9 @@ class BookmarksViewModel {
             .store(in: &subscriptions)
     }
 
-    var bookmarkState: DataState<[MovieSimple]> = .data([])
-    var paginationState: DataPaginationState = .loading
+    @Published var bookmarkState: DataState<[MovieSimple]> = .data([])
+    @Published var paginationState: DataPaginationState = .loading
 
-    @ObservationIgnored
     private var page = 1
 
     private func getBookmark(id: Int, filter: BookmarkFilters, genre: Genres) {

@@ -2,7 +2,7 @@ import Defaults
 import SwiftUI
 
 struct SearchView: View {
-    @State private var vm = SearchViewModel()
+    @StateObject private var vm = SearchViewModel()
 
     @Binding private var searchText: String
     @State private var searchWork: DispatchWorkItem?
@@ -70,13 +70,14 @@ struct SearchView: View {
                             .padding(.vertical, 52)
                             .padding(.horizontal, 36)
                             .onGeometryChange(for: Bool.self) { geometry in
-                                -geometry.frame(in: .scrollView).origin.y / 52 >= 1
+                                -geometry.frame(in: .named("scroll")).origin.y / 52 >= 1
                             } action: { showBar in
                                 withAnimation(.easeInOut(duration: 0.15)) {
                                     self.showBar = showBar
                                 }
                             }
                         }
+                        .coordinateSpace(name: "scroll")
                         .scrollIndicators(.never)
 
                         if vm.paginationState == .loading {
@@ -115,7 +116,7 @@ struct SearchView: View {
             }
         }
         .background(.background)
-        .onChange(of: searchText.trimmingCharacters(in: .whitespacesAndNewlines)) {
+        .customOnChange(of: searchText.trimmingCharacters(in: .whitespacesAndNewlines)) {
             searchWork?.cancel()
 
             if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {

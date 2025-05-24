@@ -7,7 +7,8 @@ struct SignInSheetView: View {
     @Injected(\.signInUseCase) private var signInUseCase
 
     @Environment(\.dismiss) private var dismiss
-    @Environment(AppState.self) private var appState
+
+    @EnvironmentObject private var appState: AppState
 
     @State private var username: String = ""
     @State private var password: String = ""
@@ -51,9 +52,8 @@ struct SignInSheetView: View {
                                 TextField("key.username", text: $username, prompt: Text(String(localized: "key.username.full").lowercased()))
                                     .textFieldStyle(.plain)
                                     .multilineTextAlignment(.trailing)
-                                    .textContentType(.emailAddress)
                                     .focused($focusedField, equals: .username)
-                                    .onChange(of: username) {
+                                    .customOnChange(of: username) {
                                         let newValue = String(username.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
                                         if newValue != username {
                                             username = newValue
@@ -74,9 +74,8 @@ struct SignInSheetView: View {
                                     TextField("key.password", text: $password, prompt: Text(String(localized: "key.password").lowercased()))
                                         .textFieldStyle(.plain)
                                         .multilineTextAlignment(.trailing)
-                                        .textContentType(.password)
                                         .focused($focusedField, equals: .password)
-                                        .onChange(of: password) {
+                                        .customOnChange(of: password) {
                                             let newValue = String(password.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
                                             if newValue != password {
                                                 password = newValue
@@ -120,9 +119,8 @@ struct SignInSheetView: View {
                                     SecureField("key.password", text: $password, prompt: Text(String(localized: "key.password").lowercased()))
                                         .textFieldStyle(.plain)
                                         .multilineTextAlignment(.trailing)
-                                        .textContentType(.password)
                                         .focused($focusedField, equals: .password)
-                                        .onChange(of: password) {
+                                        .customOnChange(of: password) {
                                             let newValue = String(password.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
                                             if newValue != password {
                                                 password = newValue
@@ -177,7 +175,9 @@ struct SignInSheetView: View {
                                                 .onEnded { _ in
                                                     withAnimation(.easeInOut(duration: 0.15)) {
                                                         showPassword = false
-                                                    } completion: {
+                                                    }
+
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                                                         focusedField = .password
                                                     }
                                                 }

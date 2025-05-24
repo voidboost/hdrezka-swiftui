@@ -5,7 +5,7 @@ import FactoryKit
 import SwiftUI
 
 struct WatchingLaterView: View {
-    @State private var vm = WatchingLaterViewModel()
+    @StateObject private var vm = WatchingLaterViewModel()
 
     @State private var subscriptions: Set<AnyCancellable> = []
 
@@ -132,13 +132,14 @@ struct WatchingLaterView: View {
                         .padding(.vertical, 52)
                         .padding(.horizontal, 36)
                         .onGeometryChange(for: Bool.self) { geometry in
-                            -geometry.frame(in: .scrollView).origin.y / 52 >= 1
+                            -geometry.frame(in: .named("scroll")).origin.y / 52 >= 1
                         } action: { showBar in
                             withAnimation(.easeInOut(duration: 0.15)) {
                                 self.showBar = showBar
                             }
                         }
                     }
+                    .coordinateSpace(name: "scroll")
                     .scrollIndicators(.never)
                 }
             } else {

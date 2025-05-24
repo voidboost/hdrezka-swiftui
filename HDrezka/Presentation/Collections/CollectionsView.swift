@@ -2,7 +2,7 @@ import Defaults
 import SwiftUI
 
 struct CollectionsView: View {
-    @State private var vm = CollectionsViewModel()
+    @StateObject private var vm = CollectionsViewModel()
 
     @State private var showBar: Bool = false
 
@@ -61,13 +61,14 @@ struct CollectionsView: View {
                             .padding(.vertical, 52)
                             .padding(.horizontal, 36)
                             .onGeometryChange(for: Bool.self) { geometry in
-                                -geometry.frame(in: .scrollView).origin.y / 52 >= 1
+                                -geometry.frame(in: .named("scroll")).origin.y / 52 >= 1
                             } action: { showBar in
                                 withAnimation(.easeInOut(duration: 0.15)) {
                                     self.showBar = showBar
                                 }
                             }
                         }
+                        .coordinateSpace(name: "scroll")
                         .scrollIndicators(.never)
 
                         if vm.paginationState == .loading {

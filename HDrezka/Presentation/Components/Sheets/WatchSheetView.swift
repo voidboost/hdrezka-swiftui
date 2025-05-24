@@ -14,9 +14,9 @@ struct WatchSheetView: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openWindow) private var openWindow
-    @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.managedObjectContext) private var viewContext
-    @Environment(AppState.self) private var appState
+
+    @EnvironmentObject private var appState: AppState
 
     @FetchRequest(fetchRequest: SelectPosition.fetch()) private var selectPositions: FetchedResults<SelectPosition>
 
@@ -479,7 +479,7 @@ struct WatchSheetView: View {
                 }
                 .store(in: &subscriptions)
         }
-        .onChange(of: details) {
+        .customOnChange(of: details) {
             if let details, let acting = details.voiceActing {
                 withAnimation(.easeInOut) {
                     selectedActing = if !isLoggedIn,
@@ -503,7 +503,7 @@ struct WatchSheetView: View {
                 }
             }
         }
-        .onChange(of: selectedActing) {
+        .customOnChange(of: selectedActing) {
             withAnimation(.easeInOut) {
                 selectedSeason = nil
                 selectedEpisode = nil
@@ -584,7 +584,7 @@ struct WatchSheetView: View {
                 }
             }
         }
-        .onChange(of: selectedSeason) {
+        .customOnChange(of: selectedSeason) {
             withAnimation(.easeInOut) {
                 selectedQuality = nil
                 movie = nil
@@ -607,7 +607,7 @@ struct WatchSheetView: View {
                 }
             }
         }
-        .onChange(of: selectedEpisode) {
+        .customOnChange(of: selectedEpisode) {
             withAnimation(.easeInOut) {
                 selectedQuality = nil
                 movie = nil

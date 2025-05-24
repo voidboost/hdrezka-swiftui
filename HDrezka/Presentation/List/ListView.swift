@@ -9,7 +9,8 @@ struct ListView: View {
     private let category: Categories?
     private let collection: MoviesCollection?
 
-    @State private var vm = ListViewModel()
+    @StateObject private var vm = ListViewModel()
+
     @State private var selectedGenre = Genres.all
     @State private var filter = Filters.latest
     @State private var newFilter = NewFilters.latest
@@ -133,13 +134,14 @@ struct ListView: View {
                             .padding(.vertical, 52)
                             .padding(.horizontal, 36)
                             .onGeometryChange(for: Bool.self) { geometry in
-                                -geometry.frame(in: .scrollView).origin.y / 52 >= 1
+                                -geometry.frame(in: .named("scroll")).origin.y / 52 >= 1
                             } action: { showBar in
                                 withAnimation(.easeInOut(duration: 0.15)) {
                                     self.showBar = showBar
                                 }
                             }
                         }
+                        .coordinateSpace(name: "scroll")
                         .scrollIndicators(.never)
 
                         if vm.paginationState == .loading {
@@ -173,40 +175,74 @@ struct ListView: View {
                 Image(systemName: "line.3.horizontal.decrease.circle")
 
                 if genre != nil || collection != nil || country != nil {
-                    Picker("key.filter.select", selection: $filter) {
-                        ForEach(Filters.allCases) { f in
-                            Text(f.rawValue).tag(f)
+                    if #available(macOS 14.0, *) {
+                        Picker("key.filter.select", selection: $filter) {
+                            ForEach(Filters.allCases) { f in
+                                Text(f.rawValue).tag(f)
+                            }
                         }
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .background(.tertiary.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .buttonStyle(.accessoryBar)
+                        .controlSize(.large)
+                        .background(.tertiary.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        }
+                    } else {
+                        Picker("key.filter.select", selection: $filter) {
+                            ForEach(Filters.allCases) { f in
+                                Text(f.rawValue).tag(f)
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .background(.tertiary.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        }
                     }
                 }
 
                 if let category, case .newest = category {
-                    Picker("key.filter.select", selection: $newFilter) {
-                        ForEach(NewFilters.allCases) { f in
-                            Text(f.rawValue).tag(f)
+                    if #available(macOS 14.0, *) {
+                        Picker("key.filter.select", selection: $newFilter) {
+                            ForEach(NewFilters.allCases) { f in
+                                Text(f.rawValue).tag(f)
+                            }
                         }
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .background(.tertiary.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .buttonStyle(.accessoryBar)
+                        .controlSize(.large)
+                        .background(.tertiary.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        }
+                    } else {
+                        Picker("key.filter.select", selection: $newFilter) {
+                            ForEach(NewFilters.allCases) { f in
+                                Text(f.rawValue).tag(f)
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .background(.tertiary.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        }
                     }
 
                     Divider()
@@ -219,21 +255,38 @@ struct ListView: View {
                 }
 
                 if category != nil || country != nil {
-                    Picker("key.genre.select", selection: $selectedGenre) {
-                        ForEach(Genres.allCases.filter { $0 != .show || category != .hot }) { g in
-                            Text(g.rawValue).tag(g)
+                    if #available(macOS 14.0, *) {
+                        Picker("key.genre.select", selection: $selectedGenre) {
+                            ForEach(Genres.allCases.filter { $0 != .show || category != .hot }) { g in
+                                Text(g.rawValue).tag(g)
+                            }
                         }
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .background(.tertiary.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .buttonStyle(.accessoryBar)
+                        .controlSize(.large)
+                        .background(.tertiary.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        }
+                    } else {
+                        Picker("key.genre.select", selection: $selectedGenre) {
+                            ForEach(Genres.allCases.filter { $0 != .show || category != .hot }) { g in
+                                Text(g.rawValue).tag(g)
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .background(.tertiary.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        }
                     }
                 }
             }
@@ -246,13 +299,13 @@ struct ListView: View {
                 reloadData()
             }
         }
-        .onChange(of: selectedGenre) {
+        .customOnChange(of: selectedGenre) {
             reloadData()
         }
-        .onChange(of: filter) {
+        .customOnChange(of: filter) {
             reloadData()
         }
-        .onChange(of: newFilter) {
+        .customOnChange(of: newFilter) {
             reloadData()
         }
         .background(.background)

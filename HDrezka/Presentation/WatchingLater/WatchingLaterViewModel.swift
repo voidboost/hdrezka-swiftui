@@ -2,16 +2,12 @@ import Combine
 import FactoryKit
 import SwiftUI
 
-@Observable
-class WatchingLaterViewModel {
-    @ObservationIgnored
-    @Injected(\.getWatchingLaterMoviesUseCase)
-    private var getWatchingLaterMoviesUseCase
+class WatchingLaterViewModel: ObservableObject {
+    @Injected(\.getWatchingLaterMoviesUseCase) private var getWatchingLaterMoviesUseCase
 
-    @ObservationIgnored
     private var subscriptions: Set<AnyCancellable> = []
 
-    var state: DataState<[MovieWatchLater]> = .loading
+    @Published var state: DataState<[MovieWatchLater]> = .loading
 
     private func getMovies() {
         getWatchingLaterMoviesUseCase()

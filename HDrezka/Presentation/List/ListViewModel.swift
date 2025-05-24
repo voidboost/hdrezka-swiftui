@@ -3,83 +3,36 @@ import Defaults
 import FactoryKit
 import SwiftUI
 
-@Observable
-class ListViewModel {
-//    @ObservationIgnored
-//    @Injected(\.getFeaturedMoviesUseCase)
-//    private var getFeaturedMoviesUseCase
-    @ObservationIgnored
-    @Injected(\.getHotMoviesUseCase)
-    private var getHotMoviesUseCase
-    @ObservationIgnored
-    @Injected(\.getLatestMoviesByCountryUseCase)
-    private var getLatestMoviesByCountryUseCase
-    @ObservationIgnored
-    @Injected(\.getLatestMoviesByGenreUseCase)
-    private var getLatestMoviesByGenreUseCase
-    @ObservationIgnored
-    @Injected(\.getLatestMoviesUseCase)
-    private var getLatestMoviesUseCase
-    @ObservationIgnored
-    @Injected(\.getLatestNewestMoviesUseCase)
-    private var getLatestNewestMoviesUseCase
-    @ObservationIgnored
-    @Injected(\.getMovieListUseCase)
-    private var getMovieListUseCase
-    @ObservationIgnored
-    @Injected(\.getPopularMoviesByCountryUseCase)
-    private var getPopularMoviesByCountryUseCase
-    @ObservationIgnored
-    @Injected(\.getPopularMoviesByGenreUseCase)
-    private var getPopularMoviesByGenreUseCase
-    @ObservationIgnored
-    @Injected(\.getPopularMoviesUseCase)
-    private var getPopularMoviesUseCase
-    @ObservationIgnored
-    @Injected(\.getPopularNewestMoviesUseCase)
-    private var getPopularNewestMoviesUseCase
-    @ObservationIgnored
-    @Injected(\.getSoonMoviesByCountryUseCase)
-    private var getSoonMoviesByCountryUseCase
-    @ObservationIgnored
-    @Injected(\.getSoonMoviesByGenreUseCase)
-    private var getSoonMoviesByGenreUseCase
-    @ObservationIgnored
-    @Injected(\.getSoonMoviesUseCase)
-    private var getSoonMoviesUseCase
-    @ObservationIgnored
-    @Injected(\.getWatchingNowMoviesByCountryUseCase)
-    private var getWatchingNowMoviesByCountryUseCase
-    @ObservationIgnored
-    @Injected(\.getWatchingNowMoviesByGenreUseCase)
-    private var getWatchingNowMoviesByGenreUseCase
-    @ObservationIgnored
-    @Injected(\.getWatchingNowMoviesUseCase)
-    private var getWatchingNowMoviesUseCase
-    @ObservationIgnored
-    @Injected(\.getWatchingNowNewestMoviesUseCase)
-    private var getWatchingNowNewestMoviesUseCase
-    @ObservationIgnored
-    @Injected(\.getLatestMoviesInCollectionUseCase)
-    private var getLatestMoviesInCollectionUseCase
-    @ObservationIgnored
-    @Injected(\.getSoonMoviesInCollectionUseCase)
-    private var getSoonMoviesInCollectionUseCase
-    @ObservationIgnored
-    @Injected(\.getPopularMoviesInCollectionUseCase)
-    private var getPopularMoviesInCollectionUseCase
-    @ObservationIgnored
-    @Injected(\.getWatchingNowMoviesInCollectionUseCase)
-    private var getWatchingNowMoviesInCollectionUseCase
+class ListViewModel: ObservableObject {
+//    @Injected(\.getFeaturedMoviesUseCase) private var getFeaturedMoviesUseCase
+    @Injected(\.getHotMoviesUseCase) private var getHotMoviesUseCase
+    @Injected(\.getLatestMoviesByCountryUseCase) private var getLatestMoviesByCountryUseCase
+    @Injected(\.getLatestMoviesByGenreUseCase) private var getLatestMoviesByGenreUseCase
+    @Injected(\.getLatestMoviesUseCase) private var getLatestMoviesUseCase
+    @Injected(\.getLatestNewestMoviesUseCase) private var getLatestNewestMoviesUseCase
+    @Injected(\.getMovieListUseCase) private var getMovieListUseCase
+    @Injected(\.getPopularMoviesByCountryUseCase) private var getPopularMoviesByCountryUseCase
+    @Injected(\.getPopularMoviesByGenreUseCase) private var getPopularMoviesByGenreUseCase
+    @Injected(\.getPopularMoviesUseCase) private var getPopularMoviesUseCase
+    @Injected(\.getPopularNewestMoviesUseCase) private var getPopularNewestMoviesUseCase
+    @Injected(\.getSoonMoviesByCountryUseCase) private var getSoonMoviesByCountryUseCase
+    @Injected(\.getSoonMoviesByGenreUseCase) private var getSoonMoviesByGenreUseCase
+    @Injected(\.getSoonMoviesUseCase) private var getSoonMoviesUseCase
+    @Injected(\.getWatchingNowMoviesByCountryUseCase) private var getWatchingNowMoviesByCountryUseCase
+    @Injected(\.getWatchingNowMoviesByGenreUseCase) private var getWatchingNowMoviesByGenreUseCase
+    @Injected(\.getWatchingNowMoviesUseCase) private var getWatchingNowMoviesUseCase
+    @Injected(\.getWatchingNowNewestMoviesUseCase) private var getWatchingNowNewestMoviesUseCase
+    @Injected(\.getLatestMoviesInCollectionUseCase) private var getLatestMoviesInCollectionUseCase
+    @Injected(\.getSoonMoviesInCollectionUseCase) private var getSoonMoviesInCollectionUseCase
+    @Injected(\.getPopularMoviesInCollectionUseCase) private var getPopularMoviesInCollectionUseCase
+    @Injected(\.getWatchingNowMoviesInCollectionUseCase) private var getWatchingNowMoviesInCollectionUseCase
 
-    @ObservationIgnored
     private var subscriptions: Set<AnyCancellable> = []
 
-    var title = String(localized: "key.list")
-    var state: DataState<[MovieSimple]> = .loading
-    var paginationState: DataPaginationState = .idle
+    @Published var title = String(localized: "key.list")
+    @Published var state: DataState<[MovieSimple]> = .loading
+    @Published var paginationState: DataPaginationState = .idle
 
-    @ObservationIgnored
     private var page = 1
 
     private func getMovies(movies: [MovieSimple]? = nil, list: MovieList? = nil, country: MovieCountry? = nil, genre: MovieGenre? = nil, collection: MoviesCollection? = nil, category: Categories? = nil, filterGenre: Genres? = nil, filter: Filters? = nil, newFilter: NewFilters? = nil) {

@@ -165,14 +165,23 @@ struct BookmarksSheetView: View {
                                             }
                                         } label: {
                                             HStack(alignment: .center) {
-                                                Image(systemName: isChecked ? "bookmark.fill" : "bookmark")
-                                                    .contentTransition(.symbolEffect(.replace))
+                                                if #available(macOS 14.0, *) {
+                                                    Image(systemName: isChecked ? "bookmark.fill" : "bookmark")
+                                                        .contentTransition(.symbolEffect(.replace))
 
-                                                Text("\(bookmark.name) (\(bookmark.count.description))")
-                                                    .monospacedDigit()
-                                                    .lineLimit(nil)
-                                                    .multilineTextAlignment(.center)
-                                                    .contentTransition(.numericText(value: Double(bookmark.count)))
+                                                    Text("\(bookmark.name) (\(bookmark.count.description))")
+                                                        .monospacedDigit()
+                                                        .lineLimit(nil)
+                                                        .multilineTextAlignment(.center)
+                                                        .contentTransition(.numericText(value: Double(bookmark.count)))
+                                                } else {
+                                                    Image(systemName: isChecked ? "bookmark.fill" : "bookmark")
+
+                                                    Text("\(bookmark.name) (\(bookmark.count.description))")
+                                                        .monospacedDigit()
+                                                        .lineLimit(nil)
+                                                        .multilineTextAlignment(.center)
+                                                }
                                             }
                                             .highlightOnHover()
                                         }

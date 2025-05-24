@@ -45,7 +45,7 @@ struct SettingsView: View {
                         .textFieldStyle(.plain)
                         .multilineTextAlignment(.trailing)
                         .autocorrectionDisabled()
-                        .onChange(of: mirror) {
+                        .customOnChange(of: mirror) {
                             withAnimation(.easeInOut) {
                                 mirrorValid = nil
                             }
@@ -179,22 +179,40 @@ struct SettingsView: View {
 
                     Spacer()
 
-                    Picker("key.spatialAudio", selection: $spatialAudio) {
-                        ForEach(SpatialAudio.allCases) { format in
-                            Text(format.localizedKey)
-                                .tag(format)
+                    if #available(macOS 14.0, *) {
+                        Picker("key.spatialAudio", selection: $spatialAudio) {
+                            ForEach(SpatialAudio.allCases) { format in
+                                Text(format.localizedKey)
+                                    .tag(format)
+                            }
                         }
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .background(.tertiary.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .buttonStyle(.accessoryBar)
+                        .controlSize(.large)
+                        .background(.tertiary.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        }
+                    } else {
+                        Picker("key.spatialAudio", selection: $spatialAudio) {
+                            ForEach(SpatialAudio.allCases) { format in
+                                Text(format.localizedKey)
+                                    .tag(format)
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .background(.tertiary.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        }
                     }
                 }
                 .frame(height: 40)
@@ -206,22 +224,40 @@ struct SettingsView: View {
 
                     Spacer()
 
-                    Picker("key.defaultQuality", selection: $defaultQuality) {
-                        ForEach(DefaultQuality.allCases) { quality in
-                            Text(quality.localizedKey)
-                                .tag(quality)
+                    if #available(macOS 14.0, *) {
+                        Picker("key.defaultQuality", selection: $defaultQuality) {
+                            ForEach(DefaultQuality.allCases) { quality in
+                                Text(quality.localizedKey)
+                                    .tag(quality)
+                            }
                         }
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .background(.tertiary.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .buttonStyle(.accessoryBar)
+                        .controlSize(.large)
+                        .background(.tertiary.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        }
+                    } else {
+                        Picker("key.defaultQuality", selection: $defaultQuality) {
+                            ForEach(DefaultQuality.allCases) { quality in
+                                Text(quality.localizedKey)
+                                    .tag(quality)
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .background(.tertiary.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        }
                     }
                 }
                 .frame(height: 40)
@@ -229,9 +265,14 @@ struct SettingsView: View {
                 Divider()
 
                 HStack(alignment: .center, spacing: 8) {
-                    Text("key.playerPositions-\(playerPositions.count.description)")
-                        .monospacedDigit()
-                        .contentTransition(.numericText(value: Double(playerPositions.count)))
+                    if #available(macOS 14.0, *) {
+                        Text("key.playerPositions-\(playerPositions.count.description)")
+                            .monospacedDigit()
+                            .contentTransition(.numericText(value: Double(playerPositions.count)))
+                    } else {
+                        Text("key.playerPositions-\(playerPositions.count.description)")
+                            .monospacedDigit()
+                    }
 
                     Spacer()
 
@@ -261,9 +302,14 @@ struct SettingsView: View {
                     Divider()
 
                     HStack(alignment: .center, spacing: 8) {
-                        Text("key.selectPositions-\(selectPositions.count.description)")
-                            .monospacedDigit()
-                            .contentTransition(.numericText(value: Double(selectPositions.count)))
+                        if #available(macOS 14.0, *) {
+                            Text("key.selectPositions-\(selectPositions.count.description)")
+                                .monospacedDigit()
+                                .contentTransition(.numericText(value: Double(selectPositions.count)))
+                        } else {
+                            Text("key.selectPositions-\(selectPositions.count.description)")
+                                .monospacedDigit()
+                        }
 
                         Spacer()
 
@@ -309,7 +355,7 @@ struct SettingsView: View {
                         .labelsHidden()
                 }
                 .frame(height: 40)
-                .onChange(of: automaticallyChecksForUpdates) {
+                .customOnChange(of: automaticallyChecksForUpdates) {
                     updater.automaticallyChecksForUpdates = automaticallyChecksForUpdates
                 }
 
@@ -326,7 +372,7 @@ struct SettingsView: View {
                 }
                 .frame(height: 40)
                 .disabled(!automaticallyChecksForUpdates)
-                .onChange(of: automaticallyDownloadsUpdates) {
+                .customOnChange(of: automaticallyDownloadsUpdates) {
                     updater.automaticallyDownloadsUpdates = automaticallyDownloadsUpdates
                 }
 
@@ -337,27 +383,45 @@ struct SettingsView: View {
 
                     Spacer()
 
-                    Picker("key.updateCheckInterval", selection: $updateCheckInterval) {
-                        ForEach(UpdateInterval.allCases) { interval in
-                            Text(interval.localizedKey)
-                                .tag(TimeInterval(interval.rawValue))
+                    if #available(macOS 14.0, *) {
+                        Picker("key.updateCheckInterval", selection: $updateCheckInterval) {
+                            ForEach(UpdateInterval.allCases) { interval in
+                                Text(interval.localizedKey)
+                                    .tag(TimeInterval(interval.rawValue))
+                            }
                         }
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .background(.tertiary.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .buttonStyle(.accessoryBar)
+                        .controlSize(.large)
+                        .background(.tertiary.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        }
+                    } else {
+                        Picker("key.updateCheckInterval", selection: $updateCheckInterval) {
+                            ForEach(UpdateInterval.allCases) { interval in
+                                Text(interval.localizedKey)
+                                    .tag(TimeInterval(interval.rawValue))
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .background(.tertiary.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        }
                     }
                 }
                 .frame(height: 40)
                 .disabled(!automaticallyChecksForUpdates)
-                .onChange(of: updateCheckInterval) {
+                .customOnChange(of: updateCheckInterval) {
                     updater.updateCheckInterval = updateCheckInterval
                 }
             }
@@ -371,7 +435,7 @@ struct SettingsView: View {
         }
         .padding(25)
         .background(.background)
-        .onChange(of: currentMirror) {
+        .customOnChange(of: currentMirror) {
             mirror = nil
         }
     }

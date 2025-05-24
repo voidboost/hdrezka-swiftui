@@ -9,7 +9,8 @@ struct CommentsView: View {
     private let details: MovieDetailed
     private let title: String
 
-    @State private var vm = CommentsViewModel()
+    @StateObject private var vm = CommentsViewModel()
+
     @State private var showBar: Bool = false
 
     @Default(.isLoggedIn) private var isLoggedIn
@@ -51,13 +52,14 @@ struct CommentsView: View {
                         .padding(.vertical, 52)
                         .padding(.horizontal, 36)
                         .onGeometryChange(for: Bool.self) { geometry in
-                            -geometry.frame(in: .scrollView).origin.y / 52 >= 1
+                            -geometry.frame(in: .named("scroll")).origin.y / 52 >= 1
                         } action: { showBar in
                             withAnimation(.easeInOut(duration: 0.15)) {
                                 self.showBar = showBar
                             }
                         }
                     }
+                    .coordinateSpace(name: "scroll")
                     .scrollIndicators(.never)
                 } else {
                     VStack {
@@ -98,13 +100,14 @@ struct CommentsView: View {
                             .padding(.vertical, 52)
                             .padding(.horizontal, 36)
                             .onGeometryChange(for: Bool.self) { geometry in
-                                -geometry.frame(in: .scrollView).origin.y / 52 >= 1
+                                -geometry.frame(in: .named("scroll")).origin.y / 52 >= 1
                             } action: { showBar in
                                 withAnimation(.easeInOut(duration: 0.15)) {
                                     self.showBar = showBar
                                 }
                             }
                         }
+                        .coordinateSpace(name: "scroll")
                         .scrollIndicators(.never)
 
                         if vm.paginationState == .loading {
@@ -159,7 +162,7 @@ struct CommentsView: View {
                 Text(message)
             }
         }
-        .dialogSeverity(.standard)
+        .dialogSeverity(.automatic)
         .sheet(isPresented: $vm.isCommentPresented) {
             VStack(alignment: .center, spacing: 25) {
                 if let comment = vm.comment {
@@ -217,7 +220,7 @@ struct CommentsView: View {
         private let details: MovieDetailed
 
         @Default(.isLoggedIn) private var isLoggedIn
-        @Environment(AppState.self) private var appState
+        @EnvironmentObject private var appState: AppState
 
         @State private var delayShow: DispatchWorkItem?
 
@@ -293,9 +296,14 @@ struct CommentsView: View {
                                 }
 
                                 if comment.likesCount > 0 {
-                                    Text(comment.likesCount.description)
-                                        .font(.system(size: 13, weight: .semibold).monospacedDigit())
-                                        .contentTransition(.numericText(value: Double(comment.likesCount)))
+                                    if #available(macOS 14.0, *) {
+                                        Text(comment.likesCount.description)
+                                            .font(.system(size: 13, weight: .semibold).monospacedDigit())
+                                            .contentTransition(.numericText(value: Double(comment.likesCount)))
+                                    } else {
+                                        Text(comment.likesCount.description)
+                                            .font(.system(size: 13, weight: .semibold).monospacedDigit())
+                                    }
                                 }
                             }
                             .frame(height: 28)
@@ -466,7 +474,7 @@ struct CommentsView: View {
         @State private var comment: Comment
         private let getComment: (String, String) -> Void
 
-        @Environment(AppState.self) private var appState
+        @EnvironmentObject private var appState: AppState
 
         init(comment: Comment, getComment: @escaping (String, String) -> Void) {
             self.comment = comment
@@ -542,7 +550,7 @@ struct CommentsView: View {
 
         @Default(.isLoggedIn) private var isLoggedIn
         @Default(.allowedComments) private var allowedComments
-        @Environment(AppState.self) private var appState
+        @EnvironmentObject private var appState: AppState
 
         var body: some View {
             VStack(alignment: .leading, spacing: 8) {
@@ -665,7 +673,7 @@ struct CommentsView: View {
                             .font(.system(size: 13))
                             .multilineTextAlignment(.trailing)
                             .lineLimit(1)
-                            .onChange(of: name) {
+                            .customOnChange(of: name) {
                                 if name.count > 60 {
                                     name = String(name.prefix(60))
                                 }
@@ -705,7 +713,7 @@ struct CommentsView: View {
                 RoundedRectangle(cornerRadius: 6)
                     .stroke(.tertiary.opacity(0.2), lineWidth: 1)
             }
-            .onChange(of: feedback) {
+            .customOnChange(of: feedback) {
                 if !allowedComments, !feedback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     appState.commentsRulesPresented = true
                 }

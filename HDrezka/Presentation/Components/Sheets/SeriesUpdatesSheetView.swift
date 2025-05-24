@@ -125,7 +125,7 @@ struct SeriesUpdatesSheetView: View {
 
         @State private var isExpanded: Bool
 
-        @Environment(AppState.self) private var appState
+        @EnvironmentObject private var appState: AppState
 
         init(group: SeriesUpdateGroup, dismiss: @escaping () -> Void, isExpanded: Bool) {
             self.group = group

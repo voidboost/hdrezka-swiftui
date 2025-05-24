@@ -2,31 +2,15 @@ import Combine
 import FactoryKit
 import SwiftUI
 
-@Observable
-class HomeViewModel {
-    @ObservationIgnored
-    @Injected(\.getHotMoviesUseCase)
-    private var getHotMoviesUseCase
-//    @ObservationIgnored
-//    @Injected(\.getFeaturedMoviesUseCase)
-//    private var getFeaturedMoviesUseCase
-    @ObservationIgnored
-    @Injected(\.getWatchingNowMoviesUseCase)
-    private var getWatchingNowMoviesUseCase
-    @ObservationIgnored
-    @Injected(\.getLatestMoviesUseCase)
-    private var getLatestMoviesUseCase
-    @ObservationIgnored
-    @Injected(\.getLatestNewestMoviesUseCase)
-    private var getLatestNewestMoviesUseCase
-    @ObservationIgnored
-    @Injected(\.getPopularMoviesUseCase)
-    private var getPopularMoviesUseCase
-    @ObservationIgnored
-    @Injected(\.getSoonMoviesUseCase)
-    private var getSoonMoviesUseCase
+class HomeViewModel: ObservableObject {
+    @Injected(\.getHotMoviesUseCase) private var getHotMoviesUseCase
+//    @Injected(\.getFeaturedMoviesUseCase) private var getFeaturedMoviesUseCase
+    @Injected(\.getWatchingNowMoviesUseCase) private var getWatchingNowMoviesUseCase
+    @Injected(\.getLatestMoviesUseCase) private var getLatestMoviesUseCase
+    @Injected(\.getLatestNewestMoviesUseCase) private var getLatestNewestMoviesUseCase
+    @Injected(\.getPopularMoviesUseCase) private var getPopularMoviesUseCase
+    @Injected(\.getSoonMoviesUseCase) private var getSoonMoviesUseCase
 
-    @ObservationIgnored
     private var subscriptions: Set<AnyCancellable> = []
 
     struct Category: Identifiable, Hashable {
@@ -43,10 +27,9 @@ class HomeViewModel {
         }
     }
 
-    var state: DataState<[Category]> = .loading
-    var paginationState: DataPaginationState = .idle
+    @Published var state: DataState<[Category]> = .loading
+    @Published var paginationState: DataPaginationState = .idle
 
-    @ObservationIgnored
     private var page: Categories? = Categories.allCases.first ?? .hot
 
     private func getMovies() {

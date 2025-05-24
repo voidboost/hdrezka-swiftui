@@ -84,10 +84,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 @main
 struct HDrezkaApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
-    @State private var appState: AppState = .shared
-    @State private var downloader: Downloader = .shared
-    @State private var persistenceController: PersistenceController = .shared
-    @Environment(\.dismissWindow) private var dismissWindow
+    @StateObject private var appState: AppState = .shared
+    @StateObject private var downloader: Downloader = .shared
+    @StateObject private var persistenceController: PersistenceController = .shared
     @Environment(\.openWindow) private var openWindow
 
     private let updaterController: SPUStandardUpdaterController
@@ -99,8 +98,8 @@ struct HDrezkaApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(appState)
-                .environment(downloader)
+                .environmentObject(appState)
+                .environmentObject(downloader)
                 .environment(\.managedObjectContext, persistenceController.viewContext)
                 .task {
                     if #unavailable(macOS 15) {
@@ -133,7 +132,7 @@ struct HDrezkaApp: App {
         WindowGroup("key.player", id: "player", for: PlayerData.self) { $data in
             if let data {
                 PlayerView(data: data)
-                    .environment(appState)
+                    .environmentObject(appState)
                     .environment(\.managedObjectContext, persistenceController.viewContext)
             }
         }
@@ -176,7 +175,7 @@ struct HDrezkaApp: App {
             !downloader.downloads.isEmpty
         } set: { _ in }) {
             DownloadsView()
-                .environment(downloader)
+                .environmentObject(downloader)
         } label: {
             MenuBarIcon()
         }
@@ -188,10 +187,23 @@ struct HDrezkaApp: App {
     @CommandsBuilder
     func customCommands() -> some Commands {
         CommandGroup(replacing: .appSettings) {
-            SettingsLink {
-                Text("key.settings")
+            if #available(macOS 14.0, *) {
+                SettingsLink {
+                    Text("key.settings")
+                }
+                .keyboardShortcut(",", modifiers: .command)
+            } else {
+                Button {
+                    if #available(macOS 13.0, *) {
+                        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+                    } else {
+                        NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
+                    }
+                } label: {
+                    Text("key.settings")
+                }
+                .keyboardShortcut(",", modifiers: .command)
             }
-            .keyboardShortcut(",", modifiers: .command)
 
             Button {
                 updaterController.updater.checkForUpdates()

@@ -3,7 +3,7 @@ import Flow
 import SwiftUI
 
 struct CategoriesView: View {
-    @State private var vm = CategoriesViewModel()
+    @StateObject private var vm = CategoriesViewModel()
 
     @Default(.isLoggedIn) private var isLoggedIn
 
@@ -57,13 +57,14 @@ struct CategoriesView: View {
                         .padding(.vertical, 52)
                         .padding(.horizontal, 36)
                         .onGeometryChange(for: Bool.self) { geometry in
-                            -geometry.frame(in: .scrollView).origin.y / 52 >= 1
+                            -geometry.frame(in: .named("scroll")).origin.y / 52 >= 1
                         } action: { showBar in
                             withAnimation(.easeInOut(duration: 0.15)) {
                                 self.showBar = showBar
                             }
                         }
                     }
+                    .coordinateSpace(name: "scroll")
                     .scrollIndicators(.never)
                 }
             } else {
@@ -106,7 +107,7 @@ struct CategoriesView: View {
             self.bestYear = year
         }
 
-        @Environment(AppState.self) private var appState
+        @EnvironmentObject private var appState: AppState
 
         @State private var bestGenre: MovieGenre
         @State private var bestYear: MovieYear
@@ -161,42 +162,78 @@ struct CategoriesView: View {
                 HStack(spacing: 6) {
                     Text("\(type.best.name):")
 
-                    Picker("key.categories", selection: $bestGenre) {
-                        ForEach(type.best.genres) { genre in
-                            Text(genre.name)
-                                .tag(genre)
+                    if #available(macOS 14.0, *) {
+                        Picker("key.categories", selection: $bestGenre) {
+                            ForEach(type.best.genres) { genre in
+                                Text(genre.name)
+                                    .tag(genre)
+                            }
                         }
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .frame(height: 28)
-                    .background(.tertiary.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                    }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .buttonStyle(.accessoryBar)
+                        .controlSize(.large)
+                        .frame(height: 28)
+                        .background(.tertiary.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        }
 
-                    Picker("key.categories", selection: $bestYear) {
-                        ForEach(type.best.years) { year in
-                            Text(year.name)
-                                .tag(year)
+                        Picker("key.categories", selection: $bestYear) {
+                            ForEach(type.best.years) { year in
+                                Text(year.name)
+                                    .tag(year)
+                            }
                         }
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .frame(height: 28)
-                    .background(.tertiary.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .buttonStyle(.accessoryBar)
+                        .controlSize(.large)
+                        .frame(height: 28)
+                        .background(.tertiary.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        }
+                    } else {
+                        Picker("key.categories", selection: $bestGenre) {
+                            ForEach(type.best.genres) { genre in
+                                Text(genre.name)
+                                    .tag(genre)
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .frame(height: 28)
+                        .background(.tertiary.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        }
+
+                        Picker("key.categories", selection: $bestYear) {
+                            ForEach(type.best.years) { year in
+                                Text(year.name)
+                                    .tag(year)
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .frame(height: 28)
+                        .background(.tertiary.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                        }
                     }
 
                     Button {

@@ -11,7 +11,7 @@ struct BookmarksView: View {
 
     @State private var subscriptions: Set<AnyCancellable> = []
     
-    @State private var vm = BookmarksViewModel()
+    @StateObject private var vm = BookmarksViewModel()
         
     @State private var selectedBookmark: Int = -1
     
@@ -94,134 +94,264 @@ struct BookmarksView: View {
                     } else {
                         List(selection: $selectedBookmark) {
                             ForEach(bookmarks) { bookmark in
-                                Text(bookmark.name)
-                                    .font(.system(size: 15))
-                                    .lineLimit(1)
-                                    .badge(
-                                        Text(bookmark.count.description)
-                                            .monospacedDigit()
-                                    )
-                                    .contentTransition(.numericText(value: Double(bookmark.count)))
-                                    .tag(bookmark.bookmarkId)
-                                    .padding(7)
-                                    .listRowInsets(.init())
-                                    .contextMenu {
-                                        Button {
-                                            renameBookmark = bookmark
-                                        } label: {
-                                            Text("key.rename")
-                                        }
-
-                                        Button {
-                                            deleteBookmarksCategoryUseCase(id: bookmark.bookmarkId)
-                                                .receive(on: DispatchQueue.main)
-                                                .sink { completion in
-                                                    guard case let .failure(error) = completion else { return }
-
-                                                    self.error = error
-                                                    self.isErrorPresented = true
-                                                } receiveValue: { delete in
-                                                    if delete {
-                                                        bookmarks.removeAll(where: {
-                                                            $0.bookmarkId == bookmark.bookmarkId
-                                                        })
-                                                        
-                                                        withAnimation(.easeInOut) {
-                                                            vm.bookmarksState = .data(bookmarks)
-                                                        }
-
-                                                        if selectedBookmark == bookmark.bookmarkId {
-                                                            selectedBookmark = -1
-                                                            vm.bookmarkState = .data([])
-                                                        }
-                                                    }
-                                                }
-                                                .store(in: &subscriptions)
-                                        } label: {
-                                            Text("key.delete")
-                                        }
-                                    }
-                                    .if(selectedBookmark != bookmark.bookmarkId) { view in
-                                        view.dropDestination(for: MovieSimple.self) { movies, _ in
-                                            if !movies.isEmpty, !movies.compactMap(\.movieId.id).isEmpty {
-                                                moveBetweenBookmarksUseCase(movies: movies.compactMap(\.movieId.id), fromBookmarkUserCategory: selectedBookmark, toBookmarkUserCategory: bookmark.bookmarkId)
+                                if #available(macOS 14.0, *) {
+                                    Text(bookmark.name)
+                                        .font(.system(size: 15))
+                                        .lineLimit(1)
+                                        .badge(
+                                            Text(bookmark.count.description)
+                                                .monospacedDigit()
+                                        )
+                                        .contentTransition(.numericText(value: Double(bookmark.count)))
+                                        .tag(bookmark.bookmarkId)
+                                        .padding(7)
+                                        .listRowInsets(.init())
+                                        .contextMenu {
+                                            Button {
+                                                renameBookmark = bookmark
+                                            } label: {
+                                                Text("key.rename")
+                                            }
+                                            
+                                            Button {
+                                                deleteBookmarksCategoryUseCase(id: bookmark.bookmarkId)
                                                     .receive(on: DispatchQueue.main)
                                                     .sink { completion in
                                                         guard case let .failure(error) = completion else { return }
-
+                                                        
                                                         self.error = error
                                                         self.isErrorPresented = true
-                                                    } receiveValue: { moved in
-                                                        withAnimation(.easeInOut) {
-                                                            if var data = vm.bookmarkState.data {
-                                                                data.removeAll(where: { movie in
-                                                                    movies.contains(where: { movedMovie in
-                                                                        movie.movieId == movedMovie.movieId
-                                                                    })
-                                                                })
-                                                                
-                                                                vm.bookmarkState = .data(data)
+                                                    } receiveValue: { delete in
+                                                        if delete {
+                                                            bookmarks.removeAll(where: {
+                                                                $0.bookmarkId == bookmark.bookmarkId
+                                                            })
+                                                            
+                                                            withAnimation(.easeInOut) {
+                                                                vm.bookmarksState = .data(bookmarks)
                                                             }
                                                             
-                                                            if let from = bookmarks.firstIndex(where: { $0.bookmarkId == selectedBookmark }) {
-                                                                bookmarks[from] -= 1
+                                                            if selectedBookmark == bookmark.bookmarkId {
+                                                                selectedBookmark = -1
+                                                                vm.bookmarkState = .data([])
                                                             }
-                                                                
-                                                            if let to = bookmarks.firstIndex(where: { $0.bookmarkId == bookmark.bookmarkId }) {
-                                                                bookmarks[to] += moved
-                                                            }
-                                                                
-                                                            vm.bookmarksState = .data(bookmarks)
                                                         }
                                                     }
                                                     .store(in: &subscriptions)
-
-                                                return true
+                                            } label: {
+                                                Text("key.delete")
                                             }
-
-                                            return false
                                         }
-                                    }
-                                    .swipeActions(edge: .trailing) {
-                                        Button {
-                                            deleteBookmarksCategoryUseCase(id: bookmark.bookmarkId)
-                                                .receive(on: DispatchQueue.main)
-                                                .sink { completion in
-                                                    guard case let .failure(error) = completion else { return }
-
-                                                    self.error = error
-                                                    self.isErrorPresented = true
-                                                } receiveValue: { delete in
-                                                    if delete {
-                                                        bookmarks.removeAll(where: {
-                                                            $0.bookmarkId == bookmark.bookmarkId
-                                                        })
-                                                        
-                                                        withAnimation(.easeInOut) {
-                                                            vm.bookmarksState = .data(bookmarks)
+                                        .if(selectedBookmark != bookmark.bookmarkId) { view in
+                                            view.dropDestination(for: MovieSimple.self) { movies, _ in
+                                                if !movies.isEmpty, !movies.compactMap(\.movieId.id).isEmpty {
+                                                    moveBetweenBookmarksUseCase(movies: movies.compactMap(\.movieId.id), fromBookmarkUserCategory: selectedBookmark, toBookmarkUserCategory: bookmark.bookmarkId)
+                                                        .receive(on: DispatchQueue.main)
+                                                        .sink { completion in
+                                                            guard case let .failure(error) = completion else { return }
+                                                            
+                                                            self.error = error
+                                                            self.isErrorPresented = true
+                                                        } receiveValue: { moved in
+                                                            withAnimation(.easeInOut) {
+                                                                if var data = vm.bookmarkState.data {
+                                                                    data.removeAll(where: { movie in
+                                                                        movies.contains(where: { movedMovie in
+                                                                            movie.movieId == movedMovie.movieId
+                                                                        })
+                                                                    })
+                                                                    
+                                                                    vm.bookmarkState = .data(data)
+                                                                }
+                                                                
+                                                                if let from = bookmarks.firstIndex(where: { $0.bookmarkId == selectedBookmark }) {
+                                                                    bookmarks[from] -= 1
+                                                                }
+                                                                
+                                                                if let to = bookmarks.firstIndex(where: { $0.bookmarkId == bookmark.bookmarkId }) {
+                                                                    bookmarks[to] += moved
+                                                                }
+                                                                
+                                                                vm.bookmarksState = .data(bookmarks)
+                                                            }
                                                         }
-
-                                                        if selectedBookmark == bookmark.bookmarkId {
-                                                            selectedBookmark = -1
-                                                            vm.bookmarkState = .data([])
+                                                        .store(in: &subscriptions)
+                                                    
+                                                    return true
+                                                }
+                                                
+                                                return false
+                                            }
+                                        }
+                                        .swipeActions(edge: .trailing) {
+                                            Button {
+                                                deleteBookmarksCategoryUseCase(id: bookmark.bookmarkId)
+                                                    .receive(on: DispatchQueue.main)
+                                                    .sink { completion in
+                                                        guard case let .failure(error) = completion else { return }
+                                                        
+                                                        self.error = error
+                                                        self.isErrorPresented = true
+                                                    } receiveValue: { delete in
+                                                        if delete {
+                                                            bookmarks.removeAll(where: {
+                                                                $0.bookmarkId == bookmark.bookmarkId
+                                                            })
+                                                            
+                                                            withAnimation(.easeInOut) {
+                                                                vm.bookmarksState = .data(bookmarks)
+                                                            }
+                                                            
+                                                            if selectedBookmark == bookmark.bookmarkId {
+                                                                selectedBookmark = -1
+                                                                vm.bookmarkState = .data([])
+                                                            }
                                                         }
                                                     }
+                                                    .store(in: &subscriptions)
+                                            } label: {
+                                                Image(systemName: "trash")
+                                                    .font(.system(size: 15))
+                                            }
+                                            .tint(.accentColor)
+                                            
+                                            Button {
+                                                renameBookmark = bookmark
+                                            } label: {
+                                                Image(systemName: "pencil")
+                                                    .font(.system(size: 15))
+                                            }
+                                            .tint(.secondary)
+                                        }
+                                } else {
+                                    Text(bookmark.name)
+                                        .font(.system(size: 15))
+                                        .lineLimit(1)
+                                        .badge(
+                                            Text(bookmark.count.description)
+                                                .monospacedDigit()
+                                        )
+                                        .tag(bookmark.bookmarkId)
+                                        .padding(7)
+                                        .listRowInsets(.init())
+                                        .contextMenu {
+                                            Button {
+                                                renameBookmark = bookmark
+                                            } label: {
+                                                Text("key.rename")
+                                            }
+                                            
+                                            Button {
+                                                deleteBookmarksCategoryUseCase(id: bookmark.bookmarkId)
+                                                    .receive(on: DispatchQueue.main)
+                                                    .sink { completion in
+                                                        guard case let .failure(error) = completion else { return }
+                                                        
+                                                        self.error = error
+                                                        self.isErrorPresented = true
+                                                    } receiveValue: { delete in
+                                                        if delete {
+                                                            bookmarks.removeAll(where: {
+                                                                $0.bookmarkId == bookmark.bookmarkId
+                                                            })
+                                                            
+                                                            withAnimation(.easeInOut) {
+                                                                vm.bookmarksState = .data(bookmarks)
+                                                            }
+                                                            
+                                                            if selectedBookmark == bookmark.bookmarkId {
+                                                                selectedBookmark = -1
+                                                                vm.bookmarkState = .data([])
+                                                            }
+                                                        }
+                                                    }
+                                                    .store(in: &subscriptions)
+                                            } label: {
+                                                Text("key.delete")
+                                            }
+                                        }
+                                        .if(selectedBookmark != bookmark.bookmarkId) { view in
+                                            view.dropDestination(for: MovieSimple.self) { movies, _ in
+                                                if !movies.isEmpty, !movies.compactMap(\.movieId.id).isEmpty {
+                                                    moveBetweenBookmarksUseCase(movies: movies.compactMap(\.movieId.id), fromBookmarkUserCategory: selectedBookmark, toBookmarkUserCategory: bookmark.bookmarkId)
+                                                        .receive(on: DispatchQueue.main)
+                                                        .sink { completion in
+                                                            guard case let .failure(error) = completion else { return }
+                                                            
+                                                            self.error = error
+                                                            self.isErrorPresented = true
+                                                        } receiveValue: { moved in
+                                                            withAnimation(.easeInOut) {
+                                                                if var data = vm.bookmarkState.data {
+                                                                    data.removeAll(where: { movie in
+                                                                        movies.contains(where: { movedMovie in
+                                                                            movie.movieId == movedMovie.movieId
+                                                                        })
+                                                                    })
+                                                                    
+                                                                    vm.bookmarkState = .data(data)
+                                                                }
+                                                                
+                                                                if let from = bookmarks.firstIndex(where: { $0.bookmarkId == selectedBookmark }) {
+                                                                    bookmarks[from] -= 1
+                                                                }
+                                                                
+                                                                if let to = bookmarks.firstIndex(where: { $0.bookmarkId == bookmark.bookmarkId }) {
+                                                                    bookmarks[to] += moved
+                                                                }
+                                                                
+                                                                vm.bookmarksState = .data(bookmarks)
+                                                            }
+                                                        }
+                                                        .store(in: &subscriptions)
+                                                    
+                                                    return true
                                                 }
-                                                .store(in: &subscriptions)
-                                        } label: {
-                                            Image(systemName: "trash")
-                                                .font(.system(size: 15))
+                                                
+                                                return false
+                                            }
                                         }
-                                        .tint(.accentColor)
-                                        
-                                        Button {
-                                            renameBookmark = bookmark
-                                        } label: {
-                                            Image(systemName: "pencil")
-                                                .font(.system(size: 15))
+                                        .swipeActions(edge: .trailing) {
+                                            Button {
+                                                deleteBookmarksCategoryUseCase(id: bookmark.bookmarkId)
+                                                    .receive(on: DispatchQueue.main)
+                                                    .sink { completion in
+                                                        guard case let .failure(error) = completion else { return }
+                                                        
+                                                        self.error = error
+                                                        self.isErrorPresented = true
+                                                    } receiveValue: { delete in
+                                                        if delete {
+                                                            bookmarks.removeAll(where: {
+                                                                $0.bookmarkId == bookmark.bookmarkId
+                                                            })
+                                                            
+                                                            withAnimation(.easeInOut) {
+                                                                vm.bookmarksState = .data(bookmarks)
+                                                            }
+                                                            
+                                                            if selectedBookmark == bookmark.bookmarkId {
+                                                                selectedBookmark = -1
+                                                                vm.bookmarkState = .data([])
+                                                            }
+                                                        }
+                                                    }
+                                                    .store(in: &subscriptions)
+                                            } label: {
+                                                Image(systemName: "trash")
+                                                    .font(.system(size: 15))
+                                            }
+                                            .tint(.accentColor)
+                                            
+                                            Button {
+                                                renameBookmark = bookmark
+                                            } label: {
+                                                Image(systemName: "pencil")
+                                                    .font(.system(size: 15))
+                                            }
+                                            .tint(.secondary)
                                         }
-                                        .tint(.secondary)
-                                    }
+                                }
                             }
                             .onMove { indexSet, index in
                                 if var bookmarks = vm.bookmarksState.data {
@@ -253,7 +383,6 @@ struct BookmarksView: View {
                         .scrollContentBackground(.hidden)
                         .environment(\.defaultMinListRowHeight, 0)
                         .padding(.top, 52)
-                        .scrollClipDisabled()
                         .scrollIndicators(.never)
                     }
                 } else {
@@ -266,7 +395,6 @@ struct BookmarksView: View {
             .frame(width: 200)
                 
             Divider()
-                .background(.windowBackground)
                 .padding(.top, 52)
             
             if let error = vm.bookmarkState.error {
@@ -409,65 +537,99 @@ struct BookmarksView: View {
             if vm.bookmarkState != .loading, selectedBookmark != -1 {
                 Image(systemName: "line.3.horizontal.decrease.circle")
 
-                Picker("key.filter.select", selection: $filter) {
-                    ForEach(BookmarkFilters.allCases) { f in
-                        Text(f.rawValue).tag(f)
+                if #available(macOS 14.0, *) {
+                    Picker("key.filter.select", selection: $filter) {
+                        ForEach(BookmarkFilters.allCases) { f in
+                            Text(f.rawValue).tag(f)
+                        }
                     }
-                }
-                .labelsHidden()
-                .pickerStyle(.menu)
-                .buttonStyle(.accessoryBar)
-                .controlSize(.large)
-                .background(.tertiary.opacity(0.05))
-                .clipShape(RoundedRectangle(cornerRadius: 6))
-                .contentShape(RoundedRectangle(cornerRadius: 6))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 6)
-                        .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .buttonStyle(.accessoryBar)
+                    .controlSize(.large)
+                    .background(.tertiary.opacity(0.05))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                    }
+                } else {
+                    Picker("key.filter.select", selection: $filter) {
+                        ForEach(BookmarkFilters.allCases) { f in
+                            Text(f.rawValue).tag(f)
+                        }
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .background(.tertiary.opacity(0.05))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                    }
                 }
                     
                 Divider()
                     .padding(.vertical, 18)
 
-                Picker("key.genre.select", selection: $selectedGenre) {
-                    ForEach(Genres.allCases) { g in
-                        Text(g.rawValue).tag(g)
+                if #available(macOS 14.0, *) {
+                    Picker("key.genre.select", selection: $selectedGenre) {
+                        ForEach(Genres.allCases) { g in
+                            Text(g.rawValue).tag(g)
+                        }
                     }
-                }
-                .labelsHidden()
-                .pickerStyle(.menu)
-                .buttonStyle(.accessoryBar)
-                .controlSize(.large)
-                .background(.tertiary.opacity(0.05))
-                .clipShape(RoundedRectangle(cornerRadius: 6))
-                .contentShape(RoundedRectangle(cornerRadius: 6))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 6)
-                        .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .buttonStyle(.accessoryBar)
+                    .controlSize(.large)
+                    .background(.tertiary.opacity(0.05))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                    }
+                } else {
+                    Picker("key.genre.select", selection: $selectedGenre) {
+                        ForEach(Genres.allCases) { g in
+                            Text(g.rawValue).tag(g)
+                        }
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .background(.tertiary.opacity(0.05))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                    }
                 }
             }
         })
-        .onChange(of: selectedBookmark) {
+        .customOnChange(of: selectedBookmark) {
             if selectedBookmark != -1 {
                 vm.reloadBookmark(id: selectedBookmark, filter: filter, genre: selectedGenre)
             }
         }
-        .onChange(of: isCreateBookmarkPresented) {
+        .customOnChange(of: isCreateBookmarkPresented) {
             if !isCreateBookmarkPresented {
                 selectedBookmark = -1
                 vm.reloadBookmarks()
             }
         }
-        .onChange(of: renameBookmark) {
+        .customOnChange(of: renameBookmark) {
             if renameBookmark == nil {
                 selectedBookmark = -1
                 vm.reloadBookmarks()
             }
         }
-        .onChange(of: filter) {
+        .customOnChange(of: filter) {
             vm.reloadBookmark(id: selectedBookmark, filter: filter, genre: selectedGenre)
         }
-        .onChange(of: selectedGenre) {
+        .customOnChange(of: selectedGenre) {
             vm.reloadBookmark(id: selectedBookmark, filter: filter, genre: selectedGenre)
         }
         .load(isLoggedIn) {

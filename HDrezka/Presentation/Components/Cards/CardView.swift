@@ -6,7 +6,7 @@ struct CardView: View {
     private let draggable: Bool
     private let reservesSpace: Bool
 
-    @Environment(AppState.self) private var appState
+    @EnvironmentObject private var appState: AppState
 
     init(movie: MovieSimple, draggable: Bool = false, reservesSpace: Bool = false) {
         self.movie = movie

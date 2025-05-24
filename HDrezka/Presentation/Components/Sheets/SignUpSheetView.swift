@@ -9,7 +9,8 @@ struct SignUpSheetView: View {
     @Injected(\.checkUsernameUseCase) private var checkUsernameUseCase
 
     @Environment(\.dismiss) private var dismiss
-    @Environment(AppState.self) private var appState
+
+    @EnvironmentObject private var appState: AppState
 
     @State private var email: String = ""
     @State private var username: String = ""
@@ -199,9 +200,8 @@ struct SignUpSheetView: View {
                                         TextField("key.email", text: $email, prompt: Text(String(localized: "key.email").lowercased()))
                                             .textFieldStyle(.plain)
                                             .multilineTextAlignment(.trailing)
-                                            .textContentType(.emailAddress)
                                             .focused($focusedField, equals: FocusedField.email)
-                                            .onChange(of: email) {
+                                            .customOnChange(of: email) {
                                                 let newValue = String(email.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
                                                 if newValue != email {
                                                     email = newValue
@@ -251,9 +251,8 @@ struct SignUpSheetView: View {
                                         TextField("key.username", text: $username, prompt: Text(String(localized: "key.username").lowercased()))
                                             .textFieldStyle(.plain)
                                             .multilineTextAlignment(.trailing)
-                                            .textContentType(.username)
                                             .focused($focusedField, equals: .username)
-                                            .onChange(of: username) {
+                                            .customOnChange(of: username) {
                                                 let newValue = String(username.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) }.prefix(30))
                                                 if newValue != username {
                                                     username = newValue
@@ -303,9 +302,8 @@ struct SignUpSheetView: View {
                                             TextField("key.password", text: $password1, prompt: Text(String(localized: "key.password").lowercased()))
                                                 .textFieldStyle(.plain)
                                                 .multilineTextAlignment(.trailing)
-                                                .textContentType(.newPassword)
                                                 .focused($focusedField, equals: .password1)
-                                                .onChange(of: password1) {
+                                                .customOnChange(of: password1) {
                                                     let newValue = String(password1.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
                                                     if newValue != password1 {
                                                         password1 = newValue
@@ -339,9 +337,8 @@ struct SignUpSheetView: View {
                                             SecureField("key.password", text: $password1, prompt: Text(String(localized: "key.password").lowercased()))
                                                 .textFieldStyle(.plain)
                                                 .multilineTextAlignment(.trailing)
-                                                .textContentType(.newPassword)
                                                 .focused($focusedField, equals: .password1)
-                                                .onChange(of: password1) {
+                                                .customOnChange(of: password1) {
                                                     let newValue = String(password1.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
                                                     if newValue != password1 {
                                                         password1 = newValue
@@ -386,7 +383,9 @@ struct SignUpSheetView: View {
                                                         .onEnded { _ in
                                                             withAnimation(.easeInOut(duration: 0.15)) {
                                                                 showPassword = false
-                                                            } completion: {
+                                                            }
+                                                            
+                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                                                                 focusedField = .password1
                                                             }
                                                         }
@@ -411,9 +410,8 @@ struct SignUpSheetView: View {
                                             TextField("key.password.confirm", text: $password2, prompt: Text(String(localized: "key.password.confirm").lowercased()))
                                                 .textFieldStyle(.plain)
                                                 .multilineTextAlignment(.trailing)
-                                                .textContentType(.newPassword)
                                                 .focused($focusedField, equals: .password2)
-                                                .onChange(of: password2) {
+                                                .customOnChange(of: password2) {
                                                     let newValue = String(password2.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
                                                     if newValue != password2 {
                                                         password2 = newValue
@@ -470,9 +468,8 @@ struct SignUpSheetView: View {
                                             SecureField("key.password.confirm", text: $password2, prompt: Text(String(localized: "key.password.confirm").lowercased()))
                                                 .textFieldStyle(.plain)
                                                 .multilineTextAlignment(.trailing)
-                                                .textContentType(.newPassword)
                                                 .focused($focusedField, equals: .password2)
-                                                .onChange(of: password2) {
+                                                .customOnChange(of: password2) {
                                                     let newValue = String(password2.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
                                                     if newValue != password2 {
                                                         password2 = newValue
@@ -540,7 +537,9 @@ struct SignUpSheetView: View {
                                                         .onEnded { _ in
                                                             withAnimation(.easeInOut(duration: 0.15)) {
                                                                 showConfirmPassword = false
-                                                            } completion: {
+                                                            }
+                                                            
+                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                                                                 focusedField = .password2
                                                             }
                                                         }

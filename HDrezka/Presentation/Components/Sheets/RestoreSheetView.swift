@@ -8,7 +8,8 @@ struct RestoreSheetView: View {
     @State private var subscriptions: Set<AnyCancellable> = []
 
     @Environment(\.dismiss) private var dismiss
-    @Environment(AppState.self) private var appState
+
+    @EnvironmentObject private var appState: AppState
 
     @State private var login: String = ""
     @State private var state: EmptyState = .data
@@ -50,7 +51,7 @@ struct RestoreSheetView: View {
                                     .textFieldStyle(.plain)
                                     .multilineTextAlignment(.trailing)
                                     .focused($focusedField, equals: .login)
-                                    .onChange(of: login) {
+                                    .customOnChange(of: login) {
                                         let newValue = String(login.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
                                         if newValue != login {
                                             login = newValue
