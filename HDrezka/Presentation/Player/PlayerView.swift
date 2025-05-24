@@ -518,34 +518,6 @@ struct PlayerView: View {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-
-//            KeyAwareView { event in
-//                self.resetTimer()
-//
-//                if event.keyCode == .m {
-//                    guard let player = self.playerLayer.player,
-//                          player.status == .readyToPlay
-//                    else {
-//                        return
-//                    }
-//
-//                    player.isMuted.toggle()
-//                } else if event.keyCode == .space {
-//                    guard let player = self.playerLayer.player,
-//                          player.status == .readyToPlay,
-//                          !self.isPictureInPictureActive,
-//                          !self.isLoading
-//                    else {
-//                        return
-//                    }
-//
-//                    if self.isPlaying {
-//                        player.pause()
-//                    } else {
-//                        player.playImmediately(atRate: self.rate)
-//                    }
-//                }
-//            }
         }
         .navigationTitle("Player - \(name)")
         .padding(1)
