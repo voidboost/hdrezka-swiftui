@@ -4,8 +4,9 @@ import SwiftUI
 struct ImageView: View {
     private let url: URL
 
+    @Environment(\.dismiss) private var dismiss
+
     @State private var window: NSWindow?
-    @State private var monitorID: Any?
 
     init(url: URL) {
         self.url = url
@@ -58,26 +59,17 @@ struct ImageView: View {
             if !window.styleMask.contains(.fullScreen) {
                 window.toggleFullScreen(nil)
             }
-
-            monitorID = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-                if event.keyCode == .escape {
-                    dismissWindow(id: "imageViewer")
-
-                    return nil
-                }
-
-                return event
-            }
-        }
-        .onDisappear {
-            if let monitorID {
-                NSEvent.removeMonitor(monitorID)
-            }
         }
         .ignoresSafeArea()
         .focusable()
         .frame(minWidth: 300 * (16 / 9), maxWidth: .infinity, minHeight: 300, maxHeight: .infinity)
-        .background(WindowAccessor(window: $window))
+        .background(WindowAccessor { window in
+            self.window = window
+            window.contentView?.focusRingType = .none
+        })
+        .onExitCommand {
+            dismiss()
+        }
         .background {
             ZStack(alignment: .topLeading) {
                 LazyImage(url: url, transaction: .init(animation: .easeInOut)) { state in
@@ -112,7 +104,7 @@ struct ImageView: View {
                         .exclusively(before:
                             TapGesture(count: 1)
                                 .onEnded {
-                                    dismissWindow(id: "imageViewer")
+                                    dismiss()
                                 }
                         )
                 )

@@ -101,14 +101,9 @@ struct HDrezkaApp: App {
                 .environmentObject(appState)
                 .environmentObject(downloader)
                 .environment(\.managedObjectContext, persistenceController.viewContext)
-                .task {
-                    if #unavailable(macOS 15) {
-                        dismissWindow(id: "player")
-
-                        dismissWindow(id: "imageViewer")
-                    }
-                }
-                .background(WindowAccessor(window: $appState.window))
+                .background(WindowAccessor { window in
+                    appState.window = window
+                })
                 .onOpenURL { url in
                     guard let scheme = Const.details.scheme,
                           url.scheme == scheme
@@ -323,12 +318,18 @@ extension NSImage {
 }
 
 struct WindowAccessor: NSViewRepresentable {
-    @Binding var window: NSWindow?
+    private let callback: (NSWindow) -> Void
+
+    init(callback: @escaping (NSWindow) -> Void) {
+        self.callback = callback
+    }
 
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
         DispatchQueue.main.async {
-            self.window = view.window
+            if let window = view.window {
+                callback(window)
+            }
         }
         return view
     }
