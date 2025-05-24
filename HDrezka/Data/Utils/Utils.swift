@@ -44,10 +44,6 @@ extension String {
         return nil
     }
 
-    var linkIsBroken: Bool {
-        !contains(/(http(s)?:\/\/)[\-a-zA-Z\d\/:.=]+(\.mp4)/)
-    }
-
     var shortNumber: String {
         if let number = Int(String(unicodeScalars.filter(CharacterSet.decimalDigits.contains))) {
             let numFormatter = NumberFormatter()
