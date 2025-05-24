@@ -1,32 +1,33 @@
-<h1>HDrezka macOS (unofficial)</h1>
-<p>Unofficial macOS client for HDrezka. Requires macOS 13 Ventura or later.</p>
-<h2>Features</h2>
+<a href="./README_EN.md">English 👈</a>
+<h1>HDrezka для macOS (неофициальный)</h1>
+<p>Неофициальный клиент HDrezka для macOS. Требуется macOS 13 Ventura или новее.</p>
+<h2>Возможности</h2>
 <ul>
-    <li>⭐️ Custom video player</li>
-    <li>User account authentication</li>
-    <li>Bookmark your favorite content</li>
-    <li>Commenting system</li>
-    <li>Organized and intuitive movie list</li>
-    <li>Light and dark theme support</li>
-    <li>Localization: English, Ukrainian, and Russian</li>
-    <li>Search</li>
-    <li>Video download support</li>
+    <li>⭐️ Кастомный плеер</li>
+    <li>Авторизация аккаунта</li>
+    <li>Добавление любимого контента в закладки</li>
+    <li>Система комментариев</li>
+    <li>Удобный и интуитивно понятный список фильмов</li>
+    <li>Поддержка светлой и тёмной темы</li>
+    <li>Локализация: английский, украинский и русский</li>
+    <li>Поиск</li>
+    <li>Поддержка загрузки видео</li>
 </ul>
-<p>And more!</p>
-<h2>Releases</h2>
-<a href="https://voidboost.github.io/hdrezka-releases/HDrezka.dmg">Download latest version</a>
-<h2>Sponsor & Support</h2>
+<p>И многое другое!</p>
+<h2>Релизы</h2>
+<a href="https://voidboost.github.io/hdrezka-releases/HDrezka.dmg">Скачать последнюю версию</a>
+<h2>Спонсорство и поддержка</h2>
 <p>
-    To keep this app maintained and up-to-date please consider sponsoring it on GitHub. Or if you are looking for a private support or help in customizing the experience, then reach out to me on Telegram
+    Чтобы приложение оставалось актуальным и поддерживалось, рассмотрите возможность спонсорства на GitHub. Если вам нужна приватная поддержка или помощь в настройке приложения, свяжитесь со мной в Telegram:  
     <a href="https://t.me/voidboost">@voidboost</a>.
 </p>
-<h2>Troubleshooting</h2>
-<h3>Error during installation/launch of the application</h3>
-<p>These two commands usually help — you need to run them in the terminal (when entering the password, it will be hidden — that’s normal).</p>
+<h2>Устранение проблем</h2>
+<h3>Ошибка при установке/запуске приложения</h3>
+<p>Эти две команды обычно помогают — их нужно ввести в терминале (при вводе пароля он не отображается — это нормально).</p>
 <pre><code>sudo xattr -cr /Applications/HDrezka.app</code></pre>
-<p>and</p>
+<p>и</p>
 <pre><code>sudo codesign --force --deep --sign - /Applications/HDrezka.app</code></pre>
-<h2>Screenshots</h2>
+<h2>Скриншоты</h2>
 <p>
     <img width="49%" src="https://github.com/user-attachments/assets/717fce79-2084-4fed-ac8c-64ae601cd581" />
     <img width="49%" src="https://github.com/user-attachments/assets/cd186b48-db12-430a-8ed7-241f3125f16b" />
@@ -74,5 +75,5 @@
 <p>
     <img width="49%" src="https://github.com/user-attachments/assets/5df3dd8e-24c9-4ff4-9a37-39b4cfb1fa5a" />
 </p>
-<h2>License</h2>
+<h2>Лицензия</h2>
 <a href="./LICENSE">MIT</a>
