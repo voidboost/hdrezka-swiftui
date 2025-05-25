@@ -200,12 +200,7 @@ struct HDrezkaApp: App {
                 .keyboardShortcut(",", modifiers: .command)
             }
 
-            Button {
-                updaterController.updater.checkForUpdates()
-            } label: {
-                Text("key.checkUpdates")
-            }
-            .disabled(!updaterController.updater.canCheckForUpdates)
+            UpdateButton(updater: updaterController.updater)
 
             Button {
                 openWindow(id: "licenses")

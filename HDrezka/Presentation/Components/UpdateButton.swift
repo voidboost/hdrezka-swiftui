@@ -1,0 +1,31 @@
+import Combine
+import Sparkle
+import SwiftUI
+
+struct UpdateButton: View {
+    private let updater: SPUUpdater
+
+    @State private var canCheckForUpdates: Bool = false
+
+    @State private var subscriptions: Set<AnyCancellable> = []
+
+    init(updater: SPUUpdater) {
+        self.updater = updater
+    }
+
+    var body: some View {
+        Button {
+            updater.checkForUpdates()
+        } label: {
+            Text("key.checkUpdates")
+        }
+        .disabled(!canCheckForUpdates)
+        .task {
+            updater.publisher(for: \.canCheckForUpdates)
+                .sink { canCheckForUpdates in
+                    self.canCheckForUpdates = canCheckForUpdates
+                }
+                .store(in: &subscriptions)
+        }
+    }
+}
