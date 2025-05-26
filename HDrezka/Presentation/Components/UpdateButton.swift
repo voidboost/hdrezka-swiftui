@@ -22,6 +22,7 @@ struct UpdateButton: View {
         .disabled(!canCheckForUpdates)
         .task {
             updater.publisher(for: \.canCheckForUpdates)
+                .receive(on: DispatchQueue.main)
                 .sink { canCheckForUpdates in
                     self.canCheckForUpdates = canCheckForUpdates
                 }
