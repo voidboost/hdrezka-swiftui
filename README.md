@@ -1,4 +1,8 @@
-<a href="./README_EN.md">English 👈</a>
+<h2>Мова / Language</h2>
+<ul>
+    <li><a href="./README_UA.md">Українська 👈</a></li>
+    <li><a href="./README_EN.md">English 👈</a></li>
+</ul>
 <h1>HDrezka для macOS (неофициальный)</h1>
 <p>Неофициальный клиент HDrezka для macOS. Требуется macOS 13 Ventura или новее.</p>
 <h2>Возможности</h2>
