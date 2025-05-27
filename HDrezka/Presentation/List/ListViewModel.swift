@@ -29,7 +29,7 @@ class ListViewModel: ObservableObject {
 
     private var subscriptions: Set<AnyCancellable> = []
 
-    @Published var title = String(localized: "key.list")
+    @Published var title: String?
     @Published var state: DataState<[MovieSimple]> = .loading
     @Published var paginationState: DataPaginationState = .idle
 

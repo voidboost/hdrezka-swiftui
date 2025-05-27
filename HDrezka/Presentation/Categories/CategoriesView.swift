@@ -160,7 +160,7 @@ struct CategoriesView: View {
                 }
 
                 HStack(spacing: 6) {
-                    Text("\(type.best.name):")
+                    Text(verbatim: "\(type.best.name):")
 
                     if #available(macOS 14.0, *) {
                         Picker("key.categories", selection: $bestGenre) {

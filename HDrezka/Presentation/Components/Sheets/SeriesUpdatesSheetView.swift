@@ -156,7 +156,7 @@ struct SeriesUpdatesSheetView: View {
                                 appState.path.append(.details(MovieSimple(movieId: item.seriesId, name: item.seriesName)))
                             } label: {
                                 HStack(alignment: .center) {
-                                    Text("\(item.seriesName) \(item.season)")
+                                    Text(verbatim: "\(item.seriesName) \(item.season)")
                                         .font(.system(size: 13))
                                         .lineLimit(nil)
 
@@ -207,7 +207,7 @@ struct SeriesUpdatesSheetView: View {
                                 appState.path.append(.details(MovieSimple(movieId: item.seriesId, name: item.seriesName)))
                             } label: {
                                 HStack(alignment: .center) {
-                                    Text("\(item.seriesName) \(item.season)")
+                                    Text(verbatim: "\(item.seriesName) \(item.season)")
                                         .font(.system(size: 13))
                                         .lineLimit(nil)
 

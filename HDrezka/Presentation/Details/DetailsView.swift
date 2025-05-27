@@ -78,7 +78,7 @@ struct DetailsView: View {
                         Image(systemName: "bubble.left.and.bubble.right")
                                 
                         if details.commentsCount > 0 {
-                            Text("(\(details.commentsCount.description))")
+                            Text(verbatim: "(\(details.commentsCount.description))")
                         }
                     }
                 }
@@ -585,13 +585,25 @@ struct DetailsView: View {
                                                                 .blended(withFraction: CGFloat(rating / 10.0), of: NSColor.green) ?? NSColor.labelColor
                                                         )
                                                         
-                                                        HStack(spacing: 3) {
-                                                            Text("key.franchise.year-\(fr.year)")
-                                                            Text("•")
-                                                            Text(rating.description).foregroundStyle(color)
-                                                            Image(systemName: "star.fill").font(.system(size: 9)).foregroundStyle(color)
+                                                        if #available(macOS 14.0, *) {
+                                                            (
+                                                                Text("key.franchise.year-\(fr.year)") +
+                                                                    Text(verbatim: " • ") +
+                                                                    Text(verbatim: "\(rating.description) ").foregroundStyle(color) +
+                                                                    Text(Image(systemName: "star.fill")).foregroundStyle(color)
+                                                            )
+                                                            .font(.system(size: 11))
+                                                            .foregroundStyle(.secondary)
+                                                        } else {
+                                                            (
+                                                                Text("key.franchise.year-\(fr.year)") +
+                                                                    Text(verbatim: " • ") +
+                                                                    Text(verbatim: "\(rating.description) ").foregroundColor(color) +
+                                                                    Text(Image(systemName: "star.fill")).foregroundColor(color)
+                                                            )
+                                                            .font(.system(size: 11))
+                                                            .foregroundColor(.secondary)
                                                         }
-                                                        .font(.system(size: 11)).foregroundStyle(.secondary)
                                                     } else {
                                                         Text("key.franchise.year-\(fr.year)").font(.system(size: 11)).foregroundStyle(.secondary)
                                                     }
@@ -630,13 +642,25 @@ struct DetailsView: View {
                                                             .blended(withFraction: CGFloat(rating / 10.0), of: NSColor.green) ?? NSColor.labelColor
                                                     )
                                                     
-                                                    HStack(spacing: 3) {
-                                                        Text("key.franchise.year-\(fr.year)")
-                                                        Text("•")
-                                                        Text(rating.description).foregroundStyle(color)
-                                                        Image(systemName: "star.fill").font(.system(size: 9)).foregroundStyle(color)
+                                                    if #available(macOS 14.0, *) {
+                                                        (
+                                                            Text("key.franchise.year-\(fr.year)") +
+                                                                Text(verbatim: " • ") +
+                                                                Text(verbatim: "\(rating.description) ").foregroundStyle(color) +
+                                                                Text(Image(systemName: "star.fill")).foregroundStyle(color)
+                                                        )
+                                                        .font(.system(size: 11))
+                                                        .foregroundStyle(.secondary)
+                                                    } else {
+                                                        (
+                                                            Text("key.franchise.year-\(fr.year)") +
+                                                                Text(verbatim: " • ") +
+                                                                Text(verbatim: "\(rating.description) ").foregroundColor(color) +
+                                                                Text(Image(systemName: "star.fill")).foregroundColor(color)
+                                                        )
+                                                        .font(.system(size: 11))
+                                                        .foregroundColor(.secondary)
                                                     }
-                                                    .font(.system(size: 11)).foregroundStyle(.secondary)
                                                 } else {
                                                     Text("key.franchise.year-\(fr.year)").font(.system(size: 11)).foregroundStyle(.secondary)
                                                 }
@@ -836,13 +860,23 @@ struct DetailsView: View {
                                         PersonTextWithPhoto(person: person)
                                             .contentShape(Rectangle())
                                     } else if let list = item as? MovieList, let position = list.moviePosition?.toNumeral() {
-                                        Text(
-                                            "\(Text(list.name).foregroundStyle(.secondary)) \(Text("key.place-\(position)").foregroundStyle(.tertiary))"
-                                        )
-                                        .font(.system(size: 13))
-                                        .lineLimit(1)
-                                        .truncationMode(.middle)
-                                        .contentShape(Rectangle())
+                                        if #available(macOS 14.0, *) {
+                                            (
+                                                Text(verbatim: "\(list.name) ").foregroundStyle(.secondary) +
+                                                    Text("key.place-\(position)").foregroundStyle(.tertiary)
+                                            )
+                                            .font(.system(size: 13))
+                                            .lineLimit(1)
+                                            .truncationMode(.middle)
+                                            .contentShape(Rectangle())
+                                        } else {
+                                            Text(verbatim: "\(list.name) \(String(localized: "key.place-\(position)"))")
+                                                .font(.system(size: 13))
+                                                .foregroundColor(.secondary)
+                                                .lineLimit(1)
+                                                .truncationMode(.middle)
+                                                .contentShape(Rectangle())
+                                        }
                                     } else {
                                         Text(item.name)
                                             .font(.system(size: 13))
@@ -854,7 +888,7 @@ struct DetailsView: View {
                                 .buttonStyle(.plain)
                                 
                                 if item != data.prefix(2).last {
-                                    Text(", ")
+                                    Text(verbatim: ", ")
                                         .font(.system(size: 13))
                                         .foregroundStyle(.secondary)
                                 }
@@ -917,13 +951,25 @@ struct DetailsView: View {
                                                     }
                                                     .contentShape(Rectangle())
                                                 } else if let list = item as? MovieList, let position = list.moviePosition?.toNumeral() {
-                                                    Text(
-                                                        "\(Text(list.name)) \(Text("key.place-\(position)").foregroundStyle(.secondary))"
-                                                    )
-                                                    .font(.system(size: 13))
-                                                    .lineLimit(nil)
-                                                    .multilineTextAlignment(.center)
-                                                    .contentShape(Rectangle())
+                                                    if #available(macOS 14.0, *) {
+                                                        (
+                                                            Text(verbatim: "\(list.name) ") +
+                                                                Text("key.place-\(position)").foregroundStyle(.secondary)
+                                                        )
+                                                        .font(.system(size: 13))
+                                                        .lineLimit(nil)
+                                                        .multilineTextAlignment(.center)
+                                                        .contentShape(Rectangle())
+                                                    } else {
+                                                        (
+                                                            Text(verbatim: "\(list.name) ") +
+                                                                Text("key.place-\(position)").foregroundColor(.secondary)
+                                                        )
+                                                        .font(.system(size: 13))
+                                                        .lineLimit(nil)
+                                                        .multilineTextAlignment(.center)
+                                                        .contentShape(Rectangle())
+                                                    }
                                                 } else {
                                                     Text(item.name)
                                                         .font(.system(size: 13))
@@ -1034,7 +1080,7 @@ struct DetailsView: View {
                                     .contentTransition(.numericText(value: Double(rating)))
                                 
                                 if let votes, vote {
-                                    Text("(\(votes))")
+                                    Text(verbatim: "(\(votes))")
                                         .font(.system(size: 9).monospacedDigit())
                                         .foregroundStyle(.secondary)
                                         .contentTransition(.numericText())
@@ -1045,7 +1091,7 @@ struct DetailsView: View {
                                     .foregroundStyle(.secondary)
                                 
                                 if let votes, vote {
-                                    Text("(\(votes))")
+                                    Text(verbatim: "(\(votes))")
                                         .font(.system(size: 9).monospacedDigit())
                                         .foregroundStyle(.secondary)
                                 }
@@ -1193,7 +1239,7 @@ struct DetailsView: View {
                                         }
                                     
                                     if let hover, show {
-                                        Text("(\(hover))")
+                                        Text(verbatim: "(\(hover))")
                                             .font(.system(size: 11))
                                             .foregroundStyle(.secondary)
                                     }
@@ -1223,7 +1269,7 @@ struct DetailsView: View {
                                     }
                                 
                                 if let hover, show {
-                                    Text("(\(hover))")
+                                    Text(verbatim: "(\(hover))")
                                         .font(.system(size: 11))
                                         .foregroundStyle(.secondary)
                                 }

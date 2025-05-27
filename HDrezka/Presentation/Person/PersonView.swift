@@ -303,7 +303,9 @@ struct PersonView: View {
                         
                     Spacer()
                         
-                    Text(info).font(.system(size: 13)).foregroundStyle(.secondary)
+                    Text(info)
+                        .font(.system(size: 13))
+                        .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
                 .padding(.vertical, 8)

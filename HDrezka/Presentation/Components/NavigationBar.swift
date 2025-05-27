@@ -41,7 +41,7 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .navigationTitle("HDrezka - \(title)")
+            .navigationTitle(Text(verbatim: "HDrezka - \(title)"))
             .customOnChange(of: appState.path) {
                 if parallax != (appState.path.count != index) {
                     withAnimation(.easeInOut) {

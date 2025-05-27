@@ -385,7 +385,7 @@ struct PlayerView: View {
                                                 }
                                             }) {
                                                 ForEach(rates, id: \.self) { value in
-                                                    Text("\(value.description)x").tag(value)
+                                                    Text(verbatim: "\(value.description)x").tag(value)
                                                 }
                                             } label: {
                                                 EmptyView()
@@ -537,7 +537,7 @@ struct PlayerView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .navigationTitle("Player - \(name)")
+        .navigationTitle(Text(verbatim: "Player - \(name)"))
         .padding(1)
         .task {
             setupPlayer(subtitles: selectPositions.first(where: { position in position.id == voiceActing.voiceId })?.subtitles) {

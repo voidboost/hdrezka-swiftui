@@ -267,7 +267,7 @@ struct SignInSheetView: View {
 
                             appState.isSignUpPresented = true
                         } label: {
-                            Text("\(String(localized: "key.register"))!")
+                            Text(verbatim: "\(String(localized: "key.register"))!")
                                 .font(.caption)
                                 .foregroundStyle(.accent)
                         }

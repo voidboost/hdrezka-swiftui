@@ -86,7 +86,7 @@ struct WatchSheetView: View {
                                                             ProgressView(value: rate.percent / 100.0) {
                                                                 Text(rate.name)
                                                             } currentValueLabel: {
-                                                                Text("\(rate.percent.description)%")
+                                                                Text(verbatim: "\(rate.percent.description)%")
                                                             }
                                                         }
                                                     }
