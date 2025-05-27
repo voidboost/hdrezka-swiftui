@@ -134,6 +134,7 @@ struct PlayerView: View {
                                 }
                                 .buttonStyle(.plain)
                                 .disabled(isPictureInPictureActive || !isPictureInPicturePossible)
+                                .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                             }
 
                             Spacer()
@@ -154,6 +155,7 @@ struct PlayerView: View {
 
                                     window.isMovableByWindowBackground = !hovering
                                 }
+                                .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
 
                                 VStack(alignment: .center) {
                                     Button {
@@ -174,6 +176,7 @@ struct PlayerView: View {
                                     }
                                     .buttonStyle(.plain)
                                     .keyboardShortcut("m", modifiers: [])
+                                    .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                                 }
                                 .frame(width: 30)
                             }
@@ -196,12 +199,14 @@ struct PlayerView: View {
                                 }
                                 .buttonStyle(.plain)
                                 .disabled(seasons.element(before: season) == nil && season.episodes.element(before: episode) == nil)
+                                .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                             }
 
                             Spacer()
 
                             if isLoading {
                                 ProgressView()
+                                    .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                             } else {
                                 Button {
                                     resetTimer()
@@ -225,6 +230,7 @@ struct PlayerView: View {
                                 }
                                 .buttonStyle(.plain)
                                 .keyboardShortcut(.space, modifiers: [])
+                                .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                             }
 
                             Spacer()
@@ -238,6 +244,7 @@ struct PlayerView: View {
                                 }
                                 .buttonStyle(.plain)
                                 .disabled(seasons.element(after: season) == nil && season.episodes.element(after: episode) == nil)
+                                .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                             }
                         }
                         .frame(width: 160)
@@ -256,18 +263,21 @@ struct PlayerView: View {
                                             Text("key.season-\(season.name).episode-\(episode.name)")
                                                 .font(.title2.bold())
                                                 .lineLimit(1)
+                                                .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                                         }
 
                                         Text(voiceActing.name)
                                             .font(.title2.bold())
                                             .foregroundStyle(.secondary)
                                             .lineLimit(1)
+                                            .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                                     }
 
                                     Text(name)
                                         .font(.largeTitle.bold())
                                         .lineLimit(1)
                                         .help(name)
+                                        .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                                 }
 
                                 Spacer()
@@ -294,6 +304,7 @@ struct PlayerView: View {
                                         }
                                     }
                                     .buttonStyle(.plain)
+                                    .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
 
                                     if !subtitlesOptions.isEmpty {
                                         Menu {
@@ -319,6 +330,7 @@ struct PlayerView: View {
                                                 .font(.system(size: 17))
                                         }
                                         .buttonStyle(.plain)
+                                        .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                                     }
 
                                     Menu {
@@ -419,6 +431,7 @@ struct PlayerView: View {
                                             .font(.system(size: 17))
                                     }
                                     .buttonStyle(.plain)
+                                    .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                                 }
                             }
 
@@ -437,6 +450,7 @@ struct PlayerView: View {
 
                                     window.isMovableByWindowBackground = !hovering
                                 }
+                                .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                         }
                     }
                 }
@@ -516,6 +530,7 @@ struct PlayerView: View {
                         Spacer(minLength: 0)
                     }
                     .padding(.top, 102)
+                    .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                 }
             } else if isLoading {
                 ProgressView()
