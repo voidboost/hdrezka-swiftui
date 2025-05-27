@@ -87,7 +87,7 @@ struct CommentsView: View {
 
                                     LazyVStack(alignment: .leading, spacing: 16) {
                                         ForEach(comments) { comment in
-                                            CommentsViewComponent(comment: comment, vm: vm, details: details)
+                                            CommentsViewComponent(comment: comment, details: details)
                                                 .task {
                                                     if comments.last == comment, vm.paginationState == .idle {
                                                         vm.loadMoreComments(movieId: details.movieId)
@@ -109,6 +109,7 @@ struct CommentsView: View {
                         }
                         .coordinateSpace(name: "scroll")
                         .scrollIndicators(.never)
+                        .environmentObject(vm)
 
                         if vm.paginationState == .loading {
                             HStack {
@@ -167,9 +168,10 @@ struct CommentsView: View {
             VStack(alignment: .center, spacing: 25) {
                 if let comment = vm.comment {
                     ScrollView(.vertical) {
-                        CommentsViewComponent(comment: comment, vm: vm, details: details)
+                        CommentsViewComponent(comment: comment, details: details)
                     }
                     .scrollIndicators(.never)
+                    .environmentObject(vm)
                 } else {
                     ProgressView()
                 }
@@ -216,17 +218,16 @@ struct CommentsView: View {
 
     private struct CommentsViewComponent: View {
         private let comment: Comment
-        private let vm: CommentsViewModel
         private let details: MovieDetailed
 
         @Default(.isLoggedIn) private var isLoggedIn
         @EnvironmentObject private var appState: AppState
+        @EnvironmentObject private var vm: CommentsViewModel
 
         @State private var delayShow: DispatchWorkItem?
 
-        init(comment: Comment, vm: CommentsViewModel, details: MovieDetailed) {
+        init(comment: Comment, details: MovieDetailed) {
             self.comment = comment
-            self.vm = vm
             self.details = details
         }
 
@@ -461,7 +462,7 @@ struct CommentsView: View {
                 if !comment.replies.isEmpty {
                     LazyVStack(alignment: .leading, spacing: 16) {
                         ForEach(comment.replies) { reply in
-                            CommentsViewComponent(comment: reply, vm: vm, details: details)
+                            CommentsViewComponent(comment: reply, details: details)
                         }
                     }
                     .padding(.leading, 16)
