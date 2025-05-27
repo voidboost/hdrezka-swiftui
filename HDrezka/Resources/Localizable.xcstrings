@@ -1,61 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    ", " : {
-      "shouldTranslate" : false
-    },
-    "(%@)" : {
-      "shouldTranslate" : false
-    },
-    "%@ (%@)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ (%2$@)"
-          }
-        }
-      },
-      "shouldTranslate" : false
-    },
-    "%@ %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ %2$@"
-          }
-        }
-      },
-      "shouldTranslate" : false
-    },
-    "%@:" : {
-      "shouldTranslate" : false
-    },
-    "%@!" : {
-      "shouldTranslate" : false
-    },
-    "%@%%" : {
-      "shouldTranslate" : false
-    },
-    "%@x" : {
-      "shouldTranslate" : false
-    },
-    "•" : {
-      "shouldTranslate" : false
-    },
-    "1" : {
-      "shouldTranslate" : false
-    },
-    "2" : {
-      "shouldTranslate" : false
-    },
-    "3" : {
-      "shouldTranslate" : false
-    },
-    "HDrezka - %@" : {
-      "shouldTranslate" : false
-    },
     "key.2k" : {
       "localizations" : {
         "en" : {
@@ -6547,9 +6492,6 @@
           }
         }
       }
-    },
-    "Player - %@" : {
-      "shouldTranslate" : false
     }
   },
   "version" : "1.0"

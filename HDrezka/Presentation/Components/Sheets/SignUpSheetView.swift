@@ -94,14 +94,14 @@ struct SignUpSheetView: View {
                             .multilineTextAlignment(.leading)
                         
                         HStack(alignment: .top, spacing: 6) {
-                            Text("1").monospacedDigit()
+                            Text(verbatim: "1").monospacedDigit()
                                 
                             Text("key.sign_up_info_tutorial_step_1")
                                 .multilineTextAlignment(.leading)
                         }
                         
                         HStack(alignment: .top, spacing: 6) {
-                            Text("2").monospacedDigit()
+                            Text(verbatim: "2").monospacedDigit()
                                 
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("key.sign_up_info_tutorial_step_2")
@@ -125,7 +125,7 @@ struct SignUpSheetView: View {
                         
                         VStack(alignment: .leading, spacing: 6) {
                             HStack(alignment: .top, spacing: 6) {
-                                Text("3").monospacedDigit()
+                                Text(verbatim: "3").monospacedDigit()
                                 
                                 Text("key.sign_up_info_tutorial_step_3")
                                     .multilineTextAlignment(.leading)
@@ -624,7 +624,7 @@ struct SignUpSheetView: View {
                                 
                                 appState.isSignInPresented = true
                             } label: {
-                                Text("\(String(localized: "key.sign_in"))!")
+                                Text(verbatim: "\(String(localized: "key.sign_in"))!")
                                     .font(.caption)
                                     .foregroundStyle(.accent)
                             }

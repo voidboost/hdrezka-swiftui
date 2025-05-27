@@ -49,21 +49,59 @@ struct CardView: View {
                                 HStack {
                                     Spacer()
 
-                                    HStack(alignment: .center, spacing: 4) {
-                                        if let rating = cat.rating {
-                                            Text("\(cat.title) (\(Text(rating.description).fontWeight(.medium)))")
+                                    if let rating = cat.rating {
+                                        if #available(macOS 14.0, *) {
+                                            (
+                                                Text(verbatim: "\(cat.title) (") +
+                                                    Text(rating.description).fontWeight(.medium) +
+                                                    Text(verbatim: ") ") +
+                                                    Text(Image(systemName: cat.icon))
+                                            )
+                                            .font(.system(size: 10))
+                                            .foregroundStyle(.white)
+                                            .padding(.vertical, 3)
+                                            .padding(.horizontal, 6)
+                                            .background(cat.color)
+                                            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 6))
                                         } else {
-                                            Text(cat.title)
+                                            (
+                                                Text(verbatim: "\(cat.title) (") +
+                                                    Text(rating.description).fontWeight(.medium) +
+                                                    Text(verbatim: ") ") +
+                                                    Text(Image(systemName: cat.icon))
+                                            )
+                                            .font(.system(size: 10))
+                                            .foregroundColor(.white)
+                                            .padding(.vertical, 3)
+                                            .padding(.horizontal, 6)
+                                            .background(cat.color)
+                                            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 6))
                                         }
-
-                                        Image(systemName: cat.icon)
+                                    } else {
+                                        if #available(macOS 14.0, *) {
+                                            (
+                                                Text(verbatim: "\(cat.title) ") +
+                                                    Text(Image(systemName: cat.icon))
+                                            )
+                                            .font(.system(size: 10))
+                                            .foregroundStyle(.white)
+                                            .padding(.vertical, 3)
+                                            .padding(.horizontal, 6)
+                                            .background(cat.color)
+                                            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 6))
+                                        } else {
+                                            (
+                                                Text(verbatim: "\(cat.title) ") +
+                                                    Text(Image(systemName: cat.icon))
+                                            )
+                                            .font(.system(size: 10))
+                                            .foregroundColor(.white)
+                                            .padding(.vertical, 3)
+                                            .padding(.horizontal, 6)
+                                            .background(cat.color)
+                                            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 6))
+                                        }
                                     }
-                                    .font(.system(size: 10))
-                                    .foregroundStyle(.white)
-                                    .padding(.vertical, 3)
-                                    .padding(.horizontal, 6)
-                                    .background(cat.color)
-                                    .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 6))
                                 }
                             }
 

@@ -8,6 +8,7 @@ struct ListView: View {
     private let genre: MovieGenre?
     private let category: Categories?
     private let collection: MoviesCollection?
+    private let customTitle: String?
 
     @StateObject private var vm = ListViewModel()
 
@@ -28,8 +29,7 @@ struct ListView: View {
         self.genre = nil
         self.category = nil
         self.collection = nil
-
-        vm.title = title
+        self.customTitle = title
     }
 
     init(list: MovieList) {
@@ -39,8 +39,7 @@ struct ListView: View {
         self.genre = nil
         self.category = nil
         self.collection = nil
-
-        vm.title = !list.name.isEmpty ? list.name : String(localized: "key.list")
+        self.customTitle = nil
     }
 
     init(country: MovieCountry) {
@@ -50,8 +49,7 @@ struct ListView: View {
         self.genre = nil
         self.category = nil
         self.collection = nil
-
-        vm.title = country.name
+        self.customTitle = nil
     }
 
     init(genre: MovieGenre) {
@@ -61,8 +59,7 @@ struct ListView: View {
         self.genre = genre
         self.category = nil
         self.collection = nil
-
-        vm.title = genre.name
+        self.customTitle = nil
     }
 
     init(category: Categories) {
@@ -72,8 +69,7 @@ struct ListView: View {
         self.genre = nil
         self.category = category
         self.collection = nil
-
-        vm.title = category.localized
+        self.customTitle = nil
     }
 
     init(collection: MoviesCollection) {
@@ -83,21 +79,20 @@ struct ListView: View {
         self.genre = nil
         self.category = nil
         self.collection = collection
-
-        vm.title = collection.name
+        self.customTitle = nil
     }
 
     var body: some View {
         Group {
             if let error = vm.state.error {
-                ErrorStateView(error, vm.title) {
+                ErrorStateView(error, title) {
                     reloadData()
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
             } else if let movies = vm.state.data {
                 if movies.isEmpty {
-                    EmptyStateView(String(localized: "key.nothing_found"), vm.title, String(localized: "key.filter.empty")) {
+                    EmptyStateView(String(localized: "key.nothing_found"), title, String(localized: "key.filter.empty")) {
                         reloadData()
                     }
                     .padding(.vertical, 52)
@@ -109,7 +104,7 @@ struct ListView: View {
                                 VStack(alignment: .leading) {
                                     Spacer()
 
-                                    Text(vm.title)
+                                    Text(title)
                                         .font(.largeTitle.weight(.semibold))
                                         .lineLimit(1)
 
@@ -155,12 +150,12 @@ struct ListView: View {
                     }
                 }
             } else {
-                LoadingStateView(vm.title)
+                LoadingStateView(title)
                     .padding(.vertical, 52)
                     .padding(.horizontal, 36)
             }
         }
-        .navigationBar(title: vm.title, showBar: showBar, navbar: {
+        .navigationBar(title: title, showBar: showBar, navbar: {
             if let movies = vm.state.data, !movies.isEmpty {
                 Button {
                     reloadData()
@@ -340,6 +335,26 @@ struct ListView: View {
             vm.nextPage(movies: movies)
         } else if let list {
             vm.nextPage(list: list)
+        }
+    }
+
+    private var title: String {
+        if let title = vm.title, !title.isEmpty {
+            return title
+        } else if let title = list?.name, !title.isEmpty {
+            return title
+        } else if let title = country?.name, !title.isEmpty {
+            return title
+        } else if let title = genre?.name, !title.isEmpty {
+            return title
+        } else if let title = category?.localized, !title.isEmpty {
+            return title
+        } else if let title = collection?.name, !title.isEmpty {
+            return title
+        } else if let title = customTitle, !title.isEmpty {
+            return title
+        } else {
+            return String(localized: "key.list")
         }
     }
 }

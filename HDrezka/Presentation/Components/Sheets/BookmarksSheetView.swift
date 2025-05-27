@@ -169,7 +169,7 @@ struct BookmarksSheetView: View {
                                                     Image(systemName: isChecked ? "bookmark.fill" : "bookmark")
                                                         .contentTransition(.symbolEffect(.replace))
 
-                                                    Text("\(bookmark.name) (\(bookmark.count.description))")
+                                                    Text(verbatim: "\(bookmark.name) (\(bookmark.count.description))")
                                                         .monospacedDigit()
                                                         .lineLimit(nil)
                                                         .multilineTextAlignment(.center)
@@ -177,7 +177,7 @@ struct BookmarksSheetView: View {
                                                 } else {
                                                     Image(systemName: isChecked ? "bookmark.fill" : "bookmark")
 
-                                                    Text("\(bookmark.name) (\(bookmark.count.description))")
+                                                    Text(verbatim: "\(bookmark.name) (\(bookmark.count.description))")
                                                         .monospacedDigit()
                                                         .lineLimit(nil)
                                                         .multilineTextAlignment(.center)
