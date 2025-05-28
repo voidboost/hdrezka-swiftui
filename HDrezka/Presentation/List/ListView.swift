@@ -2,7 +2,7 @@ import Defaults
 import SwiftUI
 
 struct ListView: View {
-    private let movies: [MovieSimple]?
+    private let customMovies: [MovieSimple]?
     private let list: MovieList?
     private let country: MovieCountry?
     private let genre: MovieGenre?
@@ -12,7 +12,7 @@ struct ListView: View {
 
     @StateObject private var vm = ListViewModel()
 
-    @State private var selectedGenre = Genres.all
+    @State private var filterGenre = Genres.all
     @State private var filter = Filters.latest
     @State private var newFilter = NewFilters.latest
 
@@ -22,8 +22,8 @@ struct ListView: View {
 
     private let columns = [GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading)]
 
-    init(movies: [MovieSimple], title: String) {
-        self.movies = movies
+    init(customMovies: [MovieSimple], title: String) {
+        self.customMovies = customMovies
         self.list = nil
         self.country = nil
         self.genre = nil
@@ -33,7 +33,7 @@ struct ListView: View {
     }
 
     init(list: MovieList) {
-        self.movies = nil
+        self.customMovies = nil
         self.list = list
         self.country = nil
         self.genre = nil
@@ -43,7 +43,7 @@ struct ListView: View {
     }
 
     init(country: MovieCountry) {
-        self.movies = nil
+        self.customMovies = nil
         self.list = nil
         self.country = country
         self.genre = nil
@@ -53,7 +53,7 @@ struct ListView: View {
     }
 
     init(genre: MovieGenre) {
-        self.movies = nil
+        self.customMovies = nil
         self.list = nil
         self.country = nil
         self.genre = genre
@@ -63,7 +63,7 @@ struct ListView: View {
     }
 
     init(category: Categories) {
-        self.movies = nil
+        self.customMovies = nil
         self.list = nil
         self.country = nil
         self.genre = nil
@@ -73,7 +73,7 @@ struct ListView: View {
     }
 
     init(collection: MoviesCollection) {
-        self.movies = nil
+        self.customMovies = nil
         self.list = nil
         self.country = nil
         self.genre = nil
@@ -86,14 +86,14 @@ struct ListView: View {
         Group {
             if let error = vm.state.error {
                 ErrorStateView(error, title) {
-                    reloadData()
+                    vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
             } else if let movies = vm.state.data {
                 if movies.isEmpty {
                     EmptyStateView(String(localized: "key.nothing_found"), title, String(localized: "key.filter.empty")) {
-                        reloadData()
+                        vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
                     }
                     .padding(.vertical, 52)
                     .padding(.horizontal, 36)
@@ -119,7 +119,7 @@ struct ListView: View {
                                         CardView(movie: movie)
                                             .task {
                                                 if movies.last == movie, vm.paginationState == .idle {
-                                                    nextPage()
+                                                    vm.loadMore(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
                                                 }
                                             }
                                     }
@@ -158,7 +158,7 @@ struct ListView: View {
         .navigationBar(title: title, showBar: showBar, navbar: {
             if let movies = vm.state.data, !movies.isEmpty {
                 Button {
-                    reloadData()
+                    vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -166,7 +166,7 @@ struct ListView: View {
                 .keyboardShortcut("r", modifiers: .command)
             }
         }, toolbar: {
-            if vm.state != .loading, movies == nil, list == nil {
+            if vm.state != .loading, customMovies == nil, list == nil {
                 Image(systemName: "line.3.horizontal.decrease.circle")
 
                 if genre != nil || collection != nil || country != nil {
@@ -251,7 +251,7 @@ struct ListView: View {
 
                 if category != nil || country != nil {
                     if #available(macOS 14.0, *) {
-                        Picker("key.genre.select", selection: $selectedGenre) {
+                        Picker("key.genre.select", selection: $filterGenre) {
                             ForEach(Genres.allCases.filter { $0 != .show || category != .hot }) { g in
                                 Text(g.rawValue).tag(g)
                             }
@@ -268,7 +268,7 @@ struct ListView: View {
                                 .stroke(.tertiary.opacity(0.2), lineWidth: 1)
                         }
                     } else {
-                        Picker("key.genre.select", selection: $selectedGenre) {
+                        Picker("key.genre.select", selection: $filterGenre) {
                             ForEach(Genres.allCases.filter { $0 != .show || category != .hot }) { g in
                                 Text(g.rawValue).tag(g)
                             }
@@ -291,51 +291,19 @@ struct ListView: View {
             case .data:
                 break
             default:
-                reloadData()
+                vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
             }
         }
-        .customOnChange(of: selectedGenre) {
-            reloadData()
+        .customOnChange(of: filterGenre) {
+            vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
         }
         .customOnChange(of: filter) {
-            reloadData()
+            vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
         }
         .customOnChange(of: newFilter) {
-            reloadData()
+            vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
         }
         .background(.background)
-    }
-
-    private func reloadData() {
-        if let category {
-            vm.reload(category: category, genre: selectedGenre, newFilter: newFilter)
-        } else if let collection {
-            vm.reload(collection: collection, filter: filter)
-        } else if let genre {
-            vm.reload(genre: genre, filter: filter)
-        } else if let country {
-            vm.reload(country: country, genre: selectedGenre, filter: filter)
-        } else if let movies {
-            vm.reload(movies: movies)
-        } else if let list {
-            vm.reload(list: list)
-        }
-    }
-
-    private func nextPage() {
-        if let category {
-            vm.nextPage(category: category, genre: selectedGenre, newFilter: newFilter)
-        } else if let collection {
-            vm.nextPage(collection: collection, filter: filter)
-        } else if let genre {
-            vm.nextPage(genre: genre, filter: filter)
-        } else if let country {
-            vm.nextPage(country: country, genre: selectedGenre, filter: filter)
-        } else if let movies {
-            vm.nextPage(movies: movies)
-        } else if let list {
-            vm.nextPage(list: list)
-        }
     }
 
     private var title: String {

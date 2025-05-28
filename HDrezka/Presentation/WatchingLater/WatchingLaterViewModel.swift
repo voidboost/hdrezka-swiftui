@@ -9,7 +9,9 @@ class WatchingLaterViewModel: ObservableObject {
 
     @Published var state: DataState<[MovieWatchLater]> = .loading
 
-    private func getMovies() {
+    func getMovies() {
+        state = .loading
+
         getWatchingLaterMoviesUseCase()
             .receive(on: DispatchQueue.main)
             .sink { completion in
@@ -24,10 +26,5 @@ class WatchingLaterViewModel: ObservableObject {
                 }
             }
             .store(in: &subscriptions)
-    }
-
-    func reload() {
-        state = .loading
-        getMovies()
     }
 }

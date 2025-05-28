@@ -12,7 +12,7 @@ class BookmarksViewModel: ObservableObject {
 
     @Published var bookmarksState: DataState<[Bookmark]> = .loading
 
-    private func getBookmarks() {
+    func getBookmarks() {
         bookmarksState = .loading
 
         bookmarkState = .data([])
@@ -40,48 +40,40 @@ class BookmarksViewModel: ObservableObject {
 
     private var page = 1
 
-    private func getBookmark(id: Int, filter: BookmarkFilters, genre: Genres) {
-        bookmarkState = .loading
-        paginationState = .idle
-        page = 1
-
-        let publisher = switch filter {
-        case .added:
-            getBookmarksByCategoryAddedUseCase(id: id, genre: genre.genreCode, page: page)
-        case .year:
-            getBookmarksByCategoryYearUseCase(id: id, genre: genre.genreCode, page: page)
-        case .popular:
-            getBookmarksByCategoryPopularUseCase(id: id, genre: genre.genreCode, page: page)
-        }
-
-        publisher
+    private func getBookmark(id: Int, filter: BookmarkFilters, genre: Genres, isInitial: Bool = true) {
+        getPublisher(id: id, filter: filter, genre: genre)
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 guard case let .failure(error) = completion else { return }
 
                 withAnimation(.easeInOut) {
-                    self.bookmarkState = .error(error as NSError)
+                    if isInitial {
+                        self.bookmarkState = .error(error as NSError)
+                    } else {
+                        self.paginationState = .error(error as NSError)
+                    }
                 }
             } receiveValue: { result in
                 self.page += 1
 
                 withAnimation(.easeInOut) {
-                    self.bookmarkState = .data(result)
+                    if isInitial {
+                        self.bookmarkState = .data(result)
+                    } else {
+                        if !result.isEmpty {
+                            self.bookmarkState.append(result)
+                            self.paginationState = .idle
+                        } else {
+                            self.paginationState = .error(NSError())
+                        }
+                    }
                 }
             }
             .store(in: &subscriptions)
     }
 
-    func nextPage(id: Int, filter: BookmarkFilters, genre: Genres) {
-        guard paginationState == .idle else {
-            return
-        }
-
-        withAnimation(.easeInOut) {
-            paginationState = .loading
-        }
-
-        let publisher = switch filter {
+    private func getPublisher(id: Int, filter: BookmarkFilters, genre: Genres) -> AnyPublisher<[MovieSimple], Error> {
+        switch filter {
         case .added:
             getBookmarksByCategoryAddedUseCase(id: id, genre: genre.genreCode, page: page)
         case .year:
@@ -89,36 +81,23 @@ class BookmarksViewModel: ObservableObject {
         case .popular:
             getBookmarksByCategoryPopularUseCase(id: id, genre: genre.genreCode, page: page)
         }
-
-        publisher
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
-
-                withAnimation(.easeInOut) {
-                    self.paginationState = .error(error as NSError)
-                }
-            } receiveValue: { result in
-                if !result.isEmpty {
-                    withAnimation(.easeInOut) {
-                        self.bookmarkState.append(result)
-                        self.paginationState = .idle
-                    }
-                    self.page += 1
-                } else {
-                    withAnimation(.easeInOut) {
-                        self.paginationState = .error(NSError())
-                    }
-                }
-            }
-            .store(in: &subscriptions)
     }
 
-    func reloadBookmarks() {
-        getBookmarks()
-    }
+    func load(id: Int, filter: BookmarkFilters, genre: Genres) {
+        bookmarkState = .loading
+        paginationState = .idle
+        page = 1
 
-    func reloadBookmark(id: Int, filter: BookmarkFilters, genre: Genres) {
         getBookmark(id: id, filter: filter, genre: genre)
+    }
+
+    func loadMore(id: Int, filter: BookmarkFilters, genre: Genres) {
+        guard paginationState == .idle else { return }
+
+        withAnimation(.easeInOut) {
+            paginationState = .loading
+        }
+
+        getBookmark(id: id, filter: filter, genre: genre, isInitial: false)
     }
 }

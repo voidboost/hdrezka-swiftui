@@ -44,7 +44,7 @@ struct BookmarksView: View {
                             
                         Button {
                             selectedBookmark = -1
-                            vm.reloadBookmarks()
+                            vm.getBookmarks()
                         } label: {
                             Text("key.retry")
                                 .font(.system(size: 13))
@@ -78,7 +78,7 @@ struct BookmarksView: View {
                    
                             Button {
                                 selectedBookmark = -1
-                                vm.reloadBookmarks()
+                                vm.getBookmarks()
                             } label: {
                                 Text("key.retry")
                                     .font(.system(size: 13))
@@ -405,7 +405,7 @@ struct BookmarksView: View {
                         .multilineTextAlignment(.center)
                             
                     Button {
-                        vm.reloadBookmark(id: selectedBookmark, filter: filter, genre: selectedGenre)
+                        vm.load(id: selectedBookmark, filter: filter, genre: selectedGenre)
                     } label: {
                         Text("key.retry")
                             .font(.system(size: 15))
@@ -428,7 +428,7 @@ struct BookmarksView: View {
                    
                         if selectedBookmark != -1 {
                             Button {
-                                vm.reloadBookmark(id: selectedBookmark, filter: filter, genre: selectedGenre)
+                                vm.load(id: selectedBookmark, filter: filter, genre: selectedGenre)
                             } label: {
                                 Text("key.retry")
                                     .font(.system(size: 15))
@@ -484,7 +484,7 @@ struct BookmarksView: View {
                                         }
                                         .task {
                                             if movies.last == movie, vm.paginationState == .idle {
-                                                vm.nextPage(id: selectedBookmark, filter: filter, genre: selectedGenre)
+                                                vm.loadMore(id: selectedBookmark, filter: filter, genre: selectedGenre)
                                             }
                                         }
                                 }
@@ -517,7 +517,7 @@ struct BookmarksView: View {
                 if !(vm.bookmarkState.data?.isEmpty ?? true) || selectedBookmark == -1 {
                     Button {
                         selectedBookmark = -1
-                        vm.reloadBookmarks()
+                        vm.getBookmarks()
                     } label: {
                         Image(systemName: "arrow.trianglehead.clockwise")
                     }
@@ -611,33 +611,33 @@ struct BookmarksView: View {
         })
         .customOnChange(of: selectedBookmark) {
             if selectedBookmark != -1 {
-                vm.reloadBookmark(id: selectedBookmark, filter: filter, genre: selectedGenre)
+                vm.load(id: selectedBookmark, filter: filter, genre: selectedGenre)
             }
         }
         .customOnChange(of: isCreateBookmarkPresented) {
             if !isCreateBookmarkPresented {
                 selectedBookmark = -1
-                vm.reloadBookmarks()
+                vm.getBookmarks()
             }
         }
         .customOnChange(of: renameBookmark) {
             if renameBookmark == nil {
                 selectedBookmark = -1
-                vm.reloadBookmarks()
+                vm.getBookmarks()
             }
         }
         .customOnChange(of: filter) {
-            vm.reloadBookmark(id: selectedBookmark, filter: filter, genre: selectedGenre)
+            vm.load(id: selectedBookmark, filter: filter, genre: selectedGenre)
         }
         .customOnChange(of: selectedGenre) {
-            vm.reloadBookmark(id: selectedBookmark, filter: filter, genre: selectedGenre)
+            vm.load(id: selectedBookmark, filter: filter, genre: selectedGenre)
         }
         .load(isLoggedIn) {
             switch vm.bookmarksState {
             case .data:
                 break
             default:
-                vm.reloadBookmarks()
+                vm.getBookmarks()
             }
         }
         .alert("key.ops", isPresented: $isErrorPresented) {

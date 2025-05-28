@@ -24,7 +24,7 @@ struct CommentsView: View {
         Group {
             if let error = vm.state.error {
                 ErrorStateView(error, title) {
-                    vm.getComments(movieId: details.movieId)
+                    vm.load(movieId: details.movieId)
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
@@ -90,7 +90,7 @@ struct CommentsView: View {
                                             CommentsViewComponent(comment: comment, details: details)
                                                 .task {
                                                     if comments.last == comment, vm.paginationState == .idle {
-                                                        vm.loadMoreComments(movieId: details.movieId)
+                                                        vm.loadMore(movieId: details.movieId)
                                                     }
                                                 }
                                         }
@@ -130,7 +130,7 @@ struct CommentsView: View {
         .navigationBar(title: title, showBar: showBar, navbar: {
             if let comments = vm.state.data, !comments.isEmpty {
                 Button {
-                    vm.getComments(movieId: details.movieId)
+                    vm.load(movieId: details.movieId)
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -143,7 +143,7 @@ struct CommentsView: View {
             case .data:
                 break
             default:
-                vm.getComments(movieId: details.movieId)
+                vm.load(movieId: details.movieId)
             }
         }
         .alert("key.ops", isPresented: $vm.isErrorPresented) {

@@ -16,14 +16,14 @@ struct HomeView: View {
         Group {
             if let error = vm.state.error {
                 ErrorStateView(error, title) {
-                    vm.reload()
+                    vm.load()
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
             } else if let categories = vm.state.data {
                 if categories.isEmpty {
                     EmptyStateView(String(localized: "key.home.empty"), title) {
-                        vm.reload()
+                        vm.load()
                     }
                     .padding(.vertical, 52)
                     .padding(.horizontal, 36)
@@ -50,7 +50,7 @@ struct HomeView: View {
                                         CategorySection(title: category.title, category: category.category, movies: category.movies)
                                             .task {
                                                 if categories.last == category, vm.paginationState == .idle {
-                                                    vm.nextCategory()
+                                                    vm.loadMore()
                                                 }
                                             }
 
@@ -80,7 +80,7 @@ struct HomeView: View {
 
                                 Button {
                                     vm.paginationState = .idle
-                                    vm.nextCategory()
+                                    vm.loadMore()
                                 } label: {
                                     Text("key.retry")
                                         .foregroundStyle(.accent)
@@ -108,7 +108,7 @@ struct HomeView: View {
         .navigationBar(title: title, showBar: showBar, navbar: {
             if let categories = vm.state.data, !categories.isEmpty {
                 Button {
-                    vm.reload()
+                    vm.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -130,7 +130,7 @@ struct HomeView: View {
             case .data:
                 break
             default:
-                vm.reload()
+                vm.load()
             }
         }
         .background(.background)
