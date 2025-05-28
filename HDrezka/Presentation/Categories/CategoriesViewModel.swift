@@ -10,7 +10,9 @@ class CategoriesViewModel: ObservableObject {
 
     private var subscriptions: Set<AnyCancellable> = []
 
-    private func getTypes() {
+    func getTypes() {
+        state = .loading
+
         categoriesUseCase()
             .receive(on: DispatchQueue.main)
             .sink { completion in
@@ -26,10 +28,5 @@ class CategoriesViewModel: ObservableObject {
                 }
             }
             .store(in: &subscriptions)
-    }
-
-    func reload() {
-        state = .loading
-        getTypes()
     }
 }

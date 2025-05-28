@@ -12,57 +12,49 @@ class CollectionsViewModel: ObservableObject {
 
     private var page = 1
 
-    private func getCollection() {
+    private func getData(isInitial: Bool = true) {
         getCollectionsUseCase(page: page)
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 guard case let .failure(error) = completion else { return }
 
                 withAnimation(.easeInOut) {
-                    self.state = .error(error as NSError)
+                    if isInitial {
+                        self.state = .error(error as NSError)
+                    } else {
+                        self.paginationState = .error(error as NSError)
+                    }
                 }
             } receiveValue: { result in
                 self.page += 1
 
                 withAnimation(.easeInOut) {
-                    self.state = .data(result)
+                    if isInitial {
+                        self.state = .data(result)
+                    } else {
+                        self.state.append(result)
+                        self.paginationState = .idle
+                    }
                 }
             }
             .store(in: &subscriptions)
     }
 
-    func nextPage() {
-        guard paginationState == .idle else {
-            return
-        }
+    func load() {
+        state = .loading
+        paginationState = .idle
+        page = 1
+
+        getData()
+    }
+
+    func loadMore() {
+        guard paginationState == .idle else { return }
 
         withAnimation(.easeInOut) {
             paginationState = .loading
         }
 
-        getCollectionsUseCase(page: page)
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
-
-                withAnimation(.easeInOut) {
-                    self.paginationState = .error(error as NSError)
-                }
-            } receiveValue: { result in
-                self.page += 1
-
-                withAnimation(.easeInOut) {
-                    self.state.append(result)
-                    self.paginationState = .idle
-                }
-            }
-            .store(in: &subscriptions)
-    }
-
-    func reload() {
-        state = .loading
-        paginationState = .idle
-        page = 1
-        getCollection()
+        getData(isInitial: false)
     }
 }

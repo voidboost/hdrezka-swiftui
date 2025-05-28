@@ -30,7 +30,7 @@ struct SearchView: View {
         Group {
             if let error = vm.state.error {
                 ErrorStateView(error, title) {
-                    vm.reload(query: searchText)
+                    vm.load(query: searchText)
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
@@ -61,7 +61,7 @@ struct SearchView: View {
                                         CardView(movie: movie)
                                             .task {
                                                 if movies.last == movie, vm.paginationState == .idle {
-                                                    vm.nextPage(query: searchText)
+                                                    vm.loadMore(query: searchText)
                                                 }
                                             }
                                     }
@@ -99,7 +99,7 @@ struct SearchView: View {
         .navigationBar(title: title, showBar: showBar, navbar: {
             if let movies = vm.state.data, !movies.isEmpty {
                 Button {
-                    vm.reload(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
+                    vm.load(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -112,7 +112,7 @@ struct SearchView: View {
             case .data:
                 break
             default:
-                vm.reload(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
+                vm.load(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
             }
         }
         .background(.background)
@@ -127,7 +127,7 @@ struct SearchView: View {
                         title = String(localized: "key.search")
                     }
 
-                    vm.reload(query: searchText.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines))
+                    vm.load(query: searchText.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines))
                 }
 
                 if let searchWork {

@@ -33,14 +33,14 @@ struct WatchingLaterView: View {
         Group {
             if let error = vm.state.error {
                 ErrorStateView(error, title) {
-                    vm.reload()
+                    vm.getMovies()
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
             } else if var movies = vm.state.data {
                 if movies.isEmpty {
                     EmptyStateView(String(localized: "key.watching_later.empty"), title, String(localized: "key.watching_later.empty.description")) {
-                        vm.reload()
+                        vm.getMovies()
                     }
                     .padding(.vertical, 52)
                     .padding(.horizontal, 36)
@@ -151,7 +151,7 @@ struct WatchingLaterView: View {
         .navigationBar(title: title, showBar: showBar, navbar: {
             if let movies = vm.state.data, !movies.isEmpty {
                 Button {
-                    vm.reload()
+                    vm.getMovies()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -164,7 +164,7 @@ struct WatchingLaterView: View {
             case .data:
                 break
             default:
-                vm.reload()
+                vm.getMovies()
             }
         }
         .alert("key.ops", isPresented: $isErrorPresented) {

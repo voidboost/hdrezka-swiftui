@@ -35,11 +35,7 @@ class ListViewModel: ObservableObject {
 
     private var page = 1
 
-    private func getMovies(movies: [MovieSimple]? = nil, list: MovieList? = nil, country: MovieCountry? = nil, genre: MovieGenre? = nil, collection: MoviesCollection? = nil, category: Categories? = nil, filterGenre: Genres? = nil, filter: Filters? = nil, newFilter: NewFilters? = nil) {
-        state = .loading
-        paginationState = .idle
-        page = 1
-
+    private func getData(movies: [MovieSimple]?, list: MovieList?, country: MovieCountry?, genre: MovieGenre?, collection: MoviesCollection?, category: Categories?, filterGenre: Genres?, filter: Filters?, newFilter: NewFilters?, isInitial: Bool = true) {
         if let list {
             getMovieListUseCase(listId: list.listId, page: page)
                 .receive(on: DispatchQueue.main)
@@ -47,21 +43,29 @@ class ListViewModel: ObservableObject {
                     guard case let .failure(error) = completion else { return }
 
                     withAnimation(.easeInOut) {
-                        self.state = .error(error as NSError)
+                        if isInitial {
+                            self.state = .error(error as NSError)
+                        } else {
+                            self.paginationState = .error(error as NSError)
+                        }
                     }
                 } receiveValue: { result in
+                    self.page += 1
+
                     withAnimation(.easeInOut) {
-                        if !result.0.isEmpty {
-                            self.title = result.0
+                        if isInitial {
+                            if !result.0.isEmpty {
+                                self.title = result.0
+                            }
+                            self.state = .data(result.1)
+                        } else {
+                            self.state.append(result.1)
+                            self.paginationState = .idle
                         }
-                        self.state = .data(result.1)
-                        self.page += 1
                     }
                 }
                 .store(in: &subscriptions)
-        }
-
-        if let movies {
+        } else if let movies {
             if Defaults[.navigationAnimation] {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                     withAnimation(.easeInOut) {
@@ -73,353 +77,205 @@ class ListViewModel: ObservableObject {
                     self.state = .data(movies)
                 }
             }
-        }
-
-        if let country, let filterGenre, let filter {
-            let publisher = switch filter {
-            case .latest:
-                getLatestMoviesByCountryUseCase(countryId: country.countryId, genre: filterGenre.genreCode, page: page)
-            case .popular:
-                getPopularMoviesByCountryUseCase(countryId: country.countryId, genre: filterGenre.genreCode, page: page)
-            case .soon:
-                getSoonMoviesByCountryUseCase(countryId: country.countryId, genre: filterGenre.genreCode, page: page)
-            case .watching:
-                getWatchingNowMoviesByCountryUseCase(countryId: country.countryId, genre: filterGenre.genreCode, page: page)
-            }
-
-            publisher
+        } else if let country, let filterGenre, let filter {
+            getPublisher(country: country, filterGenre: filterGenre, filter: filter)
                 .receive(on: DispatchQueue.main)
                 .sink { completion in
                     guard case let .failure(error) = completion else { return }
 
                     withAnimation(.easeInOut) {
-                        self.state = .error(error as NSError)
+                        if isInitial {
+                            self.state = .error(error as NSError)
+                        } else {
+                            self.paginationState = .error(error as NSError)
+                        }
                     }
                 } receiveValue: { result in
+                    self.page += 1
+
                     withAnimation(.easeInOut) {
-                        self.state = .data(result)
-                        self.page += 1
+                        if isInitial {
+                            self.state = .data(result)
+                        } else {
+                            self.state.append(result)
+                            self.paginationState = .idle
+                        }
                     }
                 }
                 .store(in: &subscriptions)
-        }
-
-        if let genre, let filter {
-            let publisher = switch filter {
-            case .latest:
-                getLatestMoviesByGenreUseCase(genreId: genre.genreId, page: page)
-            case .popular:
-                getPopularMoviesByGenreUseCase(genreId: genre.genreId, page: page)
-            case .soon:
-                getSoonMoviesByGenreUseCase(genreId: genre.genreId, page: page)
-            case .watching:
-                getWatchingNowMoviesByGenreUseCase(genreId: genre.genreId, page: page)
-            }
-
-            publisher
+        } else if let genre, let filter {
+            getPublisher(genre: genre, filter: filter)
                 .receive(on: DispatchQueue.main)
                 .sink { completion in
                     guard case let .failure(error) = completion else { return }
 
                     withAnimation(.easeInOut) {
-                        self.state = .error(error as NSError)
+                        if isInitial {
+                            self.state = .error(error as NSError)
+                        } else {
+                            self.paginationState = .error(error as NSError)
+                        }
                     }
                 } receiveValue: { result in
+                    self.page += 1
+
                     withAnimation(.easeInOut) {
-                        self.state = .data(result)
-                        self.page += 1
+                        if isInitial {
+                            self.state = .data(result)
+                        } else {
+                            self.state.append(result)
+                            self.paginationState = .idle
+                        }
                     }
                 }
                 .store(in: &subscriptions)
-        }
+        } else if let category, let filterGenre {
+            getPublisher(category: category, filterGenre: filterGenre, newFilter: newFilter)
+                .receive(on: DispatchQueue.main)
+                .sink { completion in
+                    guard case let .failure(error) = completion else { return }
 
-        if let category, let filterGenre {
-            let publisher = switch category {
-            case .hot:
-                getHotMoviesUseCase(genre: filterGenre.genreCode)
-//            case .featured:
-//                getFeaturedMoviesUseCase(page: page, genre: filterGenre.genreCode)
-            case .watchingNow:
-                getWatchingNowMoviesUseCase(page: page, genre: filterGenre.genreCode)
-            case .newest:
-                if let newFilter {
-                    switch newFilter {
-                    case .latest:
-                        getLatestNewestMoviesUseCase(page: page, genre: filterGenre.genreCode)
-                    case .popular:
-                        getPopularNewestMoviesUseCase(page: page, genre: filterGenre.genreCode)
-                    case .watching:
-                        getWatchingNowNewestMoviesUseCase(page: page, genre: filterGenre.genreCode)
+                    withAnimation(.easeInOut) {
+                        if isInitial {
+                            self.state = .error(error as NSError)
+                        } else {
+                            self.paginationState = .error(error as NSError)
+                        }
                     }
+                } receiveValue: { result in
+                    self.page += 1
+
+                    withAnimation(.easeInOut) {
+                        if isInitial {
+                            self.state = .data(result)
+                        } else {
+                            self.state.append(result)
+                            self.paginationState = .idle
+                        }
+                    }
+                }
+                .store(in: &subscriptions)
+        } else if let collection, let filter {
+            getPublisher(collection: collection, filter: filter)
+                .receive(on: DispatchQueue.main)
+                .sink { completion in
+                    guard case let .failure(error) = completion else { return }
+
+                    withAnimation(.easeInOut) {
+                        if isInitial {
+                            self.state = .error(error as NSError)
+                        } else {
+                            self.paginationState = .error(error as NSError)
+                        }
+                    }
+                } receiveValue: { result in
+                    self.page += 1
+
+                    withAnimation(.easeInOut) {
+                        if isInitial {
+                            self.state = .data(result)
+                        } else {
+                            self.state.append(result)
+                            self.paginationState = .idle
+                        }
+                    }
+                }
+                .store(in: &subscriptions)
+        } else {
+            withAnimation(.easeInOut) {
+                if isInitial {
+                    self.state = .error(NSError())
                 } else {
-                    getLatestNewestMoviesUseCase(page: page, genre: filterGenre.genreCode)
+                    self.paginationState = .error(NSError())
                 }
-            case .latest:
-                getLatestMoviesUseCase(page: page, genre: filterGenre.genreCode)
-            case .popular:
-                getPopularMoviesUseCase(page: page, genre: filterGenre.genreCode)
-            case .soon:
-                getSoonMoviesUseCase(page: page, genre: filterGenre.genreCode)
             }
-
-            publisher
-                .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
-
-                    withAnimation(.easeInOut) {
-                        self.state = .error(error as NSError)
-                    }
-                } receiveValue: { result in
-                    withAnimation(.easeInOut) {
-                        self.state = .data(result)
-                        self.page += 1
-                    }
-                }
-                .store(in: &subscriptions)
-        }
-
-        if let collection, let filter {
-            let publisher = switch filter {
-            case .latest:
-                getLatestMoviesInCollectionUseCase(collectionId: collection.collectionId, page: page)
-            case .popular:
-                getPopularMoviesInCollectionUseCase(collectionId: collection.collectionId, page: page)
-            case .soon:
-                getSoonMoviesInCollectionUseCase(collectionId: collection.collectionId, page: page)
-            case .watching:
-                getWatchingNowMoviesInCollectionUseCase(collectionId: collection.collectionId, page: page)
-            }
-
-            publisher
-                .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
-
-                    withAnimation(.easeInOut) {
-                        self.state = .error(error as NSError)
-                    }
-                } receiveValue: { result in
-                    withAnimation(.easeInOut) {
-                        self.state = .data(result)
-                        self.page += 1
-                    }
-                }
-                .store(in: &subscriptions)
         }
     }
 
-    private func loadMore(movies: [MovieSimple]? = nil, list: MovieList? = nil, country: MovieCountry? = nil, genre: MovieGenre? = nil, collection: MoviesCollection? = nil, category: Categories? = nil, filterGenre: Genres? = nil, filter: Filters? = nil, newFilter: NewFilters? = nil) {
-        guard paginationState == .idle, movies == nil, category != .hot else {
-            return
+    private func getPublisher(country: MovieCountry, filterGenre: Genres, filter: Filters) -> AnyPublisher<[MovieSimple], Error> {
+        switch filter {
+        case .latest:
+            getLatestMoviesByCountryUseCase(countryId: country.countryId, genre: filterGenre.genreCode, page: page)
+        case .popular:
+            getPopularMoviesByCountryUseCase(countryId: country.countryId, genre: filterGenre.genreCode, page: page)
+        case .soon:
+            getSoonMoviesByCountryUseCase(countryId: country.countryId, genre: filterGenre.genreCode, page: page)
+        case .watching:
+            getWatchingNowMoviesByCountryUseCase(countryId: country.countryId, genre: filterGenre.genreCode, page: page)
         }
+    }
+
+    private func getPublisher(genre: MovieGenre, filter: Filters) -> AnyPublisher<[MovieSimple], Error> {
+        switch filter {
+        case .latest:
+            getLatestMoviesByGenreUseCase(genreId: genre.genreId, page: page)
+        case .popular:
+            getPopularMoviesByGenreUseCase(genreId: genre.genreId, page: page)
+        case .soon:
+            getSoonMoviesByGenreUseCase(genreId: genre.genreId, page: page)
+        case .watching:
+            getWatchingNowMoviesByGenreUseCase(genreId: genre.genreId, page: page)
+        }
+    }
+
+    private func getPublisher(category: Categories, filterGenre: Genres, newFilter: NewFilters?) -> AnyPublisher<[MovieSimple], Error> {
+        switch category {
+        case .hot:
+            getHotMoviesUseCase(genre: filterGenre.genreCode)
+//        case .featured:
+//            getFeaturedMoviesUseCase(page: page, genre: filterGenre.genreCode)
+        case .watchingNow:
+            getWatchingNowMoviesUseCase(page: page, genre: filterGenre.genreCode)
+        case .newest:
+            if let newFilter {
+                switch newFilter {
+                case .latest:
+                    getLatestNewestMoviesUseCase(page: page, genre: filterGenre.genreCode)
+                case .popular:
+                    getPopularNewestMoviesUseCase(page: page, genre: filterGenre.genreCode)
+                case .watching:
+                    getWatchingNowNewestMoviesUseCase(page: page, genre: filterGenre.genreCode)
+                }
+            } else {
+                getLatestNewestMoviesUseCase(page: page, genre: filterGenre.genreCode)
+            }
+        case .latest:
+            getLatestMoviesUseCase(page: page, genre: filterGenre.genreCode)
+        case .popular:
+            getPopularMoviesUseCase(page: page, genre: filterGenre.genreCode)
+        case .soon:
+            getSoonMoviesUseCase(page: page, genre: filterGenre.genreCode)
+        }
+    }
+
+    private func getPublisher(collection: MoviesCollection, filter: Filters) -> AnyPublisher<[MovieSimple], Error> {
+        switch filter {
+        case .latest:
+            getLatestMoviesInCollectionUseCase(collectionId: collection.collectionId, page: page)
+        case .popular:
+            getPopularMoviesInCollectionUseCase(collectionId: collection.collectionId, page: page)
+        case .soon:
+            getSoonMoviesInCollectionUseCase(collectionId: collection.collectionId, page: page)
+        case .watching:
+            getWatchingNowMoviesInCollectionUseCase(collectionId: collection.collectionId, page: page)
+        }
+    }
+
+    func load(movies: [MovieSimple]?, list: MovieList?, country: MovieCountry?, genre: MovieGenre?, collection: MoviesCollection?, category: Categories?, filterGenre: Genres?, filter: Filters?, newFilter: NewFilters?) {
+        state = .loading
+        paginationState = .idle
+        page = 1
+
+        getData(movies: movies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
+    }
+
+    func loadMore(movies: [MovieSimple]?, list: MovieList?, country: MovieCountry?, genre: MovieGenre?, collection: MoviesCollection?, category: Categories?, filterGenre: Genres?, filter: Filters?, newFilter: NewFilters?) {
+        guard paginationState == .idle, movies == nil, category != .hot else { return }
 
         withAnimation(.easeInOut) {
             paginationState = .loading
         }
 
-        if let list {
-            getMovieListUseCase(listId: list.listId, page: page)
-                .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
-
-                    withAnimation(.easeInOut) {
-                        self.paginationState = .error(error as NSError)
-                    }
-                } receiveValue: { result in
-                    withAnimation(.easeInOut) {
-                        self.state.append(result.1)
-                        self.paginationState = .idle
-                    }
-                    self.page += 1
-                }
-                .store(in: &subscriptions)
-        }
-
-        if let c = country, let g = filterGenre, let f = filter {
-            let publisher = switch f {
-            case .latest:
-                getLatestMoviesByCountryUseCase(countryId: c.countryId, genre: g.genreCode, page: page)
-            case .popular:
-                getPopularMoviesByCountryUseCase(countryId: c.countryId, genre: g.genreCode, page: page)
-            case .soon:
-                getSoonMoviesByCountryUseCase(countryId: c.countryId, genre: g.genreCode, page: page)
-            case .watching:
-                getWatchingNowMoviesByCountryUseCase(countryId: c.countryId, genre: g.genreCode, page: page)
-            }
-
-            publisher
-                .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
-
-                    withAnimation(.easeInOut) {
-                        self.paginationState = .error(error as NSError)
-                    }
-                } receiveValue: { result in
-                    withAnimation(.easeInOut) {
-                        self.state.append(result)
-                        self.paginationState = .idle
-                    }
-                    self.page += 1
-                }
-                .store(in: &subscriptions)
-        }
-
-        if let g = genre, let f = filter {
-            let publisher = switch f {
-            case .latest:
-                getLatestMoviesByGenreUseCase(genreId: g.genreId, page: page)
-            case .popular:
-                getPopularMoviesByGenreUseCase(genreId: g.genreId, page: page)
-            case .soon:
-                getSoonMoviesByGenreUseCase(genreId: g.genreId, page: page)
-            case .watching:
-                getWatchingNowMoviesByGenreUseCase(genreId: g.genreId, page: page)
-            }
-
-            publisher
-                .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
-
-                    withAnimation(.easeInOut) {
-                        self.paginationState = .error(error as NSError)
-                    }
-                } receiveValue: { result in
-                    withAnimation(.easeInOut) {
-                        self.state.append(result)
-                        self.paginationState = .idle
-                    }
-                    self.page += 1
-                }
-                .store(in: &subscriptions)
-        }
-
-        if let c = category, let g = filterGenre {
-            let publisher = switch c {
-            case .hot:
-                getHotMoviesUseCase(genre: g.genreCode)
-//            case .featured:
-//                getFeaturedMoviesUseCase(page: page, genre: g.genreCode)
-            case .watchingNow:
-                getWatchingNowMoviesUseCase(page: page, genre: g.genreCode)
-            case .newest:
-                if let newFilter {
-                    switch newFilter {
-                    case .latest:
-                        getLatestNewestMoviesUseCase(page: page, genre: g.genreCode)
-                    case .popular:
-                        getPopularNewestMoviesUseCase(page: page, genre: g.genreCode)
-                    case .watching:
-                        getWatchingNowNewestMoviesUseCase(page: page, genre: g.genreCode)
-                    }
-                } else {
-                    getLatestNewestMoviesUseCase(page: page, genre: g.genreCode)
-                }
-            case .latest:
-                getLatestMoviesUseCase(page: page, genre: g.genreCode)
-            case .popular:
-                getPopularMoviesUseCase(page: page, genre: g.genreCode)
-            case .soon:
-                getSoonMoviesUseCase(page: page, genre: g.genreCode)
-            }
-
-            publisher
-                .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
-
-                    withAnimation(.easeInOut) {
-                        self.paginationState = .error(error as NSError)
-                    }
-                } receiveValue: { result in
-                    withAnimation(.easeInOut) {
-                        self.state.append(result)
-                        self.paginationState = .idle
-                    }
-                    self.page += 1
-                }
-                .store(in: &subscriptions)
-        }
-
-        if let c = collection, let f = filter {
-            let publisher = switch f {
-            case .latest:
-                getLatestMoviesInCollectionUseCase(collectionId: c.collectionId, page: page)
-            case .popular:
-                getPopularMoviesInCollectionUseCase(collectionId: c.collectionId, page: page)
-            case .soon:
-                getSoonMoviesInCollectionUseCase(collectionId: c.collectionId, page: page)
-            case .watching:
-                getWatchingNowMoviesInCollectionUseCase(collectionId: c.collectionId, page: page)
-            }
-
-            publisher
-                .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
-
-                    withAnimation(.easeInOut) {
-                        self.paginationState = .error(error as NSError)
-                    }
-                } receiveValue: { result in
-                    withAnimation(.easeInOut) {
-                        self.state.append(result)
-                        self.paginationState = .idle
-                    }
-                    self.page += 1
-                }
-                .store(in: &subscriptions)
-        }
-    }
-
-    func reload(category: Categories, genre: Genres, newFilter: NewFilters) {
-        getMovies(category: category, filterGenre: genre, newFilter: newFilter)
-    }
-
-    func nextPage(category: Categories, genre: Genres, newFilter: NewFilters) {
-        loadMore(category: category, filterGenre: genre, newFilter: newFilter)
-    }
-
-    func reload(collection: MoviesCollection, filter: Filters) {
-        getMovies(collection: collection, filter: filter)
-    }
-
-    func nextPage(collection: MoviesCollection, filter: Filters) {
-        loadMore(collection: collection, filter: filter)
-    }
-
-    func reload(genre: MovieGenre, filter: Filters) {
-        getMovies(genre: genre, filter: filter)
-    }
-
-    func nextPage(genre: MovieGenre, filter: Filters) {
-        loadMore(genre: genre, filter: filter)
-    }
-
-    func reload(country: MovieCountry, genre: Genres, filter: Filters) {
-        getMovies(country: country, filterGenre: genre, filter: filter)
-    }
-
-    func nextPage(country: MovieCountry, genre: Genres, filter: Filters) {
-        loadMore(country: country, filterGenre: genre, filter: filter)
-    }
-
-    func reload(movies: [MovieSimple]) {
-        getMovies(movies: movies)
-    }
-
-    func nextPage(movies: [MovieSimple]) {
-        loadMore(movies: movies)
-    }
-
-    func reload(list: MovieList) {
-        getMovies(list: list)
-    }
-
-    func nextPage(list: MovieList) {
-        loadMore(list: list)
+        getData(movies: movies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter, isInitial: false)
     }
 }

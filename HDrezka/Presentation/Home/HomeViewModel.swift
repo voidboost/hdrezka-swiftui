@@ -30,101 +30,68 @@ class HomeViewModel: ObservableObject {
     @Published var state: DataState<[Category]> = .loading
     @Published var paginationState: DataPaginationState = .idle
 
-    private var page: Categories? = Categories.allCases.first ?? .hot
+    private var page: Categories?
 
-    private func getMovies() {
-        state = .loading
-        paginationState = .idle
-        page = Categories.allCases.first ?? .watchingNow
-
-        if let page {
-            let publisher = switch page {
-            case .hot:
-                getHotMoviesUseCase(genre: 0)
-//            case .featured:
-//                getFeaturedMoviesUseCase(page: 1, genre: 0)
-            case .watchingNow:
-                getWatchingNowMoviesUseCase(page: 1, genre: 0)
-            case .latest:
-                getLatestMoviesUseCase(page: 1, genre: 0)
-            case .newest:
-                getLatestNewestMoviesUseCase(page: 1, genre: 0)
-            case .popular:
-                getPopularMoviesUseCase(page: 1, genre: 0)
-            case .soon:
-                getSoonMoviesUseCase(page: 1, genre: 0)
-            }
-
-            publisher
-                .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
-
-                    withAnimation(.easeInOut) {
-                        self.state = .error(error as NSError)
-                    }
-                } receiveValue: { movies in
-                    self.page = Categories.allCases.element(after: page)
-
-                    withAnimation(.easeInOut) {
-                        self.state = .data([.init(category: page, title: page.localized, movies: movies)])
-                    }
-                }
-                .store(in: &subscriptions)
-        }
-    }
-
-    private func loadMore() {
-        guard let page, paginationState == .idle else {
-            return
-        }
-
-        withAnimation(.easeInOut) {
-            paginationState = .loading
-        }
-
-        let publisher = switch page {
-        case .hot:
-            getHotMoviesUseCase(genre: 0)
-//        case .featured:
-//            getFeaturedMoviesUseCase(page: 1, genre: 0)
-        case .watchingNow:
-            getWatchingNowMoviesUseCase(page: 1, genre: 0)
-        case .latest:
-            getLatestMoviesUseCase(page: 1, genre: 0)
-        case .newest:
-            getLatestNewestMoviesUseCase(page: 1, genre: 0)
-        case .popular:
-            getPopularMoviesUseCase(page: 1, genre: 0)
-        case .soon:
-            getSoonMoviesUseCase(page: 1, genre: 0)
-        }
-
-        publisher
+    private func getData(category: Categories, isInitial: Bool = true) {
+        getPublisher(category: category)
             .receive(on: DispatchQueue.main)
             .sink { completion in
-                guard case let .failure(error) = completion else { return }
-
-                withAnimation(.easeInOut) {
-                    self.paginationState = .error(error as NSError)
+                if case let .failure(error) = completion {
+                    withAnimation(.easeInOut) {
+                        if isInitial {
+                            self.state = .error(error as NSError)
+                        } else {
+                            self.paginationState = .error(error as NSError)
+                        }
+                    }
                 }
             } receiveValue: { movies in
-                self.page = Categories.allCases.element(after: page)
+                self.page = Categories.allCases.element(after: category)
+                let newCategory = Category(category: category, title: category.localized, movies: movies)
 
                 withAnimation(.easeInOut) {
-                    self.state.append([.init(category: page, title: page.localized, movies: movies)])
-                    self.paginationState = .idle
+                    if isInitial {
+                        self.state = .data([newCategory])
+                    } else {
+                        self.state.append([newCategory])
+                        self.paginationState = .idle
+                    }
                 }
             }
             .store(in: &subscriptions)
     }
 
-    func reload() {
-        getMovies()
+    private func getPublisher(category: Categories) -> AnyPublisher<[MovieSimple], Error> {
+        switch category {
+            case .hot: getHotMoviesUseCase(genre: 0)
+//            case .featured: getFeaturedMoviesUseCase(page: 1, genre: 0)
+            case .watchingNow: getWatchingNowMoviesUseCase(page: 1, genre: 0)
+            case .latest: getLatestMoviesUseCase(page: 1, genre: 0)
+            case .newest: getLatestNewestMoviesUseCase(page: 1, genre: 0)
+            case .popular: getPopularMoviesUseCase(page: 1, genre: 0)
+            case .soon: getSoonMoviesUseCase(page: 1, genre: 0)
+        }
     }
 
-    func nextCategory() {
-        loadMore()
+    func load() {
+        state = .loading
+        paginationState = .idle
+
+        page = Categories.allCases.first
+
+        if let page {
+            getData(category: page)
+        }
+    }
+
+    func loadMore() {
+        guard let page, paginationState == .idle else { return }
+
+        withAnimation(.easeInOut) {
+            paginationState = .loading
+        }
+
+        getData(category: page, isInitial: false)
     }
 }
 

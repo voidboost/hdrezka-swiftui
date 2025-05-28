@@ -12,75 +12,60 @@ class SearchViewModel: ObservableObject {
 
     private var page = 1
 
-    private func getMovies(query: String) {
-        paginationState = .idle
-        page = 1
-
-        if !query.isEmpty {
-            state = .loading
-
-            subscriptions.forEach { $0.cancel() }
-            subscriptions.removeAll()
-
-            searchUseCase(query: query, page: page)
-                .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
-
-                    withAnimation(.easeInOut) {
-                        self.state = .error(error as NSError)
-                    }
-                } receiveValue: { result in
-                    self.page += 1
-
-                    withAnimation(.easeInOut) {
-                        self.state = .data(result)
-                    }
-                }
-                .store(in: &subscriptions)
-        } else {
-            state = .data([])
-        }
-    }
-
-    private func loadMore(query: String) {
-        guard paginationState == .idle, !query.isEmpty else {
-            return
-        }
-
-        withAnimation(.easeInOut) {
-            paginationState = .loading
-        }
-
+    private func getData(query: String, isInitial: Bool = true) {
         searchUseCase(query: query, page: page)
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 guard case let .failure(error) = completion else { return }
 
                 withAnimation(.easeInOut) {
-                    self.paginationState = .error(error as NSError)
+                    if isInitial {
+                        self.state = .error(error as NSError)
+                    } else {
+                        self.paginationState = .error(error as NSError)
+                    }
                 }
             } receiveValue: { result in
-                if !result.isEmpty {
-                    withAnimation(.easeInOut) {
-                        self.state.append(result)
-                        self.paginationState = .idle
-                    }
-                    self.page += 1
-                } else {
-                    withAnimation(.easeInOut) {
-                        self.paginationState = .error(NSError())
+                self.page += 1
+
+                withAnimation(.easeInOut) {
+                    if isInitial {
+                        self.state = .data(result)
+                    } else {
+                        if !result.isEmpty {
+                            self.state.append(result)
+                            self.paginationState = .idle
+                        } else {
+                            self.paginationState = .error(NSError())
+                        }
                     }
                 }
             }
             .store(in: &subscriptions)
     }
 
-    func reload(query: String) {
-        getMovies(query: query)
+    func load(query: String) {
+        paginationState = .idle
+        page = 1
+
+        if !query.isEmpty {
+            state = .loading
+            subscriptions.forEach { $0.cancel() }
+            subscriptions.removeAll()
+
+            getData(query: query)
+        } else {
+            state = .data([])
+        }
     }
 
-    func nextPage(query: String) {
-        loadMore(query: query)
+    func loadMore(query: String) {
+        guard paginationState == .idle, !query.isEmpty else { return }
+
+        withAnimation(.easeInOut) {
+            paginationState = .loading
+        }
+
+        getData(query: query, isInitial: false)
     }
 }

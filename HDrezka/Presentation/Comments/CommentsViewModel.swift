@@ -20,28 +20,45 @@ class CommentsViewModel: ObservableObject {
 
     private var page = 1
 
-    func getComments(movieId: String) {
+    func getData(movieId: String, isInitial: Bool = true) {
+        getCommentsPageUseCase(movieId: movieId, page: page)
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                guard case let .failure(error) = completion else { return }
+
+                withAnimation(.easeInOut) {
+                    if isInitial {
+                        self.state = .error(error as NSError)
+                    } else {
+                        self.paginationState = .error(error as NSError)
+                    }
+                }
+            } receiveValue: { comments in
+                self.page += 1
+
+                withAnimation(.easeInOut) {
+                    if isInitial {
+                        self.state = .data(comments)
+                    } else {
+                        if !comments.isEmpty {
+                            self.state.append(comments)
+                            self.paginationState = .idle
+                        } else {
+                            self.paginationState = .error(NSError())
+                        }
+                    }
+                }
+            }
+            .store(in: &subscriptions)
+    }
+
+    func load(movieId: String) {
         paginationState = .idle
         state = .loading
         page = 1
 
         if let movieId = movieId.id {
-            getCommentsPageUseCase(movieId: movieId, page: page)
-                .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
-
-                    withAnimation(.easeInOut) {
-                        self.state = .error(error as NSError)
-                    }
-                } receiveValue: { comments in
-                    self.page += 1
-
-                    withAnimation(.easeInOut) {
-                        self.state = .data(comments)
-                    }
-                }
-                .store(in: &subscriptions)
+            getData(movieId: movieId)
         } else {
             withAnimation(.easeInOut) {
                 self.state = .error(NSError())
@@ -49,39 +66,15 @@ class CommentsViewModel: ObservableObject {
         }
     }
 
-    func loadMoreComments(movieId: String) {
-        guard paginationState == .idle else {
-            return
-        }
+    func loadMore(movieId: String) {
+        guard paginationState == .idle else { return }
 
         withAnimation(.easeInOut) {
             paginationState = .loading
         }
 
         if let movieId = movieId.id {
-            getCommentsPageUseCase(movieId: movieId, page: page)
-                .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
-
-                    withAnimation(.easeInOut) {
-                        self.paginationState = .error(error as NSError)
-                    }
-                } receiveValue: { comments in
-                    if !comments.isEmpty {
-                        withAnimation(.easeInOut) {
-                            self.state.append(comments)
-                            self.paginationState = .idle
-                        }
-
-                        self.page += 1
-                    } else {
-                        withAnimation(.easeInOut) {
-                            self.paginationState = .error(NSError())
-                        }
-                    }
-                }
-                .store(in: &subscriptions)
+            getData(movieId: movieId, isInitial: false)
         } else {
             withAnimation(.easeInOut) {
                 self.paginationState = .error(NSError())

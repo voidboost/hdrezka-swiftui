@@ -18,14 +18,14 @@ struct CollectionsView: View {
         Group {
             if let error = vm.state.error {
                 ErrorStateView(error, title) {
-                    vm.reload()
+                    vm.load()
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
             } else if let collections = vm.state.data {
                 if collections.isEmpty {
                     EmptyStateView(String(localized: "key.collections.empty"), title) {
-                        vm.reload()
+                        vm.load()
                     }
                     .padding(.vertical, 52)
                     .padding(.horizontal, 36)
@@ -51,7 +51,7 @@ struct CollectionsView: View {
                                         CollectionCardView(collection: collection)
                                             .task {
                                                 if collections.last == collection, vm.paginationState == .idle {
-                                                    vm.nextPage()
+                                                    vm.loadMore()
                                                 }
                                             }
                                     }
@@ -90,7 +90,7 @@ struct CollectionsView: View {
         .navigationBar(title: title, showBar: showBar, navbar: {
             if let collections = vm.state.data, !collections.isEmpty {
                 Button {
-                    vm.reload()
+                    vm.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -103,7 +103,7 @@ struct CollectionsView: View {
             case .data:
                 break
             default:
-                vm.reload()
+                vm.load()
             }
         }
         .background(.background)
