@@ -142,7 +142,6 @@ struct SeriesUpdatesSheetView: View {
                 } label: {
                     Label(group.date, systemImage: isExpanded ? "chevron.up" : "chevron.down")
                         .font(.system(size: 15).bold())
-                        .labelStyle(CenterIcon())
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -259,15 +258,6 @@ struct SeriesUpdatesSheetView: View {
                             .stroke(.tertiary, lineWidth: 1)
                     }
                 }
-            }
-        }
-    }
-
-    private struct CenterIcon: LabelStyle {
-        func makeBody(configuration: Configuration) -> some View {
-            HStack(alignment: .center) {
-                configuration.icon
-                configuration.title
             }
         }
     }

@@ -384,15 +384,14 @@ struct CommentsView: View {
                                 vm.reply = (vm.reply == comment.commentId) ? nil : comment.commentId
                             }
                         } label: {
-                            HStack(alignment: .center, spacing: 8) {
+                            Group {
                                 if vm.reply == comment.commentId {
                                     Image(systemName: "chevron.up")
-                                        .font(.system(size: 13, weight: .semibold))
                                 } else {
                                     Text("key.reply")
-                                        .font(.system(size: 13, weight: .semibold))
                                 }
                             }
+                            .font(.system(size: 13, weight: .semibold))
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .background(.tertiary.opacity(0.05))
@@ -409,20 +408,18 @@ struct CommentsView: View {
                             Button {
                                 vm.reportComment = comment
                             } label: {
-                                HStack(alignment: .center, spacing: 8) {
-                                    Image(systemName: "exclamationmark.bubble.fill")
-                                        .foregroundColor(.accentColor)
-                                        .font(.system(size: 17))
-                                }
-                                .frame(height: 28)
-                                .padding(.horizontal, 16)
-                                .background(.tertiary.opacity(0.05))
-                                .clipShape(RoundedRectangle(cornerRadius: 100))
-                                .contentShape(RoundedRectangle(cornerRadius: 100))
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: 100)
-                                        .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                                }
+                                Image(systemName: "exclamationmark.bubble.fill")
+                                    .foregroundColor(.accentColor)
+                                    .font(.system(size: 17))
+                                    .frame(height: 28)
+                                    .padding(.horizontal, 16)
+                                    .background(.tertiary.opacity(0.05))
+                                    .clipShape(RoundedRectangle(cornerRadius: 100))
+                                    .contentShape(RoundedRectangle(cornerRadius: 100))
+                                    .overlay {
+                                        RoundedRectangle(cornerRadius: 100)
+                                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                                    }
                             }
                             .buttonStyle(.plain)
                         }
@@ -433,20 +430,18 @@ struct CommentsView: View {
                             Button {
                                 vm.deleteComment = comment
                             } label: {
-                                HStack(alignment: .center, spacing: 8) {
-                                    Image(systemName: "trash")
-                                        .foregroundColor(.accentColor)
-                                        .font(.system(size: 17))
-                                }
-                                .frame(height: 28)
-                                .padding(.horizontal, 16)
-                                .background(.tertiary.opacity(0.05))
-                                .clipShape(RoundedRectangle(cornerRadius: 100))
-                                .contentShape(RoundedRectangle(cornerRadius: 100))
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: 100)
-                                        .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                                }
+                                Image(systemName: "trash")
+                                    .foregroundColor(.accentColor)
+                                    .font(.system(size: 17))
+                                    .frame(height: 28)
+                                    .padding(.horizontal, 16)
+                                    .background(.tertiary.opacity(0.05))
+                                    .clipShape(RoundedRectangle(cornerRadius: 100))
+                                    .contentShape(RoundedRectangle(cornerRadius: 100))
+                                    .overlay {
+                                        RoundedRectangle(cornerRadius: 100)
+                                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                                    }
                             }
                             .buttonStyle(.plain)
                         }
@@ -562,19 +557,17 @@ struct CommentsView: View {
 
                         selection = NSRange(location: selection.location + 3, length: selection.length)
                     } label: {
-                        HStack(alignment: .center, spacing: 8) {
-                            Image(systemName: "bold")
-                                .font(.system(size: 17))
-                        }
-                        .frame(height: 28)
-                        .padding(.horizontal, 16)
-                        .background(.tertiary.opacity(0.05))
-                        .clipShape(RoundedRectangle(cornerRadius: 100))
-                        .contentShape(RoundedRectangle(cornerRadius: 100))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 100)
-                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                        }
+                        Image(systemName: "bold")
+                            .font(.system(size: 17))
+                            .frame(height: 28)
+                            .padding(.horizontal, 16)
+                            .background(.tertiary.opacity(0.05))
+                            .clipShape(RoundedRectangle(cornerRadius: 100))
+                            .contentShape(RoundedRectangle(cornerRadius: 100))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 100)
+                                    .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                            }
                     }
                     .buttonStyle(.plain)
 
@@ -584,19 +577,17 @@ struct CommentsView: View {
 
                         selection = NSRange(location: selection.location + 3, length: selection.length)
                     } label: {
-                        HStack(alignment: .center, spacing: 8) {
-                            Image(systemName: "italic")
-                                .font(.system(size: 17))
-                        }
-                        .frame(height: 28)
-                        .padding(.horizontal, 16)
-                        .background(.tertiary.opacity(0.05))
-                        .clipShape(RoundedRectangle(cornerRadius: 100))
-                        .contentShape(RoundedRectangle(cornerRadius: 100))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 100)
-                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                        }
+                        Image(systemName: "italic")
+                            .font(.system(size: 17))
+                            .frame(height: 28)
+                            .padding(.horizontal, 16)
+                            .background(.tertiary.opacity(0.05))
+                            .clipShape(RoundedRectangle(cornerRadius: 100))
+                            .contentShape(RoundedRectangle(cornerRadius: 100))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 100)
+                                    .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                            }
                     }
                     .buttonStyle(.plain)
 
@@ -606,19 +597,17 @@ struct CommentsView: View {
 
                         selection = NSRange(location: selection.location + 3, length: selection.length)
                     } label: {
-                        HStack(alignment: .center, spacing: 8) {
-                            Image(systemName: "underline")
-                                .font(.system(size: 17))
-                        }
-                        .frame(height: 28)
-                        .padding(.horizontal, 16)
-                        .background(.tertiary.opacity(0.05))
-                        .clipShape(RoundedRectangle(cornerRadius: 100))
-                        .contentShape(RoundedRectangle(cornerRadius: 100))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 100)
-                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                        }
+                        Image(systemName: "underline")
+                            .font(.system(size: 17))
+                            .frame(height: 28)
+                            .padding(.horizontal, 16)
+                            .background(.tertiary.opacity(0.05))
+                            .clipShape(RoundedRectangle(cornerRadius: 100))
+                            .contentShape(RoundedRectangle(cornerRadius: 100))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 100)
+                                    .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                            }
                     }
                     .buttonStyle(.plain)
 
@@ -628,19 +617,17 @@ struct CommentsView: View {
 
                         selection = NSRange(location: selection.location + 3, length: selection.length)
                     } label: {
-                        HStack(alignment: .center, spacing: 8) {
-                            Image(systemName: "strikethrough")
-                                .font(.system(size: 17))
-                        }
-                        .frame(height: 28)
-                        .padding(.horizontal, 16)
-                        .background(.tertiary.opacity(0.05))
-                        .clipShape(RoundedRectangle(cornerRadius: 100))
-                        .contentShape(RoundedRectangle(cornerRadius: 100))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 100)
-                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                        }
+                        Image(systemName: "strikethrough")
+                            .font(.system(size: 17))
+                            .frame(height: 28)
+                            .padding(.horizontal, 16)
+                            .background(.tertiary.opacity(0.05))
+                            .clipShape(RoundedRectangle(cornerRadius: 100))
+                            .contentShape(RoundedRectangle(cornerRadius: 100))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 100)
+                                    .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                            }
                     }
                     .buttonStyle(.plain)
 
@@ -650,19 +637,17 @@ struct CommentsView: View {
 
                         selection = NSRange(location: selection.location + 9, length: selection.length)
                     } label: {
-                        HStack(alignment: .center, spacing: 8) {
-                            Text("Spoiler!".uppercased())
-                                .font(.system(size: 15, weight: .bold, design: .rounded))
-                        }
-                        .frame(height: 28)
-                        .padding(.horizontal, 16)
-                        .background(.tertiary.opacity(0.05))
-                        .clipShape(RoundedRectangle(cornerRadius: 100))
-                        .contentShape(RoundedRectangle(cornerRadius: 100))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 100)
-                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                        }
+                        Text("Spoiler!".uppercased())
+                            .font(.system(size: 15, weight: .bold, design: .rounded))
+                            .frame(height: 28)
+                            .padding(.horizontal, 16)
+                            .background(.tertiary.opacity(0.05))
+                            .clipShape(RoundedRectangle(cornerRadius: 100))
+                            .contentShape(RoundedRectangle(cornerRadius: 100))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 100)
+                                    .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                            }
                     }
                     .buttonStyle(.plain)
 
@@ -687,19 +672,17 @@ struct CommentsView: View {
                         name = ""
                         feedback = ""
                     } label: {
-                        HStack(alignment: .center, spacing: 8) {
-                            Text("key.send")
-                                .font(.system(size: 15, weight: .bold))
-                        }
-                        .frame(height: 28)
-                        .padding(.horizontal, 16)
-                        .background(.tertiary.opacity(0.05))
-                        .clipShape(RoundedRectangle(cornerRadius: 100))
-                        .contentShape(RoundedRectangle(cornerRadius: 100))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 100)
-                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                        }
+                        Text("key.send")
+                            .font(.system(size: 15, weight: .bold))
+                            .frame(height: 28)
+                            .padding(.horizontal, 16)
+                            .background(.tertiary.opacity(0.05))
+                            .clipShape(RoundedRectangle(cornerRadius: 100))
+                            .contentShape(RoundedRectangle(cornerRadius: 100))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 100)
+                                    .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                            }
                     }
                     .buttonStyle(.plain)
                     .disabled(feedback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || (!isLoggedIn && name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) || !allowedComments)

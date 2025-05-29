@@ -161,7 +161,7 @@ struct WatchSheetView: View {
                                         }
                                         .menuStyle(.button)
                                         .menuIndicator(.hidden)
-                                        .buttonStyle(CustomButtonStyle())
+                                        .buttonStyle(.plain)
                                         .labelStyle(CustomLabelStyle(iconVisible: acting.count > 1))
                                     }
                                     .padding(.vertical, 10)
@@ -210,7 +210,7 @@ struct WatchSheetView: View {
                                         }
                                         .menuStyle(.button)
                                         .menuIndicator(.hidden)
-                                        .buttonStyle(CustomButtonStyle())
+                                        .buttonStyle(.plain)
                                         .labelStyle(CustomLabelStyle(iconVisible: (seasons?.count ?? 0) > 1))
                                     }
                                     .padding(.vertical, 10)
@@ -255,7 +255,7 @@ struct WatchSheetView: View {
                                         }
                                         .menuStyle(.button)
                                         .menuIndicator(.hidden)
-                                        .buttonStyle(CustomButtonStyle())
+                                        .buttonStyle(.plain)
                                         .labelStyle(CustomLabelStyle(iconVisible: (selectedSeason?.episodes.count ?? 0) > 1))
                                     }
                                     .padding(.vertical, 10)
@@ -339,7 +339,7 @@ struct WatchSheetView: View {
                                 }
                                 .menuStyle(.button)
                                 .menuIndicator(.hidden)
-                                .buttonStyle(CustomButtonStyle())
+                                .buttonStyle(.plain)
                                 .labelStyle(CustomLabelStyle(iconVisible: ((movie?.getAvailableQualities().count ?? 0) + (movie?.getLockedQualities().count ?? 0)) > 1))
                             }
                             .padding(.vertical, 10)
@@ -646,15 +646,7 @@ struct WatchSheetView: View {
         }
     }
     
-    struct CustomButtonStyle: ButtonStyle {
-        func makeBody(configuration: Configuration) -> some View {
-            HStack(alignment: .center) {
-                configuration.label
-            }
-        }
-    }
-    
-    struct CustomLabelStyle: LabelStyle {
+    private struct CustomLabelStyle: LabelStyle {
         private let iconVisible: Bool
         
         init(iconVisible: Bool = true) {
@@ -664,6 +656,7 @@ struct WatchSheetView: View {
         func makeBody(configuration: Configuration) -> some View {
             HStack(alignment: .center, spacing: 8) {
                 configuration.title
+                
                 if iconVisible {
                     configuration.icon
                 }

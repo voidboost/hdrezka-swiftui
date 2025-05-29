@@ -109,15 +109,13 @@ struct CardView: View {
 
                             if let info = movie.info {
                                 HStack {
-                                    HStack {
-                                        Text(info.title)
-                                            .lineLimit(1)
-                                    }
-                                    .font(.system(size: 10))
-                                    .padding(.vertical, 3)
-                                    .padding(.horizontal, 6)
-                                    .background(.ultraThickMaterial)
-                                    .clipShape(UnevenRoundedRectangle(topTrailingRadius: 6))
+                                    Text(info.title)
+                                        .lineLimit(1)
+                                        .font(.system(size: 10))
+                                        .padding(.vertical, 3)
+                                        .padding(.horizontal, 6)
+                                        .background(.ultraThickMaterial)
+                                        .clipShape(UnevenRoundedRectangle(topTrailingRadius: 6))
 
                                     Spacer()
                                 }

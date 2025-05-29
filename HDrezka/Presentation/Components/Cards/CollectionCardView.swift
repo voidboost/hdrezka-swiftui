@@ -50,15 +50,13 @@ struct CollectionCardView: View {
                                     HStack {
                                         Spacer()
 
-                                        HStack {
-                                            Text(count.description)
-                                                .lineLimit(1)
-                                        }
-                                        .font(.system(size: 10))
-                                        .padding(.vertical, 3)
-                                        .padding(.horizontal, 6)
-                                        .background(.ultraThickMaterial)
-                                        .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 6))
+                                        Text(count.description)
+                                            .lineLimit(1)
+                                            .font(.system(size: 10))
+                                            .padding(.vertical, 3)
+                                            .padding(.horizontal, 6)
+                                            .background(.ultraThickMaterial)
+                                            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 6))
                                     }
 
                                     Spacer()
