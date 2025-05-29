@@ -89,22 +89,13 @@ struct PlayerView: View {
     var body: some View {
         ZStack(alignment: .center) {
             if let error {
-                VStack(alignment: .center) {
-                    Label("key.ops", systemImage: "play.slash")
-
-                    Text(error.localizedDescription)
-                        .foregroundStyle(.secondary)
-
-                    Button {
-                        resetPlayer {
-                            setupPlayer(isMuted: isMuted, subtitles: subtitles, volume: volume)
-                        }
-                    } label: {
-                        Text("key.retry")
+                ErrorStateView(error) {
+                    resetPlayer {
+                        setupPlayer(isMuted: isMuted, subtitles: subtitles, volume: volume)
                     }
-                    .keyboardShortcut("r", modifiers: .command)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.vertical, 52)
+                .padding(.horizontal, 36)
             } else if let player = playerLayer.player {
                 CustomAVPlayerView(playerLayer: playerLayer)
                     .task {

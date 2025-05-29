@@ -24,6 +24,10 @@ struct ScheduleSheetView: View {
                 LazyVStack(alignment: .leading, spacing: 10) {
                     ForEach(schedule) { sch in
                         CustomSection(group: sch, isExpanded: schedule.firstIndex(of: sch) == 0)
+
+                        if sch != schedule.last {
+                            Divider()
+                        }
                     }
                 }
                 .padding(.vertical, 8)
@@ -62,7 +66,6 @@ struct ScheduleSheetView: View {
                 HStack {
                     Label(group.name, systemImage: isExpanded ? "chevron.up" : "chevron.down")
                         .font(.system(size: 15).bold())
-                        .labelStyle(CenterIcon())
 
                     Spacer()
                 }
@@ -112,15 +115,6 @@ struct ScheduleSheetView: View {
                 withAnimation(.easeInOut) {
                     isExpanded.toggle()
                 }
-            }
-        }
-    }
-
-    private struct CenterIcon: LabelStyle {
-        func makeBody(configuration: Configuration) -> some View {
-            HStack(alignment: .center) {
-                configuration.icon
-                configuration.title
             }
         }
     }
