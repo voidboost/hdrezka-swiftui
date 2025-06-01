@@ -5,8 +5,7 @@ import SwiftUI
 class CategoriesViewModel: ObservableObject {
     @Injected(\.categoriesUseCase) private var categoriesUseCase
 
-    @Published var selection: UUID?
-    @Published var state: DataState<[MovieType]> = .loading
+    @Published private(set) var state: DataState<[MovieType]> = .loading
 
     private var subscriptions: Set<AnyCancellable> = []
 
@@ -23,7 +22,6 @@ class CategoriesViewModel: ObservableObject {
                 }
             } receiveValue: { types in
                 withAnimation(.easeInOut) {
-                    self.selection = types.first?.id
                     self.state = .data(types)
                 }
             }

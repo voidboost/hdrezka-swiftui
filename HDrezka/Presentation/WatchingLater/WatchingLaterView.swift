@@ -7,25 +7,13 @@ import SwiftUI
 struct WatchingLaterView: View {
     @StateObject private var vm = WatchingLaterViewModel()
 
-    @State private var subscriptions: Set<AnyCancellable> = []
-
     private let columns = [
         GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading)
     ]
 
-    @State private var error: Error?
-    @State private var isErrorPresented: Bool = false
-
     @State private var showBar: Bool = false
 
-    @Injected(\.switchWatchedItemUseCase) private var switchWatchedItemUseCase
-    @Injected(\.removeWatchingItemUseCase) private var removeWatchingItemUseCase
-
     @Default(.isLoggedIn) private var isLoggedIn
-
-    @Environment(\.managedObjectContext) private var viewContext
-
-    @FetchRequest(fetchRequest: PlayerPosition.fetch()) private var playerPositions: FetchedResults<PlayerPosition>
 
     private let title = String(localized: "key.watching_later")
 
@@ -37,7 +25,7 @@ struct WatchingLaterView: View {
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
-            } else if var movies = vm.state.data {
+            } else if let movies = vm.state.data {
                 if movies.isEmpty {
                     EmptyStateView(String(localized: "key.watching_later.empty"), title, String(localized: "key.watching_later.empty.description")) {
                         vm.getMovies()
@@ -65,62 +53,13 @@ struct WatchingLaterView: View {
                                     WatchingLaterCardView(movie: movie)
                                         .contextMenu {
                                             Button {
-                                                switchWatchedItemUseCase(item: movie)
-                                                    .receive(on: DispatchQueue.main)
-                                                    .sink { completion in
-                                                        guard case let .failure(error) = completion else { return }
-
-                                                        self.error = error
-                                                        self.isErrorPresented = true
-                                                    } receiveValue: { result in
-                                                        if result {
-                                                            if let index = movies.firstIndex(of: movie) {
-                                                                movies[index].watched.toggle()
-
-                                                                if !movie.watched {
-                                                                    movies.move(
-                                                                        fromOffsets: IndexSet(integer: index),
-                                                                        toOffset: movies.count
-                                                                    )
-                                                                }
-
-                                                                withAnimation(.easeInOut) {
-                                                                    vm.state = .data(movies)
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                    .store(in: &subscriptions)
+                                                vm.switchWatchedItem(movie: movie)
                                             } label: {
                                                 Text(movie.watched ? String(localized: "key.mark.unwatched") : String(localized: "key.mark.watched"))
                                             }
 
                                             Button {
-                                                removeWatchingItemUseCase(item: movie)
-                                                    .receive(on: DispatchQueue.main)
-                                                    .sink { completion in
-                                                        guard case let .failure(error) = completion else { return }
-
-                                                        self.error = error
-                                                        self.isErrorPresented = true
-                                                    } receiveValue: { delete in
-                                                        if delete {
-                                                            movies.removeAll(where: {
-                                                                $0.id == movie.id
-                                                            })
-
-                                                            withAnimation(.easeInOut) {
-                                                                vm.state = .data(movies)
-                                                            }
-
-                                                            playerPositions
-                                                                .filter { $0.id == movie.watchLaterId.id }
-                                                                .forEach(viewContext.delete)
-
-                                                            viewContext.saveContext()
-                                                        }
-                                                    }
-                                                    .store(in: &subscriptions)
+                                                vm.removeWatchingItem(movie: movie)
                                             } label: {
                                                 Text("key.delete")
                                             }
@@ -167,12 +106,12 @@ struct WatchingLaterView: View {
                 vm.getMovies()
             }
         }
-        .alert("key.ops", isPresented: $isErrorPresented) {
+        .alert("key.ops", isPresented: $vm.isErrorPresented) {
             Button(role: .cancel) {} label: {
                 Text("key.ok")
             }
         } message: {
-            if let error {
+            if let error = vm.error {
                 Text(error.localizedDescription)
             }
         }

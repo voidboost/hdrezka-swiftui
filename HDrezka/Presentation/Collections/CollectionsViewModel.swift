@@ -7,8 +7,8 @@ class CollectionsViewModel: ObservableObject {
 
     private var subscriptions: Set<AnyCancellable> = []
 
-    @Published var state: DataState<[MoviesCollection]> = .loading
-    @Published var paginationState: DataPaginationState = .idle
+    @Published private(set) var state: DataState<[MoviesCollection]> = .loading
+    @Published private(set) var paginationState: DataPaginationState = .idle
 
     private var page = 1
 

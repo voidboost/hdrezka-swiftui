@@ -27,8 +27,10 @@ class HomeViewModel: ObservableObject {
         }
     }
 
-    @Published var state: DataState<[Category]> = .loading
-    @Published var paginationState: DataPaginationState = .idle
+    @Published private(set) var state: DataState<[Category]> = .loading
+    @Published private(set) var paginationState: DataPaginationState = .idle
+
+    @Published var isSeriesUpdatesPresented: Bool = false
 
     private var page: Categories?
 
@@ -84,8 +86,8 @@ class HomeViewModel: ObservableObject {
         }
     }
 
-    func loadMore() {
-        guard let page, paginationState == .idle else { return }
+    func loadMore(reset: Bool = false) {
+        guard let page, paginationState == .idle || reset else { return }
 
         withAnimation(.easeInOut) {
             paginationState = .loading

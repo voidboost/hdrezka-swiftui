@@ -22,7 +22,6 @@ struct ContentView: View {
     @Environment(\.resetFocus) var resetFocus
 
     @State private var query = ""
-    @State private var searchWork: DispatchWorkItem?
 
     @State private var showDays = false
 
@@ -249,7 +248,7 @@ struct ContentView: View {
                                 .id("home")
                                 .transition(.move(edge: .trailing))
                         case .search:
-                            SearchView(searchText: $query)
+                            SearchView(searchText: query)
                                 .id("search")
                                 .transition(.move(edge: .trailing))
                         case .categories:
@@ -322,28 +321,16 @@ struct ContentView: View {
                 .store(in: &subscriptions)
         }
         .customOnChange(of: query.trimmingCharacters(in: .whitespacesAndNewlines)) {
-            searchWork?.cancel()
+            let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
 
-            searchWork = DispatchWorkItem {
-                let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
-
-                if !trimmed.isEmpty {
-                    if trimmed.removeMirror().id != nil {
-                        if case let .details(movie) = appState.path.last, movie.movieId == trimmed.removeMirror() {
-                            return
-                        }
-
-                        appState.path.append(.details(.init(movieId: trimmed.removeMirror())))
-                    } else if appState.path.last != .search {
-                        appState.path.append(.search)
-                    }
-                } else if trimmed.isEmpty, appState.path.last == .search {
-                    appState.path.removeLast()
+            if trimmed.removeMirror().id != nil {
+                if case let .details(movie) = appState.path.last, movie.movieId == trimmed.removeMirror() {
+                    return
                 }
-            }
 
-            if let searchWork {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: searchWork)
+                appState.path.append(.details(.init(movieId: trimmed.removeMirror())))
+            } else if appState.path.last != .search {
+                appState.path.append(.search)
             }
         }
         .customOnChange(of: isLoggedIn) {
