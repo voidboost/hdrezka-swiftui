@@ -5,7 +5,7 @@ import SwiftUI
 class PersonViewModel: ObservableObject {
     @Injected(\.getPersonDetailsUseCase) private var getPersonDetailsUseCase
 
-    @Published var state: DataState<PersonDetailed> = .loading
+    @Published private(set) var state: DataState<PersonDetailed> = .loading
 
     private var subscriptions: Set<AnyCancellable> = []
 

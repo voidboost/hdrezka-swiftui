@@ -10,8 +10,8 @@ class DetailsViewModel: ObservableObject {
 
     private var subscriptions: Set<AnyCancellable> = []
 
-    @Published var state: DataState<MovieDetailed> = .loading
-    @Published var trailer: YouTubePlayer?
+    @Published private(set) var state: DataState<MovieDetailed> = .loading
+    @Published private(set) var trailer: YouTubePlayer?
 
     func getDetails(id: String) {
         state = .loading
