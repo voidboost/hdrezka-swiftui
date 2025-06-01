@@ -72,12 +72,7 @@ struct CollectionsView: View {
                         .scrollIndicators(.never)
 
                         if vm.paginationState == .loading {
-                            HStack {
-                                Spacer()
-                                ProgressView()
-                                Spacer()
-                            }
-                            .padding(.vertical, 10)
+                            LoadingPaginationStateView()
                         }
                     }
                 }

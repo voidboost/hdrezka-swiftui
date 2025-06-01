@@ -38,7 +38,7 @@ final class SourcePackagesParser {
                 url: dependency.packageRef.location.replacingOccurrences(of: ".git", with: ""),
                 licenseBody: licenseBody,
                 version: dependency.state.checkoutState.version,
-                identity: dependency.packageRef.identity.components(separatedBy: CharacterSet.letters.inverted).joined(separator: "_")
+                identity: dependency.packageRef.identity.components(separatedBy: .letters.inverted).joined(separator: "_")
             )
         }
         .sorted { $0.name.lowercased() < $1.name.lowercased() }

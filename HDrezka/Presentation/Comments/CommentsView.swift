@@ -45,9 +45,7 @@ struct CommentsView: View {
                             }
                             .frame(height: 52)
 
-                            CommentTextArea { name, text in
-                                vm.sendComment(name: name, text: text, postId: details.movieId, adb: details.adb, type: details.type)
-                            }
+                            CommentTextArea(postId: details.movieId, adb: details.adb, type: details.type)
                         }
                         .padding(.vertical, 52)
                         .padding(.horizontal, 36)
@@ -80,14 +78,12 @@ struct CommentsView: View {
 
                                 VStack(spacing: 16) {
                                     if vm.reply == nil {
-                                        CommentTextArea { name, text in
-                                            vm.sendComment(name: name, text: text, postId: details.movieId, adb: details.adb, type: details.type)
-                                        }
+                                        CommentTextArea(postId: details.movieId, adb: details.adb, type: details.type)
                                     }
 
                                     LazyVStack(alignment: .leading, spacing: 16) {
                                         ForEach(comments) { comment in
-                                            CommentsViewComponent(comment: comment, details: details)
+                                            CommentsViewComponent(comment: comment, postId: details.movieId, adb: details.adb, type: details.type)
                                                 .task {
                                                     if comments.last == comment, vm.paginationState == .idle {
                                                         vm.loadMore(movieId: details.movieId)
@@ -112,12 +108,7 @@ struct CommentsView: View {
                         .environmentObject(vm)
 
                         if vm.paginationState == .loading {
-                            HStack {
-                                Spacer()
-                                ProgressView()
-                                Spacer()
-                            }
-                            .padding(.vertical, 10)
+                            LoadingPaginationStateView()
                         }
                     }
                 }
@@ -168,7 +159,7 @@ struct CommentsView: View {
             VStack(alignment: .center, spacing: 25) {
                 if let comment = vm.comment {
                     ScrollView(.vertical) {
-                        CommentsViewComponent(comment: comment, details: details)
+                        CommentsViewComponent(comment: comment, postId: details.movieId, adb: details.adb, type: details.type)
                     }
                     .scrollIndicators(.never)
                     .environmentObject(vm)
@@ -218,18 +209,22 @@ struct CommentsView: View {
 
     private struct CommentsViewComponent: View {
         private let comment: Comment
-        private let details: MovieDetailed
+        private let postId: String
+        private let adb: String?
+        private let type: String?
+
+        init(comment: Comment, postId: String, adb: String?, type: String?) {
+            self.comment = comment
+            self.postId = postId
+            self.adb = adb
+            self.type = type
+        }
 
         @Default(.isLoggedIn) private var isLoggedIn
         @EnvironmentObject private var appState: AppState
         @EnvironmentObject private var vm: CommentsViewModel
 
         @State private var delayShow: DispatchWorkItem?
-
-        init(comment: Comment, details: MovieDetailed) {
-            self.comment = comment
-            self.details = details
-        }
 
         var body: some View {
             VStack(alignment: .leading, spacing: 16) {
@@ -274,7 +269,7 @@ struct CommentsView: View {
                             .foregroundColor(.secondary)
                     }
 
-                    CommentText(comment: comment, getComment: vm.getComment)
+                    CommentText(comment: comment)
 
                     HStack(alignment: .center, spacing: 8) {
                         Button {
@@ -448,16 +443,14 @@ struct CommentsView: View {
                     }
 
                     if vm.reply == comment.commentId {
-                        CommentTextArea { name, text in
-                            vm.sendComment(name: name, text: text, postId: details.movieId, adb: details.adb, type: details.type)
-                        }
+                        CommentTextArea(postId: postId, adb: adb, type: type)
                     }
                 }
 
                 if !comment.replies.isEmpty {
                     LazyVStack(alignment: .leading, spacing: 16) {
                         ForEach(comment.replies) { reply in
-                            CommentsViewComponent(comment: reply, details: details)
+                            CommentsViewComponent(comment: reply, postId: postId, adb: adb, type: type)
                         }
                     }
                     .padding(.leading, 16)
@@ -468,13 +461,12 @@ struct CommentsView: View {
 
     private struct CommentText: View {
         @State private var comment: Comment
-        private let getComment: (String, String) -> Void
 
         @EnvironmentObject private var appState: AppState
+        @EnvironmentObject private var vm: CommentsViewModel
 
-        init(comment: Comment, getComment: @escaping (String, String) -> Void) {
+        init(comment: Comment) {
             self.comment = comment
-            self.getComment = getComment
         }
 
         var body: some View {
@@ -519,7 +511,7 @@ struct CommentsView: View {
                         let movieId = String(url.path().dropFirst())
                         let commentId = fragment.replacingOccurrences(of: "comment", with: "")
 
-                        getComment(movieId, commentId)
+                        vm.getComment(movieId: movieId, commentId: commentId)
 
                         return .handled
                     } else if !url.path().isEmpty, String(url.path().dropFirst()).id != nil {
@@ -534,10 +526,14 @@ struct CommentsView: View {
     }
 
     private struct CommentTextArea: View {
-        private let sendComment: (String?, String) -> Void
+        private let postId: String
+        private let adb: String?
+        private let type: String?
 
-        init(sendComment: @escaping (String?, String) -> Void) {
-            self.sendComment = sendComment
+        init(postId: String, adb: String?, type: String?) {
+            self.postId = postId
+            self.adb = adb
+            self.type = type
         }
 
         @State private var feedback: String = ""
@@ -547,6 +543,7 @@ struct CommentsView: View {
         @Default(.isLoggedIn) private var isLoggedIn
         @Default(.allowedComments) private var allowedComments
         @EnvironmentObject private var appState: AppState
+        @EnvironmentObject private var vm: CommentsViewModel
 
         var body: some View {
             VStack(alignment: .leading, spacing: 8) {
@@ -667,7 +664,7 @@ struct CommentsView: View {
                     }
 
                     Button {
-                        sendComment(isLoggedIn ? nil : name, feedback)
+                        vm.sendComment(name: isLoggedIn ? nil : name, text: feedback, postId: postId, adb: adb, type: type)
 
                         name = ""
                         feedback = ""

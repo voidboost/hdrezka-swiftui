@@ -4,26 +4,8 @@ import FactoryKit
 import SwiftUI
 
 struct BookmarksView: View {
-    @Injected(\.deleteBookmarksCategoryUseCase) private var deleteBookmarksCategoryUseCase
-    @Injected(\.moveBetweenBookmarksUseCase) private var moveBetweenBookmarksUseCase
-    @Injected(\.reorderBookmarksCategoriesUseCase) private var reorderBookmarksCategoriesUseCase
-    @Injected(\.removeFromBookmarksUseCase) private var removeFromBookmarksUseCase
-
-    @State private var subscriptions: Set<AnyCancellable> = []
-    
     @StateObject private var vm = BookmarksViewModel()
         
-    @State private var selectedBookmark: Int = -1
-    
-    @State private var error: Error?
-    @State private var isErrorPresented: Bool = false
-    
-    @State private var renameBookmark: Bookmark?
-    @State private var isCreateBookmarkPresented: Bool = false
-    
-    @State private var selectedGenre = Genres.all
-    @State private var filter = BookmarkFilters.added
-    
     @Default(.isLoggedIn) private var isLoggedIn
 
     private let columns = [
@@ -43,8 +25,7 @@ struct BookmarksView: View {
                             .multilineTextAlignment(.center)
                             
                         Button {
-                            selectedBookmark = -1
-                            vm.getBookmarks()
+                            vm.getBookmarks(reset: true)
                         } label: {
                             Text("key.retry")
                                 .font(.system(size: 13))
@@ -57,7 +38,7 @@ struct BookmarksView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding(.top, 52)
                     .padding(18)
-                } else if var bookmarks = vm.bookmarksState.data {
+                } else if let bookmarks = vm.bookmarksState.data {
                     if bookmarks.isEmpty {
                         VStack(alignment: .center, spacing: 8) {
                             Text("key.bookmark.empty")
@@ -66,7 +47,7 @@ struct BookmarksView: View {
                                 .multilineTextAlignment(.center)
                    
                             Button {
-                                isCreateBookmarkPresented = true
+                                vm.isCreateBookmarkPresented = true
                             } label: {
                                 Text("key.create")
                                     .font(.system(size: 13))
@@ -77,8 +58,7 @@ struct BookmarksView: View {
                             .keyboardShortcut("n", modifiers: .command)
                    
                             Button {
-                                selectedBookmark = -1
-                                vm.getBookmarks()
+                                vm.getBookmarks(reset: true)
                             } label: {
                                 Text("key.retry")
                                     .font(.system(size: 13))
@@ -92,7 +72,7 @@ struct BookmarksView: View {
                         .padding(.top, 52)
                         .padding(18)
                     } else {
-                        List(selection: $selectedBookmark) {
+                        List(selection: $vm.selectedBookmark) {
                             ForEach(bookmarks) { bookmark in
                                 if #available(macOS 14.0, *) {
                                     Text(bookmark.name)
@@ -108,74 +88,21 @@ struct BookmarksView: View {
                                         .listRowInsets(.init())
                                         .contextMenu {
                                             Button {
-                                                renameBookmark = bookmark
+                                                vm.renameBookmark = bookmark
                                             } label: {
                                                 Text("key.rename")
                                             }
                                             
                                             Button {
-                                                deleteBookmarksCategoryUseCase(id: bookmark.bookmarkId)
-                                                    .receive(on: DispatchQueue.main)
-                                                    .sink { completion in
-                                                        guard case let .failure(error) = completion else { return }
-                                                        
-                                                        self.error = error
-                                                        self.isErrorPresented = true
-                                                    } receiveValue: { delete in
-                                                        if delete {
-                                                            bookmarks.removeAll(where: {
-                                                                $0.bookmarkId == bookmark.bookmarkId
-                                                            })
-                                                            
-                                                            withAnimation(.easeInOut) {
-                                                                vm.bookmarksState = .data(bookmarks)
-                                                            }
-                                                            
-                                                            if selectedBookmark == bookmark.bookmarkId {
-                                                                selectedBookmark = -1
-                                                                vm.bookmarkState = .data([])
-                                                            }
-                                                        }
-                                                    }
-                                                    .store(in: &subscriptions)
+                                                vm.deleteBookmarksCategory(bookmark: bookmark)
                                             } label: {
                                                 Text("key.delete")
                                             }
                                         }
-                                        .if(selectedBookmark != bookmark.bookmarkId) { view in
+                                        .if(vm.selectedBookmark != bookmark.bookmarkId) { view in
                                             view.dropDestination(for: MovieSimple.self) { movies, _ in
                                                 if !movies.isEmpty, !movies.compactMap(\.movieId.id).isEmpty {
-                                                    moveBetweenBookmarksUseCase(movies: movies.compactMap(\.movieId.id), fromBookmarkUserCategory: selectedBookmark, toBookmarkUserCategory: bookmark.bookmarkId)
-                                                        .receive(on: DispatchQueue.main)
-                                                        .sink { completion in
-                                                            guard case let .failure(error) = completion else { return }
-                                                            
-                                                            self.error = error
-                                                            self.isErrorPresented = true
-                                                        } receiveValue: { moved in
-                                                            withAnimation(.easeInOut) {
-                                                                if var data = vm.bookmarkState.data {
-                                                                    data.removeAll(where: { movie in
-                                                                        movies.contains(where: { movedMovie in
-                                                                            movie.movieId == movedMovie.movieId
-                                                                        })
-                                                                    })
-                                                                    
-                                                                    vm.bookmarkState = .data(data)
-                                                                }
-                                                                
-                                                                if let from = bookmarks.firstIndex(where: { $0.bookmarkId == selectedBookmark }) {
-                                                                    bookmarks[from] -= 1
-                                                                }
-                                                                
-                                                                if let to = bookmarks.firstIndex(where: { $0.bookmarkId == bookmark.bookmarkId }) {
-                                                                    bookmarks[to] += moved
-                                                                }
-                                                                
-                                                                vm.bookmarksState = .data(bookmarks)
-                                                            }
-                                                        }
-                                                        .store(in: &subscriptions)
+                                                    vm.moveBetweenBookmarks(movies: movies, bookmark: bookmark)
                                                     
                                                     return true
                                                 }
@@ -185,30 +112,7 @@ struct BookmarksView: View {
                                         }
                                         .swipeActions(edge: .trailing) {
                                             Button {
-                                                deleteBookmarksCategoryUseCase(id: bookmark.bookmarkId)
-                                                    .receive(on: DispatchQueue.main)
-                                                    .sink { completion in
-                                                        guard case let .failure(error) = completion else { return }
-                                                        
-                                                        self.error = error
-                                                        self.isErrorPresented = true
-                                                    } receiveValue: { delete in
-                                                        if delete {
-                                                            bookmarks.removeAll(where: {
-                                                                $0.bookmarkId == bookmark.bookmarkId
-                                                            })
-                                                            
-                                                            withAnimation(.easeInOut) {
-                                                                vm.bookmarksState = .data(bookmarks)
-                                                            }
-                                                            
-                                                            if selectedBookmark == bookmark.bookmarkId {
-                                                                selectedBookmark = -1
-                                                                vm.bookmarkState = .data([])
-                                                            }
-                                                        }
-                                                    }
-                                                    .store(in: &subscriptions)
+                                                vm.deleteBookmarksCategory(bookmark: bookmark)
                                             } label: {
                                                 Image(systemName: "trash")
                                                     .font(.system(size: 15))
@@ -216,7 +120,7 @@ struct BookmarksView: View {
                                             .tint(.accentColor)
                                             
                                             Button {
-                                                renameBookmark = bookmark
+                                                vm.renameBookmark = bookmark
                                             } label: {
                                                 Image(systemName: "pencil")
                                                     .font(.system(size: 15))
@@ -236,75 +140,22 @@ struct BookmarksView: View {
                                         .listRowInsets(.init())
                                         .contextMenu {
                                             Button {
-                                                renameBookmark = bookmark
+                                                vm.renameBookmark = bookmark
                                             } label: {
                                                 Text("key.rename")
                                             }
                                             
                                             Button {
-                                                deleteBookmarksCategoryUseCase(id: bookmark.bookmarkId)
-                                                    .receive(on: DispatchQueue.main)
-                                                    .sink { completion in
-                                                        guard case let .failure(error) = completion else { return }
-                                                        
-                                                        self.error = error
-                                                        self.isErrorPresented = true
-                                                    } receiveValue: { delete in
-                                                        if delete {
-                                                            bookmarks.removeAll(where: {
-                                                                $0.bookmarkId == bookmark.bookmarkId
-                                                            })
-                                                            
-                                                            withAnimation(.easeInOut) {
-                                                                vm.bookmarksState = .data(bookmarks)
-                                                            }
-                                                            
-                                                            if selectedBookmark == bookmark.bookmarkId {
-                                                                selectedBookmark = -1
-                                                                vm.bookmarkState = .data([])
-                                                            }
-                                                        }
-                                                    }
-                                                    .store(in: &subscriptions)
+                                                vm.deleteBookmarksCategory(bookmark: bookmark)
                                             } label: {
                                                 Text("key.delete")
                                             }
                                         }
-                                        .if(selectedBookmark != bookmark.bookmarkId) { view in
+                                        .if(vm.selectedBookmark != bookmark.bookmarkId) { view in
                                             view.dropDestination(for: MovieSimple.self) { movies, _ in
                                                 if !movies.isEmpty, !movies.compactMap(\.movieId.id).isEmpty {
-                                                    moveBetweenBookmarksUseCase(movies: movies.compactMap(\.movieId.id), fromBookmarkUserCategory: selectedBookmark, toBookmarkUserCategory: bookmark.bookmarkId)
-                                                        .receive(on: DispatchQueue.main)
-                                                        .sink { completion in
-                                                            guard case let .failure(error) = completion else { return }
-                                                            
-                                                            self.error = error
-                                                            self.isErrorPresented = true
-                                                        } receiveValue: { moved in
-                                                            withAnimation(.easeInOut) {
-                                                                if var data = vm.bookmarkState.data {
-                                                                    data.removeAll(where: { movie in
-                                                                        movies.contains(where: { movedMovie in
-                                                                            movie.movieId == movedMovie.movieId
-                                                                        })
-                                                                    })
-                                                                    
-                                                                    vm.bookmarkState = .data(data)
-                                                                }
-                                                                
-                                                                if let from = bookmarks.firstIndex(where: { $0.bookmarkId == selectedBookmark }) {
-                                                                    bookmarks[from] -= 1
-                                                                }
-                                                                
-                                                                if let to = bookmarks.firstIndex(where: { $0.bookmarkId == bookmark.bookmarkId }) {
-                                                                    bookmarks[to] += moved
-                                                                }
-                                                                
-                                                                vm.bookmarksState = .data(bookmarks)
-                                                            }
-                                                        }
-                                                        .store(in: &subscriptions)
-                                                    
+                                                    vm.moveBetweenBookmarks(movies: movies, bookmark: bookmark)
+
                                                     return true
                                                 }
                                                 
@@ -313,30 +164,7 @@ struct BookmarksView: View {
                                         }
                                         .swipeActions(edge: .trailing) {
                                             Button {
-                                                deleteBookmarksCategoryUseCase(id: bookmark.bookmarkId)
-                                                    .receive(on: DispatchQueue.main)
-                                                    .sink { completion in
-                                                        guard case let .failure(error) = completion else { return }
-                                                        
-                                                        self.error = error
-                                                        self.isErrorPresented = true
-                                                    } receiveValue: { delete in
-                                                        if delete {
-                                                            bookmarks.removeAll(where: {
-                                                                $0.bookmarkId == bookmark.bookmarkId
-                                                            })
-                                                            
-                                                            withAnimation(.easeInOut) {
-                                                                vm.bookmarksState = .data(bookmarks)
-                                                            }
-                                                            
-                                                            if selectedBookmark == bookmark.bookmarkId {
-                                                                selectedBookmark = -1
-                                                                vm.bookmarkState = .data([])
-                                                            }
-                                                        }
-                                                    }
-                                                    .store(in: &subscriptions)
+                                                vm.deleteBookmarksCategory(bookmark: bookmark)
                                             } label: {
                                                 Image(systemName: "trash")
                                                     .font(.system(size: 15))
@@ -344,7 +172,7 @@ struct BookmarksView: View {
                                             .tint(.accentColor)
                                             
                                             Button {
-                                                renameBookmark = bookmark
+                                                vm.renameBookmark = bookmark
                                             } label: {
                                                 Image(systemName: "pencil")
                                                     .font(.system(size: 15))
@@ -353,31 +181,8 @@ struct BookmarksView: View {
                                         }
                                 }
                             }
-                            .onMove { indexSet, index in
-                                if var bookmarks = vm.bookmarksState.data {
-                                    var newOrder = bookmarks.map(\.self)
-                                    newOrder.move(fromOffsets: indexSet, toOffset: index)
-                                    
-                                    if newOrder != bookmarks {
-                                        reorderBookmarksCategoriesUseCase(newOrder: newOrder)
-                                            .receive(on: DispatchQueue.main)
-                                            .sink { completion in
-                                                guard case let .failure(error) = completion else { return }
-                                                
-                                                self.error = error
-                                                self.isErrorPresented = true
-                                            } receiveValue: { reorder in
-                                                if reorder {
-                                                    bookmarks.move(fromOffsets: indexSet, toOffset: index)
-
-                                                    withAnimation(.easeInOut) {
-                                                        vm.bookmarksState = .data(bookmarks)
-                                                    }
-                                                }
-                                            }
-                                            .store(in: &subscriptions)
-                                    }
-                                }
+                            .onMove { fromOffsets, toOffset in
+                                vm.reorderBookmarksCategories(fromOffsets: fromOffsets, toOffset: toOffset)
                             }
                         }
                         .scrollContentBackground(.hidden)
@@ -405,7 +210,7 @@ struct BookmarksView: View {
                         .multilineTextAlignment(.center)
                             
                     Button {
-                        vm.load(id: selectedBookmark, filter: filter, genre: selectedGenre)
+                        vm.load()
                     } label: {
                         Text("key.retry")
                             .font(.system(size: 15))
@@ -418,17 +223,17 @@ struct BookmarksView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.top, 52)
                 .padding(18)
-            } else if var movies = vm.bookmarkState.data {
+            } else if let movies = vm.bookmarkState.data {
                 if movies.isEmpty {
                     VStack(alignment: .center, spacing: 8) {
-                        Text(selectedBookmark == -1 ? String(localized: "key.bookmarks.select") : String(localized: "key.bookmarks.empty"))
+                        Text(vm.selectedBookmark == -1 ? String(localized: "key.bookmarks.select") : String(localized: "key.bookmarks.empty"))
                             .font(.system(size: 20, weight: .medium))
                             .lineLimit(nil)
                             .multilineTextAlignment(.center)
                    
-                        if selectedBookmark != -1 {
+                        if vm.selectedBookmark != -1 {
                             Button {
-                                vm.load(id: selectedBookmark, filter: filter, genre: selectedGenre)
+                                vm.load()
                             } label: {
                                 Text("key.retry")
                                     .font(.system(size: 15))
@@ -451,31 +256,7 @@ struct BookmarksView: View {
                                         .contextMenu {
                                             Button {
                                                 if let movieId = movie.movieId.id {
-                                                    removeFromBookmarksUseCase(movies: [movieId], bookmarkUserCategory: selectedBookmark)
-                                                        .receive(on: DispatchQueue.main)
-                                                        .sink { completion in
-                                                            guard case let .failure(error) = completion else { return }
-                                                                
-                                                            self.error = error
-                                                            self.isErrorPresented = true
-                                                        } receiveValue: { delete in
-                                                            if delete {
-                                                                movies.removeAll(where: {
-                                                                    $0.id == movie.id
-                                                                })
-                                                                
-                                                                withAnimation(.easeInOut) {
-                                                                    vm.bookmarkState = .data(movies)
-                                                          
-                                                                    if var bookmarks = vm.bookmarksState.data, let index = bookmarks.firstIndex(where: { $0.bookmarkId == selectedBookmark }) {
-                                                                        bookmarks[index] -= 1
-
-                                                                        vm.bookmarksState = .data(bookmarks)
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        .store(in: &subscriptions)
+                                                    vm.removeFromBookmarks(movies: [movieId])
                                                 }
                                             } label: {
                                                 Text("key.delete")
@@ -484,7 +265,7 @@ struct BookmarksView: View {
                                         }
                                         .task {
                                             if movies.last == movie, vm.paginationState == .idle {
-                                                vm.loadMore(id: selectedBookmark, filter: filter, genre: selectedGenre)
+                                                vm.loadMore()
                                             }
                                         }
                                 }
@@ -496,12 +277,7 @@ struct BookmarksView: View {
                         .scrollIndicators(.never)
                             
                         if vm.paginationState == .loading {
-                            HStack {
-                                Spacer()
-                                ProgressView()
-                                Spacer()
-                            }
-                            .padding(.vertical, 10)
+                            LoadingPaginationStateView()
                         }
                     }
                 }
@@ -514,10 +290,9 @@ struct BookmarksView: View {
         }
         .navigationBar(title: title, showBar: true, navbar: {
             if let bookmarks = vm.bookmarksState.data, !bookmarks.isEmpty {
-                if !(vm.bookmarkState.data?.isEmpty ?? true) || selectedBookmark == -1 {
+                if !(vm.bookmarkState.data?.isEmpty ?? true) || vm.selectedBookmark == -1 {
                     Button {
-                        selectedBookmark = -1
-                        vm.getBookmarks()
+                        vm.getBookmarks(reset: true)
                     } label: {
                         Image(systemName: "arrow.trianglehead.clockwise")
                     }
@@ -526,7 +301,7 @@ struct BookmarksView: View {
                 }
                 
                 Button {
-                    isCreateBookmarkPresented = true
+                    vm.isCreateBookmarkPresented = true
                 } label: {
                     Image(systemName: "plus")
                 }
@@ -534,11 +309,11 @@ struct BookmarksView: View {
                 .keyboardShortcut("n", modifiers: .command)
             }
         }, toolbar: {
-            if vm.bookmarkState != .loading, selectedBookmark != -1 {
+            if vm.bookmarkState != .loading, vm.selectedBookmark != -1 {
                 Image(systemName: "line.3.horizontal.decrease.circle")
 
                 if #available(macOS 14.0, *) {
-                    Picker("key.filter.select", selection: $filter) {
+                    Picker("key.filter.select", selection: $vm.filter) {
                         ForEach(BookmarkFilters.allCases) { f in
                             Text(f.rawValue).tag(f)
                         }
@@ -555,7 +330,7 @@ struct BookmarksView: View {
                             .stroke(.tertiary.opacity(0.2), lineWidth: 1)
                     }
                 } else {
-                    Picker("key.filter.select", selection: $filter) {
+                    Picker("key.filter.select", selection: $vm.filter) {
                         ForEach(BookmarkFilters.allCases) { f in
                             Text(f.rawValue).tag(f)
                         }
@@ -575,7 +350,7 @@ struct BookmarksView: View {
                     .padding(.vertical, 18)
 
                 if #available(macOS 14.0, *) {
-                    Picker("key.genre.select", selection: $selectedGenre) {
+                    Picker("key.genre.select", selection: $vm.genre) {
                         ForEach(Genres.allCases) { g in
                             Text(g.rawValue).tag(g)
                         }
@@ -592,7 +367,7 @@ struct BookmarksView: View {
                             .stroke(.tertiary.opacity(0.2), lineWidth: 1)
                     }
                 } else {
-                    Picker("key.genre.select", selection: $selectedGenre) {
+                    Picker("key.genre.select", selection: $vm.genre) {
                         ForEach(Genres.allCases) { g in
                             Text(g.rawValue).tag(g)
                         }
@@ -609,28 +384,26 @@ struct BookmarksView: View {
                 }
             }
         })
-        .customOnChange(of: selectedBookmark) {
-            if selectedBookmark != -1 {
-                vm.load(id: selectedBookmark, filter: filter, genre: selectedGenre)
+        .customOnChange(of: vm.selectedBookmark) {
+            if vm.selectedBookmark != -1 {
+                vm.load()
             }
         }
-        .customOnChange(of: isCreateBookmarkPresented) {
-            if !isCreateBookmarkPresented {
-                selectedBookmark = -1
-                vm.getBookmarks()
+        .customOnChange(of: vm.isCreateBookmarkPresented) {
+            if !vm.isCreateBookmarkPresented {
+                vm.getBookmarks(reset: true)
             }
         }
-        .customOnChange(of: renameBookmark) {
-            if renameBookmark == nil {
-                selectedBookmark = -1
-                vm.getBookmarks()
+        .customOnChange(of: vm.renameBookmark) {
+            if vm.renameBookmark == nil {
+                vm.getBookmarks(reset: true)
             }
         }
-        .customOnChange(of: filter) {
-            vm.load(id: selectedBookmark, filter: filter, genre: selectedGenre)
+        .customOnChange(of: vm.filter) {
+            vm.load()
         }
-        .customOnChange(of: selectedGenre) {
-            vm.load(id: selectedBookmark, filter: filter, genre: selectedGenre)
+        .customOnChange(of: vm.genre) {
+            vm.load()
         }
         .load(isLoggedIn) {
             switch vm.bookmarksState {
@@ -640,18 +413,18 @@ struct BookmarksView: View {
                 vm.getBookmarks()
             }
         }
-        .alert("key.ops", isPresented: $isErrorPresented) {
+        .alert("key.ops", isPresented: $vm.isErrorPresented) {
             Button(role: .cancel) {} label: { Text("key.ok") }
         } message: {
-            if let error {
+            if let error = vm.error {
                 Text(error.localizedDescription)
             }
         }
         .dialogSeverity(.critical)
-        .sheet(item: $renameBookmark) { bookmark in
+        .sheet(item: $vm.renameBookmark) { bookmark in
             RenameBookmarkSheetView(bookmark: bookmark)
         }
-        .sheet(isPresented: $isCreateBookmarkPresented) {
+        .sheet(isPresented: $vm.isCreateBookmarkPresented) {
             CreateBookmarkSheetView()
         }
         .background(.background)

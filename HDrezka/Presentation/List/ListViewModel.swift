@@ -29,13 +29,18 @@ class ListViewModel: ObservableObject {
 
     private var subscriptions: Set<AnyCancellable> = []
 
-    @Published var title: String?
-    @Published var state: DataState<[MovieSimple]> = .loading
-    @Published var paginationState: DataPaginationState = .idle
+    @Published private(set) var state: DataState<[MovieSimple]> = .loading
+    @Published private(set) var paginationState: DataPaginationState = .idle
+
+    @Published private(set) var title: String?
+
+    @Published var filterGenre = Genres.all
+    @Published var filter = Filters.latest
+    @Published var newFilter = NewFilters.latest
 
     private var page = 1
 
-    private func getData(movies: [MovieSimple]?, list: MovieList?, country: MovieCountry?, genre: MovieGenre?, collection: MoviesCollection?, category: Categories?, filterGenre: Genres?, filter: Filters?, newFilter: NewFilters?, isInitial: Bool = true) {
+    private func getData(movies: [MovieSimple]?, list: MovieList?, country: MovieCountry?, genre: MovieGenre?, collection: MoviesCollection?, category: Categories?, isInitial: Bool = true) {
         if let list {
             getMovieListUseCase(listId: list.listId, page: page)
                 .receive(on: DispatchQueue.main)
@@ -77,8 +82,8 @@ class ListViewModel: ObservableObject {
                     self.state = .data(movies)
                 }
             }
-        } else if let country, let filterGenre, let filter {
-            getPublisher(country: country, filterGenre: filterGenre, filter: filter)
+        } else if let country {
+            getPublisher(country: country)
                 .receive(on: DispatchQueue.main)
                 .sink { completion in
                     guard case let .failure(error) = completion else { return }
@@ -103,8 +108,8 @@ class ListViewModel: ObservableObject {
                     }
                 }
                 .store(in: &subscriptions)
-        } else if let genre, let filter {
-            getPublisher(genre: genre, filter: filter)
+        } else if let genre {
+            getPublisher(genre: genre)
                 .receive(on: DispatchQueue.main)
                 .sink { completion in
                     guard case let .failure(error) = completion else { return }
@@ -129,8 +134,8 @@ class ListViewModel: ObservableObject {
                     }
                 }
                 .store(in: &subscriptions)
-        } else if let category, let filterGenre {
-            getPublisher(category: category, filterGenre: filterGenre, newFilter: newFilter)
+        } else if let category {
+            getPublisher(category: category)
                 .receive(on: DispatchQueue.main)
                 .sink { completion in
                     guard case let .failure(error) = completion else { return }
@@ -155,7 +160,7 @@ class ListViewModel: ObservableObject {
                     }
                 }
                 .store(in: &subscriptions)
-        } else if let collection, let filter {
+        } else if let collection {
             getPublisher(collection: collection, filter: filter)
                 .receive(on: DispatchQueue.main)
                 .sink { completion in
@@ -192,7 +197,7 @@ class ListViewModel: ObservableObject {
         }
     }
 
-    private func getPublisher(country: MovieCountry, filterGenre: Genres, filter: Filters) -> AnyPublisher<[MovieSimple], Error> {
+    private func getPublisher(country: MovieCountry) -> AnyPublisher<[MovieSimple], Error> {
         switch filter {
         case .latest:
             getLatestMoviesByCountryUseCase(countryId: country.countryId, genre: filterGenre.genreCode, page: page)
@@ -205,7 +210,7 @@ class ListViewModel: ObservableObject {
         }
     }
 
-    private func getPublisher(genre: MovieGenre, filter: Filters) -> AnyPublisher<[MovieSimple], Error> {
+    private func getPublisher(genre: MovieGenre) -> AnyPublisher<[MovieSimple], Error> {
         switch filter {
         case .latest:
             getLatestMoviesByGenreUseCase(genreId: genre.genreId, page: page)
@@ -218,7 +223,7 @@ class ListViewModel: ObservableObject {
         }
     }
 
-    private func getPublisher(category: Categories, filterGenre: Genres, newFilter: NewFilters?) -> AnyPublisher<[MovieSimple], Error> {
+    private func getPublisher(category: Categories) -> AnyPublisher<[MovieSimple], Error> {
         switch category {
         case .hot:
             getHotMoviesUseCase(genre: filterGenre.genreCode)
@@ -227,17 +232,13 @@ class ListViewModel: ObservableObject {
         case .watchingNow:
             getWatchingNowMoviesUseCase(page: page, genre: filterGenre.genreCode)
         case .newest:
-            if let newFilter {
-                switch newFilter {
-                case .latest:
-                    getLatestNewestMoviesUseCase(page: page, genre: filterGenre.genreCode)
-                case .popular:
-                    getPopularNewestMoviesUseCase(page: page, genre: filterGenre.genreCode)
-                case .watching:
-                    getWatchingNowNewestMoviesUseCase(page: page, genre: filterGenre.genreCode)
-                }
-            } else {
+            switch newFilter {
+            case .latest:
                 getLatestNewestMoviesUseCase(page: page, genre: filterGenre.genreCode)
+            case .popular:
+                getPopularNewestMoviesUseCase(page: page, genre: filterGenre.genreCode)
+            case .watching:
+                getWatchingNowNewestMoviesUseCase(page: page, genre: filterGenre.genreCode)
             }
         case .latest:
             getLatestMoviesUseCase(page: page, genre: filterGenre.genreCode)
@@ -261,21 +262,21 @@ class ListViewModel: ObservableObject {
         }
     }
 
-    func load(movies: [MovieSimple]?, list: MovieList?, country: MovieCountry?, genre: MovieGenre?, collection: MoviesCollection?, category: Categories?, filterGenre: Genres?, filter: Filters?, newFilter: NewFilters?) {
+    func load(movies: [MovieSimple]?, list: MovieList?, country: MovieCountry?, genre: MovieGenre?, collection: MoviesCollection?, category: Categories?) {
         state = .loading
         paginationState = .idle
         page = 1
 
-        getData(movies: movies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
+        getData(movies: movies, list: list, country: country, genre: genre, collection: collection, category: category)
     }
 
-    func loadMore(movies: [MovieSimple]?, list: MovieList?, country: MovieCountry?, genre: MovieGenre?, collection: MoviesCollection?, category: Categories?, filterGenre: Genres?, filter: Filters?, newFilter: NewFilters?) {
+    func loadMore(movies: [MovieSimple]?, list: MovieList?, country: MovieCountry?, genre: MovieGenre?, collection: MoviesCollection?, category: Categories?) {
         guard paginationState == .idle, movies == nil, category != .hot else { return }
 
         withAnimation(.easeInOut) {
             paginationState = .loading
         }
 
-        getData(movies: movies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter, isInitial: false)
+        getData(movies: movies, list: list, country: country, genre: genre, collection: collection, category: category, isInitial: false)
     }
 }

@@ -12,11 +12,19 @@ class CommentsViewModel: ObservableObject {
 
     private var subscriptions: Set<AnyCancellable> = []
 
+    @Published private(set) var state: DataState<[Comment]> = .loading
+    @Published private(set) var paginationState: DataPaginationState = .idle
+
     @Published var reply: String?
     @Published var reportComment: Comment?
     @Published var deleteComment: Comment?
-    @Published var state: DataState<[Comment]> = .loading
-    @Published var paginationState: DataPaginationState = .idle
+    @Published private(set) var comment: Comment?
+    @Published var isCommentPresented: Bool = false
+    @Published private(set) var error: Error?
+    @Published var isErrorPresented: Bool = false
+    @Published var isOnModerationPresented: Bool = false
+    @Published private(set) var message: String?
+    @Published private(set) var likes: [String: (Bool, [Like])] = [:]
 
     private var page = 1
 
@@ -82,9 +90,6 @@ class CommentsViewModel: ObservableObject {
         }
     }
 
-    @Published var comment: Comment?
-    @Published var isCommentPresented: Bool = false
-
     func getComment(movieId: String, commentId: String) {
         comment = nil
         isCommentPresented = true
@@ -110,9 +115,6 @@ class CommentsViewModel: ObservableObject {
         }
     }
 
-    @Published var error: Error?
-    @Published var isErrorPresented: Bool = false
-
     func like(comment: Comment) {
         toggleLikeCommentUseCase(id: comment.commentId)
             .receive(on: DispatchQueue.main)
@@ -136,9 +138,6 @@ class CommentsViewModel: ObservableObject {
             }
             .store(in: &subscriptions)
     }
-
-    @Published var isOnModerationPresented: Bool = false
-    @Published var message: String?
 
     func sendComment(name: String?, text: String, postId: String, adb: String?, type: String?) {
         if let postId = postId.id {
@@ -168,8 +167,6 @@ class CommentsViewModel: ObservableObject {
             isErrorPresented = true
         }
     }
-
-    @Published var likes: [String: (Bool, [Like])] = [:]
 
     func getLikes(hovering: Bool, comment: Comment) {
         if comment.likesCount > 0 {

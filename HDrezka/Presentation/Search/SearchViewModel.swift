@@ -5,8 +5,12 @@ import SwiftUI
 class SearchViewModel: ObservableObject {
     @Injected(\.searchUseCase) private var searchUseCase
 
-    @Published var state: DataState<[MovieSimple]> = .loading
-    @Published var paginationState: DataPaginationState = .idle
+    @Published private(set) var state: DataState<[MovieSimple]> = .loading
+    @Published private(set) var paginationState: DataPaginationState = .idle
+
+    @Published private(set) var title: String = .init(localized: "key.search")
+
+    private var searchWork: DispatchWorkItem?
 
     private var subscriptions: Set<AnyCancellable> = []
 
@@ -45,17 +49,27 @@ class SearchViewModel: ObservableObject {
     }
 
     func load(query: String) {
-        paginationState = .idle
-        page = 1
+        searchWork?.cancel()
 
-        if !query.isEmpty {
-            state = .loading
-            subscriptions.forEach { $0.cancel() }
-            subscriptions.removeAll()
+        searchWork = DispatchWorkItem {
+            self.paginationState = .idle
+            self.page = 1
+            self.subscriptions.forEach { $0.cancel() }
+            self.subscriptions.removeAll()
 
-            getData(query: query)
-        } else {
-            state = .data([])
+            if !query.isEmpty {
+                self.state = .loading
+                self.title = .init(localized: "key.search.result-\(query)")
+
+                self.getData(query: query)
+            } else {
+                self.title = .init(localized: "key.search")
+                self.state = .data([])
+            }
+        }
+
+        if let searchWork {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: searchWork)
         }
     }
 

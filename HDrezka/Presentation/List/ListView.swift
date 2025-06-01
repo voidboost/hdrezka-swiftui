@@ -12,10 +12,6 @@ struct ListView: View {
 
     @StateObject private var vm = ListViewModel()
 
-    @State private var filterGenre = Genres.all
-    @State private var filter = Filters.latest
-    @State private var newFilter = NewFilters.latest
-
     @Default(.isLoggedIn) private var isLoggedIn
 
     @State private var showBar: Bool = false
@@ -86,14 +82,14 @@ struct ListView: View {
         Group {
             if let error = vm.state.error {
                 ErrorStateView(error, title) {
-                    vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
+                    vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category)
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
             } else if let movies = vm.state.data {
                 if movies.isEmpty {
                     EmptyStateView(String(localized: "key.nothing_found"), title, String(localized: "key.filter.empty")) {
-                        vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
+                        vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category)
                     }
                     .padding(.vertical, 52)
                     .padding(.horizontal, 36)
@@ -119,7 +115,7 @@ struct ListView: View {
                                         CardView(movie: movie)
                                             .task {
                                                 if movies.last == movie, vm.paginationState == .idle {
-                                                    vm.loadMore(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
+                                                    vm.loadMore(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category)
                                                 }
                                             }
                                     }
@@ -140,12 +136,7 @@ struct ListView: View {
                         .scrollIndicators(.never)
 
                         if vm.paginationState == .loading {
-                            HStack {
-                                Spacer()
-                                ProgressView()
-                                Spacer()
-                            }
-                            .padding(.vertical, 10)
+                            LoadingPaginationStateView()
                         }
                     }
                 }
@@ -158,7 +149,7 @@ struct ListView: View {
         .navigationBar(title: title, showBar: showBar, navbar: {
             if let movies = vm.state.data, !movies.isEmpty {
                 Button {
-                    vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
+                    vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category)
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -171,7 +162,7 @@ struct ListView: View {
 
                 if genre != nil || collection != nil || country != nil {
                     if #available(macOS 14.0, *) {
-                        Picker("key.filter.select", selection: $filter) {
+                        Picker("key.filter.select", selection: $vm.filter) {
                             ForEach(Filters.allCases) { f in
                                 Text(f.rawValue).tag(f)
                             }
@@ -188,7 +179,7 @@ struct ListView: View {
                                 .stroke(.tertiary.opacity(0.2), lineWidth: 1)
                         }
                     } else {
-                        Picker("key.filter.select", selection: $filter) {
+                        Picker("key.filter.select", selection: $vm.filter) {
                             ForEach(Filters.allCases) { f in
                                 Text(f.rawValue).tag(f)
                             }
@@ -207,7 +198,7 @@ struct ListView: View {
 
                 if let category, case .newest = category {
                     if #available(macOS 14.0, *) {
-                        Picker("key.filter.select", selection: $newFilter) {
+                        Picker("key.filter.select", selection: $vm.newFilter) {
                             ForEach(NewFilters.allCases) { f in
                                 Text(f.rawValue).tag(f)
                             }
@@ -224,7 +215,7 @@ struct ListView: View {
                                 .stroke(.tertiary.opacity(0.2), lineWidth: 1)
                         }
                     } else {
-                        Picker("key.filter.select", selection: $newFilter) {
+                        Picker("key.filter.select", selection: $vm.newFilter) {
                             ForEach(NewFilters.allCases) { f in
                                 Text(f.rawValue).tag(f)
                             }
@@ -251,7 +242,7 @@ struct ListView: View {
 
                 if category != nil || country != nil {
                     if #available(macOS 14.0, *) {
-                        Picker("key.genre.select", selection: $filterGenre) {
+                        Picker("key.genre.select", selection: $vm.filterGenre) {
                             ForEach(Genres.allCases.filter { $0 != .show || category != .hot }) { g in
                                 Text(g.rawValue).tag(g)
                             }
@@ -268,7 +259,7 @@ struct ListView: View {
                                 .stroke(.tertiary.opacity(0.2), lineWidth: 1)
                         }
                     } else {
-                        Picker("key.genre.select", selection: $filterGenre) {
+                        Picker("key.genre.select", selection: $vm.filterGenre) {
                             ForEach(Genres.allCases.filter { $0 != .show || category != .hot }) { g in
                                 Text(g.rawValue).tag(g)
                             }
@@ -291,17 +282,17 @@ struct ListView: View {
             case .data:
                 break
             default:
-                vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
+                vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category)
             }
         }
-        .customOnChange(of: filterGenre) {
-            vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
+        .customOnChange(of: vm.filterGenre) {
+            vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category)
         }
-        .customOnChange(of: filter) {
-            vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
+        .customOnChange(of: vm.filter) {
+            vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category)
         }
-        .customOnChange(of: newFilter) {
-            vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
+        .customOnChange(of: vm.newFilter) {
+            vm.load(movies: customMovies, list: list, country: country, genre: genre, collection: collection, category: category)
         }
         .background(.background)
     }

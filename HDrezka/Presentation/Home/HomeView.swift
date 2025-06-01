@@ -4,8 +4,6 @@ import SwiftUI
 struct HomeView: View {
     @StateObject private var vm = HomeViewModel()
 
-    @State private var isSeriesUpdatesPresented: Bool = false
-
     @State private var showBar: Bool = false
 
     @Default(.isLoggedIn) private var isLoggedIn
@@ -74,28 +72,11 @@ struct HomeView: View {
                         .scrollIndicators(.never)
 
                         if let error = vm.paginationState.error {
-                            VStack(alignment: .center) {
-                                Text(error.localizedDescription)
-                                    .lineLimit(nil)
-
-                                Button {
-                                    vm.paginationState = .idle
-                                    vm.loadMore()
-                                } label: {
-                                    Text("key.retry")
-                                        .foregroundStyle(.accent)
-                                        .highlightOnHover()
-                                }
-                                .buttonStyle(.plain)
+                            ErrorPaginationStateView(error) {
+                                vm.loadMore(reset: true)
                             }
-                            .padding(.vertical, 10)
                         } else if vm.paginationState == .loading {
-                            HStack {
-                                Spacer()
-                                ProgressView()
-                                Spacer()
-                            }
-                            .padding(.vertical, 10)
+                            LoadingPaginationStateView()
                         }
                     }
                 }
@@ -118,7 +99,7 @@ struct HomeView: View {
         }, toolbar: {
             if case .data = vm.state {
                 Button {
-                    isSeriesUpdatesPresented = true
+                    vm.isSeriesUpdatesPresented = true
                 } label: {
                     Image(systemName: "bell")
                 }
@@ -134,7 +115,7 @@ struct HomeView: View {
             }
         }
         .background(.background)
-        .sheet(isPresented: $isSeriesUpdatesPresented) {
+        .sheet(isPresented: $vm.isSeriesUpdatesPresented) {
             SeriesUpdatesSheetView()
         }
     }
