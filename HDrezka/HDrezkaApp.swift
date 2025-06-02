@@ -265,69 +265,14 @@ struct HDrezkaApp: App {
         CommandGroup(replacing: .toolbar) {}
         CommandGroup(replacing: .windowList) {}
     }
-}
 
-struct MenuBarIcon: View {
-    var body: some View {
-        if let image = NSImage(named: "BarIcon") {
-            Image(nsImage: image.resized(to: CGSize(width: 18, height: 18)))
-        } else {
-            Image(systemName: "list.and.film")
-        }
-    }
-}
-
-extension NSImage {
-    func resized(to size: CGSize) -> NSImage {
-        let image = self
-        image.size = size
-        return image
-    }
-}
-
-extension Scene {
-    func applyRestorationBehavior() -> some Scene {
-        if #available(macOS 15.0, *) {
-            return self.restorationBehavior(.disabled)
-        } else {
-            return self
-        }
-    }
-}
-
-extension NSImage {
-    func tint(_ tint: NSColor) -> NSImage {
-        guard isTemplate,
-              let tinted = copy() as? NSImage
-        else {
-            return self
-        }
-
-        tinted.lockFocus()
-        tint.set()
-        CGRect(origin: .zero, size: tinted.size).fill(using: .sourceAtop)
-        tinted.unlockFocus()
-
-        return tinted
-    }
-}
-
-struct WindowAccessor: NSViewRepresentable {
-    private let callback: (NSWindow) -> Void
-
-    init(callback: @escaping (NSWindow) -> Void) {
-        self.callback = callback
-    }
-
-    func makeNSView(context: Context) -> NSView {
-        let view = NSView()
-        DispatchQueue.main.async {
-            if let window = view.window {
-                callback(window)
+    private struct MenuBarIcon: View {
+        var body: some View {
+            if let image = NSImage(named: "BarIcon") {
+                Image(nsImage: image.resized(to: CGSize(width: 18, height: 18)))
+            } else {
+                Image(systemName: "list.and.film")
             }
         }
-        return view
     }
-
-    func updateNSView(_ nsView: NSView, context: Context) {}
 }

@@ -447,7 +447,7 @@ struct BlurredView: NSViewRepresentable {
     func updateNSView(_ nsView: NSViewType, context: Context) {}
 }
 
-extension Binding {
+private extension Binding {
     func animationIf(_ condition: Bool) -> Binding<Value> {
         return condition ? animation(.easeInOut) : self
     }
