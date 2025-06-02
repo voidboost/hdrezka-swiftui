@@ -161,74 +161,54 @@ struct ListView: View {
                 Image(systemName: "line.3.horizontal.decrease.circle")
 
                 if genre != nil || collection != nil || country != nil {
-                    if #available(macOS 14.0, *) {
-                        Picker("key.filter.select", selection: $vm.filter) {
-                            ForEach(Filters.allCases) { f in
-                                Text(f.rawValue).tag(f)
-                            }
+                    Picker("key.filter.select", selection: $vm.filter) {
+                        ForEach(Filters.allCases) { f in
+                            Text(f.rawValue).tag(f)
                         }
-                        .labelsHidden()
-                        .pickerStyle(.menu)
-                        .buttonStyle(.accessoryBar)
-                        .controlSize(.large)
-                        .background(.tertiary.opacity(0.05))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .contentShape(RoundedRectangle(cornerRadius: 6))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .viewModifier { view in
+                        if #available(macOS 14, *) {
+                            view
+                                .buttonStyle(.accessoryBar)
+                                .controlSize(.large)
+                        } else {
+                            view
                         }
-                    } else {
-                        Picker("key.filter.select", selection: $vm.filter) {
-                            ForEach(Filters.allCases) { f in
-                                Text(f.rawValue).tag(f)
-                            }
-                        }
-                        .labelsHidden()
-                        .pickerStyle(.menu)
-                        .background(.tertiary.opacity(0.05))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .contentShape(RoundedRectangle(cornerRadius: 6))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                        }
+                    }
+                    .background(.tertiary.opacity(0.05))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
                     }
                 }
 
                 if let category, case .newest = category {
-                    if #available(macOS 14.0, *) {
-                        Picker("key.filter.select", selection: $vm.newFilter) {
-                            ForEach(NewFilters.allCases) { f in
-                                Text(f.rawValue).tag(f)
-                            }
+                    Picker("key.filter.select", selection: $vm.newFilter) {
+                        ForEach(NewFilters.allCases) { f in
+                            Text(f.rawValue).tag(f)
                         }
-                        .labelsHidden()
-                        .pickerStyle(.menu)
-                        .buttonStyle(.accessoryBar)
-                        .controlSize(.large)
-                        .background(.tertiary.opacity(0.05))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .contentShape(RoundedRectangle(cornerRadius: 6))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .viewModifier { view in
+                        if #available(macOS 14, *) {
+                            view
+                                .buttonStyle(.accessoryBar)
+                                .controlSize(.large)
+                        } else {
+                            view
                         }
-                    } else {
-                        Picker("key.filter.select", selection: $vm.newFilter) {
-                            ForEach(NewFilters.allCases) { f in
-                                Text(f.rawValue).tag(f)
-                            }
-                        }
-                        .labelsHidden()
-                        .pickerStyle(.menu)
-                        .background(.tertiary.opacity(0.05))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .contentShape(RoundedRectangle(cornerRadius: 6))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                        }
+                    }
+                    .background(.tertiary.opacity(0.05))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
                     }
 
                     Divider()
@@ -241,38 +221,28 @@ struct ListView: View {
                 }
 
                 if category != nil || country != nil {
-                    if #available(macOS 14.0, *) {
-                        Picker("key.genre.select", selection: $vm.filterGenre) {
-                            ForEach(Genres.allCases.filter { $0 != .show || category != .hot }) { g in
-                                Text(g.rawValue).tag(g)
-                            }
+                    Picker("key.genre.select", selection: $vm.filterGenre) {
+                        ForEach(Genres.allCases.filter { $0 != .show || category != .hot }) { g in
+                            Text(g.rawValue).tag(g)
                         }
-                        .labelsHidden()
-                        .pickerStyle(.menu)
-                        .buttonStyle(.accessoryBar)
-                        .controlSize(.large)
-                        .background(.tertiary.opacity(0.05))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .contentShape(RoundedRectangle(cornerRadius: 6))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .viewModifier { view in
+                        if #available(macOS 14, *) {
+                            view
+                                .buttonStyle(.accessoryBar)
+                                .controlSize(.large)
+                        } else {
+                            view
                         }
-                    } else {
-                        Picker("key.genre.select", selection: $vm.filterGenre) {
-                            ForEach(Genres.allCases.filter { $0 != .show || category != .hot }) { g in
-                                Text(g.rawValue).tag(g)
-                            }
-                        }
-                        .labelsHidden()
-                        .pickerStyle(.menu)
-                        .background(.tertiary.opacity(0.05))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .contentShape(RoundedRectangle(cornerRadius: 6))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                        }
+                    }
+                    .background(.tertiary.opacity(0.05))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
                     }
                 }
             }

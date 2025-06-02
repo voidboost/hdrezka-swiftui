@@ -182,14 +182,14 @@ struct HDrezkaApp: App {
     @CommandsBuilder
     func customCommands() -> some Commands {
         CommandGroup(replacing: .appSettings) {
-            if #available(macOS 14.0, *) {
+            if #available(macOS 14, *) {
                 SettingsLink {
                     Text("key.settings")
                 }
                 .keyboardShortcut(",", modifiers: .command)
             } else {
                 Button {
-                    if #available(macOS 13.0, *) {
+                    if #available(macOS 13, *) {
                         NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
                     } else {
                         NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)

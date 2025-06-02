@@ -292,14 +292,15 @@ struct CommentsView: View {
                                 }
 
                                 if comment.likesCount > 0 {
-                                    if #available(macOS 14.0, *) {
-                                        Text(comment.likesCount.description)
-                                            .font(.system(size: 13, weight: .semibold).monospacedDigit())
-                                            .contentTransition(.numericText(value: Double(comment.likesCount)))
-                                    } else {
-                                        Text(comment.likesCount.description)
-                                            .font(.system(size: 13, weight: .semibold).monospacedDigit())
-                                    }
+                                    Text(comment.likesCount.description)
+                                        .font(.system(size: 13, weight: .semibold).monospacedDigit())
+                                        .viewModifier { view in
+                                            if #available(macOS 14, *) {
+                                                view.contentTransition(.numericText(value: Double(comment.likesCount)))
+                                            } else {
+                                                view
+                                            }
+                                        }
                                 }
                             }
                             .frame(height: 28)

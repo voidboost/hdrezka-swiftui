@@ -179,12 +179,16 @@ struct SeriesUpdatesSheetView: View {
                                                     .foregroundStyle(item.isChosenVoiceActingPremium ? .white.opacity(0.8) : .secondary)
                                                     .multilineTextAlignment(.trailing)
                                             }
-                                            .if(item.isChosenVoiceActingPremium) {
-                                                $0
-                                                    .padding(.vertical, 2)
-                                                    .padding(.horizontal, 6)
-                                                    .background(Const.premiumGradient)
-                                                    .clipShape(RoundedRectangle(cornerRadius: 40))
+                                            .viewModifier { view in
+                                                if item.isChosenVoiceActingPremium {
+                                                    view
+                                                        .padding(.vertical, 2)
+                                                        .padding(.horizontal, 6)
+                                                        .background(Const.premiumGradient)
+                                                        .clipShape(RoundedRectangle(cornerRadius: 40))
+                                                } else {
+                                                    view
+                                                }
                                             }
                                         }
                                     }
@@ -230,12 +234,16 @@ struct SeriesUpdatesSheetView: View {
                                                     .foregroundStyle(item.isChosenVoiceActingPremium ? .white.opacity(0.8) : .secondary)
                                                     .multilineTextAlignment(.trailing)
                                             }
-                                            .if(item.isChosenVoiceActingPremium) {
-                                                $0
-                                                    .padding(.vertical, 2)
-                                                    .padding(.horizontal, 6)
-                                                    .background(Const.premiumGradient)
-                                                    .clipShape(RoundedRectangle(cornerRadius: 40))
+                                            .viewModifier { view in
+                                                if item.isChosenVoiceActingPremium {
+                                                    view
+                                                        .padding(.vertical, 2)
+                                                        .padding(.horizontal, 6)
+                                                        .background(Const.premiumGradient)
+                                                        .clipShape(RoundedRectangle(cornerRadius: 40))
+                                                } else {
+                                                    view
+                                                }
                                             }
                                         }
                                     }

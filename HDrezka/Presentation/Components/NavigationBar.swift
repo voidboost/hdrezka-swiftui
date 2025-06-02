@@ -95,7 +95,13 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
                     .frame(maxWidth: .infinity)
                     .frame(height: height)
                     .background(.bar.opacity(showBar ? 1 : 0))
-                    .windowDraggable()
+                    .viewModifier { view in
+                        if #available(macOS 15, *) {
+                            view.gesture(WindowDragGesture())
+                        } else {
+                            view
+                        }
+                    }
                     
                     Spacer()
                 }
@@ -153,15 +159,6 @@ struct NavbarButtonStyle: ButtonStyle {
 }
 
 extension View {
-    @ViewBuilder
-    func windowDraggable(_ enabled: Bool = true) -> some View {
-        if enabled, #available(macOS 15.0, *) {
-            self.gesture(WindowDragGesture())
-        } else {
-            self
-        }
-    }
-    
     func navigationBar<Navbar: View, Toolbar: View>(
         title: String,
         showBar: Bool,

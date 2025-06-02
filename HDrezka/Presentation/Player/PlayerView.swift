@@ -156,14 +156,15 @@ struct PlayerView: View {
                                             player.isMuted.toggle()
                                         }
                                     } label: {
-                                        if #available(macOS 14.0, *) {
-                                            Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(volume))
-                                                .font(.system(size: 17))
-                                                .contentTransition(.symbolEffect(.replace))
-                                        } else {
-                                            Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(volume))
-                                                .font(.system(size: 17))
-                                        }
+                                        Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(volume))
+                                            .font(.system(size: 17))
+                                            .viewModifier { view in
+                                                if #available(macOS 14, *) {
+                                                    view.contentTransition(.symbolEffect(.replace))
+                                                } else {
+                                                    view
+                                                }
+                                            }
                                     }
                                     .buttonStyle(.plain)
                                     .keyboardShortcut("m", modifiers: [])
@@ -210,14 +211,15 @@ struct PlayerView: View {
                                         }
                                     }
                                 } label: {
-                                    if #available(macOS 14.0, *) {
-                                        Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                                            .font(.system(size: 43))
-                                            .contentTransition(.symbolEffect(.replace))
-                                    } else {
-                                        Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                                            .font(.system(size: 43))
-                                    }
+                                    Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                                        .font(.system(size: 43))
+                                        .viewModifier { view in
+                                            if #available(macOS 14, *) {
+                                                view.contentTransition(.symbolEffect(.replace))
+                                            } else {
+                                                view
+                                            }
+                                        }
                                 }
                                 .buttonStyle(.plain)
                                 .keyboardShortcut(.space, modifiers: [])
@@ -283,16 +285,16 @@ struct PlayerView: View {
                                             }
                                         }
                                     } label: {
-                                        if #available(macOS 14.0, *) {
-                                            Label("key.video_gravity", systemImage: videoGravity == .resizeAspect ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
-                                                .labelStyle(.iconOnly)
-                                                .font(.system(size: 17))
-                                                .contentTransition(.symbolEffect(.replace))
-                                        } else {
-                                            Label("key.video_gravity", systemImage: videoGravity == .resizeAspect ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
-                                                .labelStyle(.iconOnly)
-                                                .font(.system(size: 17))
-                                        }
+                                        Label("key.video_gravity", systemImage: videoGravity == .resizeAspect ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
+                                            .labelStyle(.iconOnly)
+                                            .font(.system(size: 17))
+                                            .viewModifier { view in
+                                                if #available(macOS 14, *) {
+                                                    view.contentTransition(.symbolEffect(.replace))
+                                                } else {
+                                                    view
+                                                }
+                                            }
                                     }
                                     .buttonStyle(.plain)
                                     .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
