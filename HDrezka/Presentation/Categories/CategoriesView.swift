@@ -162,78 +162,56 @@ struct CategoriesView: View {
                 HStack(spacing: 6) {
                     Text(verbatim: "\(type.best.name):")
 
-                    if #available(macOS 14.0, *) {
-                        Picker("key.categories", selection: $bestGenre) {
-                            ForEach(type.best.genres) { genre in
-                                Text(genre.name)
-                                    .tag(genre)
-                            }
+                    Picker("key.categories", selection: $bestGenre) {
+                        ForEach(type.best.genres) { genre in
+                            Text(genre.name)
+                                .tag(genre)
                         }
-                        .labelsHidden()
-                        .pickerStyle(.menu)
-                        .buttonStyle(.accessoryBar)
-                        .controlSize(.large)
-                        .frame(height: 28)
-                        .background(.tertiary.opacity(0.05))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .contentShape(RoundedRectangle(cornerRadius: 6))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .viewModifier { view in
+                        if #available(macOS 14, *) {
+                            view
+                                .buttonStyle(.accessoryBar)
+                                .controlSize(.large)
+                        } else {
+                            view
                         }
+                    }
+                    .frame(height: 28)
+                    .background(.tertiary.opacity(0.05))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                    }
 
-                        Picker("key.categories", selection: $bestYear) {
-                            ForEach(type.best.years) { year in
-                                Text(year.name)
-                                    .tag(year)
-                            }
+                    Picker("key.categories", selection: $bestYear) {
+                        ForEach(type.best.years) { year in
+                            Text(year.name)
+                                .tag(year)
                         }
-                        .labelsHidden()
-                        .pickerStyle(.menu)
-                        .buttonStyle(.accessoryBar)
-                        .controlSize(.large)
-                        .frame(height: 28)
-                        .background(.tertiary.opacity(0.05))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .contentShape(RoundedRectangle(cornerRadius: 6))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .viewModifier { view in
+                        if #available(macOS 14, *) {
+                            view
+                                .buttonStyle(.accessoryBar)
+                                .controlSize(.large)
+                        } else {
+                            view
                         }
-                    } else {
-                        Picker("key.categories", selection: $bestGenre) {
-                            ForEach(type.best.genres) { genre in
-                                Text(genre.name)
-                                    .tag(genre)
-                            }
-                        }
-                        .labelsHidden()
-                        .pickerStyle(.menu)
-                        .frame(height: 28)
-                        .background(.tertiary.opacity(0.05))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .contentShape(RoundedRectangle(cornerRadius: 6))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                        }
-
-                        Picker("key.categories", selection: $bestYear) {
-                            ForEach(type.best.years) { year in
-                                Text(year.name)
-                                    .tag(year)
-                            }
-                        }
-                        .labelsHidden()
-                        .pickerStyle(.menu)
-                        .frame(height: 28)
-                        .background(.tertiary.opacity(0.05))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .contentShape(RoundedRectangle(cornerRadius: 6))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                        }
+                    }
+                    .frame(height: 28)
+                    .background(.tertiary.opacity(0.05))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
                     }
 
                     Button {

@@ -165,23 +165,26 @@ struct BookmarksSheetView: View {
                                             }
                                         } label: {
                                             HStack(alignment: .center) {
-                                                if #available(macOS 14.0, *) {
-                                                    Image(systemName: isChecked ? "bookmark.fill" : "bookmark")
-                                                        .contentTransition(.symbolEffect(.replace))
+                                                Image(systemName: isChecked ? "bookmark.fill" : "bookmark")
+                                                    .viewModifier { view in
+                                                        if #available(macOS 14, *) {
+                                                            view.contentTransition(.symbolEffect(.replace))
+                                                        } else {
+                                                            view
+                                                        }
+                                                    }
 
-                                                    Text(verbatim: "\(bookmark.name) (\(bookmark.count.description))")
-                                                        .monospacedDigit()
-                                                        .lineLimit(nil)
-                                                        .multilineTextAlignment(.center)
-                                                        .contentTransition(.numericText(value: Double(bookmark.count)))
-                                                } else {
-                                                    Image(systemName: isChecked ? "bookmark.fill" : "bookmark")
-
-                                                    Text(verbatim: "\(bookmark.name) (\(bookmark.count.description))")
-                                                        .monospacedDigit()
-                                                        .lineLimit(nil)
-                                                        .multilineTextAlignment(.center)
-                                                }
+                                                Text(verbatim: "\(bookmark.name) (\(bookmark.count.description))")
+                                                    .monospacedDigit()
+                                                    .lineLimit(nil)
+                                                    .multilineTextAlignment(.center)
+                                                    .viewModifier { view in
+                                                        if #available(macOS 14, *) {
+                                                            view.contentTransition(.numericText(value: Double(bookmark.count)))
+                                                        } else {
+                                                            view
+                                                        }
+                                                    }
                                             }
                                             .highlightOnHover()
                                         }

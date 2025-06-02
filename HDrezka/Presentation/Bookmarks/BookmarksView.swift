@@ -74,32 +74,38 @@ struct BookmarksView: View {
                     } else {
                         List(selection: $vm.selectedBookmark) {
                             ForEach(bookmarks) { bookmark in
-                                if #available(macOS 14.0, *) {
-                                    Text(bookmark.name)
-                                        .font(.system(size: 15))
-                                        .lineLimit(1)
-                                        .badge(
-                                            Text(bookmark.count.description)
-                                                .monospacedDigit()
-                                        )
-                                        .contentTransition(.numericText(value: Double(bookmark.count)))
-                                        .tag(bookmark.bookmarkId)
-                                        .padding(7)
-                                        .listRowInsets(.init())
-                                        .contextMenu {
-                                            Button {
-                                                vm.renameBookmark = bookmark
-                                            } label: {
-                                                Text("key.rename")
-                                            }
-                                            
-                                            Button {
-                                                vm.deleteBookmarksCategory(bookmark: bookmark)
-                                            } label: {
-                                                Text("key.delete")
-                                            }
+                                Text(bookmark.name)
+                                    .font(.system(size: 15))
+                                    .lineLimit(1)
+                                    .badge(
+                                        Text(bookmark.count.description)
+                                            .monospacedDigit()
+                                    )
+                                    .viewModifier { view in
+                                        if #available(macOS 14, *) {
+                                            view.contentTransition(.numericText(value: Double(bookmark.count)))
+                                        } else {
+                                            view
                                         }
-                                        .if(vm.selectedBookmark != bookmark.bookmarkId) { view in
+                                    }
+                                    .tag(bookmark.bookmarkId)
+                                    .padding(7)
+                                    .listRowInsets(.init())
+                                    .contextMenu {
+                                        Button {
+                                            vm.renameBookmark = bookmark
+                                        } label: {
+                                            Text("key.rename")
+                                        }
+                                            
+                                        Button {
+                                            vm.deleteBookmarksCategory(bookmark: bookmark)
+                                        } label: {
+                                            Text("key.delete")
+                                        }
+                                    }
+                                    .viewModifier { view in
+                                        if vm.selectedBookmark != bookmark.bookmarkId {
                                             view.dropDestination(for: MovieSimple.self) { movies, _ in
                                                 if !movies.isEmpty, !movies.compactMap(\.movieId.id).isEmpty {
                                                     vm.moveBetweenBookmarks(movies: movies, bookmark: bookmark)
@@ -109,77 +115,27 @@ struct BookmarksView: View {
                                                 
                                                 return false
                                             }
+                                        } else {
+                                            view
                                         }
-                                        .swipeActions(edge: .trailing) {
-                                            Button {
-                                                vm.deleteBookmarksCategory(bookmark: bookmark)
-                                            } label: {
-                                                Image(systemName: "trash")
-                                                    .font(.system(size: 15))
-                                            }
-                                            .tint(.accentColor)
+                                    }
+                                    .swipeActions(edge: .trailing) {
+                                        Button {
+                                            vm.deleteBookmarksCategory(bookmark: bookmark)
+                                        } label: {
+                                            Image(systemName: "trash")
+                                                .font(.system(size: 15))
+                                        }
+                                        .tint(.accentColor)
                                             
-                                            Button {
-                                                vm.renameBookmark = bookmark
-                                            } label: {
-                                                Image(systemName: "pencil")
-                                                    .font(.system(size: 15))
-                                            }
-                                            .tint(.secondary)
+                                        Button {
+                                            vm.renameBookmark = bookmark
+                                        } label: {
+                                            Image(systemName: "pencil")
+                                                .font(.system(size: 15))
                                         }
-                                } else {
-                                    Text(bookmark.name)
-                                        .font(.system(size: 15))
-                                        .lineLimit(1)
-                                        .badge(
-                                            Text(bookmark.count.description)
-                                                .monospacedDigit()
-                                        )
-                                        .tag(bookmark.bookmarkId)
-                                        .padding(7)
-                                        .listRowInsets(.init())
-                                        .contextMenu {
-                                            Button {
-                                                vm.renameBookmark = bookmark
-                                            } label: {
-                                                Text("key.rename")
-                                            }
-                                            
-                                            Button {
-                                                vm.deleteBookmarksCategory(bookmark: bookmark)
-                                            } label: {
-                                                Text("key.delete")
-                                            }
-                                        }
-                                        .if(vm.selectedBookmark != bookmark.bookmarkId) { view in
-                                            view.dropDestination(for: MovieSimple.self) { movies, _ in
-                                                if !movies.isEmpty, !movies.compactMap(\.movieId.id).isEmpty {
-                                                    vm.moveBetweenBookmarks(movies: movies, bookmark: bookmark)
-
-                                                    return true
-                                                }
-                                                
-                                                return false
-                                            }
-                                        }
-                                        .swipeActions(edge: .trailing) {
-                                            Button {
-                                                vm.deleteBookmarksCategory(bookmark: bookmark)
-                                            } label: {
-                                                Image(systemName: "trash")
-                                                    .font(.system(size: 15))
-                                            }
-                                            .tint(.accentColor)
-                                            
-                                            Button {
-                                                vm.renameBookmark = bookmark
-                                            } label: {
-                                                Image(systemName: "pencil")
-                                                    .font(.system(size: 15))
-                                            }
-                                            .tint(.secondary)
-                                        }
-                                }
+                                        .tint(.secondary)
+                                    }
                             }
                             .onMove { fromOffsets, toOffset in
                                 vm.reorderBookmarksCategories(fromOffsets: fromOffsets, toOffset: toOffset)
@@ -312,75 +268,55 @@ struct BookmarksView: View {
             if vm.bookmarkState != .loading, vm.selectedBookmark != -1 {
                 Image(systemName: "line.3.horizontal.decrease.circle")
 
-                if #available(macOS 14.0, *) {
-                    Picker("key.filter.select", selection: $vm.filter) {
-                        ForEach(BookmarkFilters.allCases) { f in
-                            Text(f.rawValue).tag(f)
-                        }
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .background(.tertiary.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                    }
-                } else {
-                    Picker("key.filter.select", selection: $vm.filter) {
-                        ForEach(BookmarkFilters.allCases) { f in
-                            Text(f.rawValue).tag(f)
-                        }
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .background(.tertiary.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                Picker("key.filter.select", selection: $vm.filter) {
+                    ForEach(BookmarkFilters.allCases) { f in
+                        Text(f.rawValue).tag(f)
                     }
                 }
-                    
+                .labelsHidden()
+                .pickerStyle(.menu)
+                .viewModifier { view in
+                    if #available(macOS 14, *) {
+                        view
+                            .buttonStyle(.accessoryBar)
+                            .controlSize(.large)
+                    } else {
+                        view
+                    }
+                }
+                .background(.tertiary.opacity(0.05))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+                .contentShape(RoundedRectangle(cornerRadius: 6))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 6)
+                        .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                }
+               
                 Divider()
                     .padding(.vertical, 18)
 
-                if #available(macOS 14.0, *) {
-                    Picker("key.genre.select", selection: $vm.genre) {
-                        ForEach(Genres.allCases) { g in
-                            Text(g.rawValue).tag(g)
-                        }
+                Picker("key.genre.select", selection: $vm.genre) {
+                    ForEach(Genres.allCases) { g in
+                        Text(g.rawValue).tag(g)
                     }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .background(.tertiary.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
+                }
+                .labelsHidden()
+                .pickerStyle(.menu)
+                .viewModifier { view in
+                    if #available(macOS 14, *) {
+                        view
+                            .buttonStyle(.accessoryBar)
+                            .controlSize(.large)
+                    } else {
+                        view
                     }
-                } else {
-                    Picker("key.genre.select", selection: $vm.genre) {
-                        ForEach(Genres.allCases) { g in
-                            Text(g.rawValue).tag(g)
-                        }
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .background(.tertiary.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                    }
+                }
+                .background(.tertiary.opacity(0.05))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+                .contentShape(RoundedRectangle(cornerRadius: 6))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 6)
+                        .stroke(.tertiary.opacity(0.2), lineWidth: 1)
                 }
             }
         })

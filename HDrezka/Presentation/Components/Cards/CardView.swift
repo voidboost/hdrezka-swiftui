@@ -50,57 +50,41 @@ struct CardView: View {
                                     Spacer()
 
                                     if let rating = cat.rating {
-                                        if #available(macOS 14.0, *) {
-                                            (
-                                                Text(verbatim: "\(cat.title) (") +
-                                                    Text(rating.description).fontWeight(.medium) +
-                                                    Text(verbatim: ") ") +
-                                                    Text(Image(systemName: cat.icon))
-                                            )
-                                            .font(.system(size: 10))
-                                            .foregroundStyle(.white)
-                                            .padding(.vertical, 3)
-                                            .padding(.horizontal, 6)
-                                            .background(cat.color)
-                                            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 6))
-                                        } else {
-                                            (
-                                                Text(verbatim: "\(cat.title) (") +
-                                                    Text(rating.description).fontWeight(.medium) +
-                                                    Text(verbatim: ") ") +
-                                                    Text(Image(systemName: cat.icon))
-                                            )
-                                            .font(.system(size: 10))
-                                            .foregroundColor(.white)
-                                            .padding(.vertical, 3)
-                                            .padding(.horizontal, 6)
-                                            .background(cat.color)
-                                            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 6))
+                                        (
+                                            Text(verbatim: "\(cat.title) (") +
+                                                Text(rating.description).fontWeight(.medium) +
+                                                Text(verbatim: ") ") +
+                                                Text(Image(systemName: cat.icon))
+                                        )
+                                        .font(.system(size: 10))
+                                        .textModifier { text in
+                                            if #available(macOS 14, *) {
+                                                text.foregroundStyle(.white)
+                                            } else {
+                                                text.foregroundColor(.white)
+                                            }
                                         }
+                                        .padding(.vertical, 3)
+                                        .padding(.horizontal, 6)
+                                        .background(cat.color)
+                                        .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 6))
                                     } else {
-                                        if #available(macOS 14.0, *) {
-                                            (
-                                                Text(verbatim: "\(cat.title) ") +
-                                                    Text(Image(systemName: cat.icon))
-                                            )
-                                            .font(.system(size: 10))
-                                            .foregroundStyle(.white)
-                                            .padding(.vertical, 3)
-                                            .padding(.horizontal, 6)
-                                            .background(cat.color)
-                                            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 6))
-                                        } else {
-                                            (
-                                                Text(verbatim: "\(cat.title) ") +
-                                                    Text(Image(systemName: cat.icon))
-                                            )
-                                            .font(.system(size: 10))
-                                            .foregroundColor(.white)
-                                            .padding(.vertical, 3)
-                                            .padding(.horizontal, 6)
-                                            .background(cat.color)
-                                            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 6))
+                                        (
+                                            Text(verbatim: "\(cat.title) ") +
+                                                Text(Image(systemName: cat.icon))
+                                        )
+                                        .font(.system(size: 10))
+                                        .textModifier { text in
+                                            if #available(macOS 14, *) {
+                                                text.foregroundStyle(.white)
+                                            } else {
+                                                text.foregroundColor(.white)
+                                            }
                                         }
+                                        .padding(.vertical, 3)
+                                        .padding(.horizontal, 6)
+                                        .background(cat.color)
+                                        .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 6))
                                     }
                                 }
                             }
@@ -164,8 +148,12 @@ struct CardView: View {
                 }
             }
             .contentShape(UnevenRoundedRectangle(topLeadingRadius: 6, topTrailingRadius: 6))
-            .if(draggable) { view in
-                view.draggable(movie)
+            .viewModifier { view in
+                if draggable {
+                    view.draggable(movie)
+                } else {
+                    view
+                }
             }
         }
         .buttonStyle(.plain)
