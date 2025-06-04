@@ -21,7 +21,7 @@ final class SourcePackagesParser {
         let checkoutsURL = sourcePackagesURL.appending(path: "checkouts")
         let libraries: [Library] = workspaceState.object.dependencies.compactMap { dependency in
             guard let repositoryName = dependency.packageRef.location
-                .components(separatedBy: "/").last?
+                .components(separatedBy: "/").filter({ !$0.isEmpty }).last?
                 .replacingOccurrences(of: ".git", with: "")
             else {
                 return nil
@@ -38,7 +38,7 @@ final class SourcePackagesParser {
                 url: dependency.packageRef.location.replacingOccurrences(of: ".git", with: ""),
                 licenseBody: licenseBody,
                 version: dependency.state.checkoutState.version,
-                identity: dependency.packageRef.identity.components(separatedBy: .letters.inverted).joined(separator: "_")
+                identity: dependency.packageRef.identity.components(separatedBy: .letters.inverted).filter { !$0.isEmpty }.joined(separator: "_")
             )
         }
         .sorted { $0.name.lowercased() < $1.name.lowercased() }

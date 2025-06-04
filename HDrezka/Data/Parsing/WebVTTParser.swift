@@ -197,7 +197,7 @@ private class CueTextParser {
     }
     
     func parseImageUrl() -> String? {
-        guard let imageNameText = text.components(separatedBy: "#").first else {
+        guard let imageNameText = text.components(separatedBy: "#").filter({ !$0.isEmpty }).first else {
             return nil
         }
 
@@ -219,9 +219,9 @@ private class CueTextParser {
     }
     
     func parseFrame() -> VttFrame? {
-        let frameText = text.components(separatedBy: "#xywh=").last
+        let frameText = text.components(separatedBy: "#xywh=").filter({ !$0.isEmpty }).last
         
-        if let frames = frameText?.components(separatedBy: ","), frames.count == 4, let x = Float(frames[0]), let y = Float(frames[1]), let width = Float(frames[2]), let height = Float(frames[3]) {
+        if let frames = frameText?.components(separatedBy: ",").filter({ !$0.isEmpty }), frames.count == 4, let x = Float(frames[0]), let y = Float(frames[1]), let width = Float(frames[2]), let height = Float(frames[3]) {
             return VttFrame(x: CGFloat(x), y: CGFloat(y), width: CGFloat(width), height: CGFloat(height))
         } else {
             return nil

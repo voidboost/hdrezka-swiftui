@@ -16,6 +16,7 @@ struct MovieDetailed: Identifiable, Codable, Hashable {
     private(set) var votes: String?
     let imdbRating: MovieRating?
     let kpRating: MovieRating?
+    let waRating: MovieRating?
     let genres: [MovieGenre]?
     let lists: [MovieList]?
     let collections: [MoviesCollection]?
@@ -34,9 +35,10 @@ struct MovieDetailed: Identifiable, Codable, Hashable {
     let voiceActingRating: [MovieVoiceActingRating]?
     let watchAlsoMovies: [MovieSimple]
     let commentsCount: Int
+    let year: String?
     let id: UUID
 
-    init(movieId: String, nameRussian: String, nameOriginal: String?, hposter: String, poster: String, duration: Int?, description: String, releaseDate: String?, countries: [MovieCountry]?, ageRestriction: String?, rated: Bool, rating: Float? = nil, votes: String? = nil, imdbRating: MovieRating?, kpRating: MovieRating?, genres: [MovieGenre]?, lists: [MovieList]?, collections: [MoviesCollection]?, slogan: String?, schedule: [SeriesScheduleGroup]?, franchise: [MovieFranchisePart]?, producer: [PersonSimple]?, actors: [PersonSimple]?, available: Bool, comingSoon: Bool, favs: String, adb: String?, type: String?, voiceActing: [MovieVoiceActing]?, series: Series?, voiceActingRating: [MovieVoiceActingRating]?, watchAlsoMovies: [MovieSimple], commentsCount: Int, id: UUID = .init()) {
+    init(movieId: String, nameRussian: String, nameOriginal: String?, hposter: String, poster: String, duration: Int?, description: String, releaseDate: String?, countries: [MovieCountry]?, ageRestriction: String?, rated: Bool, rating: Float? = nil, votes: String? = nil, imdbRating: MovieRating?, kpRating: MovieRating?, waRating: MovieRating?, genres: [MovieGenre]?, lists: [MovieList]?, collections: [MoviesCollection]?, slogan: String?, schedule: [SeriesScheduleGroup]?, franchise: [MovieFranchisePart]?, producer: [PersonSimple]?, actors: [PersonSimple]?, available: Bool, comingSoon: Bool, favs: String, adb: String?, type: String?, voiceActing: [MovieVoiceActing]?, series: Series?, voiceActingRating: [MovieVoiceActingRating]?, watchAlsoMovies: [MovieSimple], commentsCount: Int, year: String?, id: UUID = .init()) {
         self.movieId = movieId
         self.nameRussian = nameRussian
         self.nameOriginal = nameOriginal
@@ -52,6 +54,7 @@ struct MovieDetailed: Identifiable, Codable, Hashable {
         self.votes = votes
         self.imdbRating = imdbRating
         self.kpRating = kpRating
+        self.waRating = waRating
         self.genres = genres
         self.lists = lists
         self.collections = collections
@@ -70,6 +73,7 @@ struct MovieDetailed: Identifiable, Codable, Hashable {
         self.voiceActingRating = voiceActingRating
         self.watchAlsoMovies = watchAlsoMovies
         self.commentsCount = commentsCount
+        self.year = year
         self.id = id
     }
 

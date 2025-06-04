@@ -3083,6 +3083,28 @@
         }
       }
     },
+    "key.info.year" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Year"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Год"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Рік"
+          }
+        }
+      }
+    },
     "key.info.years_old" : {
       "localizations" : {
         "en" : {

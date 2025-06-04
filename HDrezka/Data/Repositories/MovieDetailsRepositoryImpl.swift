@@ -7,7 +7,7 @@ struct MovieDetailsRepositoryImpl: MovieDetailsRepository {
     @Injected(\.session) private var session
 
     func getMovieDetails(movieId: String) -> AnyPublisher<MovieDetailed, Error> {
-        let parts = movieId.components(separatedBy: "/")
+        let parts = movieId.components(separatedBy: "/").filter({ !$0.isEmpty })
 
         guard parts.count == 3 else {
             return Fail(error: HDrezkaError.null(#function, #line, #column))
@@ -31,7 +31,7 @@ struct MovieDetailsRepositoryImpl: MovieDetailsRepository {
     }
 
     func getMovieBookmarks(movieId: String) -> AnyPublisher<[Bookmark], Error> {
-        let parts = movieId.components(separatedBy: "/")
+        let parts = movieId.components(separatedBy: "/").filter({ !$0.isEmpty })
 
         guard parts.count == 3 else {
             return Fail(error: HDrezkaError.null(#function, #line, #column))

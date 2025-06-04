@@ -310,6 +310,8 @@ struct DetailsView: View {
                                 ||
                                 details.releaseDate?.isEmpty == false
                                 ||
+                                details.year?.isEmpty == false
+                                ||
                                 details.countries?.isEmpty == false
                                 ||
                                 details.genres?.isEmpty == false
@@ -337,8 +339,16 @@ struct DetailsView: View {
                                         InfoRow(String(localized: "key.info.date"), releaseDate)
                                     }
                                     
-                                    if let countries = details.countries, !countries.isEmpty {
+                                    if let year = details.year, !year.isEmpty {
                                         if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false {
+                                            Divider()
+                                        }
+                                        
+                                        InfoRow(String(localized: "key.info.year"), year)
+                                    }
+                                    
+                                    if let countries = details.countries, !countries.isEmpty {
+                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false {
                                             Divider()
                                         }
                                         
@@ -346,7 +356,7 @@ struct DetailsView: View {
                                     }
                                     
                                     if let genres = details.genres, !genres.isEmpty {
-                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.countries?.isEmpty == false {
+                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false || details.countries?.isEmpty == false {
                                             Divider()
                                         }
                                         
@@ -354,7 +364,7 @@ struct DetailsView: View {
                                     }
 
                                     if let producer = details.producer, !producer.isEmpty {
-                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false {
+                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false {
                                             Divider()
                                         }
                                         
@@ -362,7 +372,7 @@ struct DetailsView: View {
                                     }
                                     
                                     if let actors = details.actors, !actors.isEmpty {
-                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false || details.producer?.isEmpty == false {
+                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false || details.producer?.isEmpty == false {
                                             Divider()
                                         }
                                         
@@ -370,7 +380,7 @@ struct DetailsView: View {
                                     }
                                     
                                     if let lists = details.lists, !lists.isEmpty {
-                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false || details.producer?.isEmpty == false || details.actors?.isEmpty == false {
+                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false || details.producer?.isEmpty == false || details.actors?.isEmpty == false {
                                             Divider()
                                         }
                                         
@@ -378,7 +388,7 @@ struct DetailsView: View {
                                     }
                                     
                                     if let collections = details.collections, !collections.isEmpty {
-                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false || details.producer?.isEmpty == false || details.actors?.isEmpty == false || details.lists?.isEmpty == false {
+                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false || details.producer?.isEmpty == false || details.actors?.isEmpty == false || details.lists?.isEmpty == false {
                                             Divider()
                                         }
                                         
@@ -386,7 +396,7 @@ struct DetailsView: View {
                                     }
                                     
                                     if let rating = details.rating {
-                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false || details.producer?.isEmpty == false || details.actors?.isEmpty == false || details.lists?.isEmpty == false || details.collections?.isEmpty == false {
+                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false || details.producer?.isEmpty == false || details.actors?.isEmpty == false || details.lists?.isEmpty == false || details.collections?.isEmpty == false {
                                             Divider()
                                         }
                                         
@@ -418,6 +428,8 @@ struct DetailsView: View {
                     ||
                     details.kpRating != nil
                     ||
+                    details.waRating != nil
+                    ||
                     details.duration != nil
                     ||
                     details.ageRestriction != nil
@@ -441,6 +453,16 @@ struct DetailsView: View {
                             )
                             
                             InfoColumn("КиноПоиск", kpRating.value.description, StarsView(rating: kpRating.value * 0.5, color: color), valueColor: color, hover: kpRating.votesCount, url: URL(string: kpRating.link))
+                        }
+                        
+                        if let waRating = details.waRating {
+                            let color = Color(
+                                NSColor
+                                    .red
+                                    .blended(withFraction: CGFloat(waRating.value / 10.0), of: NSColor.green) ?? NSColor.labelColor
+                            )
+                            
+                            InfoColumn("World Art", waRating.value.description, StarsView(rating: waRating.value * 0.5, color: color), valueColor: color, hover: waRating.votesCount, url: URL(string: waRating.link))
                         }
                     
                         if let duration = details.duration, duration > 0 {

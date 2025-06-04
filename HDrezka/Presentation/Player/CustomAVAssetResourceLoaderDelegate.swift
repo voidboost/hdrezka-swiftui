@@ -88,7 +88,7 @@ class CustomAVAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelega
     }
     
     private func processPlaylist(_ string: String) {
-        let lines = string.components(separatedBy: .newlines)
+        let lines = string.components(separatedBy: .newlines).filter { !$0.isEmpty }
         var newLines = [String]()
         var iterator = lines.makeIterator()
         
@@ -107,7 +107,7 @@ class CustomAVAssetResourceLoaderDelegate: NSObject, AVAssetResourceLoaderDelega
     }
     
     private func getDuration(forEXTINFLine line: String) -> Double {
-        let parts = line.components(separatedBy: ":")
+        let parts = line.components(separatedBy: ":").filter { !$0.isEmpty }
         
         guard parts.count > 1 else { return 0.0 }
       
