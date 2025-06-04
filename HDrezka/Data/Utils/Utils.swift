@@ -35,9 +35,9 @@ extension String {
             self
         }
 
-        let parts = string.components(separatedBy: "/")
+        let parts = string.components(separatedBy: "/").filter { !$0.isEmpty }
 
-        if parts.count == 3, let id = parts[2].components(separatedBy: "-").first, !id.isEmpty, id.isNumber, parts[2].hasSuffix(".html") {
+        if parts.count == 3, let id = parts[2].components(separatedBy: "-").filter({ !$0.isEmpty }).first, !id.isEmpty, id.isNumber, parts[2].hasSuffix(".html") {
             return id
         }
 
@@ -87,7 +87,7 @@ extension String {
 
     func removeMirror(_ scheme: String = "http") -> String {
         return if hasPrefix(scheme) {
-            components(separatedBy: "/").dropFirst(3).joined(separator: "/")
+            components(separatedBy: "/").filter { !$0.isEmpty }.dropFirst(2).joined(separator: "/")
         } else if hasPrefix("/") {
             String(dropFirst())
         } else {

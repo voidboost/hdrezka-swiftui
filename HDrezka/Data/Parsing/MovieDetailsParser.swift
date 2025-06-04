@@ -42,6 +42,7 @@ class MovieDetailsParser {
 
         var imdbRating: MovieRating?
         var kpRating: MovieRating?
+        var waRating: MovieRating?
         var releaseDate: String?
         var producer: [PersonSimple]?
         var ageRestriction: String?
@@ -52,6 +53,7 @@ class MovieDetailsParser {
         var collections: [MoviesCollection]?
         var duration: Int?
         var slogan: String?
+        var year: String?
 
         try content.getDetailsChunked { chunk in
             let chunkName = try chunk.getDetailsName()
@@ -68,8 +70,15 @@ class MovieDetailsParser {
                     votesCount: chunk.getDetailsKpVotes(),
                     link: chunk.getDetailsKpLink()
                 )
+                waRating = try MovieRating(
+                    value: chunk.getDetailsWaRating(),
+                    votesCount: chunk.getDetailsWaVotes(),
+                    link: chunk.getDetailsWaLink()
+                )
             case "Дата выхода":
                 releaseDate = try chunk.last().orThrow().text()
+            case "Год":
+                year = try chunk.last().orThrow().text()
             case "Режиссер":
                 producer = try chunk.getDetailsProducers()
             case "Возраст":
@@ -110,6 +119,7 @@ class MovieDetailsParser {
             votes: votes,
             imdbRating: imdbRating,
             kpRating: kpRating,
+            waRating: waRating,
             genres: genres,
             lists: lists,
             collections: collections,
@@ -127,7 +137,8 @@ class MovieDetailsParser {
             series: series,
             voiceActingRating: voiceActingRating,
             watchAlsoMovies: watchAlsoMovies,
-            commentsCount: commentsCount
+            commentsCount: commentsCount,
+            year: year
         )
     }
 
@@ -204,20 +215,12 @@ class MovieDetailsParser {
 }
 
 private extension Elements {
-    func getDetailsName() throws -> String {
-        try get(0).select("h2").text()
-    }
-
-    func getDetailsImdbRating() throws -> Float? {
-        try Float(get(1).select(".b-post__info_rates.imdb .bold").first()?.text() ?? "")
-    }
-
-    func getDetailsImdbVotes() throws -> String? {
-        try get(1).select(".b-post__info_rates.imdb i").first()?.text().shortNumber
+    func getDetailsName() throws -> String? {
+        try select(".l").first()?.text().trimmingCharacters(in: .letters.inverted)
     }
 
     func getDetailsImdbLink() throws -> String? {
-        guard let base64 = try get(1).select(".b-post__info_rates.imdb a").first()?.attr("href").reversed().drop(while: { $0 == "/" }).reversed()
+        guard let base64 = try last()?.select(".b-post__info_rates.imdb a").first()?.attr("href").reversed().drop(while: { $0 == "/" }).reversed()
         else {
             return nil
         }
@@ -225,8 +228,16 @@ private extension Elements {
         return try String(String(base64).suffix(from: String(base64).range(of: "/help/", options: .backwards).orThrow().upperBound)).base64Decoded.removingPercentEncoding
     }
 
+    func getDetailsImdbRating() throws -> Float? {
+        try Float(last()?.select(".b-post__info_rates.imdb .bold").first()?.text() ?? "")
+    }
+
+    func getDetailsImdbVotes() throws -> String? {
+        try last()?.select(".b-post__info_rates.imdb i").first()?.text().shortNumber
+    }
+
     func getDetailsKpLink() throws -> String? {
-        guard let base64 = try get(1).select(".b-post__info_rates.kp a").first()?.attr("href").reversed().drop(while: { $0 == "/" }).reversed()
+        guard let base64 = try last()?.select(".b-post__info_rates.kp a").first()?.attr("href").reversed().drop(while: { $0 == "/" }).reversed()
         else {
             return nil
         }
@@ -235,15 +246,32 @@ private extension Elements {
     }
 
     func getDetailsKpRating() throws -> Float? {
-        try Float(get(1).select(".b-post__info_rates.kp .bold").first()?.text() ?? "")
+        try Float(last()?.select(".b-post__info_rates.kp .bold").first()?.text() ?? "")
     }
 
     func getDetailsKpVotes() throws -> String? {
-        try get(1).select(".b-post__info_rates.kp i").first()?.text().shortNumber
+        try last()?.select(".b-post__info_rates.kp i").first()?.text().shortNumber
+    }
+
+    func getDetailsWaLink() throws -> String? {
+        guard let base64 = try last()?.select(".b-post__info_rates.wa a").first()?.attr("href").reversed().drop(while: { $0 == "/" }).reversed()
+        else {
+            return nil
+        }
+
+        return try String(String(base64).suffix(from: String(base64).range(of: "/help/", options: .backwards).orThrow().upperBound)).base64Decoded.removingPercentEncoding
+    }
+
+    func getDetailsWaRating() throws -> Float? {
+        try Float(last()?.select(".b-post__info_rates.wa .bold").first()?.text() ?? "")
+    }
+
+    func getDetailsWaVotes() throws -> String? {
+        try last()?.select(".b-post__info_rates.wa i").first()?.text().shortNumber
     }
 
     func getDetailsProducers() throws -> [PersonSimple] {
-        try get(1)
+        try last().orThrow()
             .select(".persons-list-holder").first().orThrow()
             .select(".item")
             .compactMap {
@@ -262,11 +290,11 @@ private extension Elements {
     }
 
     func getDetailsAgeRestriction() throws -> String {
-        try get(1).select("span").first().orThrow().text()
+        try last().orThrow().select("span").first().orThrow().text()
     }
 
     func getDetailsActors() throws -> [PersonSimple]? {
-        try get(0)
+        try first()?
             .select("div")
             .first()?
             .select(".item")
@@ -389,7 +417,7 @@ private extension Element {
                 isLiked: $0.select(".b-comment__like_it").first()?.hasClass("disabled") == true,
                 selfComment: $0.select(".b-comment__like_it").first()?.hasClass("self-disabled") == true,
                 isAdmin: $0.select(".b-comment").first()?.hasClass("b-comment__admin") == true,
-                deleteHash: $0.select(".actions").first()?.select(".edit li a").first(where: { try $0.text().contains("Удалить") })?.attr("onclick").components(separatedBy: "(").last?.components(separatedBy: ")").first?.components(separatedBy: ",").first(where: { $0.contains("'") })?.trimmingCharacters(in: .alphanumerics.inverted)
+                deleteHash: $0.select(".actions").first()?.select(".edit li a").first(where: { try $0.text().contains("Удалить") })?.attr("onclick").components(separatedBy: "(").filter { !$0.isEmpty }.last?.components(separatedBy: ")").filter { !$0.isEmpty }.first?.components(separatedBy: ",").filter { !$0.isEmpty }.first(where: { $0.contains("'") })?.trimmingCharacters(in: .alphanumerics.inverted)
             )
         }
     }
@@ -457,13 +485,14 @@ private extension Element {
     func getDetailsMovieLists() throws -> [MovieList] {
         try html()
             .components(separatedBy: "<br />")
+            .filter { !$0.isEmpty }
             .map {
                 let listItem = try SwiftSoup.parse($0).body().orThrow()
 
                 return try MovieList(
                     name: listItem.select("a").first().orThrow().text(),
                     listId: listItem.select("a").first().orThrow().attr("href").removeMirror(),
-                    moviePosition: Int(listItem.text().components(separatedBy: "(").last?.trimmingCharacters(in: .decimalDigits.inverted) ?? "").orThrow()
+                    moviePosition: Int(listItem.text().components(separatedBy: "(").filter { !$0.isEmpty }.last?.trimmingCharacters(in: .decimalDigits.inverted) ?? "").orThrow()
                 )
             }
     }
@@ -527,7 +556,7 @@ private extension Document {
 
     func getBookmarks() throws -> [Bookmark] {
         try select("#user-favorites-list .hd-label-row").map {
-            let name = try $0.select("label").text().components(separatedBy: "(").dropLast().joined(separator: "(")
+            let name = try $0.select("label").text().components(separatedBy: "(").filter { !$0.isEmpty }.dropLast().joined(separator: "(")
             let id = try Int($0.select("input").attr("value")).orThrow()
             let count = try Int($0.select("small b").text()).orThrow()
             let isChecked = try $0.select("input").hasAttr("checked")
@@ -738,7 +767,7 @@ private extension String {
             .select("iframe").first().orThrow()
             .attr("src")
             .replacingOccurrences(of: "https://www.youtube.com/embed/", with: "")
-            .components(separatedBy: "?").first.orThrow()
+            .components(separatedBy: "?").filter { !$0.isEmpty }.first.orThrow()
 
 //        return "https://youtu.be/\(trailerId)"
 //        return "https://www.youtube.com/watch?v=\(trailerId)"
@@ -768,11 +797,11 @@ private extension String {
 
         let streams = decrypt(encrypted: url)
 
-        let videoMap = try streams.components(separatedBy: ",").reduce(into: OrderedDictionary<String, URL?>()) { videoMap, stream in
+        let videoMap = try streams.components(separatedBy: ",").filter { !$0.isEmpty }.reduce(into: OrderedDictionary<String, URL?>()) { videoMap, stream in
             let video = stream.replacingOccurrences(of: "[", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
-            let name = try SwiftSoup.parse(video.components(separatedBy: "]").first.orThrow()).text()
-            let videos = video[(video.lastIndex(of: "]") ?? video.startIndex)...].dropFirst().components(separatedBy: " or ")
-            let link = videos.first?.components(separatedBy: ":hls:manifest.m3u8").first
+            let name = try SwiftSoup.parse(video.components(separatedBy: "]").filter { !$0.isEmpty }.first.orThrow()).text()
+            let videos = video[(video.lastIndex(of: "]") ?? video.startIndex)...].dropFirst().components(separatedBy: " or ").filter { !$0.isEmpty }
+            let link = videos.first?.components(separatedBy: ":hls:manifest.m3u8").filter { !$0.isEmpty }.first
 
             let url: URL? = if let link, link != "null" {
                 URL(string: link)
@@ -788,9 +817,9 @@ private extension String {
         }
 
         let subtitles: [MovieSubtitles] = if let subtitles = (jsonObject["subtitle"] as? String), let subtitles_lns = (jsonObject["subtitle_lns"] as? [String: Any]) {
-            try subtitles.components(separatedBy: ",").compactMap {
-                let name = try $0.components(separatedBy: "]").first.orThrow().replacingOccurrences(of: "[", with: "")
-                let link = try $0.components(separatedBy: "]").last.orThrow()
+            try subtitles.components(separatedBy: ",").filter { !$0.isEmpty }.compactMap {
+                let name = try $0.components(separatedBy: "]").filter { !$0.isEmpty }.first.orThrow().replacingOccurrences(of: "[", with: "")
+                let link = try $0.components(separatedBy: "]").filter { !$0.isEmpty }.last.orThrow()
                 let lang = subtitles_lns[name] as? String
 
                 if let lang {

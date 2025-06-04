@@ -128,6 +128,6 @@ struct WatchingLaterCardView: View {
         }
         .buttonStyle(.plain)
         .opacity(movie.watched ? 0.6 : 1)
-        .disabled(movie.watchLaterId.removeMirror().components(separatedBy: "/").count != 3)
+        .disabled(movie.watchLaterId.removeMirror().components(separatedBy: "/").filter({ !$0.isEmpty }).count != 3)
     }
 }
