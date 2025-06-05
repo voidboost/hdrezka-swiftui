@@ -287,8 +287,8 @@ struct ContentView: View {
                             ListView(collection: collection)
                                 .id(collection.collectionId)
                                 .transition(.move(edge: .trailing))
-                        case let .customList(customMovies, title):
-                            ListView(customMovies: customMovies, title: title)
+                        case let .customList(movies, title):
+                            ListView(movies: movies, title: title)
                                 .id(title)
                                 .transition(.move(edge: .trailing))
                         case let .list(list):

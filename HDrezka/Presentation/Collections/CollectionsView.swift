@@ -2,17 +2,17 @@ import Defaults
 import SwiftUI
 
 struct CollectionsView: View {
+    private let title = String(localized: "key.collections")
+
     @StateObject private var vm = CollectionsViewModel()
-
-    @State private var showBar: Bool = false
-
-    @Default(.isLoggedIn) private var isLoggedIn
 
     private let columns = [
         GridItem(.adaptive(minimum: 200, maximum: .infinity), spacing: 18, alignment: .topLeading)
     ]
 
-    private let title = String(localized: "key.collections")
+    @State private var showBar: Bool = false
+
+    @Default(.isLoggedIn) private var isLoggedIn
 
     var body: some View {
         Group {

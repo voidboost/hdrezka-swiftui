@@ -5,12 +5,12 @@ import Pow
 import SwiftUI
 
 struct BookmarksSheetView: View {
-    private let movie: MovieSimple
+    private let id: String
 
     @Binding private var isCreateBookmarkPresented: Bool
 
-    init(movie: MovieSimple, isCreateBookmarkPresented: Binding<Bool>) {
-        self.movie = movie
+    init(id: String, isCreateBookmarkPresented: Binding<Bool>) {
+        self.id = id
         self._isCreateBookmarkPresented = isCreateBookmarkPresented
     }
 
@@ -52,26 +52,7 @@ struct BookmarksSheetView: View {
                             .lineLimit(nil)
 
                         Button {
-                            withAnimation(.easeInOut) {
-                                state = .loading
-                            }
-
-                            getMovieBookmarksUseCase(movieId: movie.movieId)
-                                .receive(on: DispatchQueue.main)
-                                .sink { completion in
-                                    guard case let .failure(error) = completion else { return }
-
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                        withAnimation(.easeInOut) {
-                                            state = .error(error as NSError)
-                                        }
-                                    }
-                                } receiveValue: { bookmarks in
-                                    withAnimation(.easeInOut) {
-                                        self.state = .data(bookmarks)
-                                    }
-                                }
-                                .store(in: &subscriptions)
+                            load(reset: true)
                         } label: {
                             Text("key.retry")
                                 .foregroundStyle(.accent)
@@ -86,26 +67,7 @@ struct BookmarksSheetView: View {
                             Text("key.bookmark.empty")
 
                             Button {
-                                withAnimation(.easeInOut) {
-                                    state = .loading
-                                }
-
-                                getMovieBookmarksUseCase(movieId: movie.movieId)
-                                    .receive(on: DispatchQueue.main)
-                                    .sink { completion in
-                                        guard case let .failure(error) = completion else { return }
-
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                            withAnimation(.easeInOut) {
-                                                state = .error(error as NSError)
-                                            }
-                                        }
-                                    } receiveValue: { bookmarks in
-                                        withAnimation(.easeInOut) {
-                                            self.state = .data(bookmarks)
-                                        }
-                                    }
-                                    .store(in: &subscriptions)
+                                load(reset: true)
                             } label: {
                                 Text("key.retry")
                                     .foregroundStyle(.accent)
@@ -124,7 +86,7 @@ struct BookmarksSheetView: View {
                                         let isChecked = bookmark.isChecked ?? false
 
                                         Button {
-                                            if let movieId = movie.movieId.id {
+                                            if let movieId = id.id {
                                                 if isChecked {
                                                     removeFromBookmarksUseCase(movies: [movieId], bookmarkUserCategory: bookmark.bookmarkId)
                                                         .receive(on: DispatchQueue.main)
@@ -196,7 +158,7 @@ struct BookmarksSheetView: View {
                                             },
                                             value: bookmark.count
                                         )
-                                        .disabled(movie.movieId.id == nil)
+                                        .disabled(id.id == nil)
                                     }
                                 }
                             }
@@ -255,22 +217,7 @@ struct BookmarksSheetView: View {
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
         .task {
-            getMovieBookmarksUseCase(movieId: movie.movieId)
-                .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
-
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        withAnimation(.easeInOut) {
-                            state = .error(error as NSError)
-                        }
-                    }
-                } receiveValue: { bookmarks in
-                    withAnimation(.easeInOut) {
-                        self.state = .data(bookmarks)
-                    }
-                }
-                .store(in: &subscriptions)
+            load()
         }
         .alert("key.ops", isPresented: $isErrorPresented) {
             Button(role: .cancel) {
@@ -285,5 +232,30 @@ struct BookmarksSheetView: View {
         }
         .dialogSeverity(.critical)
         .particleLayer(name: "rise")
+    }
+
+    private func load(reset: Bool = false) {
+        if reset {
+            withAnimation(.easeInOut) {
+                state = .loading
+            }
+        }
+
+        getMovieBookmarksUseCase(movieId: id)
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                guard case let .failure(error) = completion else { return }
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    withAnimation(.easeInOut) {
+                        state = .error(error as NSError)
+                    }
+                }
+            } receiveValue: { bookmarks in
+                withAnimation(.easeInOut) {
+                    self.state = .data(bookmarks)
+                }
+            }
+            .store(in: &subscriptions)
     }
 }

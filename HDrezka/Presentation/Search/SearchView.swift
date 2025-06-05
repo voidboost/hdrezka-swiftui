@@ -6,7 +6,9 @@ struct SearchView: View {
 
     private let searchText: String
 
-    @Default(.isLoggedIn) private var isLoggedIn
+    init(searchText: String) {
+        self.searchText = searchText
+    }
 
     private let columns = [
         GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading)
@@ -14,9 +16,7 @@ struct SearchView: View {
 
     @State private var showBar: Bool = false
 
-    init(searchText: String) {
-        self.searchText = searchText
-    }
+    @Default(.isLoggedIn) private var isLoggedIn
 
     var body: some View {
         Group {

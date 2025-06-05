@@ -3,26 +3,26 @@ import Flow
 import SwiftUI
 
 struct CategoriesView: View {
-    @StateObject private var vm = CategoriesViewModel()
+    private let title = String(localized: "key.categories")
 
-    @Default(.isLoggedIn) private var isLoggedIn
+    @StateObject private var vm = CategoriesViewModel()
 
     @State private var showBar: Bool = false
 
-    private let title = String(localized: "key.categories")
+    @Default(.isLoggedIn) private var isLoggedIn
 
     var body: some View {
         Group {
             if let error = vm.state.error {
                 ErrorStateView(error, title) {
-                    vm.getTypes()
+                    vm.load()
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
             } else if let types = vm.state.data {
                 if types.isEmpty {
                     EmptyStateView(String(localized: "key.categories.empty"), title) {
-                        vm.getTypes()
+                        vm.load()
                     }
                     .padding(.vertical, 52)
                     .padding(.horizontal, 36)
@@ -76,7 +76,7 @@ struct CategoriesView: View {
         .navigationBar(title: title, showBar: showBar, navbar: {
             if let types = vm.state.data, !types.isEmpty {
                 Button {
-                    vm.getTypes()
+                    vm.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -89,7 +89,7 @@ struct CategoriesView: View {
             case .data:
                 break
             default:
-                vm.getTypes()
+                vm.load()
             }
         }
         .background(.background)

@@ -87,32 +87,7 @@ struct SignInSheetView: View {
                                         }
                                         .onSubmit {
                                             if !username.isEmpty, !password.isEmpty {
-                                                withAnimation(.easeInOut) {
-                                                    state = .loading
-                                                }
-
-                                                signInUseCase(login: username, password: password)
-                                                    .receive(on: DispatchQueue.main)
-                                                    .sink { completion in
-                                                        guard case let .failure(error) = completion else { return }
-
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                            withAnimation(.easeInOut) {
-                                                                state = .error(error as NSError)
-                                                            }
-                                                        }
-                                                    } receiveValue: { success in
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                            if success {
-                                                                dismiss()
-                                                            } else {
-                                                                withAnimation(.easeInOut) {
-                                                                    state = .error(NSError())
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                    .store(in: &subscriptions)
+                                                load()
                                             }
                                         }
                                 } else {
@@ -132,32 +107,7 @@ struct SignInSheetView: View {
                                         }
                                         .onSubmit {
                                             if !username.isEmpty, !password.isEmpty {
-                                                withAnimation(.easeInOut) {
-                                                    state = .loading
-                                                }
-
-                                                signInUseCase(login: username, password: password)
-                                                    .receive(on: DispatchQueue.main)
-                                                    .sink { completion in
-                                                        guard case let .failure(error) = completion else { return }
-
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                            withAnimation(.easeInOut) {
-                                                                state = .error(error as NSError)
-                                                            }
-                                                        }
-                                                    } receiveValue: { success in
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                            if success {
-                                                                dismiss()
-                                                            } else {
-                                                                withAnimation(.easeInOut) {
-                                                                    state = .error(NSError())
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                    .store(in: &subscriptions)
+                                                load()
                                             }
                                         }
                                 }
@@ -209,32 +159,7 @@ struct SignInSheetView: View {
 
                     VStack(alignment: .center, spacing: 10) {
                         Button {
-                            withAnimation(.easeInOut) {
-                                state = .loading
-                            }
-
-                            signInUseCase(login: username, password: password)
-                                .receive(on: DispatchQueue.main)
-                                .sink { completion in
-                                    guard case let .failure(error) = completion else { return }
-
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                        withAnimation(.easeInOut) {
-                                            state = .error(error as NSError)
-                                        }
-                                    }
-                                } receiveValue: { success in
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                        if success {
-                                            dismiss()
-                                        } else {
-                                            withAnimation(.easeInOut) {
-                                                state = .error(NSError())
-                                            }
-                                        }
-                                    }
-                                }
-                                .store(in: &subscriptions)
+                            load()
                         } label: {
                             Text("key.sign_in")
                                 .frame(width: 250, height: 30)
@@ -365,5 +290,34 @@ struct SignInSheetView: View {
         .padding(.bottom, 25)
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
+    }
+
+    private func load() {
+        withAnimation(.easeInOut) {
+            state = .loading
+        }
+
+        signInUseCase(login: username, password: password)
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                guard case let .failure(error) = completion else { return }
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    withAnimation(.easeInOut) {
+                        state = .error(error as NSError)
+                    }
+                }
+            } receiveValue: { success in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    if success {
+                        dismiss()
+                    } else {
+                        withAnimation(.easeInOut) {
+                            state = .error(NSError())
+                        }
+                    }
+                }
+            }
+            .store(in: &subscriptions)
     }
 }

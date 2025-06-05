@@ -27,12 +27,72 @@ class ListViewModel: ObservableObject {
     @Injected(\.getPopularMoviesInCollectionUseCase) private var getPopularMoviesInCollectionUseCase
     @Injected(\.getWatchingNowMoviesInCollectionUseCase) private var getWatchingNowMoviesInCollectionUseCase
 
+    private let list: MovieList?
+    private let country: MovieCountry?
+    private let genre: MovieGenre?
+    private let category: Categories?
+    private let collection: MoviesCollection?
+    private let movies: [MovieSimple]?
+
+    init(list: MovieList? = nil, country: MovieCountry? = nil, genre: MovieGenre? = nil, category: Categories? = nil, collection: MoviesCollection? = nil, movies: [MovieSimple]? = nil, title: String? = nil) {
+        self.list = list
+        self.country = country
+        self.genre = genre
+        self.category = category
+        self.collection = collection
+        self.movies = movies
+
+        self.title = if let title = list?.name, !title.isEmpty {
+            title
+        } else if let title = country?.name, !title.isEmpty {
+            title
+        } else if let title = genre?.name, !title.isEmpty {
+            title
+        } else if let title = category?.localized, !title.isEmpty {
+            title
+        } else if let title = collection?.name, !title.isEmpty {
+            title
+        } else if let title, !title.isEmpty {
+            title
+        } else {
+            String(localized: "key.list")
+        }
+    }
+
+    var isCustomMovies: Bool {
+        movies != nil
+    }
+
+    var isList: Bool {
+        list != nil
+    }
+
+    var isCountry: Bool {
+        country != nil
+    }
+
+    var isGenre: Bool {
+        genre != nil
+    }
+
+    var isCategory: Bool {
+        category != nil
+    }
+
+    func isCategory(_ category: Categories) -> Bool {
+        self.category == category
+    }
+
+    var isCollection: Bool {
+        collection != nil
+    }
+
     private var subscriptions: Set<AnyCancellable> = []
 
     @Published private(set) var state: DataState<[MovieSimple]> = .loading
     @Published private(set) var paginationState: DataPaginationState = .idle
 
-    @Published private(set) var title: String?
+    @Published private(set) var title: String
 
     @Published var filterGenre = Genres.all
     @Published var filter = Filters.latest
@@ -40,7 +100,7 @@ class ListViewModel: ObservableObject {
 
     private var page = 1
 
-    private func getData(movies: [MovieSimple]?, list: MovieList?, country: MovieCountry?, genre: MovieGenre?, collection: MoviesCollection?, category: Categories?, isInitial: Bool = true) {
+    private func getData(isInitial: Bool = true) {
         if let list {
             getMovieListUseCase(listId: list.listId, page: page)
                 .receive(on: DispatchQueue.main)
@@ -262,21 +322,21 @@ class ListViewModel: ObservableObject {
         }
     }
 
-    func load(movies: [MovieSimple]?, list: MovieList?, country: MovieCountry?, genre: MovieGenre?, collection: MoviesCollection?, category: Categories?) {
+    func load() {
         state = .loading
         paginationState = .idle
         page = 1
 
-        getData(movies: movies, list: list, country: country, genre: genre, collection: collection, category: category)
+        getData()
     }
 
-    func loadMore(movies: [MovieSimple]?, list: MovieList?, country: MovieCountry?, genre: MovieGenre?, collection: MoviesCollection?, category: Categories?) {
-        guard paginationState == .idle, movies == nil, category != .hot else { return }
+    func loadMore() {
+        guard paginationState == .idle, !isCustomMovies, !isCategory(.hot) else { return }
 
         withAnimation(.easeInOut) {
             paginationState = .loading
         }
 
-        getData(movies: movies, list: list, country: country, genre: genre, collection: collection, category: category, isInitial: false)
+        getData(isInitial: false)
     }
 }

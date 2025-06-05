@@ -2,13 +2,13 @@ import Defaults
 import SwiftUI
 
 struct HomeView: View {
+    private let title = String(localized: "key.home")
+
     @StateObject private var vm = HomeViewModel()
 
     @State private var showBar: Bool = false
 
     @Default(.isLoggedIn) private var isLoggedIn
-
-    private let title = String(localized: "key.home")
 
     var body: some View {
         Group {

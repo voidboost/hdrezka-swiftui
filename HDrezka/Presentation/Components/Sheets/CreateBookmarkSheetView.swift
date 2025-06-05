@@ -48,26 +48,7 @@ struct CreateBookmarkSheetView: View {
                                     .focused($focusedField, equals: .name)
                                     .onSubmit {
                                         if !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                                            withAnimation(.easeInOut) {
-                                                state = .loading
-                                            }
-
-                                            createBookmarksCategoryUseCase(name: name.trimmingCharacters(in: .whitespacesAndNewlines))
-                                                .receive(on: DispatchQueue.main)
-                                                .sink { completion in
-                                                    guard case let .failure(error) = completion else { return }
-
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                        withAnimation(.easeInOut) {
-                                                            state = .error(error as NSError)
-                                                        }
-                                                    }
-                                                } receiveValue: { _ in
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                        dismiss()
-                                                    }
-                                                }
-                                                .store(in: &subscriptions)
+                                            load()
                                         }
                                     }
                             }
@@ -85,26 +66,7 @@ struct CreateBookmarkSheetView: View {
 
                     VStack(alignment: .center, spacing: 10) {
                         Button {
-                            withAnimation(.easeInOut) {
-                                state = .loading
-                            }
-
-                            createBookmarksCategoryUseCase(name: name.trimmingCharacters(in: .whitespacesAndNewlines))
-                                .receive(on: DispatchQueue.main)
-                                .sink { completion in
-                                    guard case let .failure(error) = completion else { return }
-
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                        withAnimation(.easeInOut) {
-                                            state = .error(error as NSError)
-                                        }
-                                    }
-                                } receiveValue: { _ in
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                        dismiss()
-                                    }
-                                }
-                                .store(in: &subscriptions)
+                            load()
                         } label: {
                             Text("key.create")
                                 .frame(width: 250, height: 30)
@@ -220,5 +182,28 @@ struct CreateBookmarkSheetView: View {
         .padding(.bottom, 25)
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
+    }
+
+    private func load() {
+        withAnimation(.easeInOut) {
+            state = .loading
+        }
+
+        createBookmarksCategoryUseCase(name: name.trimmingCharacters(in: .whitespacesAndNewlines))
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                guard case let .failure(error) = completion else { return }
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    withAnimation(.easeInOut) {
+                        state = .error(error as NSError)
+                    }
+                }
+            } receiveValue: { _ in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    dismiss()
+                }
+            }
+            .store(in: &subscriptions)
     }
 }

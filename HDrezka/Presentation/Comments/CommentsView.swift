@@ -6,25 +6,24 @@ import Pow
 import SwiftUI
 
 struct CommentsView: View {
-    private let details: MovieDetailed
     private let title: String
 
-    @StateObject private var vm = CommentsViewModel()
+    @StateObject private var vm: CommentsViewModel
+
+    init(details: MovieDetailed) {
+        self.title = details.commentsCount > 0 ? String(localized: "key.comments-\(details.commentsCount.description)") : String(localized: "key.comments")
+        self._vm = StateObject(wrappedValue: CommentsViewModel(id: details.movieId, adb: details.adb, type: details.type))
+    }
 
     @State private var showBar: Bool = false
 
     @Default(.isLoggedIn) private var isLoggedIn
 
-    init(details: MovieDetailed) {
-        self.details = details
-        self.title = details.commentsCount > 0 ? String(localized: "key.comments-\(details.commentsCount.description)") : String(localized: "key.comments")
-    }
-
     var body: some View {
         Group {
             if let error = vm.state.error {
                 ErrorStateView(error, title) {
-                    vm.load(movieId: details.movieId)
+                    vm.load()
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
@@ -45,7 +44,7 @@ struct CommentsView: View {
                             }
                             .frame(height: 52)
 
-                            CommentTextArea(postId: details.movieId, adb: details.adb, type: details.type)
+                            CommentTextArea()
                         }
                         .padding(.vertical, 52)
                         .padding(.horizontal, 36)
@@ -78,15 +77,15 @@ struct CommentsView: View {
 
                                 VStack(spacing: 16) {
                                     if vm.reply == nil {
-                                        CommentTextArea(postId: details.movieId, adb: details.adb, type: details.type)
+                                        CommentTextArea()
                                     }
 
                                     LazyVStack(alignment: .leading, spacing: 16) {
                                         ForEach(comments) { comment in
-                                            CommentsViewComponent(comment: comment, postId: details.movieId, adb: details.adb, type: details.type)
+                                            CommentsViewComponent(comment: comment)
                                                 .task {
                                                     if comments.last == comment, vm.paginationState == .idle {
-                                                        vm.loadMore(movieId: details.movieId)
+                                                        vm.loadMore()
                                                     }
                                                 }
                                         }
@@ -121,7 +120,7 @@ struct CommentsView: View {
         .navigationBar(title: title, showBar: showBar, navbar: {
             if let comments = vm.state.data, !comments.isEmpty {
                 Button {
-                    vm.load(movieId: details.movieId)
+                    vm.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -134,7 +133,7 @@ struct CommentsView: View {
             case .data:
                 break
             default:
-                vm.load(movieId: details.movieId)
+                vm.load()
             }
         }
         .alert("key.ops", isPresented: $vm.isErrorPresented) {
@@ -159,7 +158,7 @@ struct CommentsView: View {
             VStack(alignment: .center, spacing: 25) {
                 if let comment = vm.comment {
                     ScrollView(.vertical) {
-                        CommentsViewComponent(comment: comment, postId: details.movieId, adb: details.adb, type: details.type)
+                        CommentsViewComponent(comment: comment)
                     }
                     .scrollIndicators(.never)
                     .environmentObject(vm)
@@ -209,22 +208,17 @@ struct CommentsView: View {
 
     private struct CommentsViewComponent: View {
         private let comment: Comment
-        private let postId: String
-        private let adb: String?
-        private let type: String?
 
-        init(comment: Comment, postId: String, adb: String?, type: String?) {
+        init(comment: Comment) {
             self.comment = comment
-            self.postId = postId
-            self.adb = adb
-            self.type = type
         }
 
+        @State private var delayShow: DispatchWorkItem?
+
         @Default(.isLoggedIn) private var isLoggedIn
+
         @EnvironmentObject private var appState: AppState
         @EnvironmentObject private var vm: CommentsViewModel
-
-        @State private var delayShow: DispatchWorkItem?
 
         var body: some View {
             VStack(alignment: .leading, spacing: 16) {
@@ -444,14 +438,14 @@ struct CommentsView: View {
                     }
 
                     if vm.reply == comment.commentId {
-                        CommentTextArea(postId: postId, adb: adb, type: type)
+                        CommentTextArea()
                     }
                 }
 
                 if !comment.replies.isEmpty {
                     LazyVStack(alignment: .leading, spacing: 16) {
                         ForEach(comment.replies) { reply in
-                            CommentsViewComponent(comment: reply, postId: postId, adb: adb, type: type)
+                            CommentsViewComponent(comment: reply)
                         }
                     }
                     .padding(.leading, 16)
@@ -527,22 +521,13 @@ struct CommentsView: View {
     }
 
     private struct CommentTextArea: View {
-        private let postId: String
-        private let adb: String?
-        private let type: String?
-
-        init(postId: String, adb: String?, type: String?) {
-            self.postId = postId
-            self.adb = adb
-            self.type = type
-        }
-
         @State private var feedback: String = ""
         @State private var name: String = ""
         @State private var selection: NSRange = .init(location: 0, length: 0)
 
         @Default(.isLoggedIn) private var isLoggedIn
         @Default(.allowedComments) private var allowedComments
+
         @EnvironmentObject private var appState: AppState
         @EnvironmentObject private var vm: CommentsViewModel
 
@@ -665,7 +650,7 @@ struct CommentsView: View {
                     }
 
                     Button {
-                        vm.sendComment(name: isLoggedIn ? nil : name, text: feedback, postId: postId, adb: adb, type: type)
+                        vm.sendComment(name: isLoggedIn ? nil : name, text: feedback)
 
                         name = ""
                         feedback = ""

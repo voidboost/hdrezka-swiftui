@@ -10,11 +10,11 @@ class WatchingLaterViewModel: ObservableObject {
     private var subscriptions: Set<AnyCancellable> = []
 
     @Published private(set) var state: DataState<[MovieWatchLater]> = .loading
- 
+
     @Published private(set) var error: Error?
     @Published var isErrorPresented: Bool = false
 
-    func getMovies() {
+    func load() {
         state = .loading
 
         getWatchingLaterMoviesUseCase()
