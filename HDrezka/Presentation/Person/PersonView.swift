@@ -3,24 +3,25 @@ import NukeUI
 import SwiftUI
 
 struct PersonView: View {
-    private let person: PersonSimple
+    private let title: String
         
-    @StateObject private var vm = PersonViewModel()
+    @StateObject private var vm: PersonViewModel
+    
+    init(person: PersonSimple) {
+        self.title = person.name
+        self._vm = StateObject(wrappedValue: PersonViewModel(id: person.personId))
+    }
     
     @State private var showBar: Bool = false
     
     @Default(.mirror) private var mirror
     @Default(.isLoggedIn) private var isLoggedIn
     
-    init(person: PersonSimple) {
-        self.person = person
-    }
-    
     var body: some View {
         Group {
             if let error = vm.state.error {
-                ErrorStateView(error, person.name) {
-                    vm.getDetails(id: person.personId)
+                ErrorStateView(error, title) {
+                    vm.load()
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
@@ -42,15 +43,15 @@ struct PersonView: View {
                 .coordinateSpace(name: "scroll")
                 .scrollIndicators(.never)
             } else {
-                LoadingStateView(person.name)
+                LoadingStateView(title)
                     .padding(.vertical, 52)
                     .padding(.horizontal, 36)
             }
         }
-        .navigationBar(title: person.name, showBar: showBar, navbar: {
+        .navigationBar(title: title, showBar: showBar, navbar: {
             if case .data = vm.state {
                 Button {
-                    vm.getDetails(id: person.personId)
+                    vm.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -59,7 +60,7 @@ struct PersonView: View {
             }
         }, toolbar: {
             if case .data = vm.state {
-                CustomShareLink(items: [(mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: person.personId, directoryHint: .notDirectory)]) {
+                CustomShareLink(items: [(mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: vm.id, directoryHint: .notDirectory)]) {
                     Image(systemName: "square.and.arrow.up")
                 }
                 .buttonStyle(NavbarButtonStyle(width: 30, height: 22))
@@ -70,7 +71,7 @@ struct PersonView: View {
             case .data:
                 break
             default:
-                vm.getDetails(id: person.personId)
+                vm.load()
             }
         }
         .background(.background)

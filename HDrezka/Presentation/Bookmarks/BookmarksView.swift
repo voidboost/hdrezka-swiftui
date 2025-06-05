@@ -4,16 +4,16 @@ import FactoryKit
 import SwiftUI
 
 struct BookmarksView: View {
-    @StateObject private var vm = BookmarksViewModel()
-        
-    @Default(.isLoggedIn) private var isLoggedIn
+    private let title = String(localized: "key.bookmarks")
 
+    @StateObject private var vm = BookmarksViewModel()
+    
     private let columns = [
         GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading)
     ]
-    
-    private let title = String(localized: "key.bookmarks")
-    
+        
+    @Default(.isLoggedIn) private var isLoggedIn
+
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
             Group {

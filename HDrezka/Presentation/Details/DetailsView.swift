@@ -7,41 +7,39 @@ import Vision
 import YouTubePlayerKit
 
 struct DetailsView: View {
-    private let movie: MovieSimple
+    private let title: String?
     
-    @StateObject private var vm = DetailsViewModel()
+    @StateObject private var vm: DetailsViewModel
     
-    @Default(.isLoggedIn) private var isLoggedIn
-    @Default(.mirror) private var mirror
-
-    @EnvironmentObject private var appState: AppState
-
+    init(movie: MovieSimple) {
+        self.title = movie.name
+        self._vm = StateObject(wrappedValue: DetailsViewModel(id: movie.movieId))
+    }
+    
     @State private var isBookmarksPresented = false
     @State private var isCreateBookmarkPresented = false
     @State private var isSchedulePresented = false
     
     @State private var showBar: Bool = false
     
-    init(movie: MovieSimple) {
-        self.movie = movie
-    }
+    @Default(.isLoggedIn) private var isLoggedIn
+    @Default(.mirror) private var mirror
     
+    @EnvironmentObject private var appState: AppState
+
     var body: some View {
         Group {
             if let error = vm.state.error {
-                ErrorStateView(error, movie.name) {
-                    vm.getDetails(id: movie.movieId)
+                ErrorStateView(error, title) {
+                    vm.load()
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
             } else if let details = vm.state.data {
                 ScrollView(.vertical) {
                     LazyVStack(alignment: .leading, spacing: 18) {
-                        DetailsViewComponent(details: details, trailer: vm.trailer, isSchedulePresented: $isSchedulePresented) { rating in
-                            if let id = details.movieId.id {
-                                vm.rate(id: id, rating: rating)
-                            }
-                        }
+                        DetailsViewComponent(details: details, trailer: vm.trailer, isSchedulePresented: $isSchedulePresented)
+                            .environmentObject(vm)
                     }
                     .onGeometryChange(for: Bool.self) { geometry in
                         -geometry.frame(in: .named("scroll")).origin.y / 52 >= 1
@@ -54,15 +52,15 @@ struct DetailsView: View {
                 .scrollIndicators(.never)
                 .coordinateSpace(name: "scroll")
             } else {
-                LoadingStateView(movie.name)
+                LoadingStateView(title)
                     .padding(.vertical, 52)
                     .padding(.horizontal, 36)
             }
         }
-        .navigationBar(title: vm.state.data?.nameRussian ?? movie.name ?? "", showBar: showBar, navbar: {
+        .navigationBar(title: vm.state.data?.nameRussian ?? title ?? "", showBar: showBar, navbar: {
             if case .data = vm.state {
                 Button {
-                    vm.getDetails(id: movie.movieId)
+                    vm.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -100,8 +98,8 @@ struct DetailsView: View {
                 }
                              
                 CustomShareLink(items: [
-                    (mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: movie.movieId, directoryHint: .notDirectory),
-                    Const.details.appending(queryItems: [.init(name: "id", value: movie.movieId)])
+                    (mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: vm.id, directoryHint: .notDirectory),
+                    Const.details.appending(queryItems: [.init(name: "id", value: vm.id)])
                 ]) {
                     Image(systemName: "square.and.arrow.up")
                 }
@@ -113,11 +111,11 @@ struct DetailsView: View {
             case .data:
                 break
             default:
-                vm.getDetails(id: movie.movieId)
+                vm.load()
             }
         }
         .sheet(isPresented: $isBookmarksPresented) {
-            BookmarksSheetView(movie: movie, isCreateBookmarkPresented: $isCreateBookmarkPresented)
+            BookmarksSheetView(id: vm.id, isCreateBookmarkPresented: $isCreateBookmarkPresented)
         }
         .sheet(isPresented: $isCreateBookmarkPresented) {
             CreateBookmarkSheetView()
@@ -147,15 +145,13 @@ struct DetailsView: View {
         private let details: MovieDetailed
         private let trailer: YouTubePlayer?
         @Binding private var isSchedulePresented: Bool
-        private let rate: (Int) -> Void
         
         @EnvironmentObject private var appState: AppState
 
-        init(details: MovieDetailed, trailer: YouTubePlayer?, isSchedulePresented: Binding<Bool>, rate: @escaping (Int) -> Void) {
+        init(details: MovieDetailed, trailer: YouTubePlayer?, isSchedulePresented: Binding<Bool>) {
             self.details = details
             self.trailer = trailer
             self._isSchedulePresented = isSchedulePresented
-            self.rate = rate
         }
         
         @State private var isPlayPresented: Bool = false
@@ -400,9 +396,7 @@ struct DetailsView: View {
                                             Divider()
                                         }
                                         
-                                        InfoRowRating(String(localized: "key.info.rating"), rating, details.rated, details.votes) { rating in
-                                            rate(rating)
-                                        }
+                                        InfoRowRating(String(localized: "key.info.rating"), rating, details.rated, details.votes)
                                     }
                                 }
                                 .padding(.horizontal, 10)
@@ -1028,19 +1022,19 @@ struct DetailsView: View {
             private let rating: Float
             private let rated: Bool
             private let votes: String?
-            private let rate: (Int) -> Void
             
             @State private var hover: Float?
             @State private var vote: Bool = false
             
             @Default(.isLoggedIn) private var isLoggedIn
+            
+            @EnvironmentObject private var vm: DetailsViewModel
 
-            init(_ title: String, _ rating: Float, _ rated: Bool, _ votes: String?, rate: @escaping (Int) -> Void) {
+            init(_ title: String, _ rating: Float, _ rated: Bool, _ votes: String?) {
                 self.title = title
                 self.rating = rating
                 self.rated = rated
                 self.votes = votes
-                self.rate = rate
             }
             
             private var stars: some View {
@@ -1048,7 +1042,7 @@ struct DetailsView: View {
                     ForEach(0 ..< 10) { index in
                         if !rated, isLoggedIn {
                             Button {
-                                rate(index + 1)
+                                vm.rate(rating: index + 1)
                             } label: {
                                 Image(systemName: "star.fill")
                                     .font(.system(size: 13, design: .rounded))
@@ -1142,12 +1136,13 @@ struct DetailsView: View {
         
         private struct PersonTextWithPhoto: View {
             private let person: PersonSimple
-            @State private var show: Bool = false
-            
+          
             init(person: PersonSimple) {
                 self.person = person
             }
             
+            @State private var show: Bool = false
+
             var body: some View {
                 Text(person.name)
                     .font(.system(size: 13))
@@ -1241,8 +1236,6 @@ struct DetailsView: View {
             private let valueColor: Color?
             private let url: URL?
             
-            @State private var show: Bool = false
-
             init(_ title: String, _ value: String, _ subtitle: T, valueColor: Color? = nil, hover: String? = nil, url: URL? = nil) {
                 self.title = title
                 self.value = value
@@ -1252,6 +1245,8 @@ struct DetailsView: View {
                 self.url = url
             }
             
+            @State private var show: Bool = false
+
             var body: some View {
                 HStack(alignment: .center, spacing: 0) {
                     Spacer()

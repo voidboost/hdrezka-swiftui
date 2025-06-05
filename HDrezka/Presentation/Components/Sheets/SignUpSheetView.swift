@@ -436,32 +436,7 @@ struct SignUpSheetView: View {
                                                 }
                                                 .onSubmit {
                                                     if emailValid == true, usernameValid == true, passwordValid == true, confirmPasswordValid == true {
-                                                        withAnimation(.easeInOut) {
-                                                            state = .loading
-                                                        }
-                                                        
-                                                        signUpUseCase(email: email, login: username, password: password1)
-                                                            .receive(on: DispatchQueue.main)
-                                                            .sink { completion in
-                                                                guard case let .failure(error) = completion else { return }
-                                                                
-                                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                                    withAnimation(.easeInOut) {
-                                                                        state = .error(error as NSError)
-                                                                    }
-                                                                }
-                                                            } receiveValue: { success in
-                                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                                    if success {
-                                                                        dismiss()
-                                                                    } else {
-                                                                        withAnimation(.easeInOut) {
-                                                                            state = .error(NSError())
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                            .store(in: &subscriptions)
+                                                        load()
                                                     }
                                                 }
                                         } else {
@@ -494,32 +469,7 @@ struct SignUpSheetView: View {
                                                 }
                                                 .onSubmit {
                                                     if emailValid == true, usernameValid == true, passwordValid == true, confirmPasswordValid == true {
-                                                        withAnimation(.easeInOut) {
-                                                            state = .loading
-                                                        }
-                                                        
-                                                        signUpUseCase(email: email, login: username, password: password1)
-                                                            .receive(on: DispatchQueue.main)
-                                                            .sink { completion in
-                                                                guard case let .failure(error) = completion else { return }
-                                                                
-                                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                                    withAnimation(.easeInOut) {
-                                                                        state = .error(error as NSError)
-                                                                    }
-                                                                }
-                                                            } receiveValue: { success in
-                                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                                    if success {
-                                                                        dismiss()
-                                                                    } else {
-                                                                        withAnimation(.easeInOut) {
-                                                                            state = .error(NSError())
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                            .store(in: &subscriptions)
+                                                        load()
                                                     }
                                                 }
                                         }
@@ -566,32 +516,7 @@ struct SignUpSheetView: View {
                         
                         VStack(alignment: .center, spacing: 10) {
                             Button {
-                                withAnimation(.easeInOut) {
-                                    state = .loading
-                                }
-                                
-                                signUpUseCase(email: email, login: username, password: password1)
-                                    .receive(on: DispatchQueue.main)
-                                    .sink { completion in
-                                        guard case let .failure(error) = completion else { return }
-                                        
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                            withAnimation(.easeInOut) {
-                                                state = .error(error as NSError)
-                                            }
-                                        }
-                                    } receiveValue: { success in
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                            if success {
-                                                dismiss()
-                                            } else {
-                                                withAnimation(.easeInOut) {
-                                                    state = .error(NSError())
-                                                }
-                                            }
-                                        }
-                                    }
-                                    .store(in: &subscriptions)
+                                load()
                             } label: {
                                 Text("key.sign_up")
                                     .frame(width: 250, height: 30)
@@ -723,5 +648,34 @@ struct SignUpSheetView: View {
             .fixedSize(horizontal: false, vertical: true)
             .frame(width: 520)
         }
+    }
+    
+    private func load() {
+        withAnimation(.easeInOut) {
+            state = .loading
+        }
+        
+        signUpUseCase(email: email, login: username, password: password1)
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                guard case let .failure(error) = completion else { return }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    withAnimation(.easeInOut) {
+                        state = .error(error as NSError)
+                    }
+                }
+            } receiveValue: { success in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    if success {
+                        dismiss()
+                    } else {
+                        withAnimation(.easeInOut) {
+                            state = .error(NSError())
+                        }
+                    }
+                }
+            }
+            .store(in: &subscriptions)
     }
 }

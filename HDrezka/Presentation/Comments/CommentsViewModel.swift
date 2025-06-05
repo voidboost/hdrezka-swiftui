@@ -10,6 +10,16 @@ class CommentsViewModel: ObservableObject {
     @Injected(\.sendCommentUseCase) private var sendCommentUseCase
     @Injected(\.getLikesUseCase) private var getLikesUseCase
 
+    private let id: String
+    private let adb: String?
+    private let type: String?
+
+    init(id: String, adb: String?, type: String?) {
+        self.id = id
+        self.adb = adb
+        self.type = type
+    }
+
     private var subscriptions: Set<AnyCancellable> = []
 
     @Published private(set) var state: DataState<[Comment]> = .loading
@@ -60,12 +70,12 @@ class CommentsViewModel: ObservableObject {
             .store(in: &subscriptions)
     }
 
-    func load(movieId: String) {
+    func load() {
         paginationState = .idle
         state = .loading
         page = 1
 
-        if let movieId = movieId.id {
+        if let movieId = id.id {
             getData(movieId: movieId)
         } else {
             withAnimation(.easeInOut) {
@@ -74,14 +84,14 @@ class CommentsViewModel: ObservableObject {
         }
     }
 
-    func loadMore(movieId: String) {
+    func loadMore() {
         guard paginationState == .idle else { return }
 
         withAnimation(.easeInOut) {
             paginationState = .loading
         }
 
-        if let movieId = movieId.id {
+        if let movieId = id.id {
             getData(movieId: movieId, isInitial: false)
         } else {
             withAnimation(.easeInOut) {
@@ -139,9 +149,9 @@ class CommentsViewModel: ObservableObject {
             .store(in: &subscriptions)
     }
 
-    func sendComment(name: String?, text: String, postId: String, adb: String?, type: String?) {
-        if let postId = postId.id {
-            sendCommentUseCase(id: reply, postId: postId, name: name, text: text, adb: adb, type: type)
+    func sendComment(name: String?, text: String) {
+        if let id = id.id {
+            sendCommentUseCase(id: reply, postId: id, name: name, text: text, adb: adb, type: type)
                 .receive(on: DispatchQueue.main)
                 .sink { completion in
                     guard case let .failure(error) = completion else { return }

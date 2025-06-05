@@ -5,6 +5,8 @@ import FactoryKit
 import SwiftUI
 
 struct WatchingLaterView: View {
+    private let title = String(localized: "key.watching_later")
+
     @StateObject private var vm = WatchingLaterViewModel()
 
     private let columns = [
@@ -15,20 +17,18 @@ struct WatchingLaterView: View {
 
     @Default(.isLoggedIn) private var isLoggedIn
 
-    private let title = String(localized: "key.watching_later")
-
     var body: some View {
         Group {
             if let error = vm.state.error {
                 ErrorStateView(error, title) {
-                    vm.getMovies()
+                    vm.load()
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
             } else if let movies = vm.state.data {
                 if movies.isEmpty {
                     EmptyStateView(String(localized: "key.watching_later.empty"), title, String(localized: "key.watching_later.empty.description")) {
-                        vm.getMovies()
+                        vm.load()
                     }
                     .padding(.vertical, 52)
                     .padding(.horizontal, 36)
@@ -90,7 +90,7 @@ struct WatchingLaterView: View {
         .navigationBar(title: title, showBar: showBar, navbar: {
             if let movies = vm.state.data, !movies.isEmpty {
                 Button {
-                    vm.getMovies()
+                    vm.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -103,7 +103,7 @@ struct WatchingLaterView: View {
             case .data:
                 break
             default:
-                vm.getMovies()
+                vm.load()
             }
         }
         .alert("key.ops", isPresented: $vm.isErrorPresented) {

@@ -29,7 +29,7 @@ struct SeriesUpdatesSheetView: View {
                             .lineLimit(nil)
 
                         Button {
-                            getSeriesUpdates()
+                            load()
                         } label: {
                             Text("key.retry")
                                 .foregroundStyle(.accent)
@@ -44,7 +44,7 @@ struct SeriesUpdatesSheetView: View {
                             Text("key.empty")
 
                             Button {
-                                getSeriesUpdates()
+                                load()
                             } label: {
                                 Text("key.retry")
                                     .foregroundStyle(.accent)
@@ -91,11 +91,11 @@ struct SeriesUpdatesSheetView: View {
         .padding(.bottom, 25)
         .frame(width: 520, height: 520)
         .task {
-            getSeriesUpdates()
+            load()
         }
     }
 
-    private func getSeriesUpdates() {
+    private func load() {
         withAnimation(.easeInOut) {
             self.state = .loading
         }

@@ -59,33 +59,7 @@ struct RestoreSheetView: View {
                                     }
                                     .onSubmit {
                                         if !login.isEmpty {
-                                            withAnimation(.easeInOut) {
-                                                state = .loading
-                                            }
-
-                                            restoreUseCase(login: login)
-                                                .receive(on: DispatchQueue.main)
-                                                .sink { completion in
-                                                    guard case let .failure(error) = completion else { return }
-
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                        withAnimation(.easeInOut) {
-                                                            state = .error(error as NSError)
-                                                        }
-                                                    }
-                                                } receiveValue: { email in
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                                        if let email, !email.isEmpty {
-                                                            self.email = email
-                                                            isSuccessPresented = true
-                                                        } else {
-                                                            withAnimation(.easeInOut) {
-                                                                state = .error(NSError())
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                .store(in: &subscriptions)
+                                            load()
                                         }
                                     }
                             }
@@ -103,33 +77,7 @@ struct RestoreSheetView: View {
 
                     VStack(alignment: .center, spacing: 10) {
                         Button {
-                            withAnimation(.easeInOut) {
-                                state = .loading
-                            }
-
-                            restoreUseCase(login: login)
-                                .receive(on: DispatchQueue.main)
-                                .sink { completion in
-                                    guard case let .failure(error) = completion else { return }
-
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                        withAnimation(.easeInOut) {
-                                            state = .error(error as NSError)
-                                        }
-                                    }
-                                } receiveValue: { email in
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                        if let email, !email.isEmpty {
-                                            self.email = email
-                                            isSuccessPresented = true
-                                        } else {
-                                            withAnimation(.easeInOut) {
-                                                state = .error(NSError())
-                                            }
-                                        }
-                                    }
-                                }
-                                .store(in: &subscriptions)
+                            load()
                         } label: {
                             Text("key.restore")
                                 .frame(width: 250, height: 30)
@@ -260,5 +208,35 @@ struct RestoreSheetView: View {
         } message: {
             Text("key.restore.success.message-\(email)")
         }
+    }
+
+    private func load() {
+        withAnimation(.easeInOut) {
+            state = .loading
+        }
+
+        restoreUseCase(login: login)
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                guard case let .failure(error) = completion else { return }
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    withAnimation(.easeInOut) {
+                        state = .error(error as NSError)
+                    }
+                }
+            } receiveValue: { email in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    if let email, !email.isEmpty {
+                        self.email = email
+                        isSuccessPresented = true
+                    } else {
+                        withAnimation(.easeInOut) {
+                            state = .error(NSError())
+                        }
+                    }
+                }
+            }
+            .store(in: &subscriptions)
     }
 }

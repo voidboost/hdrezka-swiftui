@@ -9,7 +9,7 @@ class CategoriesViewModel: ObservableObject {
 
     private var subscriptions: Set<AnyCancellable> = []
 
-    func getTypes() {
+    func load() {
         state = .loading
 
         categoriesUseCase()

@@ -8,12 +8,18 @@ class DetailsViewModel: ObservableObject {
     @Injected(\.getMovieTrailerIdUseCase) private var getMovieTrailerIdUseCase
     @Injected(\.rateUseCase) private var rateUseCase
 
+    let id: String
+
+    init(id: String) {
+        self.id = id
+    }
+
     private var subscriptions: Set<AnyCancellable> = []
 
     @Published private(set) var state: DataState<MovieDetailed> = .loading
     @Published private(set) var trailer: YouTubePlayer?
 
-    func getDetails(id: String) {
+    func load() {
         state = .loading
 
         getMovieDetailsUseCase(movieId: id)
@@ -68,25 +74,27 @@ class DetailsViewModel: ObservableObject {
     @Published var isErrorPresented: Bool = false
     @Published var error: Error?
 
-    func rate(id: String, rating: Int) {
-        rateUseCase(id: id, rating: rating)
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
+    func rate(rating: Int) {
+        if let id = id.id {
+            rateUseCase(id: id, rating: rating)
+                .receive(on: DispatchQueue.main)
+                .sink { completion in
+                    guard case let .failure(error) = completion else { return }
 
-                self.error = error
-                self.isErrorPresented = true
-            } receiveValue: { rating in
-                if let rating, case var .data(details) = self.state {
-                    details.rate(rating.0, rating.1)
-
-                    withAnimation(.easeInOut) {
-                        self.state = .data(details)
-                    }
-                } else {
+                    self.error = error
                     self.isErrorPresented = true
+                } receiveValue: { rating in
+                    if let rating, case var .data(details) = self.state {
+                        details.rate(rating.0, rating.1)
+
+                        withAnimation(.easeInOut) {
+                            self.state = .data(details)
+                        }
+                    } else {
+                        self.isErrorPresented = true
+                    }
                 }
-            }
-            .store(in: &subscriptions)
+                .store(in: &subscriptions)
+        }
     }
 }
