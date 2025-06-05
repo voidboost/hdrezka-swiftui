@@ -533,23 +533,23 @@ struct PlayerView: View {
         .navigationTitle(Text(verbatim: "Player - \(name)"))
         .padding(1)
         .task {
-            setupPlayer(subtitles: selectPositions.first(where: { position in position.id == voiceActing.voiceId })?.subtitles) {
-                if hideMainWindow, let window = appState.window {
-                    let animation = window.animationBehavior
-                    window.animationBehavior = .none
-                    window.orderOut(nil)
-                    window.animationBehavior = animation
-                }
+            setupPlayer(subtitles: selectPositions.first(where: { position in position.id == voiceActing.voiceId })?.subtitles)
+
+            if hideMainWindow, let window = appState.window {
+                let animation = window.animationBehavior
+                window.animationBehavior = .none
+                window.orderOut(nil)
+                window.animationBehavior = animation
             }
         }
         .onDisappear {
-            resetPlayer {
-                if hideMainWindow, let window = appState.window {
-                    let animation = window.animationBehavior
-                    window.animationBehavior = .none
-                    window.orderFront(nil)
-                    window.animationBehavior = animation
-                }
+            resetPlayer()
+
+            if hideMainWindow, let window = appState.window {
+                let animation = window.animationBehavior
+                window.animationBehavior = .none
+                window.orderFront(nil)
+                window.animationBehavior = animation
             }
         }
         .onContinuousHover { phase in
@@ -692,7 +692,7 @@ struct PlayerView: View {
         )
     }
 
-    private func setupPlayer(seek: CMTime? = nil, isPlaying playing: Bool = true, isMuted muted: Bool = false, subtitles: String? = nil, completion: (() -> Void)? = nil, volume vol: Float = 1.0) {
+    private func setupPlayer(seek: CMTime? = nil, isPlaying playing: Bool = true, isMuted muted: Bool = false, subtitles: String? = nil, volume vol: Float = 1.0) {
         guard let link = movie.getClosestTo(quality: quality),
               let url = URL(string: "\(link.absoluteString):hls:manifest.m3u8")
         else {
@@ -1107,10 +1107,6 @@ struct PlayerView: View {
                 self.playerLayer.player = player
                 self.pipController = pipController
             }
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                completion?()
-            }
         }
     }
 
@@ -1152,8 +1148,10 @@ struct PlayerView: View {
             isLoading = true
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-            completion?()
+        if let completion {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                completion()
+            }
         }
 
         duration = .greatestFiniteMagnitude
