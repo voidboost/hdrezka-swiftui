@@ -7,7 +7,6 @@ import SwiftUI
 struct SettingsView: View {
     @Default(.mirror) private var currentMirror
     @Default(.isLoggedIn) private var isLoggedIn
-    @Default(.navigationAnimation) private var navigationAnimation
     @Default(.playerFullscreen) private var playerFullscreen
     @Default(.hideMainWindow) private var hideMainWindow
     @Default(.defaultQuality) private var defaultQuality
@@ -135,19 +134,6 @@ struct SettingsView: View {
             .frame(height: 40)
 
             VStack(spacing: 0) {
-                HStack(alignment: .center, spacing: 8) {
-                    Text("key.navigationAnimation")
-
-                    Spacer()
-
-                    Toggle("key.navigationAnimation", isOn: $navigationAnimation)
-                        .toggleStyle(.switch)
-                        .labelsHidden()
-                }
-                .frame(height: 40)
-
-                Divider()
-
                 HStack(alignment: .center, spacing: 8) {
                     Text("key.playerFullscreen")
 

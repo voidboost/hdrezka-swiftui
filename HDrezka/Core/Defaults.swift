@@ -9,7 +9,6 @@ extension Defaults.Keys {
     static let allowedComments = Key<Bool>("allowed_comments", default: false)
     static let defaultQuality = Key<DefaultQuality>("default_quality", default: .ask)
 
-    static let navigationAnimation = Key<Bool>("navigation_animation", default: false)
     static let playerFullscreen = Key<Bool>("player_fullscreen", default: false)
     static let hideMainWindow = Key<Bool>("hide_main_window", default: false)
     static let spatialAudio = Key<SpatialAudio>("spatial_audio", default: .off)

@@ -106,7 +106,7 @@ struct HomeView: View {
                 .buttonStyle(NavbarButtonStyle(width: 30, height: 22))
             }
         })
-        .load(isLoggedIn) {
+        .task(id: isLoggedIn) {
             switch vm.state {
             case .data:
                 break

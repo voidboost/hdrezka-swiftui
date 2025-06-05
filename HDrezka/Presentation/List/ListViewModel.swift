@@ -131,16 +131,8 @@ class ListViewModel: ObservableObject {
                 }
                 .store(in: &subscriptions)
         } else if let movies {
-            if Defaults[.navigationAnimation] {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    withAnimation(.easeInOut) {
-                        self.state = .data(movies)
-                    }
-                }
-            } else {
-                withAnimation(.easeInOut) {
-                    self.state = .data(movies)
-                }
+            withAnimation(.easeInOut) {
+                self.state = .data(movies)
             }
         } else if let country {
             getPublisher(country: country)

@@ -9,14 +9,9 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
     
     private let height: CGFloat = 52
     
-    @State private var index: Int
-    @State private var width: CGFloat = .zero
-    @State private var parallax = false
-    
     @EnvironmentObject private var appState: AppState
 
     @Default(.isLoggedIn) private var isLoggedIn
-    @Default(.navigationAnimation) private var navigationAnimation
     
     init(
         title: String,
@@ -28,7 +23,6 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
         self.showBar = showBar
         self.navbar = navbar?()
         self.toolbar = toolbar?()
-        self.index = AppState.shared.path.count
     }
     
     init(
@@ -42,20 +36,14 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
     func body(content: Content) -> some View {
         content
             .navigationTitle(Text(verbatim: "HDrezka - \(title)"))
-            .customOnChange(of: appState.path) {
-                if parallax != (appState.path.count != index) {
-                    withAnimation(.easeInOut) {
-                        parallax = appState.path.count > index
-                    }
-                }
-            }
+            .transition(.opacity)
             .ignoresSafeArea(edges: .top)
             .overlay {
                 VStack {
                     ZStack(alignment: .bottom) {
                         HStack(alignment: .center, spacing: 8) {
                             HStack(alignment: .center, spacing: 5) {
-                                if index > 0 {
+                                if !appState.path.isEmpty {
                                     Button {
                                         backButtonAction()
                                     } label: {
@@ -106,12 +94,6 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
                     Spacer()
                 }
             }
-            .onGeometryChange(for: CGFloat.self) { geometry in
-                geometry.size.width
-            } action: { width in
-                self.width = width
-            }
-            .offset(x: parallax && navigationAnimation ? width / -4 : 0)
             .clipShape(Rectangle())
     }
     

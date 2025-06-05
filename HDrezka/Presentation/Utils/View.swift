@@ -10,18 +10,6 @@ extension View {
             .aspectRatio(ratio, contentMode: .fit)
     }
 
-    @ViewBuilder func load<T: Equatable>(_ id: T, _ block: @escaping () -> Void) -> some View {
-        task(id: id) {
-            if Defaults[.navigationAnimation] {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    block()
-                }
-            } else {
-                block()
-            }
-        }
-    }
-
     @ViewBuilder func customOnChange<V: Equatable>(of value: V, _ action: @escaping () -> Void) -> some View {
         if #available(macOS 14, *) {
             onChange(of: value) {

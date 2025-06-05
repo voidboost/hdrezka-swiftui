@@ -3501,28 +3501,6 @@
         }
       }
     },
-    "key.navigationAnimation" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Navigation animation (unstable)"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Анимация навигации (не стабильно)"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Анімація навігації (нестабільно)"
-          }
-        }
-      }
-    },
     "key.next" : {
       "localizations" : {
         "en" : {

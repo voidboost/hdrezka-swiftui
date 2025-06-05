@@ -341,7 +341,7 @@ struct BookmarksView: View {
         .customOnChange(of: vm.genre) {
             vm.load()
         }
-        .load(isLoggedIn) {
+        .task(id: isLoggedIn) {
             switch vm.bookmarksState {
             case .data:
                 break
