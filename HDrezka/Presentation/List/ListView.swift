@@ -203,7 +203,7 @@ struct ListView: View {
                 }
             }
         })
-        .load(isLoggedIn) {
+        .task(id: isLoggedIn) {
             switch vm.state {
             case .data:
                 break

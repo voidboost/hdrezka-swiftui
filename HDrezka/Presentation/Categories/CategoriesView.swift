@@ -84,7 +84,7 @@ struct CategoriesView: View {
                 .keyboardShortcut("r", modifiers: .command)
             }
         })
-        .load(isLoggedIn) {
+        .task(id: isLoggedIn) {
             switch vm.state {
             case .data:
                 break

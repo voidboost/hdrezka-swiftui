@@ -12,7 +12,6 @@ struct ContentView: View {
 
     @Default(.isLoggedIn) private var isLoggedIn
     @Default(.mirror) private var mirror
-    @Default(.navigationAnimation) private var navigationAnimation
     @Default(.isUserPremium) private var isUserPremium
     @Default(.lastHdrezkaAppVersion) private var lastHdrezkaAppVersion
 
@@ -238,7 +237,7 @@ struct ContentView: View {
 
             Divider()
 
-            NavigationStack(path: $appState.path.animationIf(navigationAnimation)) {
+            NavigationStack(path: $appState.path) {
                 HomeView()
                     .id("home")
                     .navigationDestination(for: Destinations.self) { destination in
@@ -246,63 +245,48 @@ struct ContentView: View {
                         case .home:
                             HomeView()
                                 .id("home")
-                                .transition(.move(edge: .trailing))
                         case .search:
                             SearchView(searchText: query)
                                 .id("search")
-                                .transition(.move(edge: .trailing))
                         case .categories:
                             CategoriesView()
                                 .id("categories")
-                                .transition(.move(edge: .trailing))
                         case .collections:
                             CollectionsView()
                                 .id("collections")
-                                .transition(.move(edge: .trailing))
                         case .watchingLater:
                             WatchingLaterView()
                                 .id("watching_later")
-                                .transition(.move(edge: .trailing))
                         case .bookmarks:
                             BookmarksView()
                                 .id("bookmarks")
-                                .transition(.move(edge: .trailing))
                         case let .details(movie):
                             DetailsView(movie: movie)
                                 .id(movie.movieId)
-                                .transition(.move(edge: .trailing))
                         case let .country(country):
                             ListView(country: country)
                                 .id(country.countryId)
-                                .transition(.move(edge: .trailing))
                         case let .category(category):
                             ListView(category: category)
                                 .id(category)
-                                .transition(.move(edge: .trailing))
                         case let .genre(genre):
                             ListView(genre: genre)
                                 .id(genre.genreId)
-                                .transition(.move(edge: .trailing))
                         case let .collection(collection):
                             ListView(collection: collection)
                                 .id(collection.collectionId)
-                                .transition(.move(edge: .trailing))
                         case let .customList(movies, title):
                             ListView(movies: movies, title: title)
                                 .id(title)
-                                .transition(.move(edge: .trailing))
                         case let .list(list):
                             ListView(list: list)
                                 .id(list.listId)
-                                .transition(.move(edge: .trailing))
                         case let .person(person):
                             PersonView(person: person)
                                 .id(person.personId)
-                                .transition(.move(edge: .trailing))
                         case let .comments(details):
                             CommentsView(details: details)
                                 .id(details.movieId)
-                                .transition(.move(edge: .trailing))
                         }
                     }
             }
@@ -322,6 +306,8 @@ struct ContentView: View {
         }
         .customOnChange(of: query.trimmingCharacters(in: .whitespacesAndNewlines)) {
             let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            guard !trimmed.isEmpty else { return }
 
             if trimmed.removeMirror().id != nil {
                 if case let .details(movie) = appState.path.last, movie.movieId == trimmed.removeMirror() {
@@ -445,10 +431,4 @@ struct BlurredView: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: NSViewType, context: Context) {}
-}
-
-private extension Binding {
-    func animationIf(_ condition: Bool) -> Binding<Value> {
-        return condition ? animation(.easeInOut) : self
-    }
 }
