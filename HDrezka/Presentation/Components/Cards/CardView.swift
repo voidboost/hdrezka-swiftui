@@ -30,8 +30,7 @@ struct CardView: View {
                                     )
                                 )
                         } else {
-                            Rectangle()
-                                .fill(.gray)
+                            Color.gray
                                 .shimmering()
                                 .transition(
                                     .asymmetric(
@@ -67,7 +66,7 @@ struct CardView: View {
                                         .padding(.vertical, 3)
                                         .padding(.horizontal, 6)
                                         .background(cat.color)
-                                        .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 6))
+                                        .clipShape(.rect(bottomLeadingRadius: 6))
                                     } else {
                                         (
                                             Text(verbatim: "\(cat.title) ") +
@@ -84,7 +83,7 @@ struct CardView: View {
                                         .padding(.vertical, 3)
                                         .padding(.horizontal, 6)
                                         .background(cat.color)
-                                        .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 6))
+                                        .clipShape(.rect(bottomLeadingRadius: 6))
                                     }
                                 }
                             }
@@ -99,14 +98,14 @@ struct CardView: View {
                                         .padding(.vertical, 3)
                                         .padding(.horizontal, 6)
                                         .background(.ultraThickMaterial)
-                                        .clipShape(UnevenRoundedRectangle(topTrailingRadius: 6))
+                                        .clipShape(.rect(topTrailingRadius: 6))
 
                                     Spacer()
                                 }
                             }
                         }
                     }
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .clipShape(.rect(cornerRadius: 6))
                 }
 
                 if let name = movie.name, let details = movie.details {
@@ -147,7 +146,7 @@ struct CardView: View {
                     }
                 }
             }
-            .contentShape(UnevenRoundedRectangle(topLeadingRadius: 6, topTrailingRadius: 6))
+            .contentShape(.rect(topLeadingRadius: 6, topTrailingRadius: 6))
             .viewModifier { view in
                 if draggable {
                     view.draggable(movie)

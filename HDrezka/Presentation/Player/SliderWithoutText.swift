@@ -35,13 +35,11 @@ struct SliderWithoutText<T: BinaryFloatingPoint>: View {
         GeometryReader { bounds in
             ZStack(alignment: .center) {
                 ZStack(alignment: .center) {
-                    Rectangle()
-                        .fill(emptyColor)
-                    Rectangle()
-                        .fill(isActive ? activeFillColor : fillColor)
+                    emptyColor
+                    (isActive ? activeFillColor : fillColor)
                         .mask {
                             HStack {
-                                Rectangle()
+                                Color.black
                                     .frame(width: max(bounds.size.width * CGFloat(localRealProgress + localTempProgress), 0), alignment: .leading)
                                 Spacer(minLength: 0)
                             }
@@ -49,8 +47,8 @@ struct SliderWithoutText<T: BinaryFloatingPoint>: View {
                 }
                 .frame(height: isActive ? height * 1.25 : height, alignment: .center)
                 .animation(.easeInOut, value: isActive)
-                .clipShape(Capsule())
-                .contentShape(Capsule())
+                .clipShape(.capsule)
+                .contentShape(.capsule)
                 .gesture(
                     DragGesture(minimumDistance: 0, coordinateSpace: .local)
                         .updating($isActive) { _, state, _ in

@@ -81,8 +81,8 @@ struct SeriesUpdatesSheetView: View {
                 Text("key.done")
                     .frame(width: 250, height: 30)
                     .background(.quinary.opacity(0.5))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                    .clipShape(.rect(cornerRadius: 6))
+                    .contentShape(.rect(cornerRadius: 6))
             }
             .buttonStyle(.plain)
         }
@@ -142,7 +142,7 @@ struct SeriesUpdatesSheetView: View {
                 } label: {
                     Label(group.date, systemImage: isExpanded ? "chevron.up" : "chevron.down")
                         .font(.system(size: 15).bold())
-                        .contentShape(Rectangle())
+                        .contentShape(.rect)
                 }
                 .buttonStyle(.plain)
 
@@ -185,7 +185,7 @@ struct SeriesUpdatesSheetView: View {
                                                         .padding(.vertical, 2)
                                                         .padding(.horizontal, 6)
                                                         .background(Const.premiumGradient)
-                                                        .clipShape(RoundedRectangle(cornerRadius: 40))
+                                                        .clipShape(.rect(cornerRadius: 40))
                                                 } else {
                                                     view
                                                 }
@@ -194,7 +194,7 @@ struct SeriesUpdatesSheetView: View {
                                     }
                                 }
                                 .padding(.vertical, 8)
-                                .contentShape(Rectangle())
+                                .contentShape(.rect)
                             }
                             .buttonStyle(.plain)
 
@@ -240,7 +240,7 @@ struct SeriesUpdatesSheetView: View {
                                                         .padding(.vertical, 2)
                                                         .padding(.horizontal, 6)
                                                         .background(Const.premiumGradient)
-                                                        .clipShape(RoundedRectangle(cornerRadius: 40))
+                                                        .clipShape(.rect(cornerRadius: 40))
                                                 } else {
                                                     view
                                                 }
@@ -249,7 +249,7 @@ struct SeriesUpdatesSheetView: View {
                                     }
                                 }
                                 .padding(.vertical, 8)
-                                .contentShape(Rectangle())
+                                .contentShape(.rect)
                             }
                             .buttonStyle(.plain)
 
@@ -260,11 +260,8 @@ struct SeriesUpdatesSheetView: View {
                     }
                     .padding(.horizontal, 10)
                     .background(.quinary)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary, lineWidth: 1)
-                    }
+                    .clipShape(.rect(cornerRadius: 6))
+                    .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
             }
         }

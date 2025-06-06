@@ -172,8 +172,8 @@ struct CommentsView: View {
                     Text("key.done")
                         .frame(width: 250, height: 30)
                         .background(.quinary.opacity(0.5))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .clipShape(.rect(cornerRadius: 6))
+                        .contentShape(.rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
             }
@@ -234,8 +234,7 @@ struct CommentsView: View {
                                         )
                                     )
                             } else {
-                                Rectangle()
-                                    .fill(.gray)
+                                Color.gray
                                     .shimmering()
                                     .transition(
                                         .asymmetric(
@@ -248,11 +247,8 @@ struct CommentsView: View {
                         .onDisappear(.cancel)
                         .scaledToFill()
                         .frame(width: 24, height: 24)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                        }
+                        .clipShape(.rect(cornerRadius: 12))
+                        .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 12).stroke(lineWidth: 1))
 
                         Text(comment.author)
                             .font(.system(size: 13, weight: .bold))
@@ -299,14 +295,8 @@ struct CommentsView: View {
                             }
                             .frame(height: 28)
                             .padding(.horizontal, 16)
-                            .background(
-                                RoundedRectangle(cornerRadius: 100)
-                                    .fill(.tertiary.opacity(0.05))
-                            )
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 100)
-                                    .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                            }
+                            .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 100))
+                            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
                         }
                         .buttonStyle(.plain)
                         .disabled(comment.selfComment)
@@ -344,15 +334,14 @@ struct CommentsView: View {
                                                         if let image = state.image {
                                                             image.resizable()
                                                         } else {
-                                                            Rectangle()
-                                                                .fill(.gray)
+                                                            Color.gray
                                                                 .shimmering()
                                                         }
                                                     }
                                                     .onDisappear(.cancel)
                                                     .scaledToFill()
                                                     .frame(width: 60, height: 60)
-                                                    .clipShape(RoundedRectangle(cornerRadius: 30))
+                                                    .clipShape(.rect(cornerRadius: 30))
 
                                                     Text(like.name)
                                                         .lineLimit(1)
@@ -385,12 +374,9 @@ struct CommentsView: View {
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .background(.tertiary.opacity(0.05))
-                            .clipShape(RoundedRectangle(cornerRadius: 100))
-                            .contentShape(RoundedRectangle(cornerRadius: 100))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 100)
-                                    .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                            }
+                            .clipShape(.rect(cornerRadius: 100))
+                            .contentShape(.rect(cornerRadius: 100))
+                            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
                         }
                         .buttonStyle(.plain)
 
@@ -404,12 +390,9 @@ struct CommentsView: View {
                                     .frame(height: 28)
                                     .padding(.horizontal, 16)
                                     .background(.tertiary.opacity(0.05))
-                                    .clipShape(RoundedRectangle(cornerRadius: 100))
-                                    .contentShape(RoundedRectangle(cornerRadius: 100))
-                                    .overlay {
-                                        RoundedRectangle(cornerRadius: 100)
-                                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                                    }
+                                    .clipShape(.rect(cornerRadius: 100))
+                                    .contentShape(.rect(cornerRadius: 100))
+                                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
                             }
                             .buttonStyle(.plain)
                         }
@@ -426,12 +409,9 @@ struct CommentsView: View {
                                     .frame(height: 28)
                                     .padding(.horizontal, 16)
                                     .background(.tertiary.opacity(0.05))
-                                    .clipShape(RoundedRectangle(cornerRadius: 100))
-                                    .contentShape(RoundedRectangle(cornerRadius: 100))
-                                    .overlay {
-                                        RoundedRectangle(cornerRadius: 100)
-                                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                                    }
+                                    .clipShape(.rect(cornerRadius: 100))
+                                    .contentShape(.rect(cornerRadius: 100))
+                                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
                             }
                             .buttonStyle(.plain)
                         }
@@ -487,8 +467,8 @@ struct CommentsView: View {
 
                                 SpoilerView()
                                     .background(.background)
-                                    .clipShape(Rectangle())
-                                    .contentShape(Rectangle())
+                                    .clipShape(.rect)
+                                    .contentShape(.rect)
                                     .onTapGesture {
                                         withAnimation(.easeInOut) {
                                             comment.removeSpoiler(spoiler.id)
@@ -545,12 +525,9 @@ struct CommentsView: View {
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .background(.tertiary.opacity(0.05))
-                            .clipShape(RoundedRectangle(cornerRadius: 100))
-                            .contentShape(RoundedRectangle(cornerRadius: 100))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 100)
-                                    .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                            }
+                            .clipShape(.rect(cornerRadius: 100))
+                            .contentShape(.rect(cornerRadius: 100))
+                            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
 
@@ -565,12 +542,9 @@ struct CommentsView: View {
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .background(.tertiary.opacity(0.05))
-                            .clipShape(RoundedRectangle(cornerRadius: 100))
-                            .contentShape(RoundedRectangle(cornerRadius: 100))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 100)
-                                    .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                            }
+                            .clipShape(.rect(cornerRadius: 100))
+                            .contentShape(.rect(cornerRadius: 100))
+                            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
 
@@ -585,12 +559,9 @@ struct CommentsView: View {
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .background(.tertiary.opacity(0.05))
-                            .clipShape(RoundedRectangle(cornerRadius: 100))
-                            .contentShape(RoundedRectangle(cornerRadius: 100))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 100)
-                                    .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                            }
+                            .clipShape(.rect(cornerRadius: 100))
+                            .contentShape(.rect(cornerRadius: 100))
+                            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
 
@@ -605,12 +576,9 @@ struct CommentsView: View {
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .background(.tertiary.opacity(0.05))
-                            .clipShape(RoundedRectangle(cornerRadius: 100))
-                            .contentShape(RoundedRectangle(cornerRadius: 100))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 100)
-                                    .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                            }
+                            .clipShape(.rect(cornerRadius: 100))
+                            .contentShape(.rect(cornerRadius: 100))
+                            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
 
@@ -625,12 +593,9 @@ struct CommentsView: View {
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .background(.tertiary.opacity(0.05))
-                            .clipShape(RoundedRectangle(cornerRadius: 100))
-                            .contentShape(RoundedRectangle(cornerRadius: 100))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 100)
-                                    .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                            }
+                            .clipShape(.rect(cornerRadius: 100))
+                            .contentShape(.rect(cornerRadius: 100))
+                            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
 
@@ -660,12 +625,9 @@ struct CommentsView: View {
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .background(.tertiary.opacity(0.05))
-                            .clipShape(RoundedRectangle(cornerRadius: 100))
-                            .contentShape(RoundedRectangle(cornerRadius: 100))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 100)
-                                    .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                            }
+                            .clipShape(.rect(cornerRadius: 100))
+                            .contentShape(.rect(cornerRadius: 100))
+                            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
                     .disabled(feedback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || (!isLoggedIn && name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) || !allowedComments)
@@ -675,11 +637,8 @@ struct CommentsView: View {
                 CursorPositionTextView(text: $feedback, selection: $selection, prompt: String(localized: "key.comments.placeholder").lowercased())
             }
             .padding(12)
-            .clipShape(RoundedRectangle(cornerRadius: 6))
-            .overlay {
-                RoundedRectangle(cornerRadius: 6)
-                    .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-            }
+            .clipShape(.rect(cornerRadius: 6))
+            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
             .customOnChange(of: feedback) {
                 if !allowedComments, !feedback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     appState.commentsRulesPresented = true

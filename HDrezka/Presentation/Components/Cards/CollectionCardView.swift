@@ -26,8 +26,7 @@ struct CollectionCardView: View {
                                     )
                                 )
                         } else {
-                            Rectangle()
-                                .fill(.gray)
+                            Color.gray
                                 .shimmering()
                                 .transition(
                                     .asymmetric(
@@ -56,7 +55,7 @@ struct CollectionCardView: View {
                                             .padding(.vertical, 3)
                                             .padding(.horizontal, 6)
                                             .background(.ultraThickMaterial)
-                                            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 6))
+                                            .clipShape(.rect(bottomLeadingRadius: 6))
                                     }
 
                                     Spacer()
@@ -70,12 +69,9 @@ struct CollectionCardView: View {
                                 .padding(9)
                         }
                     }
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary, lineWidth: 1)
-                    }
+                    .clipShape(.rect(cornerRadius: 6))
+                    .contentShape(.rect(cornerRadius: 6))
+                    .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
             }
         }

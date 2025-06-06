@@ -76,21 +76,20 @@ struct ImageView: View {
                     if let image = state.image {
                         image.resizable()
                     } else {
-                        Rectangle()
-                            .fill(.gray)
+                        Color.gray
                     }
                 }
                 .onDisappear(.cancel)
                 .scaledToFill()
                 .frame(maxWidth: .infinity)
-                .clipShape(Rectangle())
+                .clipShape(.rect)
 
                 VStack {}
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(.ultraThickMaterial)
             }
         }
-        .contentShape(Rectangle())
+        .contentShape(.rect)
         .toolbar(.hidden)
         .gesture(
             DragGesture()

@@ -89,11 +89,8 @@ struct SettingsView: View {
                 .padding(.horizontal, 15)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(.quinary)
-                .clipShape(RoundedRectangle(cornerRadius: 6))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 6)
-                        .stroke(.tertiary, lineWidth: 1)
-                }
+                .clipShape(.rect(cornerRadius: 6))
+                .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
 
                 if mirrorValid == true, let mirror, var urlComponents = URLComponents(url: mirror, resolvingAgainstBaseURL: false) {
                     Button {
@@ -121,12 +118,9 @@ struct SettingsView: View {
                             .foregroundStyle(.accent)
                             .bold()
                             .imageFill(1)
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
-                            .contentShape(RoundedRectangle(cornerRadius: 6))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 6)
-                                    .stroke(.accent, lineWidth: 1)
-                            }
+                            .clipShape(.rect(cornerRadius: 6))
+                            .contentShape(.rect(cornerRadius: 6))
+                            .overlay(.accent, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
                 }
@@ -183,12 +177,9 @@ struct SettingsView: View {
                         }
                     }
                     .background(.tertiary.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                    }
+                    .clipShape(.rect(cornerRadius: 6))
+                    .contentShape(.rect(cornerRadius: 6))
+                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
                 .frame(height: 40)
 
@@ -217,12 +208,9 @@ struct SettingsView: View {
                         }
                     }
                     .background(.tertiary.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                    }
+                    .clipShape(.rect(cornerRadius: 6))
+                    .contentShape(.rect(cornerRadius: 6))
+                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
                 .frame(height: 40)
 
@@ -251,12 +239,9 @@ struct SettingsView: View {
                             .bold()
                             .imageFill(1)
                             .frame(height: 30)
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
-                            .contentShape(RoundedRectangle(cornerRadius: 6))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 6)
-                                    .stroke(.accent, lineWidth: 1)
-                            }
+                            .clipShape(.rect(cornerRadius: 6))
+                            .contentShape(.rect(cornerRadius: 6))
+                            .overlay(.accent, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
                     .disabled(playerPositions.isEmpty)
@@ -289,12 +274,9 @@ struct SettingsView: View {
                                 .bold()
                                 .imageFill(1)
                                 .frame(height: 30)
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                                .contentShape(RoundedRectangle(cornerRadius: 6))
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .stroke(.accent, lineWidth: 1)
-                                }
+                                .clipShape(.rect(cornerRadius: 6))
+                                .contentShape(.rect(cornerRadius: 6))
+                                .overlay(.accent, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                         }
                         .buttonStyle(.plain)
                         .disabled(selectPositions.isEmpty)
@@ -304,11 +286,8 @@ struct SettingsView: View {
             }
             .padding(.horizontal, 15)
             .background(.quinary)
-            .clipShape(RoundedRectangle(cornerRadius: 6))
-            .overlay {
-                RoundedRectangle(cornerRadius: 6)
-                    .stroke(.tertiary, lineWidth: 1)
-            }
+            .clipShape(.rect(cornerRadius: 6))
+            .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
 
             VStack(spacing: 0) {
                 HStack(alignment: .center, spacing: 8) {
@@ -367,12 +346,9 @@ struct SettingsView: View {
                         }
                     }
                     .background(.tertiary.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                    }
+                    .clipShape(.rect(cornerRadius: 6))
+                    .contentShape(.rect(cornerRadius: 6))
+                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
                 .frame(height: 40)
                 .disabled(!automaticallyChecksForUpdates)
@@ -382,11 +358,8 @@ struct SettingsView: View {
             }
             .padding(.horizontal, 15)
             .background(.quinary)
-            .clipShape(RoundedRectangle(cornerRadius: 6))
-            .overlay {
-                RoundedRectangle(cornerRadius: 6)
-                    .stroke(.tertiary, lineWidth: 1)
-            }
+            .clipShape(.rect(cornerRadius: 6))
+            .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
         }
         .padding(25)
         .background(.background)

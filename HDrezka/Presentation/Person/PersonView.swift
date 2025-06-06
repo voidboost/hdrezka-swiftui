@@ -113,8 +113,7 @@ struct PersonView: View {
                                             )
                                         )
                                 } else {
-                                    Rectangle()
-                                        .fill(.gray)
+                                    Color.gray
                                         .shimmering()
                                         .transition(
                                             .asymmetric(
@@ -136,8 +135,8 @@ struct PersonView: View {
                     .onDisappear(.cancel)
                     .imageFill(2 / 3)
                     .frame(width: 250)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                    .clipShape(.rect(cornerRadius: 6))
+                    .contentShape(.rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
         
@@ -214,11 +213,8 @@ struct PersonView: View {
                         }
                         .padding(.horizontal, 10)
                         .background(.quinary)
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(.tertiary, lineWidth: 1)
-                        }
+                        .clipShape(.rect(cornerRadius: 6))
+                        .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
                 }
             }

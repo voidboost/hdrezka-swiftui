@@ -88,8 +88,8 @@ struct CommentReportSheet: View {
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
                                 .background((report != nil && report != .other) || (report == .other && !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) ? .accent : .secondary)
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                                .contentShape(RoundedRectangle(cornerRadius: 6))
+                                .clipShape(.rect(cornerRadius: 6))
+                                .contentShape(.rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                         .disabled(report == nil || (report == .other && message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty))
@@ -101,8 +101,8 @@ struct CommentReportSheet: View {
                             Text("key.cancel")
                                 .frame(width: 250, height: 30)
                                 .background(.quinary.opacity(0.5))
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                                .contentShape(RoundedRectangle(cornerRadius: 6))
+                                .clipShape(.rect(cornerRadius: 6))
+                                .contentShape(.rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                     }
@@ -136,10 +136,7 @@ struct CommentReportSheet: View {
                         } label: {
                             Text("key.cancel")
                                 .frame(width: 250, height: 30)
-                                .background {
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .foregroundStyle(.quinary.opacity(0.5))
-                                }
+                                .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                     }
@@ -172,8 +169,8 @@ struct CommentReportSheet: View {
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
                                 .background(.accent)
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                                .contentShape(RoundedRectangle(cornerRadius: 6))
+                                .clipShape(.rect(cornerRadius: 6))
+                                .contentShape(.rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
 
@@ -183,8 +180,8 @@ struct CommentReportSheet: View {
                             Text("key.cancel")
                                 .frame(width: 250, height: 30)
                                 .background(.quinary.opacity(0.5))
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                                .contentShape(RoundedRectangle(cornerRadius: 6))
+                                .clipShape(.rect(cornerRadius: 6))
+                                .contentShape(.rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                     }
@@ -234,12 +231,9 @@ struct CommentReportSheet: View {
                 }
             }
             .padding(10)
-            .clipShape(RoundedRectangle(cornerRadius: 6))
-            .contentShape(RoundedRectangle(cornerRadius: 6))
-            .overlay {
-                RoundedRectangle(cornerRadius: 6)
-                    .stroke(isSelected ? .accent : .secondary, lineWidth: 1)
-            }
+            .clipShape(.rect(cornerRadius: 6))
+            .contentShape(.rect(cornerRadius: 6))
+            .overlay(isSelected ? .accent : .secondary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
             .onTapGesture { isSelected = true }
             .animation(.easeInOut, value: isSelected)
             .customOnChange(of: isSelected) {

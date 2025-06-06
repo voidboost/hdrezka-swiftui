@@ -148,12 +148,9 @@ struct CategoriesView: View {
                                 .frame(maxWidth: .infinity)
                                 .padding(.horizontal, 16)
                                 .background(.tertiary.opacity(0.05))
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                                .contentShape(RoundedRectangle(cornerRadius: 6))
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                                }
+                                .clipShape(.rect(cornerRadius: 6))
+                                .contentShape(.rect(cornerRadius: 6))
+                                .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                         }
                         .buttonStyle(.plain)
                     }
@@ -181,12 +178,9 @@ struct CategoriesView: View {
                     }
                     .frame(height: 28)
                     .background(.tertiary.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                    }
+                    .clipShape(.rect(cornerRadius: 6))
+                    .contentShape(.rect(cornerRadius: 6))
+                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
 
                     Picker("key.categories", selection: $bestYear) {
                         ForEach(type.best.years) { year in
@@ -207,12 +201,9 @@ struct CategoriesView: View {
                     }
                     .frame(height: 28)
                     .background(.tertiary.opacity(0.05))
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                    }
+                    .clipShape(.rect(cornerRadius: 6))
+                    .contentShape(.rect(cornerRadius: 6))
+                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
 
                     Button {
                         appState.path.append(.list(.init(name: type.name, listId: bestGenre.genreId + (bestYear.year != 0 ? "\(bestYear.year.description)/" : ""))))
@@ -222,23 +213,17 @@ struct CategoriesView: View {
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .background(.tertiary.opacity(0.05))
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
-                            .contentShape(RoundedRectangle(cornerRadius: 6))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 6)
-                                    .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                            }
+                            .clipShape(.rect(cornerRadius: 6))
+                            .contentShape(.rect(cornerRadius: 6))
+                            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 16)
                 .background(.tertiary.opacity(0.05))
-                .clipShape(RoundedRectangle(cornerRadius: 6))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 6)
-                        .stroke(.secondary.opacity(0.2), lineWidth: 1)
-                }
+                .clipShape(.rect(cornerRadius: 6))
+                .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
             }
         }
     }

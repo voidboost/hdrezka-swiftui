@@ -366,8 +366,8 @@ struct SidebarButtonStyle: ButtonStyle {
         .padding(7)
         .frame(maxWidth: .infinity)
         .background(isHovered ? .secondary.opacity(configuration.isPressed ? 0.3 : 0.1) : Color.clear)
-        .clipShape(RoundedRectangle(cornerRadius: 6))
-        .contentShape(RoundedRectangle(cornerRadius: 6))
+        .clipShape(.rect(cornerRadius: 6))
+        .contentShape(.rect(cornerRadius: 6))
         .animation(.easeInOut(duration: 0.15), value: isHovered)
         .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
         .onHover { over in
