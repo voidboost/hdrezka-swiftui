@@ -139,7 +139,6 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                     } else {
                                         ProgressView()
                                             .scaleEffect(0.75)
-                                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                                             .transition(
                                                 .asymmetric(
                                                     insertion: .wipe(blurRadius: 10),

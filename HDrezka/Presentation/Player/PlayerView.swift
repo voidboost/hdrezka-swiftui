@@ -458,58 +458,41 @@ struct PlayerView: View {
                             Button {
                                 nextTrack(seasons, season, episode)
                             } label: {
-                                ZStack {
-                                    HStack(alignment: .center, spacing: 21) {
-                                        VStack(alignment: .leading) {
-                                            HStack(alignment: .bottom, spacing: 7) {
-                                                if let image = NSImage(named: "Bars") {
-                                                    Image(nsImage: image.resized(to: CGSize(width: 15, height: 14)))
-                                                        .offset(y: -14.0 / 4)
-                                                } else {
-                                                    Image(systemName: "chart.bar.xaxis")
-                                                        .font(.system(size: 15))
-                                                }
-
-                                                Text("key.next")
-                                                    .font(.title2.bold())
+                                HStack(alignment: .center, spacing: 21) {
+                                    VStack(alignment: .leading) {
+                                        HStack(alignment: .bottom, spacing: 7) {
+                                            if let image = NSImage(named: "Bars") {
+                                                Image(nsImage: image.resized(to: CGSize(width: 15, height: 14)))
+                                                    .offset(y: -14.0 / 4)
+                                            } else {
+                                                Image(systemName: "chart.bar.xaxis")
+                                                    .font(.system(size: 15))
                                             }
-                                            .foregroundStyle(.accent)
 
-                                            Spacer(minLength: 0)
-
-                                            if let nextEpisode = season.episodes.element(after: episode) {
-                                                Text("key.season-\(season.name).episode-\(nextEpisode.name)")
-                                                    .font(.title2.bold())
-                                            } else if let nextSeason = seasons.element(after: season), let nextEpisode = nextSeason.episodes.first {
-                                                Text("key.season-\(nextSeason.name).episode-\(nextEpisode.name)")
-                                                    .font(.title2.bold())
-                                            }
+                                            Text("key.next")
+                                                .font(.title2.bold())
                                         }
+                                        .foregroundStyle(.accent)
 
-                                        ZStack(alignment: .center) {
-                                            Image(systemName: "play.circle")
-                                                .resizable()
-                                                .frame(width: 28, height: 28)
+                                        Spacer(minLength: 0)
 
-                                            Group {
-                                                Circle()
-                                                    .stroke(.accent.opacity(0.3), style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
-
-                                                Circle()
-                                                    .trim(from: 0.0, to: nextTimer)
-                                                    .stroke(.ultraThickMaterial, style: StrokeStyle(lineWidth: 8, lineCap: .round, lineJoin: .round))
-
-                                                Circle()
-                                                    .trim(from: 0.0, to: nextTimer)
-                                                    .stroke(.accent, style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round))
-                                            }
-                                            .padding(4)
-                                            .rotationEffect(.degrees(-90))
+                                        if let nextEpisode = season.episodes.element(after: episode) {
+                                            Text("key.season-\(season.name).episode-\(nextEpisode.name)")
+                                                .font(.title2.bold())
+                                        } else if let nextSeason = seasons.element(after: season), let nextEpisode = nextSeason.episodes.first {
+                                            Text("key.season-\(nextSeason.name).episode-\(nextEpisode.name)")
+                                                .font(.title2.bold())
                                         }
-                                        .frame(width: 50)
                                     }
-                                    .frame(height: 50)
+
+                                    Image(systemName: "play.circle")
+                                        .resizable()
+                                        .frame(width: 28, height: 28)
+                                        .background(.accent, in: .circle.inset(by: -7).rotation(.degrees(-90)).trim(from: 0.0, to: nextTimer).stroke(style: .init(lineWidth: 6, lineCap: .round, lineJoin: .round)))
+                                        .background(.ultraThickMaterial, in: .circle.inset(by: -7).rotation(.degrees(-90)).trim(from: 0.0, to: nextTimer).stroke(style: .init(lineWidth: 8, lineCap: .round, lineJoin: .round)))
+                                        .background(.accent.opacity(0.3), in: .circle.inset(by: -7).rotation(.degrees(-90)).stroke(style: .init(lineWidth: 4, lineCap: .round, lineJoin: .round)))
                                 }
+                                .frame(height: 50)
                                 .padding(.vertical, 16)
                                 .padding(.leading, 16)
                                 .padding(.trailing, 36)
