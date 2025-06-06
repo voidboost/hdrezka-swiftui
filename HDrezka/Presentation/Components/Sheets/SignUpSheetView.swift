@@ -76,18 +76,15 @@ struct SignUpSheetView: View {
                                 .frame(height: 30)
                                 .frame(maxWidth: .infinity)
                                 .background(.quinary.opacity(0.5))
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                                .contentShape(RoundedRectangle(cornerRadius: 6))
+                                .clipShape(.rect(cornerRadius: 6))
+                                .contentShape(.rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                     }
                     .padding(15)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.accent, lineWidth: 1)
-                    }
-                    
+                    .clipShape(.rect(cornerRadius: 6))
+                    .overlay(.accent, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                   
                     VStack(alignment: .leading, spacing: 12) {
                         Text("key.sign_up_info_tutorial_title")
                             .font(.headline)
@@ -141,8 +138,8 @@ struct SignUpSheetView: View {
                                     .frame(maxWidth: .infinity)
                                     .foregroundStyle(.white)
                                     .background(.accent)
-                                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                                    .clipShape(.rect(cornerRadius: 6))
+                                    .contentShape(.rect(cornerRadius: 6))
                             }
                             .buttonStyle(.plain)
                             
@@ -153,18 +150,15 @@ struct SignUpSheetView: View {
                                     .frame(height: 30)
                                     .frame(maxWidth: .infinity)
                                     .background(.quinary.opacity(0.5))
-                                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                                    .clipShape(.rect(cornerRadius: 6))
+                                    .contentShape(.rect(cornerRadius: 6))
                             }
                             .buttonStyle(.plain)
                         }
                     }
                     .padding(15)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(.tertiary, lineWidth: 1)
-                    }
+                    .clipShape(.rect(cornerRadius: 6))
+                    .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
             }
             .padding(.horizontal, 35)
@@ -507,11 +501,8 @@ struct SignUpSheetView: View {
                             .padding(.horizontal, 15)
                             .padding(.vertical, 5)
                             .background(.quinary)
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 6)
-                                    .stroke(.tertiary, lineWidth: 1)
-                            }
+                            .clipShape(.rect(cornerRadius: 6))
+                            .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                         }
                         
                         VStack(alignment: .center, spacing: 10) {
@@ -522,8 +513,8 @@ struct SignUpSheetView: View {
                                     .frame(width: 250, height: 30)
                                     .foregroundStyle(.white)
                                     .background(emailValid == true && usernameValid == true && passwordValid == true && confirmPasswordValid == true ? .accent : .secondary)
-                                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                                    .clipShape(.rect(cornerRadius: 6))
+                                    .contentShape(.rect(cornerRadius: 6))
                             }
                             .buttonStyle(.plain)
                             .disabled(emailValid != true || usernameValid != true || passwordValid != true || confirmPasswordValid != true)
@@ -535,8 +526,8 @@ struct SignUpSheetView: View {
                                 Text("key.cancel")
                                     .frame(width: 250, height: 30)
                                     .background(.quinary.opacity(0.5))
-                                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                                    .clipShape(.rect(cornerRadius: 6))
+                                    .contentShape(.rect(cornerRadius: 6))
                             }
                             .buttonStyle(.plain)
                         }
@@ -589,8 +580,8 @@ struct SignUpSheetView: View {
                                 Text("key.cancel")
                                     .frame(width: 250, height: 30)
                                     .background(.quinary.opacity(0.5))
-                                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                                    .clipShape(.rect(cornerRadius: 6))
+                                    .contentShape(.rect(cornerRadius: 6))
                             }
                             .buttonStyle(.plain)
                         }
@@ -623,8 +614,8 @@ struct SignUpSheetView: View {
                                     .frame(width: 250, height: 30)
                                     .foregroundStyle(.white)
                                     .background(.accent)
-                                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                                    .clipShape(.rect(cornerRadius: 6))
+                                    .contentShape(.rect(cornerRadius: 6))
                             }
                             .buttonStyle(.plain)
                             
@@ -634,8 +625,8 @@ struct SignUpSheetView: View {
                                 Text("key.cancel")
                                     .frame(width: 250, height: 30)
                                     .background(.quinary.opacity(0.5))
-                                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                                    .clipShape(.rect(cornerRadius: 6))
+                                    .contentShape(.rect(cornerRadius: 6))
                             }
                             .buttonStyle(.plain)
                         }

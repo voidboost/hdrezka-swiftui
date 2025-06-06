@@ -28,8 +28,7 @@ struct WatchingLaterCardView: View {
                                 )
                             )
                     } else {
-                        Rectangle()
-                            .fill(.gray)
+                        Color.gray
                             .shimmering()
                             .transition(
                                 .asymmetric(
@@ -107,7 +106,7 @@ struct WatchingLaterCardView: View {
                         }
                     }
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 6))
+                .clipShape(.rect(cornerRadius: 6))
 
                 VStack(alignment: .leading) {
                     Text(movie.name)
@@ -124,10 +123,10 @@ struct WatchingLaterCardView: View {
                         .foregroundStyle(.accent)
                 }
             }
-            .contentShape(UnevenRoundedRectangle(topLeadingRadius: 6, topTrailingRadius: 6))
+            .contentShape(.rect(topLeadingRadius: 6, topTrailingRadius: 6))
         }
         .buttonStyle(.plain)
         .opacity(movie.watched ? 0.6 : 1)
-        .disabled(movie.watchLaterId.removeMirror().components(separatedBy: "/").filter({ !$0.isEmpty }).count != 3)
+        .disabled(movie.watchLaterId.removeMirror().components(separatedBy: "/").filter { !$0.isEmpty }.count != 3)
     }
 }

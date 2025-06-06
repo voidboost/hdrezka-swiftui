@@ -194,8 +194,7 @@ struct DetailsView: View {
                                                     )
                                                 )
                                         } else {
-                                            Rectangle()
-                                                .fill(.gray)
+                                            Color.gray
                                                 .shimmering()
                                                 .transition(
                                                     .asymmetric(
@@ -217,8 +216,8 @@ struct DetailsView: View {
                             .onDisappear(.cancel)
                             .imageFill(2 / 3)
                             .frame(width: 300)
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
-                            .contentShape(RoundedRectangle(cornerRadius: 6))
+                            .clipShape(.rect(cornerRadius: 6))
+                            .contentShape(.rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
 
@@ -249,8 +248,8 @@ struct DetailsView: View {
                                     }
                                     .buttonStyle(.plain)
                                     .background(.accent)
-                                    .clipShape(RoundedRectangle(cornerRadius: 40))
-                                    .contentShape(RoundedRectangle(cornerRadius: 40))
+                                    .clipShape(.rect(cornerRadius: 40))
+                                    .contentShape(.rect(cornerRadius: 40))
                                     .sheet(isPresented: $isPlayPresented) {
                                         WatchSheetView(id: details.movieId)
                                     }
@@ -266,12 +265,9 @@ struct DetailsView: View {
                                     }
                                     .buttonStyle(.plain)
                                     .background(.tertiary.opacity(0.05))
-                                    .clipShape(RoundedRectangle(cornerRadius: 40))
-                                    .contentShape(RoundedRectangle(cornerRadius: 40))
-                                    .overlay {
-                                        RoundedRectangle(cornerRadius: 40)
-                                            .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                                    }
+                                    .clipShape(.rect(cornerRadius: 40))
+                                    .contentShape(.rect(cornerRadius: 40))
+                                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 40).stroke(lineWidth: 1))
                                     .sheet(isPresented: $isDownloadPresented) {
                                         DownloadSheetView(id: details.movieId)
                                     }
@@ -285,7 +281,7 @@ struct DetailsView: View {
                                     }
                                     .buttonStyle(.plain)
                                     .background(.accent)
-                                    .clipShape(RoundedRectangle(cornerRadius: 40))
+                                    .clipShape(.rect(cornerRadius: 40))
                                     .disabled(true)
                                 } else {
                                     Button {} label: {
@@ -297,7 +293,7 @@ struct DetailsView: View {
                                     }
                                     .buttonStyle(.plain)
                                     .background(.accent)
-                                    .clipShape(RoundedRectangle(cornerRadius: 40))
+                                    .clipShape(.rect(cornerRadius: 40))
                                     .disabled(true)
                                 }
                             }
@@ -401,11 +397,8 @@ struct DetailsView: View {
                                 }
                                 .padding(.horizontal, 10)
                                 .background(.quinary)
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .stroke(.tertiary, lineWidth: 1)
-                                }
+                                .clipShape(.rect(cornerRadius: 6))
+                                .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                             }
                         }
                     }
@@ -481,15 +474,14 @@ struct DetailsView: View {
                             if let image = state.image {
                                 image.resizable()
                             } else {
-                                Rectangle()
-                                    .fill(.gray)
+                                Color.gray
                             }
                         }
                         .onDisappear(.cancel)
                         .scaledToFill()
                         .frame(maxWidth: .infinity)
                         .frame(height: blurHeght)
-                        .clipShape(Rectangle())
+                        .clipShape(.rect)
                     }
                     
                     VStack {}
@@ -555,8 +547,8 @@ struct DetailsView: View {
                     }
                     .aspectRatio(16 / 9, contentMode: .fit)
                     .frame(maxWidth: .infinity)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .contentShape(RoundedRectangle(cornerRadius: 6))
+                    .clipShape(.rect(cornerRadius: 6))
+                    .contentShape(.rect(cornerRadius: 6))
                 }
             }
             .padding(.horizontal, 36)
@@ -590,7 +582,7 @@ struct DetailsView: View {
                                                     }
                                                     .frame(width: 19, height: 19)
                                                     .background(LinearGradient(colors: [.secondary.opacity(colorScheme == .dark ? 1 : 0.5), .secondary.opacity(colorScheme == .dark ? 0.5 : 1)], startPoint: .top, endPoint: .bottom))
-                                                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                                                    .clipShape(.rect(cornerRadius: 6))
                                                 }
                                                 .frame(width: 24, height: 24)
                                                 
@@ -634,7 +626,7 @@ struct DetailsView: View {
                                                 
                                                 Image(systemName: "chevron.right").font(.system(size: 13))
                                             }
-                                            .contentShape(Rectangle())
+                                            .contentShape(.rect)
                                         }
                                         .buttonStyle(.plain)
                                         .padding(.vertical, 8)
@@ -648,7 +640,7 @@ struct DetailsView: View {
                                                 }
                                                 .frame(width: 19, height: 19)
                                                 .background(LinearGradient(colors: [.accent.opacity(colorScheme == .dark ? 1 : 0.5), .accent.opacity(colorScheme == .dark ? 0.5 : 1)], startPoint: .top, endPoint: .bottom))
-                                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                                                .clipShape(.rect(cornerRadius: 6))
                                             }
                                             .frame(width: 24, height: 24)
                                         
@@ -720,11 +712,8 @@ struct DetailsView: View {
                             }
                             .padding(.horizontal, 10)
                             .background(.quinary)
-                            .clipShape(RoundedRectangle(cornerRadius: 6))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 6)
-                                    .stroke(.tertiary, lineWidth: 1)
-                            }
+                            .clipShape(.rect(cornerRadius: 6))
+                            .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                         }
                     }
                     
@@ -792,11 +781,8 @@ struct DetailsView: View {
                                 }
                                 .padding(.horizontal, 10)
                                 .background(.quinary)
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .stroke(.tertiary, lineWidth: 1)
-                                }
+                                .clipShape(.rect(cornerRadius: 6))
+                                .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                             }
                         }
                     }
@@ -880,7 +866,7 @@ struct DetailsView: View {
                                 } label: {
                                     if let person = item as? PersonSimple, !person.photo.isEmpty {
                                         PersonTextWithPhoto(person: person)
-                                            .contentShape(Rectangle())
+                                            .contentShape(.rect)
                                     } else if let list = item as? MovieList, let position = list.moviePosition?.toNumeral() {
                                         (
                                             Text(verbatim: "\(list.name) ").textModifier { text in
@@ -901,13 +887,13 @@ struct DetailsView: View {
                                         .font(.system(size: 13))
                                         .lineLimit(1)
                                         .truncationMode(.middle)
-                                        .contentShape(Rectangle())
+                                        .contentShape(.rect)
                                     } else {
                                         Text(item.name)
                                             .font(.system(size: 13))
                                             .foregroundStyle(.secondary)
                                             .lineLimit(1)
-                                            .contentShape(Rectangle())
+                                            .contentShape(.rect)
                                     }
                                 }
                                 .buttonStyle(.plain)
@@ -952,8 +938,7 @@ struct DetailsView: View {
                                                             if let image = state.image {
                                                                 image.resizable()
                                                             } else {
-                                                                Rectangle()
-                                                                    .fill(.gray)
+                                                                Color.gray
                                                                     .shimmering()
                                                             }
                                                         }
@@ -962,19 +947,16 @@ struct DetailsView: View {
                                                         .imageFill(2 / 3)
                                                         .frame(width: 36, height: 36)
                                                         .background(.quinary)
-                                                        .clipShape(RoundedRectangle(cornerRadius: 18))
+                                                        .clipShape(.rect(cornerRadius: 18))
                                                         .padding(2)
-                                                        .overlay {
-                                                            RoundedRectangle(cornerRadius: 20)
-                                                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                                                        }
-                                                        
+                                                        .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 20).stroke(lineWidth: 1))
+                                                    
                                                         Text(person.name)
                                                             .font(.system(size: 13))
                                                             .lineLimit(nil)
                                                             .multilineTextAlignment(.center)
                                                     }
-                                                    .contentShape(Rectangle())
+                                                    .contentShape(.rect)
                                                 } else if let list = item as? MovieList, let position = list.moviePosition?.toNumeral() {
                                                     (
                                                         Text(verbatim: "\(list.name) ") +
@@ -989,13 +971,13 @@ struct DetailsView: View {
                                                     .font(.system(size: 13))
                                                     .lineLimit(nil)
                                                     .multilineTextAlignment(.center)
-                                                    .contentShape(Rectangle())
+                                                    .contentShape(.rect)
                                                 } else {
                                                     Text(item.name)
                                                         .font(.system(size: 13))
                                                         .lineLimit(nil)
                                                         .multilineTextAlignment(.center)
-                                                        .contentShape(Rectangle())
+                                                        .contentShape(.rect)
                                                 }
                                             }
                                             .buttonStyle(.plain)
@@ -1081,9 +1063,8 @@ struct DetailsView: View {
                                     let width = (CGFloat(hover ?? rating) / 10.0) * geometry.size.width
                                     
                                     HStack {
-                                        Rectangle()
+                                        (hover != nil ? Color.primary : Color.secondary)
                                             .frame(width: width)
-                                            .foregroundStyle(hover != nil ? .primary : .secondary)
                                         
                                         Spacer(minLength: 0)
                                     }
@@ -1162,8 +1143,7 @@ struct DetailsView: View {
                                         )
                                     )
                             } else {
-                                Rectangle()
-                                    .fill(.gray)
+                                Color.gray
                                     .shimmering()
                                     .transition(
                                         .asymmetric(
@@ -1178,12 +1158,9 @@ struct DetailsView: View {
                         .imageFill(2 / 3)
                         .frame(width: 64, height: 64)
                         .background(.quinary)
-                        .clipShape(RoundedRectangle(cornerRadius: 32))
+                        .clipShape(.rect(cornerRadius: 32))
                         .padding(4)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 36)
-                                .stroke(.tertiary.opacity(0.2), lineWidth: 1)
-                        }
+                        .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 32).stroke(lineWidth: 1))
                         .padding(4)
                     }
             }
@@ -1215,9 +1192,7 @@ struct DetailsView: View {
                             let width = (rating / 5.0) * geometry.size.width
                             
                             HStack {
-                                Rectangle()
-                                    .frame(width: width)
-                                    .foregroundStyle(color)
+                                color.frame(width: width)
                                 
                                 Spacer(minLength: 0)
                             }
@@ -1287,7 +1262,7 @@ struct DetailsView: View {
                               
                                 subtitle
                             }
-                            .contentShape(Rectangle())
+                            .contentShape(.rect)
                         }
                         .buttonStyle(.plain)
                     } else {

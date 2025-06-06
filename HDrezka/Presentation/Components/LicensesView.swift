@@ -15,11 +15,8 @@ struct LicensesView: View {
             }
             .padding(.horizontal, 15)
             .background(.quinary)
-            .clipShape(RoundedRectangle(cornerRadius: 6))
-            .overlay {
-                RoundedRectangle(cornerRadius: 6)
-                    .stroke(.tertiary, lineWidth: 1)
-            }
+            .clipShape(.rect(cornerRadius: 6))
+            .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
             .padding(25)
             .background(.background)
         }
@@ -64,7 +61,7 @@ struct LicensesView: View {
                     }
                 } label: {
                     Label(showLicense ? String(localized: "key.license.hide") : String(localized: "key.license.show"), systemImage: showLicense ? "chevron.up" : "chevron.down")
-                        .contentShape(Rectangle())
+                        .contentShape(.rect)
                 }
                 .buttonStyle(.plain)
 

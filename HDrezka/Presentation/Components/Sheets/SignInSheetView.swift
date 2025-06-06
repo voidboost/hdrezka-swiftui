@@ -139,11 +139,8 @@ struct SignInSheetView: View {
                         .padding(.horizontal, 15)
                         .padding(.vertical, 5)
                         .background(.quinary)
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(.tertiary, lineWidth: 1)
-                        }
+                        .clipShape(.rect(cornerRadius: 6))
+                        .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
 
                         Button {
                             dismiss()
@@ -165,8 +162,8 @@ struct SignInSheetView: View {
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
                                 .background(!username.isEmpty && !password.isEmpty ? .accent : .secondary)
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                                .contentShape(RoundedRectangle(cornerRadius: 6))
+                                .clipShape(.rect(cornerRadius: 6))
+                                .contentShape(.rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                         .disabled(username.isEmpty || password.isEmpty)
@@ -178,8 +175,8 @@ struct SignInSheetView: View {
                             Text("key.cancel")
                                 .frame(width: 250, height: 30)
                                 .background(.quinary.opacity(0.5))
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                                .contentShape(RoundedRectangle(cornerRadius: 6))
+                                .clipShape(.rect(cornerRadius: 6))
+                                .contentShape(.rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                     }
@@ -232,8 +229,8 @@ struct SignInSheetView: View {
                             Text("key.cancel")
                                 .frame(width: 250, height: 30)
                                 .background(.quinary.opacity(0.5))
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                                .contentShape(RoundedRectangle(cornerRadius: 6))
+                                .clipShape(.rect(cornerRadius: 6))
+                                .contentShape(.rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                     }
@@ -266,8 +263,8 @@ struct SignInSheetView: View {
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
                                 .background(.accent)
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                                .contentShape(RoundedRectangle(cornerRadius: 6))
+                                .clipShape(.rect(cornerRadius: 6))
+                                .contentShape(.rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
 
@@ -277,8 +274,8 @@ struct SignInSheetView: View {
                             Text("key.cancel")
                                 .frame(width: 250, height: 30)
                                 .background(.quinary.opacity(0.5))
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                                .contentShape(RoundedRectangle(cornerRadius: 6))
+                                .clipShape(.rect(cornerRadius: 6))
+                                .contentShape(.rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                     }

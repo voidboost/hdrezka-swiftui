@@ -47,7 +47,7 @@ private struct Wipe: ViewModifier, Animatable, AnimatableModifier {
         ZStack(alignment: .leading) {
             Color.clear
 
-            Rectangle()
+            Color.black
                 .frame(width: progress * bounds.width)
         }
         .frame(width: bounds.width, height: bounds.height)

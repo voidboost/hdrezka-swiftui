@@ -9,8 +9,8 @@ struct HighlightOnHover: ViewModifier {
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
             .background(isHovered ? Color.gray.opacity(0.1) : Color.clear)
-            .clipShape(RoundedRectangle(cornerRadius: 6))
-            .contentShape(RoundedRectangle(cornerRadius: 6))
+            .clipShape(.rect(cornerRadius: 6))
+            .contentShape(.rect(cornerRadius: 6))
             .onHover { isHovered in
                 withAnimation {
                     self.isHovered = isHovered

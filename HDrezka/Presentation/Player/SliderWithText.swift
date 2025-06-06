@@ -49,13 +49,11 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
             VStack {
                 GeometryReader { geometry in
                     ZStack(alignment: .center) {
-                        Rectangle()
-                            .fill(emptyColor)
-                        Rectangle()
-                            .fill(isActive ? activeFillColor : fillColor)
+                        emptyColor
+                        (isActive ? activeFillColor : fillColor)
                             .mask {
                                 HStack {
-                                    Rectangle()
+                                    Color.black
                                         .frame(width: max(geometry.size.width * CGFloat(localRealProgress + localTempProgress), 0), alignment: .leading)
                                     Spacer(minLength: 0)
                                 }
@@ -63,8 +61,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                             
                         ForEach(buffers, id: \.self) { buffer in
                             if let start = buffer.start.seconds as? T, let end = buffer.end.seconds as? T {
-                                Rectangle()
-                                    .fill(emptyColor)
+                                emptyColor
                                     .mask {
                                         ZStack(alignment: .topLeading) {
                                             let duration = if isActive {
@@ -81,7 +78,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                                 
                                             let y = (isActive ? height * 1.25 : height) * 0.5
                                                 
-                                            Rectangle()
+                                            Color.black
                                                 .frame(width: max(geometry.size.width * duration, 0))
                                                 .position(x: x, y: y)
                                         }
@@ -91,8 +88,8 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                     }
                     .frame(height: isActive ? height * 1.25 : height, alignment: .center)
                     .animation(.easeInOut, value: isActive)
-                    .clipShape(Capsule())
-                    .contentShape(Capsule())
+                    .clipShape(.capsule)
+                    .contentShape(.capsule)
                     .gesture(
                         DragGesture(minimumDistance: 0, coordinateSpace: .local)
                             .updating($isActive) { _, state, _ in
@@ -140,17 +137,15 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                                 )
                                             )
                                     } else {
-                                        ZStack {
-                                            ProgressView()
-                                                .scaleEffect(0.75)
-                                        }
-                                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                        .transition(
-                                            .asymmetric(
-                                                insertion: .wipe(blurRadius: 10),
-                                                removal: .wipe(reversed: true, blurRadius: 10)
+                                        ProgressView()
+                                            .scaleEffect(0.75)
+                                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                            .transition(
+                                                .asymmetric(
+                                                    insertion: .wipe(blurRadius: 10),
+                                                    removal: .wipe(reversed: true, blurRadius: 10)
+                                                )
                                             )
-                                        )
                                     }
                                 }
                                 .processors([.process(id: "\(frame.x.description)\(frame.y.description)\(frame.width.description)\(frame.height.description)") { $0.crop(to: .init(x: frame.x, y: frame.y, width: frame.width, height: frame.height)) }])
@@ -158,11 +153,8 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                 .scaledToFill()
                                 .frame(width: frame.width, height: frame.height)
                                 .background(.ultraThinMaterial)
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .stroke(.ultraThinMaterial, lineWidth: 1)
-                                }
+                                .clipShape(.rect(cornerRadius: 6))
+                                .overlay(.ultraThinMaterial, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                                 .overlay {
                                     VStack {
                                         Spacer()

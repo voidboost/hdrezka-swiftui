@@ -514,8 +514,8 @@ struct PlayerView: View {
                                 .padding(.leading, 16)
                                 .padding(.trailing, 36)
                                 .background(.ultraThinMaterial)
-                                .clipShape(UnevenRoundedRectangle(topLeadingRadius: 6, bottomLeadingRadius: 6))
-                                .contentShape(UnevenRoundedRectangle(topLeadingRadius: 6, bottomLeadingRadius: 6))
+                                .clipShape(.rect(topLeadingRadius: 6, bottomLeadingRadius: 6))
+                                .contentShape(.rect(topLeadingRadius: 6, bottomLeadingRadius: 6))
                             }
                             .buttonStyle(.plain)
                         }
@@ -601,7 +601,7 @@ struct PlayerView: View {
         .preferredColorScheme(.dark)
         .tint(.primary)
         .background(Color.black)
-        .contentShape(Rectangle())
+        .contentShape(.rect)
         .toolbar(.hidden)
         .onExitCommand {
             resetTimer()

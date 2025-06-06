@@ -175,11 +175,8 @@ struct BookmarksSheetView: View {
                         .frame(maxWidth: .infinity)
                         .frame(height: scrollViewContentSize.height > 140 ? 140 : scrollViewContentSize.height)
                         .background(.quinary)
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 6)
-                                .stroke(.tertiary, lineWidth: 1)
-                        }
+                        .clipShape(.rect(cornerRadius: 6))
+                        .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
                 } else {
                     ProgressView()
@@ -194,8 +191,8 @@ struct BookmarksSheetView: View {
                     Text("key.create")
                         .frame(width: 250, height: 30)
                         .background(.quinary.opacity(0.5))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .clipShape(.rect(cornerRadius: 6))
+                        .contentShape(.rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
 
@@ -205,8 +202,8 @@ struct BookmarksSheetView: View {
                     Text("key.done")
                         .frame(width: 250, height: 30)
                         .background(.quinary.opacity(0.5))
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .contentShape(RoundedRectangle(cornerRadius: 6))
+                        .clipShape(.rect(cornerRadius: 6))
+                        .contentShape(.rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
             }
