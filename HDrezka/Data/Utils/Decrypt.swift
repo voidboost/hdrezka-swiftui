@@ -1,9 +1,7 @@
 import Foundation
 
 func decrypt(encrypted: String) -> String {
-    guard encrypted.hasPrefix("#") else {
-        return encrypted
-    }
+    guard encrypted.hasPrefix("#") else { return encrypted }
 
     let trash = generateTrash()
     var cache = [String: String]()
@@ -21,7 +19,7 @@ func decrypt(encrypted: String) -> String {
                 let result = indexes.map { index in
                     let (before, after) = String(input[input.index(input.startIndex, offsetBy: index + 5)...]).divideAtFirstOccurrenceOfSymbols()
                     return decryptRecursive(input: "\(String(input[..<input.index(input.startIndex, offsetBy: index)]))\(before.clear(trash: trash))\(after)")
-                }.min { $0.count < $1.count } ?? ""
+                }.min { $0.count < $1.count } ?? input
 
                 cache[input] = result
                 return result
@@ -36,7 +34,7 @@ private func generateTrash(trashList: [String] = ["@", "#", "!", "^", "$"]) -> [
     [2, 3].flatMap(trashList.cartesianProduct).map(\.base64Encoded)
 }
 
-private extension [String] {
+private extension Array where Element == String {
     func cartesianProduct(n: Int) -> [String] {
         n == 1 ? self : self.cartesianProduct(n: n - 1).flatMap { item in self.map { "\(item)\($0)" } }
     }
@@ -44,7 +42,7 @@ private extension [String] {
 
 extension String {
     fileprivate func clear(trash: [String]) -> String {
-        trash.reduce(self) { acc, t in acc.replacingOccurrences(of: t, with: "") }
+        trash.reduce(self) { $0.replacingOccurrences(of: $1, with: "") }
     }
 
     fileprivate func indexesOf(substr: String) -> [Int] {
