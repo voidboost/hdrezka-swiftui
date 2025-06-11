@@ -33,7 +33,7 @@ struct SignInSheetView: View {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "person.circle")
                             .font(.system(size: 48))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text("key.sign_in.label")
                             .font(.largeTitle.weight(.semibold))
@@ -114,7 +114,7 @@ struct SignInSheetView: View {
 
                                 if !passwordIsEmpty {
                                     Image(systemName: "eye")
-                                        .foregroundStyle(.accent.opacity(showPassword ? 0.5 : 1))
+                                        .foregroundStyle(Color.accentColor.opacity(showPassword ? 0.5 : 1))
                                         .simultaneousGesture(
                                             DragGesture(minimumDistance: 0)
                                                 .onChanged { _ in
@@ -149,7 +149,7 @@ struct SignInSheetView: View {
                         } label: {
                             Text("key.password.lost")
                                 .font(.caption)
-                                .foregroundStyle(.accent)
+                                .foregroundStyle(Color.accentColor)
                         }
                         .buttonStyle(.plain)
                     }
@@ -161,7 +161,7 @@ struct SignInSheetView: View {
                             Text("key.sign_in")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background(!username.isEmpty && !password.isEmpty ? .accent : .secondary)
+                                .background(!username.isEmpty && !password.isEmpty ? Color.accentColor : Color.secondary)
                                 .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
                         }
@@ -191,7 +191,7 @@ struct SignInSheetView: View {
                         } label: {
                             Text(verbatim: "\(String(localized: "key.register"))!")
                                 .font(.caption)
-                                .foregroundStyle(.accent)
+                                .foregroundStyle(Color.accentColor)
                         }
                         .buttonStyle(.plain)
                     }
@@ -204,7 +204,7 @@ struct SignInSheetView: View {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "person.circle")
                             .font(.system(size: 48))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text("key.sign_in.enter")
                             .font(.largeTitle.weight(.semibold))
@@ -240,7 +240,7 @@ struct SignInSheetView: View {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "person.circle")
                             .font(.system(size: 48))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text("key.ops")
                             .font(.largeTitle.weight(.semibold))
@@ -262,7 +262,7 @@ struct SignInSheetView: View {
                             Text("key.retry")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background(.accent)
+                                .background(Color.accentColor)
                                 .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
                         }

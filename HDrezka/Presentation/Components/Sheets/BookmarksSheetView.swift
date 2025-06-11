@@ -34,7 +34,7 @@ struct BookmarksSheetView: View {
             VStack(alignment: .center, spacing: 5) {
                 Image(systemName: "bookmark.circle")
                     .font(.system(size: 48))
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(Color.accentColor)
 
                 Text("key.bookmarks")
                     .font(.largeTitle.weight(.semibold))
@@ -55,7 +55,7 @@ struct BookmarksSheetView: View {
                             load(reset: true)
                         } label: {
                             Text("key.retry")
-                                .foregroundStyle(.accent)
+                                .foregroundStyle(Color.accentColor)
                                 .highlightOnHover()
                         }
                         .buttonStyle(.plain)
@@ -70,7 +70,7 @@ struct BookmarksSheetView: View {
                                 load(reset: true)
                             } label: {
                                 Text("key.retry")
-                                    .foregroundStyle(.accent)
+                                    .foregroundStyle(Color.accentColor)
                                     .highlightOnHover()
                             }
                             .buttonStyle(.plain)

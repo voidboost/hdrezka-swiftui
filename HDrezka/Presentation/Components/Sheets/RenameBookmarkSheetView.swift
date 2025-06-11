@@ -33,7 +33,7 @@ struct RenameBookmarkSheetView: View {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "bookmark.circle")
                             .font(.system(size: 48))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text("key.rename.label")
                             .font(.largeTitle.weight(.semibold))
@@ -75,7 +75,7 @@ struct RenameBookmarkSheetView: View {
                             Text("key.rename")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background(!name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && name.trimmingCharacters(in: .whitespacesAndNewlines) != bookmark.name ? .accent : .secondary)
+                                .background(!name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && name.trimmingCharacters(in: .whitespacesAndNewlines) != bookmark.name ? Color.accentColor : Color.secondary)
                                 .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
                         }
@@ -103,7 +103,7 @@ struct RenameBookmarkSheetView: View {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "bookmark.circle")
                             .font(.system(size: 48))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text("key.rename.enter")
                             .font(.largeTitle.weight(.semibold))
@@ -139,7 +139,7 @@ struct RenameBookmarkSheetView: View {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "bookmark.circle")
                             .font(.system(size: 48))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text("key.ops")
                             .font(.largeTitle.weight(.semibold))
@@ -161,7 +161,7 @@ struct RenameBookmarkSheetView: View {
                             Text("key.retry")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background(.accent)
+                                .background(Color.accentColor)
                                 .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
                         }

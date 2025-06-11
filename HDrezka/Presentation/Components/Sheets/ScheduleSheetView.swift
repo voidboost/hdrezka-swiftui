@@ -14,7 +14,7 @@ struct ScheduleSheetView: View {
             VStack(spacing: 5) {
                 Image(systemName: "list.and.film")
                     .font(.system(size: 48))
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(Color.accentColor)
 
                 Text("key.schedule")
                     .font(.largeTitle.weight(.semibold))

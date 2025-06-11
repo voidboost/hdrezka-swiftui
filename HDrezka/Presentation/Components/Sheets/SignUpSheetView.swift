@@ -49,7 +49,7 @@ struct SignUpSheetView: View {
                 VStack(alignment: .center, spacing: 5) {
                     Image(systemName: "person.crop.circle.badge.plus")
                         .font(.system(size: 48))
-                        .foregroundStyle(.accent)
+                        .foregroundStyle(Color.accentColor)
                     
                     Text("key.sign_up.label")
                         .font(.largeTitle.weight(.semibold))
@@ -83,7 +83,7 @@ struct SignUpSheetView: View {
                     }
                     .padding(15)
                     .clipShape(.rect(cornerRadius: 6))
-                    .overlay(.accent, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                    .overlay(Color.accentColor, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                    
                     VStack(alignment: .leading, spacing: 12) {
                         Text("key.sign_up_info_tutorial_title")
@@ -137,7 +137,7 @@ struct SignUpSheetView: View {
                                     .frame(height: 30)
                                     .frame(maxWidth: .infinity)
                                     .foregroundStyle(.white)
-                                    .background(.accent)
+                                    .background(Color.accentColor)
                                     .clipShape(.rect(cornerRadius: 6))
                                     .contentShape(.rect(cornerRadius: 6))
                             }
@@ -174,7 +174,7 @@ struct SignUpSheetView: View {
                         VStack(alignment: .center, spacing: 5) {
                             Image(systemName: "person.crop.circle.badge.plus")
                                 .font(.system(size: 48))
-                                .foregroundStyle(.accent)
+                                .foregroundStyle(Color.accentColor)
                             
                             Text("key.sign_up.label")
                                 .font(.largeTitle.weight(.semibold))
@@ -232,7 +232,7 @@ struct SignUpSheetView: View {
                                     
                                     Text(String(localized: "key.email.error").lowercased())
                                         .font(.caption)
-                                        .foregroundStyle(emailValid == false ? .accent : .clear)
+                                        .foregroundStyle(emailValid == false ? Color.accentColor : Color.clear)
                                         .animation(.easeInOut, value: emailValid == false)
                                 }
                                 
@@ -282,7 +282,7 @@ struct SignUpSheetView: View {
                                     
                                     Text(String(localized: "key.username.error").lowercased())
                                         .font(.caption)
-                                        .foregroundStyle(usernameValid == false ? .accent : .clear)
+                                        .foregroundStyle(usernameValid == false ? Color.accentColor : Color.clear)
                                         .animation(.easeInOut, value: usernameValid == false)
                                 }
                                 
@@ -366,7 +366,7 @@ struct SignUpSheetView: View {
                                         
                                         if !passwordIsEmpty {
                                             Image(systemName: "eye")
-                                                .foregroundStyle(.accent.opacity(showPassword ? 0.5 : 1))
+                                                .foregroundStyle(Color.accentColor.opacity(showPassword ? 0.5 : 1))
                                                 .simultaneousGesture(
                                                     DragGesture(minimumDistance: 0)
                                                         .onChanged { _ in
@@ -390,7 +390,7 @@ struct SignUpSheetView: View {
                                     
                                     Text(String(localized: "key.password.error").lowercased())
                                         .font(.caption)
-                                        .foregroundStyle(passwordValid == false ? .accent : .clear)
+                                        .foregroundStyle(passwordValid == false ? Color.accentColor : Color.clear)
                                         .animation(.easeInOut, value: passwordValid == false)
                                 }
                                 
@@ -470,7 +470,7 @@ struct SignUpSheetView: View {
                                         
                                         if !confirmPasswordIsEmpty {
                                             Image(systemName: "eye")
-                                                .foregroundStyle(.accent.opacity(showConfirmPassword ? 0.5 : 1))
+                                                .foregroundStyle(Color.accentColor.opacity(showConfirmPassword ? 0.5 : 1))
                                                 .simultaneousGesture(
                                                     DragGesture(minimumDistance: 0)
                                                         .onChanged { _ in
@@ -494,7 +494,7 @@ struct SignUpSheetView: View {
                                     
                                     Text(String(localized: "key.password.confirm.error").lowercased())
                                         .font(.caption)
-                                        .foregroundStyle(confirmPasswordValid == false ? .accent : .clear)
+                                        .foregroundStyle(confirmPasswordValid == false ? Color.accentColor : Color.clear)
                                         .animation(.easeInOut, value: confirmPasswordValid == false)
                                 }
                             }
@@ -512,7 +512,7 @@ struct SignUpSheetView: View {
                                 Text("key.sign_up")
                                     .frame(width: 250, height: 30)
                                     .foregroundStyle(.white)
-                                    .background(emailValid == true && usernameValid == true && passwordValid == true && confirmPasswordValid == true ? .accent : .secondary)
+                                    .background(emailValid == true && usernameValid == true && passwordValid == true && confirmPasswordValid == true ? Color.accentColor : Color.secondary)
                                     .clipShape(.rect(cornerRadius: 6))
                                     .contentShape(.rect(cornerRadius: 6))
                             }
@@ -542,7 +542,7 @@ struct SignUpSheetView: View {
                             } label: {
                                 Text(verbatim: "\(String(localized: "key.sign_in"))!")
                                     .font(.caption)
-                                    .foregroundStyle(.accent)
+                                    .foregroundStyle(Color.accentColor)
                             }
                             .buttonStyle(.plain)
                         }
@@ -555,7 +555,7 @@ struct SignUpSheetView: View {
                         VStack(alignment: .center, spacing: 5) {
                             Image(systemName: "person.crop.circle.badge.plus")
                                 .font(.system(size: 48))
-                                .foregroundStyle(.accent)
+                                .foregroundStyle(Color.accentColor)
                             
                             Text("key.sign_up.enter")
                                 .font(.largeTitle.weight(.semibold))
@@ -591,7 +591,7 @@ struct SignUpSheetView: View {
                         VStack(alignment: .center, spacing: 5) {
                             Image(systemName: "person.crop.circle.badge.plus")
                                 .font(.system(size: 48))
-                                .foregroundStyle(.accent)
+                                .foregroundStyle(Color.accentColor)
                             
                             Text("key.ops")
                                 .font(.largeTitle.weight(.semibold))
@@ -613,7 +613,7 @@ struct SignUpSheetView: View {
                                 Text("key.retry")
                                     .frame(width: 250, height: 30)
                                     .foregroundStyle(.white)
-                                    .background(.accent)
+                                    .background(Color.accentColor)
                                     .clipShape(.rect(cornerRadius: 6))
                                     .contentShape(.rect(cornerRadius: 6))
                             }

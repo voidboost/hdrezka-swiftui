@@ -274,7 +274,7 @@ struct CommentsView: View {
                                     Image(systemName: "hand.thumbsup.fill")
                                         .foregroundColor(.accentColor)
                                         .font(.system(size: 17))
-                                        .transition(.movingParts.pop(.accent))
+                                        .transition(.movingParts.pop(Color.accentColor))
                                 } else {
                                     Image(systemName: "hand.thumbsup")
                                         .foregroundColor(.accentColor)

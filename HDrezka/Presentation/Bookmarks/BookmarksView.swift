@@ -29,7 +29,7 @@ struct BookmarksView: View {
                         } label: {
                             Text("key.retry")
                                 .font(.system(size: 13))
-                                .foregroundStyle(.accent)
+                                .foregroundStyle(Color.accentColor)
                                 .highlightOnHover()
                         }
                         .buttonStyle(.plain)
@@ -51,7 +51,7 @@ struct BookmarksView: View {
                             } label: {
                                 Text("key.create")
                                     .font(.system(size: 13))
-                                    .foregroundStyle(.accent)
+                                    .foregroundStyle(Color.accentColor)
                                     .highlightOnHover()
                             }
                             .buttonStyle(.plain)
@@ -62,7 +62,7 @@ struct BookmarksView: View {
                             } label: {
                                 Text("key.retry")
                                     .font(.system(size: 13))
-                                    .foregroundStyle(.accent)
+                                    .foregroundStyle(Color.accentColor)
                                     .highlightOnHover()
                             }
                             .buttonStyle(.plain)
@@ -170,7 +170,7 @@ struct BookmarksView: View {
                     } label: {
                         Text("key.retry")
                             .font(.system(size: 15))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
                             .highlightOnHover()
                     }
                     .buttonStyle(.plain)
@@ -193,7 +193,7 @@ struct BookmarksView: View {
                             } label: {
                                 Text("key.retry")
                                     .font(.system(size: 15))
-                                    .foregroundStyle(.accent)
+                                    .foregroundStyle(Color.accentColor)
                                     .highlightOnHover()
                             }
                             .buttonStyle(.plain)

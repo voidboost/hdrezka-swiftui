@@ -50,7 +50,7 @@ struct EmptyStateView: View {
                     } label: {
                         Text("key.retry")
                             .font(.system(size: 15))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
                             .highlightOnHover()
                     }
                     .buttonStyle(.plain)

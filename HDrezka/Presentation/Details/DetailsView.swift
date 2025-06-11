@@ -247,7 +247,7 @@ struct DetailsView: View {
                                             .padding(.vertical, 7)
                                     }
                                     .buttonStyle(.plain)
-                                    .background(.accent)
+                                    .background(Color.accentColor)
                                     .clipShape(.rect(cornerRadius: 40))
                                     .contentShape(.rect(cornerRadius: 40))
                                     .sheet(isPresented: $isPlayPresented) {
@@ -259,7 +259,7 @@ struct DetailsView: View {
                                     } label: {
                                         Label("key.download", systemImage: "arrow.down.circle")
                                             .font(.system(size: 13))
-                                            .foregroundStyle(.accent)
+                                            .foregroundStyle(Color.accentColor)
                                             .padding(.horizontal, 14)
                                             .padding(.vertical, 7)
                                     }
@@ -280,7 +280,7 @@ struct DetailsView: View {
                                             .padding(.vertical, 7)
                                     }
                                     .buttonStyle(.plain)
-                                    .background(.accent)
+                                    .background(Color.accentColor)
                                     .clipShape(.rect(cornerRadius: 40))
                                     .disabled(true)
                                 } else {
@@ -292,7 +292,7 @@ struct DetailsView: View {
                                             .padding(.vertical, 7)
                                     }
                                     .buttonStyle(.plain)
-                                    .background(.accent)
+                                    .background(Color.accentColor)
                                     .clipShape(.rect(cornerRadius: 40))
                                     .disabled(true)
                                 }
@@ -639,7 +639,7 @@ struct DetailsView: View {
                                                         .foregroundStyle(.white)
                                                 }
                                                 .frame(width: 19, height: 19)
-                                                .background(LinearGradient(colors: [.accent.opacity(colorScheme == .dark ? 1 : 0.5), .accent.opacity(colorScheme == .dark ? 0.5 : 1)], startPoint: .top, endPoint: .bottom))
+                                                .background(LinearGradient(colors: [Color.accentColor.opacity(colorScheme == .dark ? 1 : 0.5), Color.accentColor.opacity(colorScheme == .dark ? 0.5 : 1)], startPoint: .top, endPoint: .bottom))
                                                 .clipShape(.rect(cornerRadius: 6))
                                             }
                                             .frame(width: 24, height: 24)
@@ -1170,7 +1170,7 @@ struct DetailsView: View {
             private let rating: CGFloat
             private let color: Color
             
-            init(rating: Float, color: Color = .accent) {
+            init(rating: Float, color: Color = .accentColor) {
                 self.rating = CGFloat(rating)
                 self.color = color
             }
