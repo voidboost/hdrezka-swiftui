@@ -131,6 +131,7 @@ struct CardView: View {
                                 Text(details)
                                     .font(.system(size: 12))
                                     .foregroundStyle(.secondary)
+                                    .lineLimit(2)
                             }
                         }
                     } else {
@@ -142,6 +143,7 @@ struct CardView: View {
                             Text(details)
                                 .font(.system(size: 12))
                                 .foregroundStyle(.secondary)
+                                .lineLimit(2)
                         }
                     }
                 }
