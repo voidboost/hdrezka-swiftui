@@ -50,14 +50,14 @@ struct WatchingLaterCardView: View {
                                     if !movie.watchingInfo.isEmpty, let last = movie.watchingInfo.split(separator: "(", maxSplits: 1).last {
                                         Text(last.trimmingCharacters(in: .whitespacesAndNewlines).removeLastCharacterIf(character: ")"))
                                             .font(.caption.weight(.semibold))
-                                            .foregroundStyle(movie.buttonText != nil && !movie.watched ? Color.secondary : .primary)
+                                            .foregroundStyle(movie.buttonText != nil && !movie.watched ? Color.secondary : Color.primary)
                                             .lineLimit(1)
                                     }
 
                                     if !movie.watchingInfo.isEmpty, movie.watchingInfo.split(separator: "(", maxSplits: 1).count > 1, let first = movie.watchingInfo.split(separator: "(", maxSplits: 1).first {
                                         Text(first.trimmingCharacters(in: .whitespacesAndNewlines))
                                             .font(.caption.weight(.semibold))
-                                            .foregroundStyle(movie.buttonText != nil && !movie.watched ? Color.secondary : .primary)
+                                            .foregroundStyle(movie.buttonText != nil && !movie.watched ? Color.secondary : Color.primary)
                                             .lineLimit(1)
                                     }
                                 }
