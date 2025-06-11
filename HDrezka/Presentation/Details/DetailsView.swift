@@ -423,31 +423,43 @@ struct DetailsView: View {
                 {
                     HStack(alignment: .center) {
                         if let imdbRating = details.imdbRating {
-                            let color = Color(
-                                NSColor
-                                    .red
-                                    .blended(withFraction: CGFloat(imdbRating.value / 10.0), of: NSColor.green) ?? NSColor.labelColor
-                            )
+                            let color = if #available(macOS 15, *) {
+                                Color.red.mix(with: .green, by: Double(imdbRating.value / 10.0))
+                            } else {
+                                Color(
+                                    NSColor
+                                        .red
+                                        .blended(withFraction: CGFloat(imdbRating.value / 10.0), of: NSColor.green) ?? NSColor.labelColor
+                                )
+                            }
                             
                             InfoColumn("IMDb", imdbRating.value.description, StarsView(rating: imdbRating.value * 0.5, color: color), valueColor: color, hover: imdbRating.votesCount, url: URL(string: imdbRating.link))
                         }
                     
                         if let kpRating = details.kpRating {
-                            let color = Color(
-                                NSColor
-                                    .red
-                                    .blended(withFraction: CGFloat(kpRating.value / 10.0), of: NSColor.green) ?? NSColor.labelColor
-                            )
+                            let color = if #available(macOS 15, *) {
+                                Color.red.mix(with: .green, by: Double(kpRating.value / 10.0))
+                            } else {
+                                Color(
+                                    NSColor
+                                        .red
+                                        .blended(withFraction: CGFloat(kpRating.value / 10.0), of: NSColor.green) ?? NSColor.labelColor
+                                )
+                            }
                             
                             InfoColumn("КиноПоиск", kpRating.value.description, StarsView(rating: kpRating.value * 0.5, color: color), valueColor: color, hover: kpRating.votesCount, url: URL(string: kpRating.link))
                         }
                         
                         if let waRating = details.waRating {
-                            let color = Color(
-                                NSColor
-                                    .red
-                                    .blended(withFraction: CGFloat(waRating.value / 10.0), of: NSColor.green) ?? NSColor.labelColor
-                            )
+                            let color = if #available(macOS 15, *) {
+                                Color.red.mix(with: .green, by: Double(waRating.value / 10.0))
+                            } else {
+                                Color(
+                                    NSColor
+                                        .red
+                                        .blended(withFraction: CGFloat(waRating.value / 10.0), of: NSColor.green) ?? NSColor.labelColor
+                                )
+                            }
                             
                             InfoColumn("World Art", waRating.value.description, StarsView(rating: waRating.value * 0.5, color: color), valueColor: color, hover: waRating.votesCount, url: URL(string: waRating.link))
                         }
@@ -591,11 +603,15 @@ struct DetailsView: View {
                                                         .lineLimit(1)
                                                     
                                                     if let rating = fr.rating {
-                                                        let color = Color(
-                                                            NSColor
-                                                                .red
-                                                                .blended(withFraction: CGFloat(rating / 10.0), of: NSColor.green) ?? NSColor.labelColor
-                                                        )
+                                                        let color = if #available(macOS 15, *) {
+                                                            Color.red.mix(with: .green, by: Double(rating / 10.0))
+                                                        } else {
+                                                            Color(
+                                                                NSColor
+                                                                    .red
+                                                                    .blended(withFraction: CGFloat(rating / 10.0), of: NSColor.green) ?? NSColor.labelColor
+                                                            )
+                                                        }
                                                         
                                                         (
                                                             Text("key.franchise.year-\(fr.year)") +
@@ -649,11 +665,15 @@ struct DetailsView: View {
                                                     .lineLimit(1)
                                                 
                                                 if let rating = fr.rating {
-                                                    let color = Color(
-                                                        NSColor
-                                                            .red
-                                                            .blended(withFraction: CGFloat(rating / 10.0), of: NSColor.green) ?? NSColor.labelColor
-                                                    )
+                                                    let color = if #available(macOS 15, *) {
+                                                        Color.red.mix(with: .green, by: Double(rating / 10.0))
+                                                    } else {
+                                                        Color(
+                                                            NSColor
+                                                                .red
+                                                                .blended(withFraction: CGFloat(rating / 10.0), of: NSColor.green) ?? NSColor.labelColor
+                                                        )
+                                                    }
                                                     
                                                     (
                                                         Text("key.franchise.year-\(fr.year)") +
