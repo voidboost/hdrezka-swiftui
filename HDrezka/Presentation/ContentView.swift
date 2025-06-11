@@ -381,7 +381,7 @@ struct SidebarLabelStyle: LabelStyle {
         HStack(alignment: .center, spacing: 7) {
             configuration.icon
                 .frame(width: 20)
-                .foregroundStyle(.accent)
+                .foregroundStyle(Color.accentColor)
             configuration.title
         }
     }

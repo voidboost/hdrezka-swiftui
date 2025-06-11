@@ -12,7 +12,7 @@ struct CommentsRulesSheet: View {
             VStack(alignment: .center, spacing: 5) {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.system(size: 48))
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(Color.accentColor)
 
                 Text("key.rules")
                     .font(.largeTitle.weight(.semibold))
@@ -31,7 +31,7 @@ struct CommentsRulesSheet: View {
                         Image(systemName: "seal.fill")
                             .padding(.top, 3)
                             .font(.system(size: 9))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text(String(localized: "key.rules.inciting").lowercased())
                     }
@@ -40,7 +40,7 @@ struct CommentsRulesSheet: View {
                         Image(systemName: "seal.fill")
                             .padding(.top, 3)
                             .font(.system(size: 9))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text(String(localized: "key.rules.insulting").lowercased())
                     }
@@ -49,7 +49,7 @@ struct CommentsRulesSheet: View {
                         Image(systemName: "seal.fill")
                             .padding(.top, 3)
                             .font(.system(size: 9))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text(String(localized: "key.rules.obscene").lowercased())
                     }
@@ -58,7 +58,7 @@ struct CommentsRulesSheet: View {
                         Image(systemName: "seal.fill")
                             .padding(.top, 3)
                             .font(.system(size: 9))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text(String(localized: "key.rules.spoiler").lowercased())
                     }
@@ -67,7 +67,7 @@ struct CommentsRulesSheet: View {
                         Image(systemName: "seal.fill")
                             .padding(.top, 3)
                             .font(.system(size: 9))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text(String(localized: "key.rules.leave").lowercased())
                     }
@@ -76,7 +76,7 @@ struct CommentsRulesSheet: View {
                         Image(systemName: "seal.fill")
                             .padding(.top, 3)
                             .font(.system(size: 9))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text(String(localized: "key.rules.questions").lowercased())
                     }
@@ -85,7 +85,7 @@ struct CommentsRulesSheet: View {
                         Image(systemName: "seal.fill")
                             .padding(.top, 3)
                             .font(.system(size: 9))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text(String(localized: "key.rules.resources").lowercased())
                     }
@@ -94,7 +94,7 @@ struct CommentsRulesSheet: View {
                         Image(systemName: "seal.fill")
                             .padding(.top, 3)
                             .font(.system(size: 9))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text(String(localized: "key.rules.mention").lowercased())
                     }
@@ -103,7 +103,7 @@ struct CommentsRulesSheet: View {
                         Image(systemName: "seal.fill")
                             .padding(.top, 3)
                             .font(.system(size: 9))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text(String(localized: "key.rules.problems").lowercased())
                     }
@@ -139,7 +139,7 @@ struct CommentsRulesSheet: View {
                     Text("key.accept")
                         .frame(width: 250, height: 30)
                         .foregroundStyle(.white)
-                        .background(.accent)
+                        .background(Color.accentColor)
                         .clipShape(.rect(cornerRadius: 6))
                         .contentShape(.rect(cornerRadius: 6))
                 }

@@ -126,11 +126,11 @@ struct CategoriesView: View {
                         HStack(alignment: .center) {
                             Text("key.see_all")
                                 .font(.system(size: 12))
-                                .foregroundStyle(.accent)
+                                .foregroundStyle(Color.accentColor)
 
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 12))
-                                .foregroundStyle(.accent)
+                                .foregroundStyle(Color.accentColor)
                         }
                         .highlightOnHover()
                     }

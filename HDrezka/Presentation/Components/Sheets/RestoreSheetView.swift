@@ -31,7 +31,7 @@ struct RestoreSheetView: View {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "person.crop.circle.badge.questionmark")
                             .font(.system(size: 48))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text("key.restore.label")
                             .font(.largeTitle.weight(.semibold))
@@ -79,7 +79,7 @@ struct RestoreSheetView: View {
                             Text("key.restore")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background(!login.isEmpty ? .accent : .secondary)
+                                .background(!login.isEmpty ? Color.accentColor : Color.secondary)
                                 .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
                         }
@@ -109,7 +109,7 @@ struct RestoreSheetView: View {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "person.crop.circle.badge.questionmark")
                             .font(.system(size: 48))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text("key.restore.enter")
                             .font(.largeTitle.weight(.semibold))
@@ -145,7 +145,7 @@ struct RestoreSheetView: View {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "person.crop.circle.badge.questionmark")
                             .font(.system(size: 48))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text("key.ops")
                             .font(.largeTitle.weight(.semibold))
@@ -167,7 +167,7 @@ struct RestoreSheetView: View {
                             Text("key.retry")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background(.accent)
+                                .background(Color.accentColor)
                                 .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
                         }

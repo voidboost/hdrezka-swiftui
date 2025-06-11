@@ -28,7 +28,7 @@ struct CommentReportSheet: View {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "exclamationmark.bubble.fill")
                             .font(.system(size: 48))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text("key.report.label")
                             .font(.largeTitle.weight(.semibold))
@@ -87,7 +87,7 @@ struct CommentReportSheet: View {
                             Text("key.report")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background((report != nil && report != .other) || (report == .other && !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) ? .accent : .secondary)
+                                .background((report != nil && report != .other) || (report == .other && !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) ? Color.accentColor : Color.secondary)
                                 .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
                         }
@@ -112,7 +112,7 @@ struct CommentReportSheet: View {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "exclamationmark.bubble.fill")
                             .font(.system(size: 48))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text("key.report.enter")
                             .font(.largeTitle.weight(.semibold))
@@ -146,7 +146,7 @@ struct CommentReportSheet: View {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "exclamationmark.bubble.fill")
                             .font(.system(size: 48))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text("key.ops")
                             .font(.largeTitle.weight(.semibold))
@@ -168,7 +168,7 @@ struct CommentReportSheet: View {
                             Text("key.retry")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background(.accent)
+                                .background(Color.accentColor)
                                 .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
                         }
@@ -233,7 +233,7 @@ struct CommentReportSheet: View {
             .padding(10)
             .clipShape(.rect(cornerRadius: 6))
             .contentShape(.rect(cornerRadius: 6))
-            .overlay(isSelected ? .accent : .secondary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+            .overlay(isSelected ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
             .onTapGesture { isSelected = true }
             .animation(.easeInOut, value: isSelected)
             .customOnChange(of: isSelected) {

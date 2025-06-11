@@ -26,7 +26,7 @@ struct CreateBookmarkSheetView: View {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "bookmark.circle")
                             .font(.system(size: 48))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text("key.create.label")
                             .font(.largeTitle.weight(.semibold))
@@ -68,7 +68,7 @@ struct CreateBookmarkSheetView: View {
                             Text("key.create")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background(!name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .accent : .secondary)
+                                .background(!name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? Color.accentColor : Color.secondary)
                                 .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
                         }
@@ -96,7 +96,7 @@ struct CreateBookmarkSheetView: View {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "bookmark.circle")
                             .font(.system(size: 48))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text("key.create.enter")
                             .font(.largeTitle.weight(.semibold))
@@ -132,7 +132,7 @@ struct CreateBookmarkSheetView: View {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "bookmark.circle")
                             .font(.system(size: 48))
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
 
                         Text("key.ops")
                             .font(.largeTitle.weight(.semibold))
@@ -154,7 +154,7 @@ struct CreateBookmarkSheetView: View {
                             Text("key.retry")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background(.accent)
+                                .background(Color.accentColor)
                                 .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
                         }

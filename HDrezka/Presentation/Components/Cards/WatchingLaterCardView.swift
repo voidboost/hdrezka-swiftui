@@ -120,7 +120,7 @@ struct WatchingLaterCardView: View {
 
                     Text(movie.date.replacingOccurrences(of: "-", with: ".").firstLetterUppercased())
                         .font(.system(size: 12))
-                        .foregroundStyle(.accent)
+                        .foregroundStyle(Color.accentColor)
                 }
             }
             .contentShape(.rect(topLeadingRadius: 6, topTrailingRadius: 6))

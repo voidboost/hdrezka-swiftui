@@ -19,7 +19,7 @@ struct DownloadsView: View {
                                 download.cancel()
                             } label: {
                                 Image(systemName: "xmark.circle.fill")
-                                    .foregroundStyle(.accent)
+                                    .foregroundStyle(Color.accentColor)
                                     .font(.system(size: 15))
                             }
                             .buttonStyle(.plain)

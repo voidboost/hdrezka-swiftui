@@ -472,7 +472,7 @@ struct PlayerView: View {
                                             Text("key.next")
                                                 .font(.title2.bold())
                                         }
-                                        .foregroundStyle(.accent)
+                                        .foregroundStyle(Color.accentColor)
 
                                         Spacer(minLength: 0)
 
@@ -488,9 +488,9 @@ struct PlayerView: View {
                                     Image(systemName: "play.circle")
                                         .resizable()
                                         .frame(width: 28, height: 28)
-                                        .background(.accent, in: .circle.inset(by: -7).rotation(.degrees(-90)).trim(from: 0.0, to: nextTimer).stroke(style: .init(lineWidth: 6, lineCap: .round, lineJoin: .round)))
+                                        .background(Color.accentColor, in: .circle.inset(by: -7).rotation(.degrees(-90)).trim(from: 0.0, to: nextTimer).stroke(style: .init(lineWidth: 6, lineCap: .round, lineJoin: .round)))
                                         .background(.ultraThickMaterial, in: .circle.inset(by: -7).rotation(.degrees(-90)).trim(from: 0.0, to: nextTimer).stroke(style: .init(lineWidth: 8, lineCap: .round, lineJoin: .round)))
-                                        .background(.accent.opacity(0.3), in: .circle.inset(by: -7).rotation(.degrees(-90)).stroke(style: .init(lineWidth: 4, lineCap: .round, lineJoin: .round)))
+                                        .background(Color.accentColor.opacity(0.3), in: .circle.inset(by: -7).rotation(.degrees(-90)).stroke(style: .init(lineWidth: 4, lineCap: .round, lineJoin: .round)))
                                 }
                                 .frame(height: 50)
                                 .padding(.vertical, 16)

@@ -50,7 +50,7 @@ struct WatchSheetView: View {
             VStack(alignment: .center, spacing: 5) {
                 Image(systemName: "videoprojector")
                     .font(.system(size: 48))
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(Color.accentColor)
                 
                 Text("key.before_starting")
                     .font(.largeTitle.weight(.semibold))
@@ -75,7 +75,7 @@ struct WatchSheetView: View {
                                                 showRating = true
                                             } label: {
                                                 Image(systemName: "questionmark.circle")
-                                                    .foregroundStyle(.accent)
+                                                    .foregroundStyle(Color.accentColor)
                                                     .font(.system(size: 11))
                                             }
                                             .buttonStyle(.plain)
@@ -399,7 +399,7 @@ struct WatchSheetView: View {
                     Text("key.watch")
                         .frame(width: 250, height: 30)
                         .foregroundStyle(.white)
-                        .background(selectedQuality != nil ? .accent : .secondary)
+                        .background(selectedQuality != nil ? Color.accentColor : Color.secondary)
                         .clipShape(.rect(cornerRadius: 6))
                         .contentShape(.rect(cornerRadius: 6))
                 }

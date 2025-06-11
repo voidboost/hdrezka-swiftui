@@ -115,12 +115,12 @@ struct SettingsView: View {
                         mirrorCheck?.cancel()
                     } label: {
                         Image(systemName: "checkmark")
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
                             .bold()
                             .imageFill(1)
                             .clipShape(.rect(cornerRadius: 6))
                             .contentShape(.rect(cornerRadius: 6))
-                            .overlay(.accent, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                            .overlay(Color.accentColor, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
                 }
@@ -235,13 +235,13 @@ struct SettingsView: View {
                         viewContext.saveContext()
                     } label: {
                         Image(systemName: "trash")
-                            .foregroundStyle(.accent)
+                            .foregroundStyle(Color.accentColor)
                             .bold()
                             .imageFill(1)
                             .frame(height: 30)
                             .clipShape(.rect(cornerRadius: 6))
                             .contentShape(.rect(cornerRadius: 6))
-                            .overlay(.accent, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                            .overlay(Color.accentColor, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
                     .disabled(playerPositions.isEmpty)
@@ -270,13 +270,13 @@ struct SettingsView: View {
                             viewContext.saveContext()
                         } label: {
                             Image(systemName: "trash")
-                                .foregroundStyle(.accent)
+                                .foregroundStyle(Color.accentColor)
                                 .bold()
                                 .imageFill(1)
                                 .frame(height: 30)
                                 .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
-                                .overlay(.accent, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                                .overlay(Color.accentColor, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                         }
                         .buttonStyle(.plain)
                         .disabled(selectPositions.isEmpty)

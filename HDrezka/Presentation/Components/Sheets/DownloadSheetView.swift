@@ -49,7 +49,7 @@ struct DownloadSheetView: View {
             VStack(alignment: .center, spacing: 5) {
                 Image(systemName: "arrow.down.circle")
                     .font(.system(size: 48))
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(Color.accentColor)
                 
                 Text("key.before_starting")
                     .font(.largeTitle.weight(.semibold))
@@ -74,7 +74,7 @@ struct DownloadSheetView: View {
                                                 showRating = true
                                             } label: {
                                                 Image(systemName: "questionmark.circle")
-                                                    .foregroundStyle(.accent)
+                                                    .foregroundStyle(Color.accentColor)
                                                     .font(.system(size: 11))
                                             }
                                             .buttonStyle(.plain)
@@ -427,7 +427,7 @@ struct DownloadSheetView: View {
                     Text("key.download")
                         .frame(width: 250, height: 30)
                         .foregroundStyle(.white)
-                        .background(selectedQuality != nil ? .accent : .secondary)
+                        .background(selectedQuality != nil ? Color.accentColor : Color.secondary)
                         .clipShape(.rect(cornerRadius: 6))
                         .contentShape(.rect(cornerRadius: 6))
                 }
@@ -453,7 +453,7 @@ struct DownloadSheetView: View {
                         Text("key.download.season")
                             .frame(width: 250, height: 30)
                             .foregroundStyle(.white)
-                            .background(selectedQuality != nil ? .accent : .secondary)
+                            .background(selectedQuality != nil ? Color.accentColor : Color.secondary)
                             .clipShape(.rect(cornerRadius: 6))
                             .contentShape(.rect(cornerRadius: 6))
                     }

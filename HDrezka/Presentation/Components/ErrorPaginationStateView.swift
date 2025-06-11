@@ -22,7 +22,7 @@ struct ErrorPaginationStateView: View {
                     retryAction()
                 } label: {
                     Text("key.retry")
-                        .foregroundStyle(.accent)
+                        .foregroundStyle(Color.accentColor)
                         .highlightOnHover()
                 }
                 .buttonStyle(.plain)

@@ -16,7 +16,7 @@ struct SeriesUpdatesSheetView: View {
             VStack(spacing: 5) {
                 Image(systemName: "bell")
                     .font(.system(size: 48))
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(Color.accentColor)
 
                 Text("key.series_updates")
                     .font(.largeTitle.weight(.semibold))
@@ -32,7 +32,7 @@ struct SeriesUpdatesSheetView: View {
                             load()
                         } label: {
                             Text("key.retry")
-                                .foregroundStyle(.accent)
+                                .foregroundStyle(Color.accentColor)
                                 .highlightOnHover()
                         }
                         .buttonStyle(.plain)
@@ -47,7 +47,7 @@ struct SeriesUpdatesSheetView: View {
                                 load()
                             } label: {
                                 Text("key.retry")
-                                    .foregroundStyle(.accent)
+                                    .foregroundStyle(Color.accentColor)
                                     .highlightOnHover()
                             }
                             .buttonStyle(.plain)

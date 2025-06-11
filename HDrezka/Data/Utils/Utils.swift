@@ -166,7 +166,7 @@ class AttributedTextStyle {
 
         if let link {
             attributes[.link] = link
-            attributes[.foregroundColor] = NSColor.accent
+            attributes[.foregroundColor] = NSColor(Color.accentColor)
         }
 
         let p = NSMutableParagraphStyle()

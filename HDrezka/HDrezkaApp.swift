@@ -216,7 +216,7 @@ struct HDrezkaApp: App {
 
                 if let image = NSImage(named: "GS") {
                     let imageAttachment = NSTextAttachment()
-                    imageAttachment.image = image.resized(to: CGSize(width: 76, height: 100)).tint(.accent)
+                    imageAttachment.image = image.resized(to: CGSize(width: 76, height: 100)).tint(NSColor(Color.accentColor))
 
                     let credits = NSMutableAttributedString(attachment: imageAttachment)
                     credits.addAttribute(.link, value: Const.helpUkraine, range: NSRange(location: 0, length: credits.length))
