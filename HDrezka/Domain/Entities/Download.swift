@@ -1,20 +1,21 @@
 import Alamofire
+import Combine
 import Foundation
 
 struct Download: Identifiable, Hashable {
     let id: String
-    private let request: DownloadRequest
     let progress: Progress
+    let cancellable: AnyCancellable
 
     init(id: String, request: DownloadRequest) {
         self.id = id
-        self.request = request
-        self.progress = self.request.downloadProgress
+        self.progress = request.downloadProgress
+        self.cancellable = AnyCancellable { request.cancel() }
     }
 }
 
 extension Download {
     func cancel() {
-        request.cancel()
+        cancellable.cancel()
     }
 }
