@@ -10,7 +10,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
     let activeFillColor: Color
     let fillColor: Color
     let emptyColor: Color
-    let height: CGFloat
+    let height: Double
     let thumbnails: WebVTT?
     let onEditingChanged: (Bool) -> Void
 
@@ -18,10 +18,10 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
     @State private var localTempProgress: T = 0
     @GestureState private var isActive: Bool = false
     @State private var progressDuration: T = 0
-    
+
     @State private var showSeekImage: Bool = false
     @State private var unitSeekImage: CGFloat = .zero
-    
+
     init(
         value: Binding<T>,
         inRange: ClosedRange<T>,
@@ -29,7 +29,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
         activeFillColor: Color,
         fillColor: Color,
         emptyColor: Color,
-        height: CGFloat,
+        height: Double,
         thumbnails: WebVTT?,
         onEditingChanged: @escaping (Bool) -> Void
     ) {
@@ -43,7 +43,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
         self.thumbnails = thumbnails
         self.onEditingChanged = onEditingChanged
     }
-    
+
     var body: some View {
         ZStack(alignment: .center) {
             VStack {
@@ -58,29 +58,26 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                     Spacer(minLength: 0)
                                 }
                             }
-                            
+
                         ForEach(buffers, id: \.self) { buffer in
                             if let start = buffer.start.seconds as? T, let end = buffer.end.seconds as? T {
                                 emptyColor
                                     .mask {
                                         ZStack(alignment: .topLeading) {
                                             let duration = if isActive {
-                                                max(CGFloat(end / inRange.upperBound) - CGFloat(start / inRange.upperBound), 0)
+                                                max(Double(end / inRange.upperBound) - Double(start / inRange.upperBound), 0)
                                             } else {
-                                                max(CGFloat(end / inRange.upperBound) - CGFloat(localRealProgress + localTempProgress), 0)
+                                                max(Double(end / inRange.upperBound) - Double(localRealProgress + localTempProgress), 0)
                                             }
-                                                
-                                            let x = if isActive {
-                                                max(geometry.size.width * (CGFloat(start / inRange.upperBound) + duration * 0.5), 0)
-                                            } else {
-                                                max(geometry.size.width * (CGFloat(localRealProgress + localTempProgress) + duration * 0.5), 0)
-                                            }
-                                                
-                                            let y = (isActive ? height * 1.25 : height) * 0.5
-                                                
+
+                                            let point = CGPoint(
+                                                x: isActive ? max(geometry.size.width * (Double(start / inRange.upperBound) + duration * 0.5), 0) : max(geometry.size.width * (Double(localRealProgress + localTempProgress) + duration * 0.5), 0),
+                                                y: (isActive ? height * 1.25 : height) * 0.5
+                                            )
+
                                             Color.black
                                                 .frame(width: max(geometry.size.width * duration, 0))
-                                                .position(x: x, y: y)
+                                                .position(x: point.x, y: point.y)
                                         }
                                     }
                             }
@@ -100,7 +97,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                 let prg = max(min(localRealProgress + localTempProgress, 1), 0)
                                 progressDuration = inRange.upperBound * prg
                                 value = max(min(getPrgValue(), inRange.upperBound), inRange.lowerBound)
-                                
+
                                 withAnimation(.easeInOut) {
                                     unitSeekImage = gesture.location.x / geometry.size.width
                                 }
@@ -114,7 +111,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                         switch phase {
                         case .active(let location):
                             unitSeekImage = location.x / geometry.size.width
-                            
+
                             withAnimation(.easeInOut) {
                                 showSeekImage = true
                             }
@@ -147,7 +144,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                             )
                                     }
                                 }
-                                .processors([.process(id: "\(frame.x.description)\(frame.y.description)\(frame.width.description)\(frame.height.description)") { $0.crop(to: .init(x: frame.x, y: frame.y, width: frame.width, height: frame.height)) }])
+                                .processors([.process(id: "\(frame.minX.description)\(frame.minY.description)\(frame.width.description)\(frame.height.description)") { $0.crop(to: .init(x: frame.minX, y: frame.minY, width: frame.width, height: frame.height)) }])
                                 .onDisappear(.cancel)
                                 .scaledToFill()
                                 .frame(width: frame.width, height: frame.height)
@@ -157,7 +154,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                 .overlay {
                                     VStack {
                                         Spacer()
-                                        
+
                                         HStack {
                                             Spacer()
                                             Text((T(Float(unitSeekImage)) * inRange.upperBound).asTimeString(style: .positional))
@@ -174,7 +171,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                         }
                     }
                 }
-                    
+
                 HStack {
                     Text(progressDuration.asTimeString(style: .positional))
                     Spacer(minLength: 0)
@@ -200,14 +197,14 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
             }
         }
     }
-    
+
     private func getPrgPercentage(_ value: T) -> T {
         let range = inRange.upperBound - inRange.lowerBound
         let correctedStartValue = value - inRange.lowerBound
         let percentage = correctedStartValue / range
         return percentage
     }
-    
+
     private func getPrgValue() -> T {
         return ((localRealProgress + localTempProgress) * (inRange.upperBound - inRange.lowerBound)) + inRange.lowerBound
     }
@@ -234,7 +231,7 @@ private extension PlatformImage {
         else {
             return nil
         }
-        
+
         return .init(cgImage: cutImageRef, size: .init(width: CGFloat(cutImageRef.width), height: CGFloat(cutImageRef.height)))
     }
 }

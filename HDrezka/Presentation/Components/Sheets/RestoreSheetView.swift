@@ -229,7 +229,7 @@ struct RestoreSheetView: View {
                         isSuccessPresented = true
                     } else {
                         withAnimation(.easeInOut) {
-                            state = .error(NSError())
+                            state = .error(HDrezkaError.unknown as NSError)
                         }
                     }
                 }

@@ -4,28 +4,28 @@ import SwiftUI
 
 struct PersonView: View {
     private let title: String
-        
-    @StateObject private var vm: PersonViewModel
-    
+
+    @StateObject private var viewModel: PersonViewModel
+
     init(person: PersonSimple) {
         self.title = person.name
-        self._vm = StateObject(wrappedValue: PersonViewModel(id: person.personId))
+        self._viewModel = StateObject(wrappedValue: PersonViewModel(id: person.personId))
     }
-    
+
     @State private var showBar: Bool = false
-    
+
     @Default(.mirror) private var mirror
     @Default(.isLoggedIn) private var isLoggedIn
-    
+
     var body: some View {
         Group {
-            if let error = vm.state.error {
+            if let error = viewModel.state.error {
                 ErrorStateView(error, title) {
-                    vm.load()
+                    viewModel.load()
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
-            } else if let details = vm.state.data {
+            } else if let details = viewModel.state.data {
                 ScrollView(.vertical) {
                     LazyVStack(alignment: .leading, spacing: 18) {
                         PersonViewComponent(details: details)
@@ -49,9 +49,9 @@ struct PersonView: View {
             }
         }
         .navigationBar(title: title, showBar: showBar, navbar: {
-            if case .data = vm.state {
+            if case .data = viewModel.state {
                 Button {
-                    vm.load()
+                    viewModel.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -59,19 +59,19 @@ struct PersonView: View {
                 .keyboardShortcut("r", modifiers: .command)
             }
         }, toolbar: {
-            if case .data = vm.state {
-                CustomShareLink(items: [(mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: vm.id, directoryHint: .notDirectory)]) {
+            if case .data = viewModel.state {
+                CustomShareLink(items: [(mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: viewModel.id, directoryHint: .notDirectory)]) {
                     Image(systemName: "square.and.arrow.up")
                 }
                 .buttonStyle(NavbarButtonStyle(width: 30, height: 22))
             }
         })
         .task(id: isLoggedIn) {
-            switch vm.state {
+            switch viewModel.state {
             case .data:
                 break
             default:
-                vm.load()
+                viewModel.load()
             }
         }
         .background(.background)
@@ -79,13 +79,13 @@ struct PersonView: View {
 
     private struct PersonViewComponent: View {
         private let details: PersonDetailed
-        
+
         @Environment(\.openWindow) private var openWindow
-        
+
         init(details: PersonDetailed) {
             self.details = details
         }
-                        
+
         var body: some View {
             HStack(alignment: .bottom, spacing: 27) {
                 Button {
@@ -139,13 +139,13 @@ struct PersonView: View {
                     .contentShape(.rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
-        
+
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(details.nameRu)
                             .font(.largeTitle.weight(.semibold))
                             .textSelection(.enabled)
-                                
+
                         if let nameOriginal = details.nameOrig {
                             Text(nameOriginal)
                                 .font(.system(size: 15))
@@ -153,7 +153,7 @@ struct PersonView: View {
                                 .textSelection(.enabled)
                         }
                     }
-                            
+
                     if details.career?.isEmpty == false
                         ||
                         details.birthDate?.isEmpty == false
@@ -164,50 +164,49 @@ struct PersonView: View {
                         ||
                         details.deathPlace?.isEmpty == false
                         ||
-                        details.height?.isEmpty == false
-                    {
+                        details.height?.isEmpty == false {
                         VStack(alignment: .leading, spacing: 0) {
                             if let career = details.career, !career.isEmpty {
                                 InfoRow(String(localized: "key.person.career"), career)
                             }
-                            
+
                             if let height = details.height, !height.isEmpty {
                                 if details.career?.isEmpty == false {
                                     Divider()
                                 }
-                                
+
                                 InfoRow(String(localized: "key.person.height"), height)
                             }
-                            
+
                             if let birthDate = details.birthDate, !birthDate.isEmpty {
                                 if details.career?.isEmpty == false || details.height?.isEmpty == false {
                                     Divider()
                                 }
-                                
+
                                 InfoRow(String(localized: "key.person.birth_date"), birthDate)
                             }
-                            
+
                             if let birthPlace = details.birthPlace, !birthPlace.isEmpty {
                                 if details.career?.isEmpty == false || details.birthDate?.isEmpty == false || details.height?.isEmpty == false {
                                     Divider()
                                 }
-                                
+
                                 InfoRow(String(localized: "key.person.birth_place"), birthPlace)
                             }
-                            
+
                             if let deathDate = details.deathDate, !deathDate.isEmpty {
                                 if details.career?.isEmpty == false || details.birthDate?.isEmpty == false || details.birthPlace?.isEmpty == false || details.height?.isEmpty == false {
                                     Divider()
                                 }
-                                
+
                                 InfoRow(String(localized: "key.person.death_date"), deathDate)
                             }
-                            
+
                             if let deathPlace = details.deathPlace, !deathPlace.isEmpty {
                                 if details.career?.isEmpty == false || details.birthDate?.isEmpty == false || details.birthPlace?.isEmpty == false || details.deathDate?.isEmpty == false || details.height?.isEmpty == false {
                                     Divider()
                                 }
-                                
+
                                 InfoRow(String(localized: "key.person.death_place"), deathPlace)
                             }
                         }
@@ -219,63 +218,63 @@ struct PersonView: View {
                 }
             }
             .padding(.horizontal, 36)
-                            
+
             if let actorMovies = details.actorMovies, !actorMovies.isEmpty {
                 Divider()
                     .padding(.horizontal, 36)
-                
+
                 MoviesRow(String(localized: "key.person.actor"), actorMovies)
             }
-            
+
             if let actressMovies = details.actressMovies, !actressMovies.isEmpty {
                 Divider()
                     .padding(.horizontal, 36)
-                
+
                 MoviesRow(String(localized: "key.person.actress"), actressMovies)
             }
-            
+
             if let artistMovies = details.artistMovies, !artistMovies.isEmpty {
                 Divider()
                     .padding(.horizontal, 36)
-                
+
                 MoviesRow(String(localized: "key.person.artist"), artistMovies)
             }
-            
+
             if let directorMovies = details.directorMovies, !directorMovies.isEmpty {
                 Divider()
                     .padding(.horizontal, 36)
-                
+
                 MoviesRow(String(localized: "key.person.director"), directorMovies)
             }
-            
+
             if let editorMovies = details.editorMovies, !editorMovies.isEmpty {
                 Divider()
                     .padding(.horizontal, 36)
-                
+
                 MoviesRow(String(localized: "key.person.editor"), editorMovies)
             }
-            
+
             if let operatorMovies = details.operatorMovies, !operatorMovies.isEmpty {
                 Divider()
                     .padding(.horizontal, 36)
-                
+
                 MoviesRow(String(localized: "key.person.operator"), operatorMovies)
             }
-            
+
             if let producerMovies = details.producerMovies, !producerMovies.isEmpty {
                 Divider()
                     .padding(.horizontal, 36)
-                
+
                 MoviesRow(String(localized: "key.person.producer"), producerMovies)
             }
-            
+
             if let screenwriterMovies = details.screenwriterMovies, !screenwriterMovies.isEmpty {
                 Divider()
                     .padding(.horizontal, 36)
 
                 MoviesRow(String(localized: "key.person.screenwriter"), screenwriterMovies)
             }
-            
+
             if let composerMovies = details.composerMovies, !composerMovies.isEmpty {
                 Divider()
                     .padding(.horizontal, 36)
@@ -283,81 +282,81 @@ struct PersonView: View {
                 MoviesRow(String(localized: "key.person.composer"), composerMovies)
             }
         }
-        
-        private struct InfoRow: View {
-            private let title: String
-            private let info: String
-            
-            init(_ title: String, _ info: String) {
-                self.title = title
-                self.info = info
-            }
-            
-            var body: some View {
-                HStack(alignment: .center) {
-                    Text(title)
-                        .font(.system(size: 13))
-                        
-                    Spacer()
-                        
-                    Text(info)
-                        .font(.system(size: 13))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-                .padding(.vertical, 8)
-            }
+    }
+
+    private struct InfoRow: View {
+        private let title: String
+        private let info: String
+
+        init(_ title: String, _ info: String) {
+            self.title = title
+            self.info = info
         }
-        
-        private struct MoviesRow: View {
-            private let title: String
-            private let movies: [MovieSimple]
-            
-            @EnvironmentObject private var appState: AppState
 
-            init(_ title: String, _ movies: [MovieSimple]) {
-                self.title = title
-                self.movies = movies
+        var body: some View {
+            HStack(alignment: .center) {
+                Text(title)
+                    .font(.system(size: 13))
+
+                Spacer()
+
+                Text(info)
+                    .font(.system(size: 13))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
             }
-            
-            var body: some View {
-                VStack(alignment: .leading, spacing: 18) {
-                    HStack(alignment: .center, spacing: 9) {
-                        Text(title).font(.system(size: 22).bold())
-                        
-                        Spacer()
-                        
-                        if movies.count > 10 {
-                            Button {
-                                appState.path.append(.customList(movies, title))
-                            } label: {
-                                HStack(alignment: .center) {
-                                    Text("key.see_all")
-                                        .font(.system(size: 12))
-                                        .foregroundStyle(Color.accentColor)
+            .padding(.vertical, 8)
+        }
+    }
 
-                                    Image(systemName: "chevron.right")
-                                        .font(.system(size: 12))
-                                        .foregroundStyle(Color.accentColor)
-                                }
-                                .highlightOnHover()
+    private struct MoviesRow: View {
+        private let title: String
+        private let movies: [MovieSimple]
+
+        @EnvironmentObject private var appState: AppState
+
+        init(_ title: String, _ movies: [MovieSimple]) {
+            self.title = title
+            self.movies = movies
+        }
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 18) {
+                HStack(alignment: .center, spacing: 9) {
+                    Text(title).font(.system(size: 22).bold())
+
+                    Spacer()
+
+                    if movies.count > 10 {
+                        Button {
+                            appState.path.append(.customList(movies, title))
+                        } label: {
+                            HStack(alignment: .center) {
+                                Text("key.see_all")
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(Color.accentColor)
+
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(Color.accentColor)
                             }
-                            .buttonStyle(.plain)
+                            .highlightOnHover()
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 36)
+
+                ScrollView(.horizontal) {
+                    LazyHStack(alignment: .top, spacing: 18) {
+                        ForEach(movies.prefix(10)) { movie in
+                            CardView(movie: movie, reservesSpace: true)
+                                .frame(width: 150)
                         }
                     }
                     .padding(.horizontal, 36)
-                    
-                    ScrollView(.horizontal) {
-                        LazyHStack(alignment: .top, spacing: 18) {
-                            ForEach(movies.prefix(10)) { movie in
-                                CardView(movie: movie, reservesSpace: true)
-                                    .frame(width: 150)
-                            }
-                        }
-                        .padding(.horizontal, 36)
-                    }
-                    .scrollIndicators(.never)
                 }
+                .scrollIndicators(.never)
             }
         }
     }

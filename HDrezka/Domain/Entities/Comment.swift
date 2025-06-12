@@ -36,8 +36,8 @@ struct Comment: Identifiable, Hashable {
             likesCount = count
             self.isLiked = isLiked
         } else {
-            for i in replies.indices {
-                replies[i].like(count, isLiked, comment)
+            for index in replies.indices {
+                replies[index].like(count, isLiked, comment)
             }
         }
     }
@@ -60,8 +60,8 @@ struct Comment: Identifiable, Hashable {
         if replies.contains(where: { $0.commentId == commentId }) {
             replies.removeAll(where: { $0.commentId == commentId })
         } else {
-            for i in replies.indices {
-                replies[i].deleteComment(commentId)
+            for index in replies.indices {
+                replies[index].deleteComment(commentId)
             }
         }
     }
@@ -75,25 +75,25 @@ struct Comment: Identifiable, Hashable {
         textStorage.addLayoutManager(layoutManager)
         layoutManager.addTextContainer(textContainer)
 
-        for i in spoilers.indices {
+        for index in spoilers.indices {
             var spoilersRects: [CGRect] = []
 
-            let range = spoilers[i].range
+            let range = spoilers[index].range
 
             layoutManager.enumerateLineFragments(forGlyphRange: layoutManager.glyphRange(forCharacterRange: range, actualCharacterRange: nil)) { _, usedRect, _, glyphRange, _ in
                 let textRect = layoutManager.boundingRect(forGlyphRange: layoutManager.glyphRange(forCharacterRange: NSIntersectionRange(range, layoutManager.characterRange(forGlyphRange: glyphRange, actualGlyphRange: nil)), actualCharacterRange: nil), in: textContainer)
 
-                let x = abs(max(textRect.origin.x, usedRect.origin.x))
-                let y = abs(max(textRect.origin.y, usedRect.origin.y))
-                let width = abs(min(textRect.size.width, usedRect.size.width) - (textRect.size.width > usedRect.size.width ? abs(textRect.origin.x - usedRect.origin.x) : 0))
-                let height = abs(min(textRect.size.height, usedRect.size.height) - (textRect.size.height > usedRect.size.height ? abs(textRect.origin.y - usedRect.origin.y) : 0))
-
                 spoilersRects.append(
-                    .init(x: x, y: y, width: width, height: height)
+                    .init(
+                        x: abs(max(textRect.origin.x, usedRect.origin.x)),
+                        y: abs(max(textRect.origin.y, usedRect.origin.y)),
+                        width: abs(min(textRect.size.width, usedRect.size.width) - (textRect.size.width > usedRect.size.width ? abs(textRect.origin.x - usedRect.origin.x) : 0)),
+                        height: abs(min(textRect.size.height, usedRect.size.height) - (textRect.size.height > usedRect.size.height ? abs(textRect.origin.y - usedRect.origin.y) : 0))
+                    )
                 )
             }
 
-            spoilers[i].updateRects(
+            spoilers[index].updateRects(
                 spoilersRects
                     .reduce(into: [CGRect]()) { result, accum in
                         if let last = result.last, last.width == accum.width, last.origin.x == accum.origin.x {

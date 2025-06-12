@@ -62,7 +62,7 @@ class CommentsViewModel: ObservableObject {
                             self.state.append(comments)
                             self.paginationState = .idle
                         } else {
-                            self.paginationState = .error(NSError())
+                            self.paginationState = .error(HDrezkaError.unknown as NSError)
                         }
                     }
                 }
@@ -79,7 +79,7 @@ class CommentsViewModel: ObservableObject {
             getData(movieId: movieId)
         } else {
             withAnimation(.easeInOut) {
-                self.state = .error(NSError())
+                self.state = .error(HDrezkaError.unknown as NSError)
             }
         }
     }
@@ -95,7 +95,7 @@ class CommentsViewModel: ObservableObject {
             getData(movieId: movieId, isInitial: false)
         } else {
             withAnimation(.easeInOut) {
-                self.paginationState = .error(NSError())
+                self.paginationState = .error(HDrezkaError.unknown as NSError)
             }
         }
     }
@@ -136,8 +136,8 @@ class CommentsViewModel: ObservableObject {
             } receiveValue: { count, isLiked in
                 withAnimation(.easeInOut) {
                     if var comments = self.state.data {
-                        for i in comments.indices {
-                            comments[i].like(count, isLiked, comment)
+                        for index in comments.indices {
+                            comments[index].like(count, isLiked, comment)
                         }
 
                         self.state = .data(comments)
@@ -158,18 +158,18 @@ class CommentsViewModel: ObservableObject {
 
                     self.error = error
                     self.isErrorPresented = true
-                } receiveValue: { success, onModeration, message in
-                    if success {
+                } receiveValue: { result in
+                    if result.success {
                         self.isOnModerationPresented = true
                         self.message = nil
                     } else {
-                        if onModeration {
+                        if result.onModeration {
                             self.isOnModerationPresented = true
                         } else {
                             self.isErrorPresented = true
                         }
 
-                        self.message = message
+                        self.message = result.message
                     }
                 }
                 .store(in: &subscriptions)
@@ -229,8 +229,8 @@ class CommentsViewModel: ObservableObject {
                                 if comments.contains(where: { $0.commentId == comment.commentId }) {
                                     comments.removeAll(where: { $0.commentId == comment.commentId })
                                 } else {
-                                    for i in comments.indices {
-                                        comments[i].deleteComment(comment.commentId)
+                                    for index in comments.indices {
+                                        comments[index].deleteComment(comment.commentId)
                                     }
                                 }
 

@@ -4,7 +4,7 @@ import SwiftUI
 struct HomeView: View {
     private let title = String(localized: "key.home")
 
-    @StateObject private var vm = HomeViewModel()
+    @StateObject private var viewModel = HomeViewModel()
 
     @State private var showBar: Bool = false
 
@@ -12,16 +12,16 @@ struct HomeView: View {
 
     var body: some View {
         Group {
-            if let error = vm.state.error {
+            if let error = viewModel.state.error {
                 ErrorStateView(error, title) {
-                    vm.load()
+                    viewModel.load()
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
-            } else if let categories = vm.state.data {
+            } else if let categories = viewModel.state.data {
                 if categories.isEmpty {
                     EmptyStateView(String(localized: "key.home.empty"), title) {
-                        vm.load()
+                        viewModel.load()
                     }
                     .padding(.vertical, 52)
                     .padding(.horizontal, 36)
@@ -47,8 +47,8 @@ struct HomeView: View {
                                     ForEach(categories) { category in
                                         CategorySection(title: category.title, category: category.category, movies: category.movies)
                                             .task {
-                                                if categories.last == category, vm.paginationState == .idle {
-                                                    vm.loadMore()
+                                                if categories.last == category, viewModel.paginationState == .idle {
+                                                    viewModel.loadMore()
                                                 }
                                             }
 
@@ -71,11 +71,11 @@ struct HomeView: View {
                         .coordinateSpace(name: "scroll")
                         .scrollIndicators(.never)
 
-                        if let error = vm.paginationState.error {
+                        if let error = viewModel.paginationState.error {
                             ErrorPaginationStateView(error) {
-                                vm.loadMore(reset: true)
+                                viewModel.loadMore(reset: true)
                             }
-                        } else if vm.paginationState == .loading {
+                        } else if viewModel.paginationState == .loading {
                             LoadingPaginationStateView()
                         }
                     }
@@ -87,9 +87,9 @@ struct HomeView: View {
             }
         }
         .navigationBar(title: title, showBar: showBar, navbar: {
-            if let categories = vm.state.data, !categories.isEmpty {
+            if let categories = viewModel.state.data, !categories.isEmpty {
                 Button {
-                    vm.load()
+                    viewModel.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -97,9 +97,9 @@ struct HomeView: View {
                 .keyboardShortcut("r", modifiers: .command)
             }
         }, toolbar: {
-            if case .data = vm.state {
+            if case .data = viewModel.state {
                 Button {
-                    vm.isSeriesUpdatesPresented = true
+                    viewModel.isSeriesUpdatesPresented = true
                 } label: {
                     Image(systemName: "bell")
                 }
@@ -107,15 +107,15 @@ struct HomeView: View {
             }
         })
         .task(id: isLoggedIn) {
-            switch vm.state {
+            switch viewModel.state {
             case .data:
                 break
             default:
-                vm.load()
+                viewModel.load()
             }
         }
         .background(.background)
-        .sheet(isPresented: $vm.isSeriesUpdatesPresented) {
+        .sheet(isPresented: $viewModel.isSeriesUpdatesPresented) {
             SeriesUpdatesSheetView()
         }
     }

@@ -17,13 +17,13 @@ struct DownloadSheetView: View {
     @EnvironmentObject private var downloader: Downloader
 
     @FetchRequest(fetchRequest: SelectPosition.fetch()) private var selectPositions: FetchedResults<SelectPosition>
-    
+
     @Default(.isUserPremium) private var isUserPremium
     @Default(.isLoggedIn) private var isLoggedIn
     @Default(.defaultQuality) private var defaultQuality
 
     private let id: String
-    
+
     @State private var details: MovieDetailed?
     @State private var seasons: [MovieSeason]?
     @State private var selectedActing: MovieVoiceActing?
@@ -32,14 +32,14 @@ struct DownloadSheetView: View {
     @State private var selectedQuality: String?
     @State private var selectedSubtitles: MovieSubtitles?
     @State private var movie: MovieVideo?
-    
+
     @State private var error: Error?
-    
+
     @State private var isErrorPresented: Bool = false
     @State private var isLoginPresented: Bool = false
-    
+
     @State private var showRating: Bool = false
-    
+
     init(id: String) {
         self.id = id
     }
@@ -50,7 +50,7 @@ struct DownloadSheetView: View {
                 Image(systemName: "arrow.down.circle")
                     .font(.system(size: 48))
                     .foregroundStyle(Color.accentColor)
-                
+
                 Text("key.before_starting")
                     .font(.largeTitle.weight(.semibold))
 
@@ -59,7 +59,7 @@ struct DownloadSheetView: View {
                     .lineLimit(2, reservesSpace: true)
                     .multilineTextAlignment(.center)
             }
-            
+
             if let details {
                 VStack(spacing: 18) {
                     if details.series != nil || !(details.voiceActing ?? []).filter({ !$0.name.isEmpty }).isEmpty {
@@ -68,7 +68,7 @@ struct DownloadSheetView: View {
                                 ZStack(alignment: .center) {
                                     HStack {
                                         Text("key.acting")
-                                        
+
                                         if let rating = details.voiceActingRating?.sorted(by: { $0.percent > $1.percent }), !rating.isEmpty {
                                             Button {
                                                 showRating = true
@@ -97,9 +97,9 @@ struct DownloadSheetView: View {
                                                 .frame(maxHeight: 300)
                                             }
                                         }
-                                        
+
                                         Spacer()
-                                        
+
                                         Menu {
                                             if acting.filter({ $0 != selectedActing }).contains(where: {
                                                 $0.isPremium
@@ -115,14 +115,14 @@ struct DownloadSheetView: View {
                                                                 }
                                                             } else {
                                                                 dismiss()
-                                                                
+
                                                                 appState.isPremiumPresented = true
                                                             }
                                                         } label: {
                                                             HStack(spacing: 2) {
                                                                 Image("Premium")
                                                                     .renderingMode(.template)
-                                                                
+
                                                                 Text(acting.name)
                                                             }
                                                         }
@@ -130,10 +130,10 @@ struct DownloadSheetView: View {
                                                 } header: {
                                                     Text("key.premium")
                                                 }
-                                                
+
                                                 Divider()
                                             }
-                                            
+
                                             ForEach(acting.filter {
                                                 !$0.isPremium
                                             }.filter { $0 != selectedActing }) { acting in
@@ -155,7 +155,7 @@ struct DownloadSheetView: View {
                                             } else {
                                                 String(localized: "key.acting.select")
                                             }
-                                            
+
                                             Label(name, systemImage: "chevron.up.chevron.down")
                                         }
                                         .menuStyle(.button)
@@ -164,24 +164,24 @@ struct DownloadSheetView: View {
                                         .labelStyle(CustomLabelStyle(iconVisible: acting.count > 1))
                                     }
                                     .padding(.vertical, 10)
-                                    
+
                                     if acting.isEmpty != false {
                                         ProgressView().scaleEffect(0.6)
                                     }
                                 }
                             }
-                            
+
                             if details.series != nil, selectedActing != nil {
                                 if !(details.voiceActing ?? []).filter({ !$0.name.isEmpty }).isEmpty {
                                     Divider()
                                 }
-                                
+
                                 ZStack(alignment: .center) {
                                     HStack {
                                         Text("key.season")
-                                        
+
                                         Spacer()
-                                        
+
                                         Menu {
                                             ForEach((seasons ?? []).filter { $0 != selectedSeason }) { season in
                                                 Button {
@@ -204,7 +204,7 @@ struct DownloadSheetView: View {
                                             } else {
                                                 String(localized: "key.season.select")
                                             }
-                                            
+
                                             Label(name, systemImage: "chevron.up.chevron.down")
                                         }
                                         .menuStyle(.button)
@@ -213,20 +213,20 @@ struct DownloadSheetView: View {
                                         .labelStyle(CustomLabelStyle(iconVisible: (seasons?.count ?? 0) > 1))
                                     }
                                     .padding(.vertical, 10)
-                                    
+
                                     if seasons?.isEmpty != false {
                                         ProgressView().scaleEffect(0.6)
                                     }
                                 }
-                                
+
                                 Divider()
-                                
+
                                 ZStack {
                                     HStack {
                                         Text("key.episode")
-                                        
+
                                         Spacer()
-                                        
+
                                         Menu {
                                             ForEach((selectedSeason?.episodes ?? []).filter { $0 != selectedEpisode }) { episode in
                                                 Button {
@@ -249,7 +249,7 @@ struct DownloadSheetView: View {
                                             } else {
                                                 String(localized: "key.episode.select")
                                             }
-                                            
+
                                             Label(name, systemImage: "chevron.up.chevron.down")
                                         }
                                         .menuStyle(.button)
@@ -258,7 +258,7 @@ struct DownloadSheetView: View {
                                         .labelStyle(CustomLabelStyle(iconVisible: (selectedSeason?.episodes.count ?? 0) > 1))
                                     }
                                     .padding(.vertical, 10)
-                                    
+
                                     if selectedSeason?.episodes.isEmpty != false {
                                         ProgressView().scaleEffect(0.6)
                                     }
@@ -271,12 +271,12 @@ struct DownloadSheetView: View {
                         .clipShape(.rect(cornerRadius: 6))
                         .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
-                    
+
                     if (details.series == nil && selectedActing != nil) || selectedEpisode != nil {
                         ZStack(alignment: .center) {
                             HStack {
                                 Text("key.quality")
-                                
+
                                 if let selectedQuality, let movie, let link = movie.getClosestTo(quality: selectedQuality) {
                                     CustomShareLink(items: [link]) {
                                         Image(systemName: "square.and.arrow.up")
@@ -285,9 +285,9 @@ struct DownloadSheetView: View {
                                     }
                                     .buttonStyle(.plain)
                                 }
-                                
+
                                 Spacer()
-                                
+
                                 Menu {
                                     if !(movie?.getLockedQualities() ?? []).isEmpty {
                                         Section {
@@ -307,10 +307,10 @@ struct DownloadSheetView: View {
                                         } header: {
                                             Text("key.sign_in.access")
                                         }
-                                        
+
                                         Divider()
                                     }
-                                    
+
                                     ForEach((movie?.getAvailableQualities() ?? []).filter { $0 != selectedQuality }, id: \.self) { quality in
                                         Button {
                                             withAnimation(.easeInOut) {
@@ -330,7 +330,7 @@ struct DownloadSheetView: View {
                                     } else {
                                         String(localized: "key.quality.select")
                                     }
-                                    
+
                                     Label(name, systemImage: "chevron.up.chevron.down")
                                 }
                                 .menuStyle(.button)
@@ -339,7 +339,7 @@ struct DownloadSheetView: View {
                                 .labelStyle(CustomLabelStyle(iconVisible: ((movie?.getAvailableQualities().count ?? 0) + (movie?.getLockedQualities().count ?? 0)) > 1))
                             }
                             .padding(.vertical, 10)
-                            
+
                             if movie?.getAvailableQualities().isEmpty != false {
                                 ProgressView().scaleEffect(0.6)
                             }
@@ -350,12 +350,12 @@ struct DownloadSheetView: View {
                         .clipShape(.rect(cornerRadius: 6))
                         .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
-                    
+
                     if let movie, !movie.subtitles.isEmpty {
                         ZStack(alignment: .center) {
                             HStack {
                                 Text("key.subtitles")
-                                    
+
                                 if let selectedSubtitles, let subtitles = movie.subtitles.first(where: { $0 == selectedSubtitles }), let url = URL(string: subtitles.link) {
                                     CustomShareLink(items: [url]) {
                                         Image(systemName: "square.and.arrow.up")
@@ -364,9 +364,9 @@ struct DownloadSheetView: View {
                                     }
                                     .buttonStyle(.plain)
                                 }
-                                    
+
                                 Spacer()
-                                    
+
                                 Menu {
                                     if selectedSubtitles != nil {
                                         Button {
@@ -377,7 +377,7 @@ struct DownloadSheetView: View {
                                             Text("key.none")
                                         }
                                     }
-                                        
+
                                     ForEach(movie.subtitles.filter { $0 != selectedSubtitles }) { subtitles in
                                         Button {
                                             withAnimation(.easeInOut) {
@@ -397,7 +397,7 @@ struct DownloadSheetView: View {
                                     } else {
                                         String(localized: "key.subtitles.select")
                                     }
-                                    
+
                                     Label(name, systemImage: "chevron.up.chevron.down")
                                 }
                                 .menuStyle(.button)
@@ -437,16 +437,16 @@ struct DownloadSheetView: View {
                         $0.id == "\(details?.movieId ?? "")\(selectedSeason?.seasonId ?? "")\(selectedEpisode?.episodeId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded || $0.id == "\(details?.movieId ?? "")\(selectedSeason?.seasonId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded
                     })
                 )
-                
+
                 if let details, details.series != nil {
                     Button {
                         if let selectedActing, let selectedQuality, let selectedSeason {
                             for episode in selectedSeason.episodes {
                                 let id = "\(details.movieId)\(selectedSeason.seasonId)\(episode.episodeId)\(selectedActing.translatorId)\(selectedQuality)".base64Encoded
-                                
+
                                 downloader.downloads.first(where: { $0.id == id })?.cancel()
                             }
-                            
+
                             downloader.download(.init(details: details, acting: selectedActing, season: selectedSeason, episode: selectedEpisode, quality: selectedQuality, subtitles: selectedSubtitles, all: true))
                         }
                     } label: {
@@ -464,7 +464,7 @@ struct DownloadSheetView: View {
                         })
                     )
                 }
-                
+
                 Button {
                     dismiss()
                 } label: {
@@ -481,13 +481,13 @@ struct DownloadSheetView: View {
             if let hdrezkaError = error as? HDrezkaError, case .loginRequired = hdrezkaError {
                 Button(role: .destructive) {
                     dismiss()
-                    
+
                     appState.isSignInPresented = true
                 } label: {
                     Text("key.sign_in")
                 }
             }
-            
+
             Button(role: .cancel) {
                 dismiss()
             } label: {
@@ -502,7 +502,7 @@ struct DownloadSheetView: View {
         .confirmationDialog("key.sign_in.label", isPresented: $isLoginPresented) {
             Button {
                 dismiss()
-                
+
                 appState.isSignInPresented = true
             } label: {
                 Text("key.sign_in")
@@ -535,12 +535,10 @@ struct DownloadSheetView: View {
                 withAnimation(.easeInOut) {
                     selectedActing = if !isLoggedIn,
                                         let position = selectPositions.first(where: { $0.id == details.movieId.id }),
-                                        let first = acting.filter({ isUserPremium != nil || !$0.isPremium }).first(where: { $0.translatorId == position.acting })
-                    {
+                                        let first = acting.filter({ isUserPremium != nil || !$0.isPremium }).first(where: { $0.translatorId == position.acting }) {
                         first
                     } else if let series = details.series,
-                              let first = acting.filter({ isUserPremium != nil || !$0.isPremium }).first(where: { $0.translatorId == series.acting })
-                    {
+                              let first = acting.filter({ isUserPremium != nil || !$0.isPremium }).first(where: { $0.translatorId == series.acting }) {
                         first
                     } else if let first = acting.filter({ isUserPremium != nil || !$0.isPremium }).first(where: { $0.isSelected }) {
                         first
@@ -562,7 +560,7 @@ struct DownloadSheetView: View {
                 seasons = nil
                 movie = nil
             }
-                
+
             if let details, let selectedActing {
                 if details.series != nil {
                     if let movieId = details.movieId.id {
@@ -576,15 +574,13 @@ struct DownloadSheetView: View {
                             } receiveValue: { seasons in
                                 withAnimation(.easeInOut) {
                                     self.seasons = seasons
-                                    
+
                                     selectedSeason = if !isLoggedIn,
                                                         let position = selectPositions.first(where: { $0.id == selectedActing.voiceId }),
-                                                        let first = seasons.first(where: { $0.seasonId == position.season })
-                                    {
+                                                        let first = seasons.first(where: { $0.seasonId == position.season }) {
                                         first
                                     } else if let series = details.series,
-                                              let first = seasons.first(where: { $0.seasonId == series.season })
-                                    {
+                                              let first = seasons.first(where: { $0.seasonId == series.season }) {
                                         first
                                     } else if let first = seasons.first(where: { $0.isSelected }) {
                                         first
@@ -612,23 +608,21 @@ struct DownloadSheetView: View {
                         } receiveValue: { movie in
                             if movie.needPremium {
                                 dismiss()
-                                
+
                                 appState.isPremiumPresented = true
                             } else {
                                 withAnimation(.easeInOut) {
                                     self.movie = movie
-                                    
+
                                     if defaultQuality != .ask,
                                        defaultQuality != .highest,
-                                       movie.getAvailableQualities().contains(defaultQuality.rawValue)
-                                    {
+                                       movie.getAvailableQualities().contains(defaultQuality.rawValue) {
                                         self.selectedQuality = defaultQuality.rawValue
                                     } else if defaultQuality == .highest,
-                                              let highest = movie.getAvailableQualities().last
-                                    {
+                                              let highest = movie.getAvailableQualities().last {
                                         self.selectedQuality = highest
                                     }
-                                    
+
                                     self.selectedSubtitles = movie.subtitles.first(where: { $0.lang == selectPositions.first(where: { position in position.id == selectedActing.voiceId })?.subtitles?.replacingOccurrences(of: "uk", with: "ua") })
                                 }
                             }
@@ -641,15 +635,13 @@ struct DownloadSheetView: View {
             withAnimation(.easeInOut) {
                 selectedQuality = nil
                 movie = nil
-                
+
                 selectedEpisode = if !isLoggedIn,
                                      let position = selectPositions.first(where: { $0.id == selectedActing?.voiceId }),
-                                     let first = selectedSeason?.episodes.first(where: { $0.episodeId == position.episode })
-                {
+                                     let first = selectedSeason?.episodes.first(where: { $0.episodeId == position.episode }) {
                     first
                 } else if let series = details?.series,
-                          let first = selectedSeason?.episodes.first(where: { $0.episodeId == series.episode })
-                {
+                          let first = selectedSeason?.episodes.first(where: { $0.episodeId == series.episode }) {
                     first
                 } else if let first = selectedSeason?.episodes.first(where: { $0.isSelected }) {
                     first
@@ -665,7 +657,7 @@ struct DownloadSheetView: View {
                 selectedQuality = nil
                 movie = nil
             }
-            
+
             if let details, let selectedSeason, let selectedEpisode, let selectedActing {
                 getMovieVideoUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode, favs: details.favs)
                     .receive(on: DispatchQueue.main)
@@ -677,7 +669,7 @@ struct DownloadSheetView: View {
                     } receiveValue: { movie in
                         if movie.needPremium {
                             dismiss()
-                            
+
                             appState.isPremiumPresented = true
                         } else {
                             withAnimation(.easeInOut) {
@@ -685,15 +677,13 @@ struct DownloadSheetView: View {
 
                                 if defaultQuality != .ask,
                                    defaultQuality != .highest,
-                                   movie.getAvailableQualities().contains(defaultQuality.rawValue)
-                                {
+                                   movie.getAvailableQualities().contains(defaultQuality.rawValue) {
                                     self.selectedQuality = defaultQuality.rawValue
                                 } else if defaultQuality == .highest,
-                                          let highest = movie.getAvailableQualities().last
-                                {
+                                          let highest = movie.getAvailableQualities().last {
                                     self.selectedQuality = highest
                                 }
-                                
+
                                 self.selectedSubtitles = movie.subtitles.first(where: { $0.lang == selectPositions.first(where: { position in position.id == selectedActing.voiceId })?.subtitles?.replacingOccurrences(of: "uk", with: "ua") })
                             }
                         }
@@ -702,10 +692,10 @@ struct DownloadSheetView: View {
             }
         }
     }
-    
+
     private struct CustomLabelStyle: LabelStyle {
         private let iconVisible: Bool
-        
+
         init(iconVisible: Bool = true) {
             self.iconVisible = iconVisible
         }
@@ -713,7 +703,7 @@ struct DownloadSheetView: View {
         func makeBody(configuration: Configuration) -> some View {
             HStack(alignment: .center, spacing: 8) {
                 configuration.title
-               
+
                 if iconVisible {
                     configuration.icon
                 }

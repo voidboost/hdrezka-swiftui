@@ -29,7 +29,7 @@ final class EmitterView: NSView {
         emitterCell.alphaRange = 1
 
         emitterLayer.emitterCells = [emitterCell]
-        emitterLayer.seed = arc4random()
+        emitterLayer.seed = UInt32.random(in: UInt32.min...UInt32.max)
 
         emitterLayer.beginTime = CACurrentMediaTime()
 

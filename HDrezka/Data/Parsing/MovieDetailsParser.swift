@@ -162,11 +162,11 @@ class MovieDetailsParser {
                 throw HDrezkaError.parseJson("json", "parseSeriesSeasons")
             }
 
-            guard let s = json["seasons"] as? String, let seasons = try SwiftSoup.parse(s).body() else {
+            guard let seasonsString = json["seasons"] as? String, let seasons = try SwiftSoup.parse(seasonsString).body() else {
                 throw HDrezkaError.parseJson("seasons", "parseSeriesSeasons")
             }
 
-            guard let e = json["episodes"] as? String, let episodes = try SwiftSoup.parse(e).body() else {
+            guard let episodeString = json["episodes"] as? String, let episodes = try SwiftSoup.parse(episodeString).body() else {
                 throw HDrezkaError.parseJson("episodes", "parseSeriesSeasons")
             }
 
@@ -816,11 +816,11 @@ private extension String {
             videoMap[name] = url
         }
 
-        let subtitles: [MovieSubtitles] = if let subtitles = (jsonObject["subtitle"] as? String), let subtitles_lns = (jsonObject["subtitle_lns"] as? [String: Any]) {
+        let subtitles: [MovieSubtitles] = if let subtitles = (jsonObject["subtitle"] as? String), let subtitlesLns = (jsonObject["subtitle_lns"] as? [String: Any]) {
             try subtitles.components(separatedBy: ",").filter { !$0.isEmpty }.compactMap {
                 let name = try $0.components(separatedBy: "]").filter { !$0.isEmpty }.first.orThrow().replacingOccurrences(of: "[", with: "")
                 let link = try $0.components(separatedBy: "]").filter { !$0.isEmpty }.last.orThrow()
-                let lang = subtitles_lns[name] as? String
+                let lang = subtitlesLns[name] as? String
 
                 if let lang {
                     return MovieSubtitles(

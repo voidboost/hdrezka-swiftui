@@ -6,26 +6,26 @@ import SwiftUI
 struct BookmarksView: View {
     private let title = String(localized: "key.bookmarks")
 
-    @StateObject private var vm = BookmarksViewModel()
-    
+    @StateObject private var viewModel = BookmarksViewModel()
+
     private let columns = [
         GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading)
     ]
-        
+
     @Default(.isLoggedIn) private var isLoggedIn
 
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
             Group {
-                if let error = vm.bookmarksState.error {
+                if let error = viewModel.bookmarksState.error {
                     VStack(alignment: .center, spacing: 8) {
                         Text(error.localizedDescription)
                             .font(.system(size: 17, weight: .medium))
                             .lineLimit(nil)
                             .multilineTextAlignment(.center)
-                            
+
                         Button {
-                            vm.getBookmarks(reset: true)
+                            viewModel.getBookmarks(reset: true)
                         } label: {
                             Text("key.retry")
                                 .font(.system(size: 13))
@@ -38,16 +38,16 @@ struct BookmarksView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding(.top, 52)
                     .padding(18)
-                } else if let bookmarks = vm.bookmarksState.data {
+                } else if let bookmarks = viewModel.bookmarksState.data {
                     if bookmarks.isEmpty {
                         VStack(alignment: .center, spacing: 8) {
                             Text("key.bookmark.empty")
                                 .font(.system(size: 17, weight: .medium))
                                 .lineLimit(nil)
                                 .multilineTextAlignment(.center)
-                   
+
                             Button {
-                                vm.isCreateBookmarkPresented = true
+                                viewModel.isCreateBookmarkPresented = true
                             } label: {
                                 Text("key.create")
                                     .font(.system(size: 13))
@@ -56,9 +56,9 @@ struct BookmarksView: View {
                             }
                             .buttonStyle(.plain)
                             .keyboardShortcut("n", modifiers: .command)
-                   
+
                             Button {
-                                vm.getBookmarks(reset: true)
+                                viewModel.getBookmarks(reset: true)
                             } label: {
                                 Text("key.retry")
                                     .font(.system(size: 13))
@@ -72,7 +72,7 @@ struct BookmarksView: View {
                         .padding(.top, 52)
                         .padding(18)
                     } else {
-                        List(selection: $vm.selectedBookmark) {
+                        List(selection: $viewModel.selectedBookmark) {
                             ForEach(bookmarks) { bookmark in
                                 Text(bookmark.name)
                                     .font(.system(size: 15))
@@ -93,26 +93,26 @@ struct BookmarksView: View {
                                     .listRowInsets(.init())
                                     .contextMenu {
                                         Button {
-                                            vm.renameBookmark = bookmark
+                                            viewModel.renameBookmark = bookmark
                                         } label: {
                                             Text("key.rename")
                                         }
-                                            
+
                                         Button {
-                                            vm.deleteBookmarksCategory(bookmark: bookmark)
+                                            viewModel.deleteBookmarksCategory(bookmark: bookmark)
                                         } label: {
                                             Text("key.delete")
                                         }
                                     }
                                     .viewModifier { view in
-                                        if vm.selectedBookmark != bookmark.bookmarkId {
+                                        if viewModel.selectedBookmark != bookmark.bookmarkId {
                                             view.dropDestination(for: MovieSimple.self) { movies, _ in
                                                 if !movies.isEmpty, !movies.compactMap(\.movieId.id).isEmpty {
-                                                    vm.moveBetweenBookmarks(movies: movies, bookmark: bookmark)
-                                                    
+                                                    viewModel.moveBetweenBookmarks(movies: movies, bookmark: bookmark)
+
                                                     return true
                                                 }
-                                                
+
                                                 return false
                                             }
                                         } else {
@@ -121,15 +121,15 @@ struct BookmarksView: View {
                                     }
                                     .swipeActions(edge: .trailing) {
                                         Button {
-                                            vm.deleteBookmarksCategory(bookmark: bookmark)
+                                            viewModel.deleteBookmarksCategory(bookmark: bookmark)
                                         } label: {
                                             Image(systemName: "trash")
                                                 .font(.system(size: 15))
                                         }
                                         .tint(.accentColor)
-                                            
+
                                         Button {
-                                            vm.renameBookmark = bookmark
+                                            viewModel.renameBookmark = bookmark
                                         } label: {
                                             Image(systemName: "pencil")
                                                 .font(.system(size: 15))
@@ -138,7 +138,7 @@ struct BookmarksView: View {
                                     }
                             }
                             .onMove { fromOffsets, toOffset in
-                                vm.reorderBookmarksCategories(fromOffsets: fromOffsets, toOffset: toOffset)
+                                viewModel.reorderBookmarksCategories(fromOffsets: fromOffsets, toOffset: toOffset)
                             }
                         }
                         .scrollContentBackground(.hidden)
@@ -154,19 +154,19 @@ struct BookmarksView: View {
                 }
             }
             .frame(width: 200)
-                
+
             Divider()
                 .padding(.top, 52)
-            
-            if let error = vm.bookmarkState.error {
+
+            if let error = viewModel.bookmarkState.error {
                 VStack(alignment: .center, spacing: 8) {
                     Text(error.localizedDescription)
                         .font(.system(size: 20, weight: .medium))
                         .lineLimit(nil)
                         .multilineTextAlignment(.center)
-                            
+
                     Button {
-                        vm.load()
+                        viewModel.load()
                     } label: {
                         Text("key.retry")
                             .font(.system(size: 15))
@@ -179,17 +179,17 @@ struct BookmarksView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.top, 52)
                 .padding(18)
-            } else if let movies = vm.bookmarkState.data {
+            } else if let movies = viewModel.bookmarkState.data {
                 if movies.isEmpty {
                     VStack(alignment: .center, spacing: 8) {
-                        Text(vm.selectedBookmark == -1 ? String(localized: "key.bookmarks.select") : String(localized: "key.bookmarks.empty"))
+                        Text(viewModel.selectedBookmark == -1 ? String(localized: "key.bookmarks.select") : String(localized: "key.bookmarks.empty"))
                             .font(.system(size: 20, weight: .medium))
                             .lineLimit(nil)
                             .multilineTextAlignment(.center)
-                   
-                        if vm.selectedBookmark != -1 {
+
+                        if viewModel.selectedBookmark != -1 {
                             Button {
-                                vm.load()
+                                viewModel.load()
                             } label: {
                                 Text("key.retry")
                                     .font(.system(size: 15))
@@ -212,7 +212,7 @@ struct BookmarksView: View {
                                         .contextMenu {
                                             Button {
                                                 if let movieId = movie.movieId.id {
-                                                    vm.removeFromBookmarks(movies: [movieId])
+                                                    viewModel.removeFromBookmarks(movies: [movieId])
                                                 }
                                             } label: {
                                                 Text("key.delete")
@@ -220,8 +220,8 @@ struct BookmarksView: View {
                                             .disabled(movie.movieId.id == nil)
                                         }
                                         .task {
-                                            if movies.last == movie, vm.paginationState == .idle {
-                                                vm.loadMore()
+                                            if movies.last == movie, viewModel.paginationState == .idle {
+                                                viewModel.loadMore()
                                             }
                                         }
                                 }
@@ -231,8 +231,8 @@ struct BookmarksView: View {
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                         }
                         .scrollIndicators(.never)
-                            
-                        if vm.paginationState == .loading {
+
+                        if viewModel.paginationState == .loading {
                             LoadingPaginationStateView()
                         }
                     }
@@ -245,19 +245,19 @@ struct BookmarksView: View {
             }
         }
         .navigationBar(title: title, showBar: true, navbar: {
-            if let bookmarks = vm.bookmarksState.data, !bookmarks.isEmpty {
-                if !(vm.bookmarkState.data?.isEmpty ?? true) || vm.selectedBookmark == -1 {
+            if let bookmarks = viewModel.bookmarksState.data, !bookmarks.isEmpty {
+                if !(viewModel.bookmarkState.data?.isEmpty ?? true) || viewModel.selectedBookmark == -1 {
                     Button {
-                        vm.getBookmarks(reset: true)
+                        viewModel.getBookmarks(reset: true)
                     } label: {
                         Image(systemName: "arrow.trianglehead.clockwise")
                     }
                     .buttonStyle(NavbarButtonStyle(width: 30, height: 22))
                     .keyboardShortcut("r", modifiers: .command)
                 }
-                
+
                 Button {
-                    vm.isCreateBookmarkPresented = true
+                    viewModel.isCreateBookmarkPresented = true
                 } label: {
                     Image(systemName: "plus")
                 }
@@ -265,12 +265,12 @@ struct BookmarksView: View {
                 .keyboardShortcut("n", modifiers: .command)
             }
         }, toolbar: {
-            if vm.bookmarkState != .loading, vm.selectedBookmark != -1 {
+            if viewModel.bookmarkState != .loading, viewModel.selectedBookmark != -1 {
                 Image(systemName: "line.3.horizontal.decrease.circle")
 
-                Picker("key.filter.select", selection: $vm.filter) {
-                    ForEach(BookmarkFilters.allCases) { f in
-                        Text(f.rawValue).tag(f)
+                Picker("key.filter.select", selection: $viewModel.filter) {
+                    ForEach(BookmarkFilters.allCases) { filter in
+                        Text(filter.rawValue).tag(filter)
                     }
                 }
                 .labelsHidden()
@@ -288,13 +288,13 @@ struct BookmarksView: View {
                 .clipShape(.rect(cornerRadius: 6))
                 .contentShape(.rect(cornerRadius: 6))
                 .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
-               
+
                 Divider()
                     .padding(.vertical, 18)
 
-                Picker("key.genre.select", selection: $vm.genre) {
-                    ForEach(Genres.allCases) { g in
-                        Text(g.rawValue).tag(g)
+                Picker("key.genre.select", selection: $viewModel.genre) {
+                    ForEach(Genres.allCases) { genre in
+                        Text(genre.rawValue).tag(genre)
                     }
                 }
                 .labelsHidden()
@@ -314,47 +314,47 @@ struct BookmarksView: View {
                 .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
             }
         })
-        .customOnChange(of: vm.selectedBookmark) {
-            if vm.selectedBookmark != -1 {
-                vm.load()
+        .customOnChange(of: viewModel.selectedBookmark) {
+            if viewModel.selectedBookmark != -1 {
+                viewModel.load()
             }
         }
-        .customOnChange(of: vm.isCreateBookmarkPresented) {
-            if !vm.isCreateBookmarkPresented {
-                vm.getBookmarks(reset: true)
+        .customOnChange(of: viewModel.isCreateBookmarkPresented) {
+            if !viewModel.isCreateBookmarkPresented {
+                viewModel.getBookmarks(reset: true)
             }
         }
-        .customOnChange(of: vm.renameBookmark) {
-            if vm.renameBookmark == nil {
-                vm.getBookmarks(reset: true)
+        .customOnChange(of: viewModel.renameBookmark) {
+            if viewModel.renameBookmark == nil {
+                viewModel.getBookmarks(reset: true)
             }
         }
-        .customOnChange(of: vm.filter) {
-            vm.load()
+        .customOnChange(of: viewModel.filter) {
+            viewModel.load()
         }
-        .customOnChange(of: vm.genre) {
-            vm.load()
+        .customOnChange(of: viewModel.genre) {
+            viewModel.load()
         }
         .task(id: isLoggedIn) {
-            switch vm.bookmarksState {
+            switch viewModel.bookmarksState {
             case .data:
                 break
             default:
-                vm.getBookmarks()
+                viewModel.getBookmarks()
             }
         }
-        .alert("key.ops", isPresented: $vm.isErrorPresented) {
+        .alert("key.ops", isPresented: $viewModel.isErrorPresented) {
             Button(role: .cancel) {} label: { Text("key.ok") }
         } message: {
-            if let error = vm.error {
+            if let error = viewModel.error {
                 Text(error.localizedDescription)
             }
         }
         .dialogSeverity(.critical)
-        .sheet(item: $vm.renameBookmark) { bookmark in
+        .sheet(item: $viewModel.renameBookmark) { bookmark in
             RenameBookmarkSheetView(bookmark: bookmark)
         }
-        .sheet(isPresented: $vm.isCreateBookmarkPresented) {
+        .sheet(isPresented: $viewModel.isCreateBookmarkPresented) {
             CreateBookmarkSheetView()
         }
         .background(.background)

@@ -48,15 +48,20 @@ extension String {
         if let number = Int(String(unicodeScalars.filter(CharacterSet.decimalDigits.contains))) {
             let numFormatter = NumberFormatter()
 
-            typealias Abbrevation = (threshold: Double, divisor: Double, suffix: String)
-            let abbreviations: [Abbrevation] = [(0, 1, ""),
-                                                (1000.0, 1000.0, "K"),
-                                                (1000000.0, 1000000.0, "M"),
-                                                (1000000000.0, 1000000000.0, "B")]
+            struct Abbrevation {
+                let threshold: Double
+                let divisor: Double
+                let suffix: String
+            }
+
+            let abbreviations: [Abbrevation] = [.init(threshold: 0, divisor: 1, suffix: ""),
+                                                .init(threshold: 1000.0, divisor: 1000.0, suffix: "K"),
+                                                .init(threshold: 1000000.0, divisor: 1000000.0, suffix: "M"),
+                                                .init(threshold: 1000000000.0, divisor: 1000000000.0, suffix: "B")]
 
             let startValue = Double(abs(number))
             var abbreviation: Abbrevation {
-                var prevAbbreviation: Abbrevation = (0, 1, "")
+                var prevAbbreviation: Abbrevation = .init(threshold: 0, divisor: 1, suffix: "")
                 for tmpAbbreviation in abbreviations {
                     if startValue < tmpAbbreviation.threshold {
                         break
@@ -169,11 +174,11 @@ class AttributedTextStyle {
             attributes[.foregroundColor] = NSColor(Color.accentColor)
         }
 
-        let p = NSMutableParagraphStyle()
-        p.alignment = .left
-        p.lineBreakMode = .byWordWrapping
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .left
+        paragraphStyle.lineBreakMode = .byWordWrapping
 
-        attributes[.paragraphStyle] = p
+        attributes[.paragraphStyle] = paragraphStyle
     }
 }
 

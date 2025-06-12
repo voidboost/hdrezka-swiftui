@@ -241,9 +241,9 @@ class ListViewModel: ObservableObject {
         } else {
             withAnimation(.easeInOut) {
                 if isInitial {
-                    self.state = .error(NSError())
+                    self.state = .error(HDrezkaError.unknown as NSError)
                 } else {
-                    self.paginationState = .error(NSError())
+                    self.paginationState = .error(HDrezkaError.unknown as NSError)
                 }
             }
         }

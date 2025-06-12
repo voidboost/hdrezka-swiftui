@@ -8,11 +8,11 @@ struct SliderWithoutText<T: BinaryFloatingPoint>: View {
     let emptyColor: Color
     let height: CGFloat
     let onEditingChanged: (Bool) -> Void
-    
+
     @State private var localRealProgress: T = 0
     @State private var localTempProgress: T = 0
     @GestureState private var isActive: Bool = false
-    
+
     init(
         value: Binding<T>,
         inRange: ClosedRange<T>,
@@ -30,7 +30,7 @@ struct SliderWithoutText<T: BinaryFloatingPoint>: View {
         self.height = height
         self.onEditingChanged = onEditingChanged
     }
-    
+
     var body: some View {
         GeometryReader { bounds in
             ZStack(alignment: .center) {
@@ -78,14 +78,14 @@ struct SliderWithoutText<T: BinaryFloatingPoint>: View {
             }
         }
     }
-    
+
     private func getPrgPercentage(_ value: T) -> T {
         let range = inRange.upperBound - inRange.lowerBound
         let correctedStartValue = value - inRange.lowerBound
         let percentage = correctedStartValue / range
         return percentage
     }
-    
+
     private func getPrgValue() -> T {
         return ((localRealProgress + localTempProgress) * (inRange.upperBound - inRange.lowerBound)) + inRange.lowerBound
     }
