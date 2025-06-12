@@ -15,7 +15,7 @@ struct CollectionsRepositoryImpl: CollectionsRepository {
             .handleError()
             .eraseToAnyPublisher()
     }
-    
+
     func getWatchingNowMoviesInCollection(collectionId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
         session.request(CollectionsService.getMoviesInCollectionWithFilter(collectionId: collectionId, page: page, filter: "watching"))
             .validate(statusCode: 200 ..< 400)
@@ -25,7 +25,7 @@ struct CollectionsRepositoryImpl: CollectionsRepository {
             .handleError()
             .eraseToAnyPublisher()
     }
-    
+
     func getPopularMoviesInCollection(collectionId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
         session.request(CollectionsService.getMoviesInCollectionWithFilter(collectionId: collectionId, page: page, filter: "popular"))
             .validate(statusCode: 200 ..< 400)
@@ -35,7 +35,7 @@ struct CollectionsRepositoryImpl: CollectionsRepository {
             .handleError()
             .eraseToAnyPublisher()
     }
-    
+
     func getLatestMoviesInCollection(collectionId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
         session.request(CollectionsService.getMoviesInCollectionWithFilter(collectionId: collectionId, page: page, filter: "last"))
             .validate(statusCode: 200 ..< 400)
@@ -45,7 +45,7 @@ struct CollectionsRepositoryImpl: CollectionsRepository {
             .handleError()
             .eraseToAnyPublisher()
     }
-    
+
     func getSoonMoviesInCollection(collectionId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
         session.request(CollectionsService.getMoviesInCollectionWithFilter(collectionId: collectionId, page: page, filter: "soon"))
             .validate(statusCode: 200 ..< 400)

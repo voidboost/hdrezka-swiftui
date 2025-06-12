@@ -48,26 +48,16 @@ struct CustomSharingsPicker: NSViewRepresentable {
             var share = proposedServices
 
             for url in urls {
-                if url.scheme == "hdrezka" {
-                    let customService = NSSharingService(title: String(localized: "key.copy.link.internal"), image: image, alternateImage: image, handler: {
-                        let p = NSPasteboard.general
-                        p.clearContents()
-                        p.setString(url.absoluteString, forType: .string)
-                    })
+                let customService = NSSharingService(title: url.scheme == "hdrezka" ? String(localized: "key.copy.link.internal") : String(localized: "key.copy.link"), image: image, alternateImage: image) {
+                    let pasteboard = NSPasteboard.general
+                    pasteboard.clearContents()
+                    pasteboard.setString(url.absoluteString, forType: .string)
+                }
 
-                    if share.isEmpty {
-                        share.insert(customService, at: 0)
-                    } else {
-                        share.insert(customService, at: 1)
-                    }
-                } else {
-                    let customService = NSSharingService(title: String(localized: "key.copy.link"), image: image, alternateImage: image, handler: {
-                        let p = NSPasteboard.general
-                        p.clearContents()
-                        p.setString(url.absoluteString, forType: .string)
-                    })
-
+                if share.isEmpty {
                     share.insert(customService, at: 0)
+                } else {
+                    share.insert(customService, at: 1)
                 }
             }
 

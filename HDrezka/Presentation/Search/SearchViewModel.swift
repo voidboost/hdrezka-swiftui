@@ -40,7 +40,7 @@ class SearchViewModel: ObservableObject {
                             self.state.append(result)
                             self.paginationState = .idle
                         } else {
-                            self.paginationState = .error(NSError())
+                            self.paginationState = .error(HDrezkaError.unknown as NSError)
                         }
                     }
                 }

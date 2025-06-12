@@ -23,7 +23,7 @@ protocol MovieDetailsRepository {
 
     func deleteComment(id: String, hash: String) -> AnyPublisher<(Bool, String?), Error>
 
-    func sendComment(id: String?, postId: String, name: String?, text: String, adb: String?, type: String?) -> AnyPublisher<(Bool, Bool, String), Error>
+    func sendComment(id: String?, postId: String, name: String?, text: String, adb: String?, type: String?) -> AnyPublisher<SendCommentResult, Error>
 
     func getLikes(id: String) -> AnyPublisher<[Like], Error>
 

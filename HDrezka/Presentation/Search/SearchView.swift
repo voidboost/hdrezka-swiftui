@@ -2,7 +2,7 @@ import Defaults
 import SwiftUI
 
 struct SearchView: View {
-    @StateObject private var vm = SearchViewModel()
+    @StateObject private var viewModel = SearchViewModel()
 
     private let searchText: String
 
@@ -20,15 +20,15 @@ struct SearchView: View {
 
     var body: some View {
         Group {
-            if let error = vm.state.error {
-                ErrorStateView(error, vm.title) {
-                    vm.load(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
+            if let error = viewModel.state.error {
+                ErrorStateView(error, viewModel.title) {
+                    viewModel.load(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
-            } else if let movies = vm.state.data {
+            } else if let movies = viewModel.state.data {
                 if movies.isEmpty {
-                    EmptyStateView(String(localized: "key.nothing_found"), vm.title, String(localized: "key.search.empty"))
+                    EmptyStateView(String(localized: "key.nothing_found"), viewModel.title, String(localized: "key.search.empty"))
                         .padding(.vertical, 52)
                         .padding(.horizontal, 36)
                 } else {
@@ -38,7 +38,7 @@ struct SearchView: View {
                                 VStack(alignment: .leading) {
                                     Spacer()
 
-                                    Text(vm.title)
+                                    Text(viewModel.title)
                                         .font(.largeTitle.weight(.semibold))
                                         .lineLimit(1)
 
@@ -52,8 +52,8 @@ struct SearchView: View {
                                     ForEach(movies) { movie in
                                         CardView(movie: movie)
                                             .task {
-                                                if movies.last == movie, vm.paginationState == .idle {
-                                                    vm.loadMore(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
+                                                if movies.last == movie, viewModel.paginationState == .idle {
+                                                    viewModel.loadMore(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
                                                 }
                                             }
                                     }
@@ -72,21 +72,21 @@ struct SearchView: View {
                         .coordinateSpace(name: "scroll")
                         .scrollIndicators(.never)
 
-                        if vm.paginationState == .loading {
+                        if viewModel.paginationState == .loading {
                             LoadingPaginationStateView()
                         }
                     }
                 }
             } else {
-                LoadingStateView(vm.title)
+                LoadingStateView(viewModel.title)
                     .padding(.vertical, 52)
                     .padding(.horizontal, 36)
             }
         }
-        .navigationBar(title: vm.title, showBar: showBar, navbar: {
-            if let movies = vm.state.data, !movies.isEmpty {
+        .navigationBar(title: viewModel.title, showBar: showBar, navbar: {
+            if let movies = viewModel.state.data, !movies.isEmpty {
                 Button {
-                    vm.load(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
+                    viewModel.load(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -95,16 +95,16 @@ struct SearchView: View {
             }
         })
         .task(id: isLoggedIn) {
-            switch vm.state {
+            switch viewModel.state {
             case .data:
                 break
             default:
-                vm.load(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
+                viewModel.load(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
             }
         }
         .background(.background)
         .customOnChange(of: searchText.trimmingCharacters(in: .whitespacesAndNewlines)) {
-            vm.load(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
+            viewModel.load(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
         }
     }
 }

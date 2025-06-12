@@ -1232,7 +1232,11 @@ struct PlayerView: View {
     }
 
     private func showCursor(_ isShowed: Bool = true) {
-        isShowed ? NSCursor.unhide() : NSCursor.setHiddenUntilMouseMoves(true)
+        if isShowed {
+            NSCursor.unhide()
+        } else {
+            NSCursor.setHiddenUntilMouseMoves(true)
+        }
     }
 
     private func prevTrack(_ seasons: [MovieSeason], _ season: MovieSeason, _ episode: MovieEpisode) {

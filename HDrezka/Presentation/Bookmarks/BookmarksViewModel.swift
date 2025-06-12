@@ -82,7 +82,7 @@ class BookmarksViewModel: ObservableObject {
                             self.bookmarkState.append(result)
                             self.paginationState = .idle
                         } else {
-                            self.paginationState = .error(NSError())
+                            self.paginationState = .error(HDrezkaError.unknown as NSError)
                         }
                     }
                 }

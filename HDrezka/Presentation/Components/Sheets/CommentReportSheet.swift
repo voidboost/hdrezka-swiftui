@@ -78,7 +78,7 @@ struct CommentReportSheet: View {
                                         }
                                     } else {
                                         withAnimation(.easeInOut) {
-                                            state = .error(NSError())
+                                            state = .error(HDrezkaError.unknown as NSError)
                                         }
                                     }
                                 }

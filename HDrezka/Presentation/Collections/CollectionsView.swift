@@ -4,7 +4,7 @@ import SwiftUI
 struct CollectionsView: View {
     private let title = String(localized: "key.collections")
 
-    @StateObject private var vm = CollectionsViewModel()
+    @StateObject private var viewModel = CollectionsViewModel()
 
     private let columns = [
         GridItem(.adaptive(minimum: 200, maximum: .infinity), spacing: 18, alignment: .topLeading)
@@ -16,16 +16,16 @@ struct CollectionsView: View {
 
     var body: some View {
         Group {
-            if let error = vm.state.error {
+            if let error = viewModel.state.error {
                 ErrorStateView(error, title) {
-                    vm.load()
+                    viewModel.load()
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
-            } else if let collections = vm.state.data {
+            } else if let collections = viewModel.state.data {
                 if collections.isEmpty {
                     EmptyStateView(String(localized: "key.collections.empty"), title) {
-                        vm.load()
+                        viewModel.load()
                     }
                     .padding(.vertical, 52)
                     .padding(.horizontal, 36)
@@ -50,8 +50,8 @@ struct CollectionsView: View {
                                     ForEach(collections) { collection in
                                         CollectionCardView(collection: collection)
                                             .task {
-                                                if collections.last == collection, vm.paginationState == .idle {
-                                                    vm.loadMore()
+                                                if collections.last == collection, viewModel.paginationState == .idle {
+                                                    viewModel.loadMore()
                                                 }
                                             }
                                     }
@@ -71,7 +71,7 @@ struct CollectionsView: View {
                         .coordinateSpace(name: "scroll")
                         .scrollIndicators(.never)
 
-                        if vm.paginationState == .loading {
+                        if viewModel.paginationState == .loading {
                             LoadingPaginationStateView()
                         }
                     }
@@ -83,9 +83,9 @@ struct CollectionsView: View {
             }
         }
         .navigationBar(title: title, showBar: showBar, navbar: {
-            if let collections = vm.state.data, !collections.isEmpty {
+            if let collections = viewModel.state.data, !collections.isEmpty {
                 Button {
-                    vm.load()
+                    viewModel.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -94,11 +94,11 @@ struct CollectionsView: View {
             }
         })
         .task(id: isLoggedIn) {
-            switch vm.state {
+            switch viewModel.state {
             case .data:
                 break
             default:
-                vm.load()
+                viewModel.load()
             }
         }
         .background(.background)

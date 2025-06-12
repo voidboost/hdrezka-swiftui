@@ -35,8 +35,8 @@ private func generateTrash(trashList: [String] = ["@", "#", "!", "^", "$"]) -> [
 }
 
 private extension Array where Element == String {
-    func cartesianProduct(n: Int) -> [String] {
-        n == 1 ? self : self.cartesianProduct(n: n - 1).flatMap { item in self.map { "\(item)\($0)" } }
+    func cartesianProduct(count: Int) -> [String] {
+        count == 1 ? self : self.cartesianProduct(count: count - 1).flatMap { item in self.map { "\(item)\($0)" } }
     }
 }
 
@@ -51,8 +51,7 @@ extension String {
 
         while searchStartIndex < self.endIndex,
               let range = self.range(of: substr, range: searchStartIndex ..< self.endIndex),
-              !range.isEmpty
-        {
+              !range.isEmpty {
             let index = distance(from: self.startIndex, to: range.lowerBound)
             indices.append(index)
             searchStartIndex = self.index(range.lowerBound, offsetBy: 1, limitedBy: endIndex) ?? endIndex

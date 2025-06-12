@@ -7,7 +7,7 @@ struct SendCommentUseCase {
         self.repository = repository
     }
 
-    func callAsFunction(id: String?, postId: String, name: String?, text: String, adb: String?, type: String?) -> AnyPublisher<(Bool, Bool, String), Error> {
+    func callAsFunction(id: String?, postId: String, name: String?, text: String, adb: String?, type: String?) -> AnyPublisher<SendCommentResult, Error> {
         repository.sendComment(id: id, postId: postId, name: name, text: text, adb: adb, type: type)
     }
 }

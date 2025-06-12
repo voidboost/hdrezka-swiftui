@@ -8,11 +8,11 @@ import SwiftUI
 struct CommentsView: View {
     private let title: String
 
-    @StateObject private var vm: CommentsViewModel
+    @StateObject private var viewModel: CommentsViewModel
 
     init(details: MovieDetailed) {
         self.title = details.commentsCount > 0 ? String(localized: "key.comments-\(details.commentsCount.description)") : String(localized: "key.comments")
-        self._vm = StateObject(wrappedValue: CommentsViewModel(id: details.movieId, adb: details.adb, type: details.type))
+        self._viewModel = StateObject(wrappedValue: CommentsViewModel(id: details.movieId, adb: details.adb, type: details.type))
     }
 
     @State private var showBar: Bool = false
@@ -21,13 +21,13 @@ struct CommentsView: View {
 
     var body: some View {
         Group {
-            if let error = vm.state.error {
+            if let error = viewModel.state.error {
                 ErrorStateView(error, title) {
-                    vm.load()
+                    viewModel.load()
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
-            } else if let comments = vm.state.data {
+            } else if let comments = viewModel.state.data {
                 if comments.isEmpty {
                     ScrollView(.vertical) {
                         VStack(spacing: 18) {
@@ -76,7 +76,7 @@ struct CommentsView: View {
                                 .frame(height: 52)
 
                                 VStack(spacing: 16) {
-                                    if vm.reply == nil {
+                                    if viewModel.reply == nil {
                                         CommentTextArea()
                                     }
 
@@ -84,8 +84,8 @@ struct CommentsView: View {
                                         ForEach(comments) { comment in
                                             CommentsViewComponent(comment: comment)
                                                 .task {
-                                                    if comments.last == comment, vm.paginationState == .idle {
-                                                        vm.loadMore()
+                                                    if comments.last == comment, viewModel.paginationState == .idle {
+                                                        viewModel.loadMore()
                                                     }
                                                 }
                                         }
@@ -104,9 +104,9 @@ struct CommentsView: View {
                         }
                         .coordinateSpace(name: "scroll")
                         .scrollIndicators(.never)
-                        .environmentObject(vm)
+                        .environmentObject(viewModel)
 
-                        if vm.paginationState == .loading {
+                        if viewModel.paginationState == .loading {
                             LoadingPaginationStateView()
                         }
                     }
@@ -118,9 +118,9 @@ struct CommentsView: View {
             }
         }
         .navigationBar(title: title, showBar: showBar, navbar: {
-            if let comments = vm.state.data, !comments.isEmpty {
+            if let comments = viewModel.state.data, !comments.isEmpty {
                 Button {
-                    vm.load()
+                    viewModel.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -129,45 +129,45 @@ struct CommentsView: View {
             }
         })
         .task(id: isLoggedIn) {
-            switch vm.state {
+            switch viewModel.state {
             case .data:
                 break
             default:
-                vm.load()
+                viewModel.load()
             }
         }
-        .alert("key.ops", isPresented: $vm.isErrorPresented) {
+        .alert("key.ops", isPresented: $viewModel.isErrorPresented) {
             Button(role: .cancel) {} label: { Text("key.ok") }
         } message: {
-            if let message = vm.message {
+            if let message = viewModel.message {
                 Text(message)
-            } else if let error = vm.error {
+            } else if let error = viewModel.error {
                 Text(error.localizedDescription)
             }
         }
         .dialogSeverity(.critical)
-        .alert("key.comments.success", isPresented: $vm.isOnModerationPresented) {
+        .alert("key.comments.success", isPresented: $viewModel.isOnModerationPresented) {
             Button(role: .cancel) {} label: { Text("key.ok") }
         } message: {
-            if let message = vm.message {
+            if let message = viewModel.message {
                 Text(message)
             }
         }
         .dialogSeverity(.automatic)
-        .sheet(isPresented: $vm.isCommentPresented) {
+        .sheet(isPresented: $viewModel.isCommentPresented) {
             VStack(alignment: .center, spacing: 25) {
-                if let comment = vm.comment {
+                if let comment = viewModel.comment {
                     ScrollView(.vertical) {
                         CommentsViewComponent(comment: comment)
                     }
                     .scrollIndicators(.never)
-                    .environmentObject(vm)
+                    .environmentObject(viewModel)
                 } else {
                     ProgressView()
                 }
 
                 Button {
-                    vm.isCommentPresented = false
+                    viewModel.isCommentPresented = false
                 } label: {
                     Text("key.done")
                         .frame(width: 250, height: 30)
@@ -183,19 +183,19 @@ struct CommentsView: View {
             .frame(width: 650)
             .frame(maxHeight: 520)
         }
-        .sheet(item: $vm.reportComment) { comment in
+        .sheet(item: $viewModel.reportComment) { comment in
             CommentReportSheet(comment: comment)
         }
         .confirmationDialog("key.comment.delete.label", isPresented: Binding {
-            vm.deleteComment != nil
+            viewModel.deleteComment != nil
         } set: {
             if !$0 {
-                vm.deleteComment = nil
+                viewModel.deleteComment = nil
             }
         }) {
-            if let comment = vm.deleteComment {
+            if let comment = viewModel.deleteComment {
                 Button {
-                    vm.deleteComment(comment: comment)
+                    viewModel.deleteComment(comment: comment)
                 } label: {
                     Text("key.comment.delete.confirm")
                 }
@@ -218,7 +218,7 @@ struct CommentsView: View {
         @Default(.isLoggedIn) private var isLoggedIn
 
         @EnvironmentObject private var appState: AppState
-        @EnvironmentObject private var vm: CommentsViewModel
+        @EnvironmentObject private var viewModel: CommentsViewModel
 
         var body: some View {
             VStack(alignment: .leading, spacing: 16) {
@@ -264,7 +264,7 @@ struct CommentsView: View {
                     HStack(alignment: .center, spacing: 8) {
                         Button {
                             if isLoggedIn {
-                                vm.like(comment: comment)
+                                viewModel.like(comment: comment)
                             } else {
                                 appState.isSignInPresented = true
                             }
@@ -305,24 +305,24 @@ struct CommentsView: View {
 
                             if hovering {
                                 delayShow = DispatchWorkItem {
-                                    vm.getLikes(hovering: hovering, comment: comment)
+                                    viewModel.getLikes(hovering: hovering, comment: comment)
                                 }
 
                                 if let delayShow {
                                     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5, execute: delayShow)
                                 }
                             } else {
-                                vm.getLikes(hovering: hovering, comment: comment)
+                                viewModel.getLikes(hovering: hovering, comment: comment)
                             }
                         }
                         .popover(isPresented: Binding {
-                            vm.likes[comment.commentId]?.0 == true
+                            viewModel.likes[comment.commentId]?.0 == true
                         } set: {
-                            vm.getLikes(hovering: $0, comment: comment)
+                            viewModel.getLikes(hovering: $0, comment: comment)
                         }, attachmentAnchor: .rect(.bounds), arrowEdge: .top) {
                             VStack(alignment: .center, spacing: 10) {
-                                if let l = vm.likes[comment.commentId], !l.1.isEmpty {
-                                    let chunks = l.1.chunks(ofCount: 8)
+                                if let like = viewModel.likes[comment.commentId], !like.1.isEmpty {
+                                    let chunks = like.1.chunks(ofCount: 8)
 
                                     ForEach(chunks.indices, id: \.self) { chunkIndex in
                                         let likes = chunks[chunkIndex]
@@ -360,11 +360,11 @@ struct CommentsView: View {
 
                         Button {
                             withAnimation(.easeInOut) {
-                                vm.reply = (vm.reply == comment.commentId) ? nil : comment.commentId
+                                viewModel.reply = (viewModel.reply == comment.commentId) ? nil : comment.commentId
                             }
                         } label: {
                             Group {
-                                if vm.reply == comment.commentId {
+                                if viewModel.reply == comment.commentId {
                                     Image(systemName: "chevron.up")
                                 } else {
                                     Text("key.reply")
@@ -382,7 +382,7 @@ struct CommentsView: View {
 
                         if !comment.isAdmin {
                             Button {
-                                vm.reportComment = comment
+                                viewModel.reportComment = comment
                             } label: {
                                 Image(systemName: "exclamationmark.bubble.fill")
                                     .foregroundColor(.accentColor)
@@ -401,7 +401,7 @@ struct CommentsView: View {
 
                         if comment.deleteHash != nil {
                             Button {
-                                vm.deleteComment = comment
+                                viewModel.deleteComment = comment
                             } label: {
                                 Image(systemName: "trash")
                                     .foregroundColor(.accentColor)
@@ -417,7 +417,7 @@ struct CommentsView: View {
                         }
                     }
 
-                    if vm.reply == comment.commentId {
+                    if viewModel.reply == comment.commentId {
                         CommentTextArea()
                     }
                 }
@@ -438,7 +438,7 @@ struct CommentsView: View {
         @State private var comment: Comment
 
         @EnvironmentObject private var appState: AppState
-        @EnvironmentObject private var vm: CommentsViewModel
+        @EnvironmentObject private var viewModel: CommentsViewModel
 
         init(comment: Comment) {
             self.comment = comment
@@ -486,7 +486,7 @@ struct CommentsView: View {
                         let movieId = String(url.path().dropFirst())
                         let commentId = fragment.replacingOccurrences(of: "comment", with: "")
 
-                        vm.getComment(movieId: movieId, commentId: commentId)
+                        viewModel.getComment(movieId: movieId, commentId: commentId)
 
                         return .handled
                     } else if !url.path().isEmpty, String(url.path().dropFirst()).id != nil {
@@ -509,7 +509,7 @@ struct CommentsView: View {
         @Default(.allowedComments) private var allowedComments
 
         @EnvironmentObject private var appState: AppState
-        @EnvironmentObject private var vm: CommentsViewModel
+        @EnvironmentObject private var viewModel: CommentsViewModel
 
         var body: some View {
             VStack(alignment: .leading, spacing: 8) {
@@ -615,7 +615,7 @@ struct CommentsView: View {
                     }
 
                     Button {
-                        vm.sendComment(name: isLoggedIn ? nil : name, text: feedback)
+                        viewModel.sendComment(name: isLoggedIn ? nil : name, text: feedback)
 
                         name = ""
                         feedback = ""

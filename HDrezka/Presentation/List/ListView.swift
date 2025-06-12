@@ -2,30 +2,30 @@ import Defaults
 import SwiftUI
 
 struct ListView: View {
-    @StateObject private var vm: ListViewModel
+    @StateObject private var viewModel: ListViewModel
 
     init(movies: [MovieSimple], title: String) {
-        self._vm = StateObject(wrappedValue: ListViewModel(movies: movies, title: title))
+        self._viewModel = StateObject(wrappedValue: ListViewModel(movies: movies, title: title))
     }
 
     init(list: MovieList) {
-        self._vm = StateObject(wrappedValue: ListViewModel(list: list))
+        self._viewModel = StateObject(wrappedValue: ListViewModel(list: list))
     }
 
     init(country: MovieCountry) {
-        self._vm = StateObject(wrappedValue: ListViewModel(country: country))
+        self._viewModel = StateObject(wrappedValue: ListViewModel(country: country))
     }
 
     init(genre: MovieGenre) {
-        self._vm = StateObject(wrappedValue: ListViewModel(genre: genre))
+        self._viewModel = StateObject(wrappedValue: ListViewModel(genre: genre))
     }
 
     init(category: Categories) {
-        self._vm = StateObject(wrappedValue: ListViewModel(category: category))
+        self._viewModel = StateObject(wrappedValue: ListViewModel(category: category))
     }
 
     init(collection: MoviesCollection) {
-        self._vm = StateObject(wrappedValue: ListViewModel(collection: collection))
+        self._viewModel = StateObject(wrappedValue: ListViewModel(collection: collection))
     }
 
     private let columns = [GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading)]
@@ -36,16 +36,16 @@ struct ListView: View {
 
     var body: some View {
         Group {
-            if let error = vm.state.error {
-                ErrorStateView(error, vm.title) {
-                    vm.load()
+            if let error = viewModel.state.error {
+                ErrorStateView(error, viewModel.title) {
+                    viewModel.load()
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
-            } else if let movies = vm.state.data {
+            } else if let movies = viewModel.state.data {
                 if movies.isEmpty {
-                    EmptyStateView(String(localized: "key.nothing_found"), vm.title, String(localized: "key.filter.empty")) {
-                        vm.load()
+                    EmptyStateView(String(localized: "key.nothing_found"), viewModel.title, String(localized: "key.filter.empty")) {
+                        viewModel.load()
                     }
                     .padding(.vertical, 52)
                     .padding(.horizontal, 36)
@@ -56,7 +56,7 @@ struct ListView: View {
                                 VStack(alignment: .leading) {
                                     Spacer()
 
-                                    Text(vm.title)
+                                    Text(viewModel.title)
                                         .font(.largeTitle.weight(.semibold))
                                         .lineLimit(1)
 
@@ -70,8 +70,8 @@ struct ListView: View {
                                     ForEach(movies) { movie in
                                         CardView(movie: movie)
                                             .task {
-                                                if movies.last == movie, vm.paginationState == .idle {
-                                                    vm.loadMore()
+                                                if movies.last == movie, viewModel.paginationState == .idle {
+                                                    viewModel.loadMore()
                                                 }
                                             }
                                     }
@@ -91,21 +91,21 @@ struct ListView: View {
                         .coordinateSpace(name: "scroll")
                         .scrollIndicators(.never)
 
-                        if vm.paginationState == .loading {
+                        if viewModel.paginationState == .loading {
                             LoadingPaginationStateView()
                         }
                     }
                 }
             } else {
-                LoadingStateView(vm.title)
+                LoadingStateView(viewModel.title)
                     .padding(.vertical, 52)
                     .padding(.horizontal, 36)
             }
         }
-        .navigationBar(title: vm.title, showBar: showBar, navbar: {
-            if let movies = vm.state.data, !movies.isEmpty {
+        .navigationBar(title: viewModel.title, showBar: showBar, navbar: {
+            if let movies = viewModel.state.data, !movies.isEmpty {
                 Button {
-                    vm.load()
+                    viewModel.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -113,13 +113,13 @@ struct ListView: View {
                 .keyboardShortcut("r", modifiers: .command)
             }
         }, toolbar: {
-            if vm.state != .loading, !vm.isCustomMovies, !vm.isList {
+            if viewModel.state != .loading, !viewModel.isCustomMovies, !viewModel.isList {
                 Image(systemName: "line.3.horizontal.decrease.circle")
 
-                if vm.isGenre || vm.isCollection || vm.isCountry {
-                    Picker("key.filter.select", selection: $vm.filter) {
-                        ForEach(Filters.allCases) { f in
-                            Text(f.rawValue).tag(f)
+                if viewModel.isGenre || viewModel.isCollection || viewModel.isCountry {
+                    Picker("key.filter.select", selection: $viewModel.filter) {
+                        ForEach(Filters.allCases) { filter in
+                            Text(filter.rawValue).tag(filter)
                         }
                     }
                     .labelsHidden()
@@ -139,10 +139,10 @@ struct ListView: View {
                     .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
 
-                if vm.isCategory(.newest) {
-                    Picker("key.filter.select", selection: $vm.newFilter) {
-                        ForEach(NewFilters.allCases) { f in
-                            Text(f.rawValue).tag(f)
+                if viewModel.isCategory(.newest) {
+                    Picker("key.filter.select", selection: $viewModel.newFilter) {
+                        ForEach(NewFilters.allCases) { filter in
+                            Text(filter.rawValue).tag(filter)
                         }
                     }
                     .labelsHidden()
@@ -165,15 +165,15 @@ struct ListView: View {
                         .padding(.vertical, 18)
                 }
 
-                if vm.isCountry {
+                if viewModel.isCountry {
                     Divider()
                         .padding(.vertical, 18)
                 }
 
-                if vm.isCategory || vm.isCountry {
-                    Picker("key.genre.select", selection: $vm.filterGenre) {
-                        ForEach(Genres.allCases.filter { $0 != .show || !vm.isCategory(.hot) }) { g in
-                            Text(g.rawValue).tag(g)
+                if viewModel.isCategory || viewModel.isCountry {
+                    Picker("key.genre.select", selection: $viewModel.filterGenre) {
+                        ForEach(Genres.allCases.filter { $0 != .show || !viewModel.isCategory(.hot) }) { genre in
+                            Text(genre.rawValue).tag(genre)
                         }
                     }
                     .labelsHidden()
@@ -195,21 +195,21 @@ struct ListView: View {
             }
         })
         .task(id: isLoggedIn) {
-            switch vm.state {
+            switch viewModel.state {
             case .data:
                 break
             default:
-                vm.load()
+                viewModel.load()
             }
         }
-        .customOnChange(of: vm.filterGenre) {
-            vm.load()
+        .customOnChange(of: viewModel.filterGenre) {
+            viewModel.load()
         }
-        .customOnChange(of: vm.filter) {
-            vm.load()
+        .customOnChange(of: viewModel.filter) {
+            viewModel.load()
         }
-        .customOnChange(of: vm.newFilter) {
-            vm.load()
+        .customOnChange(of: viewModel.newFilter) {
+            viewModel.load()
         }
         .background(.background)
     }

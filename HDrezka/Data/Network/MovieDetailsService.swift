@@ -25,7 +25,7 @@ enum MovieDetailsService {
 
 extension MovieDetailsService: URLRequestConvertible {
     var baseURL: URL { Defaults[.mirror] }
-    
+
     var path: String {
         switch self {
         case let .getMovieDetails(type, genre, name):
@@ -62,7 +62,7 @@ extension MovieDetailsService: URLRequestConvertible {
             "engine/ajax/rating.php"
         }
     }
-    
+
     var method: HTTPMethod {
         switch self {
         case .getMovieTrailer, .toggleCommentLike, .reportComment, .sendComment, .getlikes, .rate:
@@ -83,7 +83,7 @@ extension MovieDetailsService: URLRequestConvertible {
             .get
         }
     }
-    
+
     func asURLRequest() throws -> URLRequest {
         let url = baseURL.appending(path: path, directoryHint: .notDirectory)
 
@@ -98,12 +98,12 @@ extension MovieDetailsService: URLRequestConvertible {
             guard episode?.url == nil, voiceActing.url == nil else {
                 return request
             }
-            
+
             var params: [String: Any] = [:]
             params["id"] = voiceActing.voiceId
             params["translator_id"] = voiceActing.translatorId
             params["favs"] = favs
-            
+
             if !voiceActing.isCamrip.isEmpty {
                 params["is_camrip"] = voiceActing.isCamrip
             }
@@ -113,15 +113,15 @@ extension MovieDetailsService: URLRequestConvertible {
             if !voiceActing.isDirector.isEmpty {
                 params["is_director"] = voiceActing.isDirector
             }
-            
-            if let s = season, let e = episode {
-                params["season"] = s.seasonId
-                params["episode"] = e.episodeId
+
+            if let season, let episode {
+                params["season"] = season.seasonId
+                params["episode"] = episode.episodeId
                 params["action"] = "get_stream"
             } else {
                 params["action"] = "get_movie"
             }
-            
+
             return try URLEncoding.httpBody.encode(URLEncoding.queryString.encode(request, with: ["t": Int(Date().timeIntervalSince1970 * 1000)]), with: params)
         case .getMovieThumbnails:
             return try URLEncoding.queryString.encode(request, with: ["t": Int(Date().timeIntervalSince1970 * 1000)])
@@ -129,7 +129,7 @@ extension MovieDetailsService: URLRequestConvertible {
             guard voiceActing.url == nil else {
                 return request
             }
-            
+
             return try URLEncoding.httpBody.encode(URLEncoding.queryString.encode(request, with: ["t": Int(Date().timeIntervalSince1970 * 1000)]), with: ["id": movieId, "translator_id": voiceActing.translatorId, "action": "get_episodes", "favs": favs])
         case let .getComments(movieId, page, type, commentId, skin):
             var params: [String: Any] = [:]
@@ -139,7 +139,7 @@ extension MovieDetailsService: URLRequestConvertible {
             params["type"] = type ?? 0
             params["comment_id"] = commentId ?? 0
             params["skin"] = skin ?? "hdrezka"
-            
+
             return try URLEncoding.queryString.encode(request, with: params)
         case let .toggleCommentLike(id):
             return try URLEncoding.httpBody.encode(request, with: ["id": id])

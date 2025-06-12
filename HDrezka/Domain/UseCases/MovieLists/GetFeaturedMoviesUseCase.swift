@@ -1,6 +1,6 @@
-//import Combine
+// import Combine
 //
-//struct GetFeaturedMoviesUseCase {
+// struct GetFeaturedMoviesUseCase {
 //    private let repository: MovieListsRepository
 //
 //    init(repository: MovieListsRepository) {
@@ -10,4 +10,4 @@
 //    func callAsFunction(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
 //        repository.getFeaturedMovies(page: page, genre: genre)
 //    }
-//}
+// }

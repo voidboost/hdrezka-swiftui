@@ -7,7 +7,7 @@ import SwiftUI
 struct WatchingLaterView: View {
     private let title = String(localized: "key.watching_later")
 
-    @StateObject private var vm = WatchingLaterViewModel()
+    @StateObject private var viewModel = WatchingLaterViewModel()
 
     private let columns = [
         GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading)
@@ -19,16 +19,16 @@ struct WatchingLaterView: View {
 
     var body: some View {
         Group {
-            if let error = vm.state.error {
+            if let error = viewModel.state.error {
                 ErrorStateView(error, title) {
-                    vm.load()
+                    viewModel.load()
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
-            } else if let movies = vm.state.data {
+            } else if let movies = viewModel.state.data {
                 if movies.isEmpty {
                     EmptyStateView(String(localized: "key.watching_later.empty"), title, String(localized: "key.watching_later.empty.description")) {
-                        vm.load()
+                        viewModel.load()
                     }
                     .padding(.vertical, 52)
                     .padding(.horizontal, 36)
@@ -53,13 +53,13 @@ struct WatchingLaterView: View {
                                     WatchingLaterCardView(movie: movie)
                                         .contextMenu {
                                             Button {
-                                                vm.switchWatchedItem(movie: movie)
+                                                viewModel.switchWatchedItem(movie: movie)
                                             } label: {
                                                 Text(movie.watched ? String(localized: "key.mark.unwatched") : String(localized: "key.mark.watched"))
                                             }
 
                                             Button {
-                                                vm.removeWatchingItem(movie: movie)
+                                                viewModel.removeWatchingItem(movie: movie)
                                             } label: {
                                                 Text("key.delete")
                                             }
@@ -88,9 +88,9 @@ struct WatchingLaterView: View {
             }
         }
         .navigationBar(title: title, showBar: showBar, navbar: {
-            if let movies = vm.state.data, !movies.isEmpty {
+            if let movies = viewModel.state.data, !movies.isEmpty {
                 Button {
-                    vm.load()
+                    viewModel.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -99,19 +99,19 @@ struct WatchingLaterView: View {
             }
         })
         .task(id: isLoggedIn) {
-            switch vm.state {
+            switch viewModel.state {
             case .data:
                 break
             default:
-                vm.load()
+                viewModel.load()
             }
         }
-        .alert("key.ops", isPresented: $vm.isErrorPresented) {
+        .alert("key.ops", isPresented: $viewModel.isErrorPresented) {
             Button(role: .cancel) {} label: {
                 Text("key.ok")
             }
         } message: {
-            if let error = vm.error {
+            if let error = viewModel.error {
                 Text(error.localizedDescription)
             }
         }

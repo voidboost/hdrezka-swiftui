@@ -80,9 +80,7 @@ struct BookmarksSheetView: View {
                         ScrollView(.vertical) {
                             HFlow(horizontalAlignment: .center, verticalAlignment: .center, horizontalSpacing: 5, verticalSpacing: 5, distributeItemsEvenly: true) {
                                 ForEach(bookmarks) { bookmark in
-                                    if let index = bookmarks.firstIndex(where: { b in
-                                        b == bookmark
-                                    }) {
+                                    if let index = bookmarks.firstIndex(where: { $0 == bookmark }) {
                                         let isChecked = bookmark.isChecked ?? false
 
                                         Button {

@@ -7,7 +7,7 @@ struct MovieDetailsRepositoryImpl: MovieDetailsRepository {
     @Injected(\.session) private var session
 
     func getMovieDetails(movieId: String) -> AnyPublisher<MovieDetailed, Error> {
-        let parts = movieId.components(separatedBy: "/").filter({ !$0.isEmpty })
+        let parts = movieId.components(separatedBy: "/").filter { !$0.isEmpty }
 
         guard parts.count == 3 else {
             return Fail(error: HDrezkaError.null(#function, #line, #column))
@@ -31,7 +31,7 @@ struct MovieDetailsRepositoryImpl: MovieDetailsRepository {
     }
 
     func getMovieBookmarks(movieId: String) -> AnyPublisher<[Bookmark], Error> {
-        let parts = movieId.components(separatedBy: "/").filter({ !$0.isEmpty })
+        let parts = movieId.components(separatedBy: "/").filter { !$0.isEmpty }
 
         guard parts.count == 3 else {
             return Fail(error: HDrezkaError.null(#function, #line, #column))
@@ -175,7 +175,7 @@ struct MovieDetailsRepositoryImpl: MovieDetailsRepository {
             .eraseToAnyPublisher()
     }
 
-    func sendComment(id: String?, postId: String, name: String?, text: String, adb: String?, type: String?) -> AnyPublisher<(Bool, Bool, String), Error> {
+    func sendComment(id: String?, postId: String, name: String?, text: String, adb: String?, type: String?) -> AnyPublisher<SendCommentResult, Error> {
         session.request(MovieDetailsService.sendComment(id: id, postId: postId, name: name, text: text, adb: adb, type: type))
             .validate(statusCode: 200 ..< 400)
             .publishData()
@@ -189,7 +189,7 @@ struct MovieDetailsRepositoryImpl: MovieDetailsRepository {
                     throw HDrezkaError.parseJson("success or on_moderation or message", "sendComment")
                 }
 
-                return (success, onModeration, message.joined(separator: "\n"))
+                return SendCommentResult(success: success, onModeration: onModeration, message: message.joined(separator: "\n"))
             }
             .handleError()
             .eraseToAnyPublisher()

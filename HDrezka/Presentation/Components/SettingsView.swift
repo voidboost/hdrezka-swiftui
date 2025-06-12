@@ -57,8 +57,7 @@ struct SettingsView: View {
                                         mirrorValid = if let mirror,
                                                          !mirror.isFileURL,
                                                          let host = mirror.host(),
-                                                         host != currentMirror.host()
-                                        {
+                                                         host != currentMirror.host() {
                                             true
                                         } else {
                                             false

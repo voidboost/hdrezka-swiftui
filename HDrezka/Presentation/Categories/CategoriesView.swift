@@ -5,7 +5,7 @@ import SwiftUI
 struct CategoriesView: View {
     private let title = String(localized: "key.categories")
 
-    @StateObject private var vm = CategoriesViewModel()
+    @StateObject private var viewModel = CategoriesViewModel()
 
     @State private var showBar: Bool = false
 
@@ -13,16 +13,16 @@ struct CategoriesView: View {
 
     var body: some View {
         Group {
-            if let error = vm.state.error {
+            if let error = viewModel.state.error {
                 ErrorStateView(error, title) {
-                    vm.load()
+                    viewModel.load()
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
-            } else if let types = vm.state.data {
+            } else if let types = viewModel.state.data {
                 if types.isEmpty {
                     EmptyStateView(String(localized: "key.categories.empty"), title) {
-                        vm.load()
+                        viewModel.load()
                     }
                     .padding(.vertical, 52)
                     .padding(.horizontal, 36)
@@ -74,9 +74,9 @@ struct CategoriesView: View {
             }
         }
         .navigationBar(title: title, showBar: showBar, navbar: {
-            if let types = vm.state.data, !types.isEmpty {
+            if let types = viewModel.state.data, !types.isEmpty {
                 Button {
-                    vm.load()
+                    viewModel.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -85,11 +85,11 @@ struct CategoriesView: View {
             }
         })
         .task(id: isLoggedIn) {
-            switch vm.state {
+            switch viewModel.state {
             case .data:
                 break
             default:
-                vm.load()
+                viewModel.load()
             }
         }
         .background(.background)

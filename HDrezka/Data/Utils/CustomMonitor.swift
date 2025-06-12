@@ -103,8 +103,7 @@ private enum DebugDescription {
 
     static func description(for data: Data?,
                             headers: HTTPHeaders,
-                            allowingPrintableTypes printableTypes: [String] = ["json", "xml", "text", "x-www-form-urlencoded"]) -> String
-    {
+                            allowingPrintableTypes printableTypes: [String] = ["json", "xml", "text", "x-www-form-urlencoded"]) -> String {
         guard let data, !data.isEmpty else { return "[Body]: None" }
 
         var maximumLength: Int {
@@ -121,11 +120,17 @@ private enum DebugDescription {
             return "[Body]: \(data.count) bytes"
         }
 
+        guard let body = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines).indentingNewlines(),
+              !body.isEmpty
+        else {
+            return """
+            [Body]: None
+            """
+        }
+
         return """
         [Body]:
-            \(String(decoding: data, as: UTF8.self)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-            .indentingNewlines())
+            \(body)
         """
     }
 }

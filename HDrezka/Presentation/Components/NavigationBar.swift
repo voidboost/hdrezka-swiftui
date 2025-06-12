@@ -6,13 +6,13 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
     private let showBar: Bool
     private let navbar: Navbar?
     private let toolbar: Toolbar?
-    
+
     private let height: CGFloat = 52
-    
+
     @EnvironmentObject private var appState: AppState
 
     @Default(.isLoggedIn) private var isLoggedIn
-    
+
     init(
         title: String,
         showBar: Bool,
@@ -24,7 +24,7 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
         self.navbar = navbar?()
         self.toolbar = toolbar?()
     }
-    
+
     init(
         title: String,
         showBar: Bool,
@@ -32,7 +32,7 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
     ) where Toolbar == EmptyView {
         self.init(title: title, showBar: showBar, navbar: navbar, toolbar: nil)
     }
-    
+
     func body(content: Content) -> some View {
         content
             .navigationTitle(Text(verbatim: "HDrezka - \(title)"))
@@ -51,22 +51,22 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
                                     }
                                     .buttonStyle(NavbarButtonStyle(width: 22, height: 22))
                                 }
-                                
+
                                 if let navbar {
                                     navbar
                                 }
                             }
-                            
+
                             Spacer()
-                            
+
                             if showBar {
                                 Text(title)
                                     .lineLimit(1)
                                     .font(.system(size: 15, weight: .semibold))
                             }
-                            
+
                             Spacer()
-                            
+
                             if let toolbar {
                                 HStack(alignment: .center, spacing: 5) {
                                     toolbar
@@ -75,7 +75,7 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .padding(.horizontal, 15)
-                        
+
                         if showBar {
                             Divider()
                         }
@@ -90,17 +90,17 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
                             view
                         }
                     }
-                    
+
                     Spacer()
                 }
             }
             .clipShape(.rect)
     }
-    
+
     private func backButtonAction() {
         if !appState.path.isEmpty {
             appState.path.removeLast()
-            
+
             while !isLoggedIn, appState.path.last == .watchingLater || appState.path.last == .bookmarks {
                 appState.path.removeLast()
             }
@@ -149,7 +149,7 @@ extension View {
     ) -> some View {
         modifier(NavigationBar(title: title, showBar: showBar, navbar: navbar, toolbar: toolbar))
     }
-    
+
     func navigationBar<Navbar: View>(
         title: String,
         showBar: Bool,
