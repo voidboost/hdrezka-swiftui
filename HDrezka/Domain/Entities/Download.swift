@@ -9,8 +9,8 @@ struct Download: Identifiable, Hashable {
 
     init(id: String, request: DownloadRequest) {
         self.id = id
-        self.progress = request.downloadProgress
-        self.cancellable = AnyCancellable { request.cancel() }
+        progress = request.downloadProgress
+        cancellable = AnyCancellable { request.cancel() }
     }
 }
 

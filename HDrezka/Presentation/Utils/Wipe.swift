@@ -4,7 +4,7 @@ extension AnyTransition {
     static func wipe(reversed: Bool = false, blurRadius: CGFloat = 0) -> AnyTransition {
         .modifier(
             active: Wipe(reversed: reversed, blurRadius: blurRadius, progress: 0),
-            identity: Wipe(reversed: reversed, blurRadius: blurRadius, progress: 1)
+            identity: Wipe(reversed: reversed, blurRadius: blurRadius, progress: 1),
         )
     }
 }
@@ -15,7 +15,7 @@ private struct Wipe: ViewModifier, Animatable, AnimatableModifier {
 
     init(reversed: Bool, blurRadius: CGFloat = 0, progress: CGFloat) {
         self.reversed = reversed
-        self.animatableData = AnimatableData(progress, clamp(0, blurRadius, 30))
+        animatableData = AnimatableData(progress, clamp(0, blurRadius, 30))
     }
 
     private var progress: CGFloat {
@@ -35,7 +35,7 @@ private struct Wipe: ViewModifier, Animatable, AnimatableModifier {
                         .compositingGroup()
                 }
                 .padding(-blurRadius)
-                .animation(nil, value: animatableData)
+                .animation(nil, value: animatableData),
             )
     }
 
@@ -62,7 +62,7 @@ extension CGRect {
     init(center: CGPoint, size: CGSize) {
         let origin = CGPoint(
             x: center.x - size.width / 2,
-            y: center.y - size.height / 2
+            y: center.y - size.height / 2,
         )
 
         self.init(origin: origin, size: size)
@@ -87,14 +87,14 @@ extension CGSize {
 
         let sizeA = CGSize(
             width: abs(width * cos(Double(theta)) + height * sin(Double(theta))),
-            height: abs(width * sin(Double(theta)) + height * cos(Double(theta)))
+            height: abs(width * sin(Double(theta)) + height * cos(Double(theta))),
         )
 
         theta += .pi * 0.5
 
         let sizeB = CGSize(
             width: abs(width * sin(Double(theta)) + height * cos(Double(theta))),
-            height: abs(width * cos(Double(theta)) + height * sin(Double(theta)))
+            height: abs(width * cos(Double(theta)) + height * sin(Double(theta))),
         )
 
         if sizeA.area > sizeB.area {

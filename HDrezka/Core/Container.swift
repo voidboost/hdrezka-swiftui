@@ -15,7 +15,7 @@ extension Container {
 
                     return newRequest
                 },
-                eventMonitors: [CustomMonitor()]
+                eventMonitors: [CustomMonitor()],
             )
         }
         .singleton

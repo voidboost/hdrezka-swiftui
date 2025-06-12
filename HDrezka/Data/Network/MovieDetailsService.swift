@@ -13,7 +13,7 @@ enum MovieDetailsService {
         page: Int?,
         type: Int?,
         commentId: String?,
-        skin: String?
+        skin: String?,
     )
     case toggleCommentLike(id: String)
     case reportComment(id: String, issue: Int, text: String)

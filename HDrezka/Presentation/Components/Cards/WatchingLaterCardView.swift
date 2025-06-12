@@ -24,8 +24,8 @@ struct WatchingLaterCardView: View {
                             .transition(
                                 .asymmetric(
                                     insertion: .wipe(blurRadius: 10),
-                                    removal: .wipe(reversed: true, blurRadius: 10)
-                                )
+                                    removal: .wipe(reversed: true, blurRadius: 10),
+                                ),
                             )
                     } else {
                         Color.gray
@@ -33,8 +33,8 @@ struct WatchingLaterCardView: View {
                             .transition(
                                 .asymmetric(
                                     insertion: .wipe(blurRadius: 10),
-                                    removal: .wipe(reversed: true, blurRadius: 10)
-                                )
+                                    removal: .wipe(reversed: true, blurRadius: 10),
+                                ),
                             )
                     }
                 }
@@ -80,7 +80,7 @@ struct WatchingLaterCardView: View {
                             .onGeometryChange(for: CGFloat.self) { geometry in
                                 geometry.size.height
                             } action: { height in
-                                self.innerHeight = height
+                                innerHeight = height
                             }
 
                             Spacer()
@@ -89,7 +89,7 @@ struct WatchingLaterCardView: View {
                         .onGeometryChange(for: CGFloat.self) { geometry in
                             geometry.size.height
                         } action: { height in
-                            self.outerHeight = height
+                            outerHeight = height
                         }
                         .background {
                             VStack {}
@@ -98,7 +98,7 @@ struct WatchingLaterCardView: View {
                                 .mask {
                                     LinearGradient(stops: [
                                         .init(color: .clear, location: ((outerHeight - innerHeight) / outerHeight) * 0.75),
-                                        .init(color: .black, location: (outerHeight - innerHeight) / outerHeight)
+                                        .init(color: .black, location: (outerHeight - innerHeight) / outerHeight),
                                     ],
                                     startPoint: .top,
                                     endPoint: .bottom)
@@ -127,6 +127,6 @@ struct WatchingLaterCardView: View {
         }
         .buttonStyle(.plain)
         .opacity(movie.watched ? 0.6 : 1)
-        .disabled(movie.watchLaterId.removeMirror().components(separatedBy: "/").filter { !$0.isEmpty }.count != 3)
+        .disabled(movie.watchLaterId.removeMirror().components(separatedBy: "/").count(where: { !$0.isEmpty }) != 3)
     }
 }

@@ -49,7 +49,7 @@ class WatchingLaterViewModel: ObservableObject {
                         if !movie.watched {
                             movies.move(
                                 fromOffsets: IndexSet(integer: index),
-                                toOffset: movies.count
+                                toOffset: movies.count,
                             )
                         }
 

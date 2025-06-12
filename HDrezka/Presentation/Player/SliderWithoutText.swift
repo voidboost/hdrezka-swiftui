@@ -22,7 +22,7 @@ struct SliderWithoutText<T: BinaryFloatingPoint>: View {
         height: CGFloat,
         onEditingChanged: @escaping (Bool) -> Void
     ) {
-        self._value = value
+        _value = value
         self.inRange = inRange
         self.activeFillColor = activeFillColor
         self.fillColor = fillColor
@@ -60,7 +60,7 @@ struct SliderWithoutText<T: BinaryFloatingPoint>: View {
                         }.onEnded { _ in
                             localRealProgress = max(min(localRealProgress + localTempProgress, 1), 0)
                             localTempProgress = 0
-                        }
+                        },
                 )
             }
             .frame(width: bounds.size.width, height: bounds.size.height)
@@ -87,6 +87,6 @@ struct SliderWithoutText<T: BinaryFloatingPoint>: View {
     }
 
     private func getPrgValue() -> T {
-        return ((localRealProgress + localTempProgress) * (inRange.upperBound - inRange.lowerBound)) + inRange.lowerBound
+        ((localRealProgress + localTempProgress) * (inRange.upperBound - inRange.lowerBound)) + inRange.lowerBound
     }
 }

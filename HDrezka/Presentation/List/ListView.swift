@@ -5,27 +5,27 @@ struct ListView: View {
     @StateObject private var viewModel: ListViewModel
 
     init(movies: [MovieSimple], title: String) {
-        self._viewModel = StateObject(wrappedValue: ListViewModel(movies: movies, title: title))
+        _viewModel = StateObject(wrappedValue: ListViewModel(movies: movies, title: title))
     }
 
     init(list: MovieList) {
-        self._viewModel = StateObject(wrappedValue: ListViewModel(list: list))
+        _viewModel = StateObject(wrappedValue: ListViewModel(list: list))
     }
 
     init(country: MovieCountry) {
-        self._viewModel = StateObject(wrappedValue: ListViewModel(country: country))
+        _viewModel = StateObject(wrappedValue: ListViewModel(country: country))
     }
 
     init(genre: MovieGenre) {
-        self._viewModel = StateObject(wrappedValue: ListViewModel(genre: genre))
+        _viewModel = StateObject(wrappedValue: ListViewModel(genre: genre))
     }
 
     init(category: Categories) {
-        self._viewModel = StateObject(wrappedValue: ListViewModel(category: category))
+        _viewModel = StateObject(wrappedValue: ListViewModel(category: category))
     }
 
     init(collection: MoviesCollection) {
-        self._viewModel = StateObject(wrappedValue: ListViewModel(collection: collection))
+        _viewModel = StateObject(wrappedValue: ListViewModel(collection: collection))
     }
 
     private let columns = [GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading)]

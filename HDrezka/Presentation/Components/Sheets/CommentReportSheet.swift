@@ -204,11 +204,11 @@ struct CommentReportSheet: View {
         @FocusState private var focused: Bool
 
         init(tag: Reports, selection: Binding<Reports?>, message: Binding<String>, label: LocalizedStringKey) {
-            self._isSelected = Binding(
+            _isSelected = Binding(
                 get: { selection.wrappedValue == tag },
-                set: { _ in selection.wrappedValue = tag }
+                set: { _ in selection.wrappedValue = tag },
             )
-            self._message = message
+            _message = message
             self.tag = tag
             self.label = label
         }

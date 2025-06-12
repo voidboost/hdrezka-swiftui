@@ -34,9 +34,9 @@ private func generateTrash(trashList: [String] = ["@", "#", "!", "^", "$"]) -> [
     [2, 3].flatMap(trashList.cartesianProduct).map(\.base64Encoded)
 }
 
-private extension Array where Element == String {
+private extension [String] {
     func cartesianProduct(count: Int) -> [String] {
-        count == 1 ? self : self.cartesianProduct(count: count - 1).flatMap { item in self.map { "\(item)\($0)" } }
+        count == 1 ? self : cartesianProduct(count: count - 1).flatMap { item in self.map { "\(item)\($0)" } }
     }
 }
 
@@ -47,12 +47,13 @@ extension String {
 
     fileprivate func indexesOf(substr: String) -> [Int] {
         var indices = [Int]()
-        var searchStartIndex = self.startIndex
+        var searchStartIndex = startIndex
 
-        while searchStartIndex < self.endIndex,
-              let range = self.range(of: substr, range: searchStartIndex ..< self.endIndex),
-              !range.isEmpty {
-            let index = distance(from: self.startIndex, to: range.lowerBound)
+        while searchStartIndex < endIndex,
+              let range = range(of: substr, range: searchStartIndex ..< endIndex),
+              !range.isEmpty
+        {
+            let index = distance(from: startIndex, to: range.lowerBound)
             indices.append(index)
             searchStartIndex = self.index(range.lowerBound, offsetBy: 1, limitedBy: endIndex) ?? endIndex
         }
@@ -69,7 +70,7 @@ extension String {
     }
 
     var base64Encoded: String {
-        guard let data = self.data(using: .utf8) else { return "" }
+        guard let data = data(using: .utf8) else { return "" }
 
         return data.base64EncodedString()
     }

@@ -97,7 +97,7 @@ struct SeriesUpdatesSheetView: View {
 
     private func load() {
         withAnimation(.easeInOut) {
-            self.state = .loading
+            state = .loading
         }
 
         getSeriesUpdatesUseCase()
@@ -107,12 +107,12 @@ struct SeriesUpdatesSheetView: View {
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation(.easeInOut) {
-                        self.state = .error(error)
+                        state = .error(error)
                     }
                 }
             } receiveValue: { seriesUpdates in
                 withAnimation(.easeInOut) {
-                    self.state = .data(seriesUpdates)
+                    state = .data(seriesUpdates)
                 }
             }
             .store(in: &subscriptions)
@@ -148,7 +148,7 @@ struct SeriesUpdatesSheetView: View {
 
                 if isExpanded {
                     LazyVStack(alignment: .leading, spacing: 0) {
-                        ForEach(group.releasedEpisodes.filter { $0.tracked }) { item in
+                        ForEach(group.releasedEpisodes.filter(\.tracked)) { item in
                             Button {
                                 dismiss()
 
@@ -198,7 +198,7 @@ struct SeriesUpdatesSheetView: View {
                             }
                             .buttonStyle(.plain)
 
-                            if item != group.releasedEpisodes.filter({ $0.tracked }).last || !group.releasedEpisodes.filter({ !$0.tracked }).isEmpty {
+                            if item != group.releasedEpisodes.filter(\.tracked).last || !group.releasedEpisodes.filter({ !$0.tracked }).isEmpty {
                                 Divider()
                             }
                         }

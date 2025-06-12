@@ -33,7 +33,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
         thumbnails: WebVTT?,
         onEditingChanged: @escaping (Bool) -> Void
     ) {
-        self._value = value
+        _value = value
         self.inRange = inRange
         self.buffers = buffers
         self.activeFillColor = activeFillColor
@@ -72,7 +72,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
 
                                             let point = CGPoint(
                                                 x: isActive ? max(geometry.size.width * (Double(start / inRange.upperBound) + duration * 0.5), 0) : max(geometry.size.width * (Double(localRealProgress + localTempProgress) + duration * 0.5), 0),
-                                                y: (isActive ? height * 1.25 : height) * 0.5
+                                                y: (isActive ? height * 1.25 : height) * 0.5,
                                             )
 
                                             Color.black
@@ -105,11 +105,11 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                 localRealProgress = max(min(localRealProgress + localTempProgress, 1), 0)
                                 localTempProgress = 0
                                 progressDuration = inRange.upperBound * localRealProgress
-                            }
+                            },
                     )
                     .onContinuousHover { phase in
                         switch phase {
-                        case .active(let location):
+                        case let .active(location):
                             unitSeekImage = location.x / geometry.size.width
 
                             withAnimation(.easeInOut) {
@@ -130,8 +130,8 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                             .transition(
                                                 .asymmetric(
                                                     insertion: .wipe(blurRadius: 10),
-                                                    removal: .wipe(reversed: true, blurRadius: 10)
-                                                )
+                                                    removal: .wipe(reversed: true, blurRadius: 10),
+                                                ),
                                             )
                                     } else {
                                         ProgressView()
@@ -139,8 +139,8 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                             .transition(
                                                 .asymmetric(
                                                     insertion: .wipe(blurRadius: 10),
-                                                    removal: .wipe(reversed: true, blurRadius: 10)
-                                                )
+                                                    removal: .wipe(reversed: true, blurRadius: 10),
+                                                ),
                                             )
                                     }
                                 }
@@ -206,7 +206,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
     }
 
     private func getPrgValue() -> T {
-        return ((localRealProgress + localTempProgress) * (inRange.upperBound - inRange.lowerBound)) + inRange.lowerBound
+        ((localRealProgress + localTempProgress) * (inRange.upperBound - inRange.lowerBound)) + inRange.lowerBound
     }
 }
 

@@ -8,8 +8,8 @@ struct PersonView: View {
     @StateObject private var viewModel: PersonViewModel
 
     init(person: PersonSimple) {
-        self.title = person.name
-        self._viewModel = StateObject(wrappedValue: PersonViewModel(id: person.personId))
+        title = person.name
+        _viewModel = StateObject(wrappedValue: PersonViewModel(id: person.personId))
     }
 
     @State private var showBar: Bool = false
@@ -99,8 +99,8 @@ struct PersonView: View {
                                 .transition(
                                     .asymmetric(
                                         insertion: .wipe(blurRadius: 10),
-                                        removal: .wipe(reversed: true, blurRadius: 10)
-                                    )
+                                        removal: .wipe(reversed: true, blurRadius: 10),
+                                    ),
                                 )
                         } else {
                             LazyImage(url: URL(string: details.photo), transaction: .init(animation: .easeInOut)) { state in
@@ -109,8 +109,8 @@ struct PersonView: View {
                                         .transition(
                                             .asymmetric(
                                                 insertion: .wipe(blurRadius: 10),
-                                                removal: .wipe(reversed: true, blurRadius: 10)
-                                            )
+                                                removal: .wipe(reversed: true, blurRadius: 10),
+                                            ),
                                         )
                                 } else {
                                     Color.gray
@@ -118,8 +118,8 @@ struct PersonView: View {
                                         .transition(
                                             .asymmetric(
                                                 insertion: .wipe(blurRadius: 10),
-                                                removal: .wipe(reversed: true, blurRadius: 10)
-                                            )
+                                                removal: .wipe(reversed: true, blurRadius: 10),
+                                            ),
                                         )
                                 }
                             }
@@ -127,8 +127,8 @@ struct PersonView: View {
                             .transition(
                                 .asymmetric(
                                     insertion: .wipe(blurRadius: 10),
-                                    removal: .wipe(reversed: true, blurRadius: 10)
-                                )
+                                    removal: .wipe(reversed: true, blurRadius: 10),
+                                ),
                             )
                         }
                     }
@@ -164,7 +164,8 @@ struct PersonView: View {
                         ||
                         details.deathPlace?.isEmpty == false
                         ||
-                        details.height?.isEmpty == false {
+                        details.height?.isEmpty == false
+                    {
                         VStack(alignment: .leading, spacing: 0) {
                             if let career = details.career, !career.isEmpty {
                                 InfoRow(String(localized: "key.person.career"), career)

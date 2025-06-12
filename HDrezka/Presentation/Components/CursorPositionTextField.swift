@@ -36,7 +36,7 @@ struct CursorPositionTextView: NSViewRepresentable {
         return textView
     }
 
-    func updateNSView(_ nsView: NSTextViewWrapper, context: Context) {
+    func updateNSView(_ nsView: NSTextViewWrapper, context _: Context) {
         DispatchQueue.main.async {
             if nsView.string != text {
                 nsView.string = text
@@ -120,7 +120,7 @@ class NSTextViewWrapper: NSTextView {
         if string.isEmpty {
             let placeholderAttributes: [NSAttributedString.Key: Any] = [
                 .foregroundColor: NSColor.placeholderTextColor,
-                .font: font ?? NSFont.systemFont(ofSize: NSFont.systemFontSize)
+                .font: font ?? NSFont.systemFont(ofSize: NSFont.systemFontSize),
             ]
             let placeholderRect = CGRect(x: 5, y: 0, width: dirtyRect.width - 10, height: dirtyRect.height)
             (placeholderString as NSString).draw(in: placeholderRect, withAttributes: placeholderAttributes)

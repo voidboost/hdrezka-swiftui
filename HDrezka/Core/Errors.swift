@@ -13,17 +13,17 @@ enum HDrezkaError: Error {
 extension HDrezkaError: LocalizedError {
     var errorDescription: String? {
         switch self {
-        case .mirrorBanned(let mirror):
+        case let .mirrorBanned(mirror):
             String(localized: "key.errors.mirror-\(mirror.host() ?? "")")
-        case .loginRequired(let mirror):
+        case let .loginRequired(mirror):
             String(localized: "key.errors.login-\(mirror.host() ?? "")")
-        case .skipLink(let link):
+        case let .skipLink(link):
             String(localized: "key.errors.link-\(link.absoluteString)")
-        case .parseJson(let param, let function):
+        case let .parseJson(param, function):
             String(localized: "key.errors.parsing-\(param)-\(function)")
-        case .null(let functionName, let lineNumber, let columnNumber):
+        case let .null(functionName, lineNumber, columnNumber):
             String(localized: "key.errors.null-\(functionName)-\(lineNumber)-\(columnNumber)")
-        case .swiftsoup(let type, let message):
+        case let .swiftsoup(type, message):
             String(localized: "key.errors.swiftsoup-\(type)-\(message)")
         case .unknown:
             String(localized: "key.errors.unknown")

@@ -12,7 +12,7 @@ class CustomScanner {
 
     var scanLocation: Int {
         get {
-            return scanner.string.distance(from: scanner.string.startIndex, to: scanner.currentIndex)
+            scanner.string.distance(from: scanner.string.startIndex, to: scanner.currentIndex)
         }
         set {
             scanner.currentIndex = scanner.string.index(scanner.string.startIndex, offsetBy: newValue)
@@ -20,7 +20,7 @@ class CustomScanner {
     }
 
     var isAtEnd: Bool {
-        return scanLocation == length
+        scanLocation == length
     }
 
     @discardableResult

@@ -78,7 +78,7 @@ struct MovieDetailed: Identifiable, Codable, Hashable {
     }
 
     mutating func rate(_ rating: Float? = nil, _ votes: String? = nil) {
-        self.rated = true
+        rated = true
 
         if let rating {
             self.rating = rating

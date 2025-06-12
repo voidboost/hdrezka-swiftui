@@ -13,7 +13,7 @@ class SearchParser {
                     details: movie.getDetails(),
                     poster: movie.getPoster(),
                     cat: movie.getCat(),
-                    info: movie.getInfo()
+                    info: movie.getInfo(),
                 )
             }
     }
@@ -27,7 +27,7 @@ class SearchParser {
                     name: type.getTypeName(),
                     typeId: type.getTypeId(),
                     genres: type.getTypeGenres(),
-                    best: type.getTypeBest()
+                    best: type.getTypeBest(),
                 )
             }
     }
@@ -57,7 +57,7 @@ private extension Element {
 
                 return MovieGenre(
                     name: name,
-                    genreId: id
+                    genreId: id,
                 )
             }
     }
@@ -75,7 +75,7 @@ private extension Element {
 
                 return MovieGenre(
                     name: name,
-                    genreId: id
+                    genreId: id,
                 )
             }
 
@@ -88,7 +88,7 @@ private extension Element {
                 if let year {
                     return MovieYear(
                         name: name,
-                        year: year
+                        year: year,
                     )
                 } else {
                     return nil
@@ -98,7 +98,7 @@ private extension Element {
         return MovieBest(
             name: name,
             genres: genres,
-            years: years
+            years: years,
         )
     }
 }

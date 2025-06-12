@@ -70,20 +70,20 @@ struct PlayerView: View {
     @State private var thumbnails: WebVTT?
 
     init(data: PlayerData) {
-        self.poster = data.details.poster
-        self.name = data.details.nameRussian
-        self.favs = data.details.favs
-        self.voiceActing = data.selectedActing
+        poster = data.details.poster
+        name = data.details.nameRussian
+        favs = data.details.favs
+        voiceActing = data.selectedActing
 
-        self.seasons = data.seasons
-        self.season = data.selectedSeason
-        self.episode = data.selectedEpisode
-        self.movie = data.movie
-        self.quality = data.selectedQuality
+        seasons = data.seasons
+        season = data.selectedSeason
+        episode = data.selectedEpisode
+        movie = data.movie
+        quality = data.selectedQuality
 
-        self.times = data.details.series != nil ? [900, 1800, 2700, 3600, -1] : [900, 1800, 2700, 3600]
+        times = data.details.series != nil ? [900, 1800, 2700, 3600, -1] : [900, 1800, 2700, 3600]
 
-        self.hideMainWindow = Defaults[.hideMainWindow]
+        hideMainWindow = Defaults[.hideMainWindow]
     }
 
     var body: some View {
@@ -371,7 +371,7 @@ struct PlayerView: View {
                                                 rate
                                             } set: { rate in
                                                 self.rate = rate
-                                                self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = rate
+                                                nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = rate
 
                                                 if isPlaying {
                                                     player.playImmediately(atRate: rate)
@@ -396,7 +396,7 @@ struct PlayerView: View {
                                                 Picker(selection: Binding {
                                                     quality
                                                 } set: {
-                                                    self.quality = $0
+                                                    quality = $0
 
                                                     let currentSeek = player.currentTime()
 
@@ -669,9 +669,7 @@ struct PlayerView: View {
                                     } else {
                                         player.playImmediately(atRate: rate)
                                     }
-                                }
-                        )
-                )
+                                })),
         )
     }
 
@@ -705,10 +703,10 @@ struct PlayerView: View {
 
                 self.currentTime = currentTime
 
-                self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
-                self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = rate
-                self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyCurrentPlaybackDate] = currentItem.currentDate()
-                self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyDefaultPlaybackRate] = player.defaultRate
+                nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
+                nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = rate
+                nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyCurrentPlaybackDate] = currentItem.currentDate()
+                nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyDefaultPlaybackRate] = player.defaultRate
 
                 if let position = playerPositions.first(where: { position in
                     position.id == voiceActing.voiceId &&
@@ -866,7 +864,7 @@ struct PlayerView: View {
                 .store(in: &subscriptions)
 
             player.publisher(for: \.error)
-                .compactMap { $0 }
+                .compactMap(\.self)
                 .handleError()
                 .receive(on: DispatchQueue.main)
                 .sink { error in
@@ -885,7 +883,7 @@ struct PlayerView: View {
                 .sink { duration in
                     self.duration = duration.seconds
 
-                    self.nowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyPlaybackDuration] = duration.seconds
+                    nowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyPlaybackDuration] = duration.seconds
 
                     updateNextTimer()
                 }
@@ -900,7 +898,7 @@ struct PlayerView: View {
                 .store(in: &subscriptions)
 
             currentItem.publisher(for: \.error)
-                .compactMap { $0 }
+                .compactMap(\.self)
                 .handleError()
                 .receive(on: DispatchQueue.main)
                 .sink { error in
@@ -1009,7 +1007,7 @@ struct PlayerView: View {
                 ImagePipeline.shared.loadImage(with: url) { result in
                     guard case let .success(response) = result else { return }
 
-                    self.nowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: response.image.size) { _ in response.image }
+                    nowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: response.image.size) { _ in response.image }
                 }
             }
 
@@ -1026,7 +1024,7 @@ struct PlayerView: View {
             }
 
             remoteCommandCenter.togglePlayPauseCommand.addTarget { _ in
-                if self.isPlaying {
+                if isPlaying {
                     player.pause()
                 } else {
                     player.playImmediately(atRate: rate)
@@ -1050,8 +1048,8 @@ struct PlayerView: View {
             remoteCommandCenter.changePlaybackRateCommand.addTarget { event in
                 guard let effectiveEvent = event as? MPChangePlaybackRateCommandEvent else { return .commandFailed }
 
-                self.rate = effectiveEvent.playbackRate
-                self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = effectiveEvent.playbackRate
+                rate = effectiveEvent.playbackRate
+                nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = effectiveEvent.playbackRate
 
                 if isPlaying {
                     player.playImmediately(atRate: effectiveEvent.playbackRate)
@@ -1087,7 +1085,7 @@ struct PlayerView: View {
             player.isMuted = muted
 
             withAnimation(.easeInOut) {
-                self.playerLayer.player = player
+                playerLayer.player = player
                 self.pipController = pipController
             }
         }
@@ -1201,7 +1199,7 @@ struct PlayerView: View {
 
     private func setMask(_ newValue: Bool) {
         withAnimation(.easeInOut) {
-            self.isMaskShow = newValue
+            isMaskShow = newValue
         }
 
         delayHide?.cancel()
@@ -1290,7 +1288,7 @@ struct PlayerView: View {
                             self.movie = movie
                             self.episode = prevEpisode
 
-                            self.setupPlayer(isMuted: isMuted, subtitles: subtitles, volume: volume)
+                            setupPlayer(isMuted: isMuted, subtitles: subtitles, volume: volume)
                         }
                     }
                     .store(in: &subscriptions)
@@ -1346,7 +1344,7 @@ struct PlayerView: View {
                             self.season = prevSeason
                             self.episode = prevEpisode
 
-                            self.setupPlayer(isMuted: isMuted, subtitles: subtitles, volume: volume)
+                            setupPlayer(isMuted: isMuted, subtitles: subtitles, volume: volume)
                         }
                     }
                     .store(in: &subscriptions)
@@ -1405,7 +1403,7 @@ struct PlayerView: View {
                             self.movie = movie
                             self.episode = nextEpisode
 
-                            self.setupPlayer(isMuted: isMuted, subtitles: subtitles, volume: volume)
+                            setupPlayer(isMuted: isMuted, subtitles: subtitles, volume: volume)
                         }
                     }
                     .store(in: &subscriptions)
@@ -1461,7 +1459,7 @@ struct PlayerView: View {
                             self.season = nextSeason
                             self.episode = nextEpisode
 
-                            self.setupPlayer(isMuted: isMuted, subtitles: subtitles, volume: volume)
+                            setupPlayer(isMuted: isMuted, subtitles: subtitles, volume: volume)
                         }
                     }
                     .store(in: &subscriptions)
@@ -1473,7 +1471,7 @@ struct PlayerView: View {
 struct CustomAVPlayerView: NSViewRepresentable {
     var playerLayer: AVPlayerLayer
 
-    func makeNSView(context: Context) -> NSView {
+    func makeNSView(context _: Context) -> NSView {
         let view = NSView()
         view.wantsLayer = true
 
@@ -1485,7 +1483,7 @@ struct CustomAVPlayerView: NSViewRepresentable {
         return view
     }
 
-    func updateNSView(_ nsView: NSView, context: Context) {
+    func updateNSView(_ nsView: NSView, context _: Context) {
         playerLayer.frame = nsView.bounds
     }
 }

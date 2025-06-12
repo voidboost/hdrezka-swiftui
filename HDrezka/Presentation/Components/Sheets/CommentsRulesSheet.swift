@@ -127,7 +127,7 @@ struct CommentsRulesSheet: View {
                         .value: "1",
                         .domain: ".\(mirror.host() ?? "")",
                         .path: "/",
-                        .expires: Date.now.addingTimeInterval(30 * 24 * 60 * 60)
+                        .expires: Date.now.addingTimeInterval(30 * 24 * 60 * 60),
                     ]) {
                         HTTPCookieStorage.shared.setCookie(cookie)
 

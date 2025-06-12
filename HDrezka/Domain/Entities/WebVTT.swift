@@ -17,10 +17,10 @@ struct WebVTT {
 
 extension WebVTT.Cue {
     var timeStart: TimeInterval {
-        return TimeInterval(timing.start) / 1000
+        TimeInterval(timing.start) / 1000
     }
 
     var timeEnd: TimeInterval {
-        return TimeInterval(timing.end) / 1000
+        TimeInterval(timing.end) / 1000
     }
 }

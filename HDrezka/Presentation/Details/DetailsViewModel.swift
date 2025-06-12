@@ -53,14 +53,14 @@ class DetailsViewModel: ObservableObject {
                                             autoPlay: false,
                                             loopEnabled: true,
                                             showControls: true,
-                                            showFullscreenButton: true
+                                            showFullscreenButton: true,
                                         ),
                                         configuration: .init(
                                             openURLAction: .init { url, _ in
                                                 NSWorkspace.shared.open(url)
-                                            }
+                                            },
                                         ),
-                                        isLoggingEnabled: isLoggingEnabled
+                                        isLoggingEnabled: isLoggingEnabled,
                                     )
                                 }
                             }

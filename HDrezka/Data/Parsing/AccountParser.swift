@@ -16,7 +16,7 @@ class AccountParser {
                     date: movie.getWatchingLaterDate(),
                     buttonText: movie.getWatchingLaterButtonText(),
                     dataId: movie.getWatchingLaterDataId(),
-                    watched: movie.getWatchingLaterWatched()
+                    watched: movie.getWatchingLaterWatched(),
                 )
             }
     }
@@ -38,7 +38,7 @@ class AccountParser {
                             releasedEpisode: item.getSeriesUpdateReleasedEpisode(),
                             chosenVoiceActing: item.getSeriesUpdateVoiceActing(),
                             isChosenVoiceActingPremium: item.isSeriesUpdateVoiceActingPremium(),
-                            tracked: item.hasClass("tracked")
+                            tracked: item.hasClass("tracked"),
                         )
                     }
 
@@ -74,7 +74,7 @@ class AccountParser {
                 try Bookmark(
                     bookmarkId: category.getBookmarksCategoryId(),
                     name: category.getBookmarksCategoryName(),
-                    count: category.getBookmarksCategoryCount()
+                    count: category.getBookmarksCategoryCount(),
                 )
             }
     }

@@ -77,13 +77,13 @@ class Downloader: ObservableObject {
             if let season = data.season, let episode = data.episode {
                 let (seasonName, episodeName) = (
                     String(localized: "key.season-\(season.name.contains(/^\d/) ? season.name : season.seasonId)"),
-                    String(localized: "key.episode-\(episode.name.contains(/^\d/) ? episode.name : episode.episodeId)")
+                    String(localized: "key.episode-\(episode.name.contains(/^\d/) ? episode.name : episode.episodeId)"),
                 )
 
                 let (movieFolder, seasonFolder, movieFile) = (
                     name.count > 255 - actingName.count - qualityName.count ? "\(name.prefix(255 - actingName.count - qualityName.count - 4))... \(qualityName)\(actingName)" : "\(name)\(qualityName)\(actingName)",
                     seasonName.count > 255 ? "\(seasonName.prefix(255 - 3))..." : "\(seasonName)",
-                    episodeName.count > 255 - 4 ? "\(episodeName.prefix(255 - 8))... .mp4" : "\(episodeName).mp4"
+                    episodeName.count > 255 - 4 ? "\(episodeName.prefix(255 - 8))... .mp4" : "\(episodeName).mp4",
                 )
 
                 let id = "\(data.details.movieId)\(season.seasonId)\(episode.episodeId)\(data.acting.translatorId)\(data.quality)".base64Encoded
@@ -92,7 +92,8 @@ class Downloader: ObservableObject {
                     .appending(path: "HDrezka", directoryHint: .isDirectory)
                     .appending(path: movieFolder.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .isDirectory)
                     .appending(path: seasonFolder.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .isDirectory)
-                    .appending(path: movieFile.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .notDirectory) {
+                    .appending(path: movieFile.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .notDirectory)
+                {
                     getMovieVideoUseCase(voiceActing: data.acting, season: season, episode: episode, favs: data.details.favs)
                         .receive(on: DispatchQueue.main)
                         .sink { completion in
@@ -154,7 +155,8 @@ class Downloader: ObservableObject {
 
                                     if let subtitles = data.subtitles,
                                        let sub = movie.subtitles.first(where: { $0.name == subtitles.name }),
-                                       let subtitlesUrl = URL(string: sub.link) {
+                                       let subtitlesUrl = URL(string: sub.link)
+                                    {
                                         let request = self.session.download(subtitlesUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination.deletingLastPathComponent().appending(path: movieFile.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":").replacingOccurrences(of: ".mp4", with: " [\(sub.name)].\(subtitlesUrl.pathExtension)"), directoryHint: .notDirectory), [.createIntermediateDirectories, .removePreviousFile]) })
                                             .validate(statusCode: 200 ..< 400)
 
@@ -168,8 +170,8 @@ class Downloader: ObservableObject {
                                     self.downloads.append(
                                         .init(
                                             id: id,
-                                            request: request
-                                        )
+                                            request: request,
+                                        ),
                                     )
 
                                     request.resume()
@@ -179,7 +181,7 @@ class Downloader: ObservableObject {
                         .store(in: &subscriptions)
                 } else {
                     notificate(id, String(localized: "key.download.failed"), String(localized:
-                        "key.download.failed.notification-\(name)-\(seasonName)-\(episodeName)-\(qualityName)-\(actingName)"
+                        "key.download.failed.notification-\(name)-\(seasonName)-\(episodeName)-\(qualityName)-\(actingName)",
                     ), "retry", ["data": retryData])
                 }
             } else if let season = data.season, let episode = season.episodes.first {
@@ -191,14 +193,15 @@ class Downloader: ObservableObject {
 
                 if let movieDestination = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?
                     .appending(path: "HDrezka", directoryHint: .isDirectory)
-                    .appending(path: file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .notDirectory) {
+                    .appending(path: file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .notDirectory)
+                {
                     getMovieVideoUseCase(voiceActing: data.acting, season: nil, episode: nil, favs: data.details.favs)
                         .receive(on: DispatchQueue.main)
                         .sink { completion in
                             guard case let .failure(error) = completion else { return }
 
                             self.notificate(id, String(localized: "key.download.failed"), String(localized:
-                                "key.download.failed.notification-\(name)-\(qualityName)-\(actingName)-\(error.localizedDescription)"
+                                "key.download.failed.notification-\(name)-\(qualityName)-\(actingName)-\(error.localizedDescription)",
                             ), "retry", ["data": retryData])
                         } receiveValue: { movie in
                             if movie.needPremium {
@@ -227,8 +230,8 @@ class Downloader: ObservableObject {
                                 }
 
                                 if let movieUrl = movie.getClosestTo(quality: data.quality) {
-                                    self.notificate(id, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(name)-\(qualityName)-\(actingName)"
-                                    ), "cancel", ["id": id])
+                                    self.notificate(id, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(name)-\(qualityName)-\(actingName)",
+                                        ), "cancel", ["id": id])
 
                                     let request = self.session.download(movieUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination, [.createIntermediateDirectories, .removePreviousFile]) })
                                         .validate(statusCode: 200 ..< 400)
@@ -249,7 +252,8 @@ class Downloader: ObservableObject {
 
                                     if let subtitles = data.subtitles,
                                        let sub = movie.subtitles.first(where: { $0.name == subtitles.name }),
-                                       let subtitlesUrl = URL(string: sub.link) {
+                                       let subtitlesUrl = URL(string: sub.link)
+                                    {
                                         let request = self.session.download(subtitlesUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination.deletingLastPathComponent().appending(path: file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":").replacingOccurrences(of: ".mp4", with: " [\(sub.name)].\(subtitlesUrl.pathExtension)"), directoryHint: .notDirectory), [.createIntermediateDirectories, .removePreviousFile]) })
                                             .validate(statusCode: 200 ..< 400)
 
@@ -263,8 +267,8 @@ class Downloader: ObservableObject {
                                     self.downloads.append(
                                         .init(
                                             id: id,
-                                            request: request
-                                        )
+                                            request: request,
+                                        ),
                                     )
 
                                     request.resume()

@@ -63,17 +63,17 @@ class MovieDetailsParser {
                 imdbRating = try MovieRating(
                     value: chunk.getDetailsImdbRating(),
                     votesCount: chunk.getDetailsImdbVotes(),
-                    link: chunk.getDetailsImdbLink()
+                    link: chunk.getDetailsImdbLink(),
                 )
                 kpRating = try MovieRating(
                     value: chunk.getDetailsKpRating(),
                     votesCount: chunk.getDetailsKpVotes(),
-                    link: chunk.getDetailsKpLink()
+                    link: chunk.getDetailsKpLink(),
                 )
                 waRating = try MovieRating(
                     value: chunk.getDetailsWaRating(),
                     votesCount: chunk.getDetailsWaVotes(),
-                    link: chunk.getDetailsWaLink()
+                    link: chunk.getDetailsWaLink(),
                 )
             case "Дата выхода":
                 releaseDate = try chunk.last().orThrow().text()
@@ -138,7 +138,7 @@ class MovieDetailsParser {
             voiceActingRating: voiceActingRating,
             watchAlsoMovies: watchAlsoMovies,
             commentsCount: commentsCount,
-            year: year
+            year: year,
         )
     }
 
@@ -182,7 +182,7 @@ class MovieDetailsParser {
                                 episodeId: episode.attr("data-episode_id"),
                                 name: episode.text().trimmingCharacters(in: .decimalDigits.inverted).isEmpty ? episode.text() : episode.text().trimmingCharacters(in: .decimalDigits.inverted),
                                 isSelected: episode.hasClass("active"),
-                                url: episode.hasAttr("href") ? episode.attr("href").removeMirror() : nil
+                                url: episode.hasAttr("href") ? episode.attr("href").removeMirror() : nil,
                             )
                         }
 
@@ -191,7 +191,7 @@ class MovieDetailsParser {
                         name: season.text().trimmingCharacters(in: .decimalDigits.inverted).isEmpty ? season.text() : season.text().trimmingCharacters(in: .decimalDigits.inverted),
                         episodes: seasonEpisodes,
                         isSelected: season.hasClass("active"),
-                        url: season.hasAttr("href") ? season.attr("href").removeMirror() : nil
+                        url: season.hasAttr("href") ? season.attr("href").removeMirror() : nil,
                     )
                 }
         }
@@ -284,7 +284,7 @@ private extension Elements {
                 return PersonSimple(
                     personId: link,
                     name: name,
-                    photo: photo == "null" ? "" : photo
+                    photo: photo == "null" ? "" : photo,
                 )
             }
     }
@@ -308,7 +308,7 @@ private extension Elements {
                 return PersonSimple(
                     personId: link,
                     name: name,
-                    photo: photo == "null" ? "" : photo
+                    photo: photo == "null" ? "" : photo,
                 )
             }
     }
@@ -383,7 +383,7 @@ private extension Element {
                             italic: styles.contains(.italic),
                             underline: styles.contains(.underline),
                             strikethrough: styles.contains(.strikethrough),
-                            link: link
+                            link: link,
                         )
                     }
                 }
@@ -417,7 +417,7 @@ private extension Element {
                 isLiked: $0.select(".b-comment__like_it").first()?.hasClass("disabled") == true,
                 selfComment: $0.select(".b-comment__like_it").first()?.hasClass("self-disabled") == true,
                 isAdmin: $0.select(".b-comment").first()?.hasClass("b-comment__admin") == true,
-                deleteHash: $0.select(".actions").first()?.select(".edit li a").first(where: { try $0.text().contains("Удалить") })?.attr("onclick").components(separatedBy: "(").filter { !$0.isEmpty }.last?.components(separatedBy: ")").filter { !$0.isEmpty }.first?.components(separatedBy: ",").filter { !$0.isEmpty }.first(where: { $0.contains("'") })?.trimmingCharacters(in: .alphanumerics.inverted)
+                deleteHash: $0.select(".actions").first()?.select(".edit li a").first(where: { try $0.text().contains("Удалить") })?.attr("onclick").components(separatedBy: "(").filter { !$0.isEmpty }.last?.components(separatedBy: ")").filter { !$0.isEmpty }.first?.components(separatedBy: ",").filter { !$0.isEmpty }.first(where: { $0.contains("'") })?.trimmingCharacters(in: .alphanumerics.inverted),
             )
         }
     }
@@ -467,7 +467,7 @@ private extension Element {
             .map {
                 try MovieCountry(
                     name: $0.text(),
-                    countryId: $0.attr("href").removeMirror()
+                    countryId: $0.attr("href").removeMirror(),
                 )
             }
     }
@@ -477,7 +477,7 @@ private extension Element {
             .map {
                 try MovieGenre(
                     name: $0.text(),
-                    genreId: $0.attr("href").removeMirror()
+                    genreId: $0.attr("href").removeMirror(),
                 )
             }
     }
@@ -492,7 +492,7 @@ private extension Element {
                 return try MovieList(
                     name: listItem.select("a").first().orThrow().text(),
                     listId: listItem.select("a").first().orThrow().attr("href").removeMirror(),
-                    moviePosition: Int(listItem.text().components(separatedBy: "(").filter { !$0.isEmpty }.last?.trimmingCharacters(in: .decimalDigits.inverted) ?? "").orThrow()
+                    moviePosition: Int(listItem.text().components(separatedBy: "(").filter { !$0.isEmpty }.last?.trimmingCharacters(in: .decimalDigits.inverted) ?? "").orThrow(),
                 )
             }
     }
@@ -503,7 +503,7 @@ private extension Element {
                 collectionId: $0.attr("href").removeMirror().replacingOccurrences(of: "collections/", with: ""),
                 name: $0.text(),
                 poster: nil,
-                count: nil
+                count: nil,
             )
         }
     }
@@ -520,7 +520,7 @@ private extension Document {
 
             return try Like(
                 photo: img.attr("src"),
-                name: img.attr("alt")
+                name: img.attr("alt"),
             )
         }
     }
@@ -549,7 +549,7 @@ private extension Document {
                 details: $0.getDetails(),
                 poster: $0.getPoster(),
                 cat: $0.getCat(),
-                info: $0.getInfo()
+                info: $0.getInfo(),
             )
         }
     }
@@ -577,8 +577,7 @@ private extension Document {
                 name: $0.select(".title").text().addFlag($0.select("img").attr("src")),
                 percent: Float($0.select(".count").text()
                     .trimmingCharacters(in: .decimalDigits.inverted)
-                    .replacingOccurrences(of: ",", with: ".")
-                ).orThrow()
+                    .replacingOccurrences(of: ",", with: ".")).orThrow(),
             )
         }
     }
@@ -610,7 +609,7 @@ private extension Document {
                         episodeId: episode.attr("data-episode_id"),
                         name: episode.text().trimmingCharacters(in: .decimalDigits.inverted).isEmpty ? episode.text() : episode.text().trimmingCharacters(in: .decimalDigits.inverted),
                         isSelected: episode.hasClass("active"),
-                        url: episode.hasAttr("href") ? episode.attr("href").removeMirror() : nil
+                        url: episode.hasAttr("href") ? episode.attr("href").removeMirror() : nil,
                     )
                 }
 
@@ -620,8 +619,8 @@ private extension Document {
                     name: id.trimmingCharacters(in: .decimalDigits.inverted),
                     episodes: episodes,
                     isSelected: true,
-                    url: nil
-                )
+                    url: nil,
+                ),
             ]
         } else {
             return try select(".b-simple_season__item").map { season in
@@ -633,7 +632,7 @@ private extension Document {
                             episodeId: episode.attr("data-episode_id"),
                             name: episode.text().trimmingCharacters(in: .decimalDigits.inverted).isEmpty ? episode.text() : episode.text().trimmingCharacters(in: .decimalDigits.inverted),
                             isSelected: episode.hasClass("active"),
-                            url: episode.hasAttr("href") ? episode.attr("href").removeMirror() : nil
+                            url: episode.hasAttr("href") ? episode.attr("href").removeMirror() : nil,
                         )
                     }
 
@@ -642,7 +641,7 @@ private extension Document {
                     name: season.text().trimmingCharacters(in: .decimalDigits.inverted).isEmpty ? season.text() : season.text().trimmingCharacters(in: .decimalDigits.inverted),
                     episodes: episodes,
                     isSelected: season.hasClass("active"),
-                    url: season.hasAttr("href") ? season.attr("href").removeMirror() : nil
+                    url: season.hasAttr("href") ? season.attr("href").removeMirror() : nil,
                 )
             }
         }
@@ -664,7 +663,7 @@ private extension Document {
                         isDirector: $0.attr("data-director"),
                         isPremium: $0.hasClass("b-prem_translator"),
                         isSelected: $0.hasClass("active"),
-                        url: $0.hasAttr("href") ? $0.attr("href").removeMirror() : nil
+                        url: $0.hasAttr("href") ? $0.attr("href").removeMirror() : nil,
                     )
                 }
         } else {
@@ -688,8 +687,8 @@ private extension Document {
                         isDirector: "",
                         isPremium: false,
                         isSelected: true,
-                        url: nil
-                    )
+                        url: nil,
+                    ),
                 ]
             }
 
@@ -717,7 +716,7 @@ private extension Document {
                         title: title,
                         russianEpisodeName: russianEpisodeName,
                         originalEpisodeName: originalEpisodeName,
-                        releaseDate: releaseDate
+                        releaseDate: releaseDate,
                     )
                 }
                 .filter { !$0.title.isEmpty }
@@ -746,7 +745,7 @@ private extension Document {
                     year: year,
                     rating: rating,
                     current: current,
-                    position: position
+                    position: position,
                 )
             }
             .filter { !$0.name.isEmpty }
@@ -826,7 +825,7 @@ private extension String {
                     return MovieSubtitles(
                         name: name,
                         link: link,
-                        lang: lang
+                        lang: lang,
                     )
                 } else {
                     return nil
@@ -840,7 +839,7 @@ private extension String {
             videoMap: videoMap,
             subtitles: subtitles,
             needPremium: (jsonObject["premium_content"] as? Int ?? 0) == 1,
-            thumbnails: jsonObject["thumbnails"] as? String
+            thumbnails: jsonObject["thumbnails"] as? String,
         )
     }
 

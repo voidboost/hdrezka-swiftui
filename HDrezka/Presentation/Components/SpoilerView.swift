@@ -29,7 +29,7 @@ final class EmitterView: NSView {
         emitterCell.alphaRange = 1
 
         emitterLayer.emitterCells = [emitterCell]
-        emitterLayer.seed = UInt32.random(in: UInt32.min...UInt32.max)
+        emitterLayer.seed = UInt32.random(in: UInt32.min ... UInt32.max)
 
         emitterLayer.beginTime = CACurrentMediaTime()
 
@@ -39,7 +39,7 @@ final class EmitterView: NSView {
 
     override func layout() {
         super.layout()
-        guard let emitterLayer = emitterLayer else { return }
+        guard let emitterLayer else { return }
         emitterLayer.emitterPosition = CGPoint(x: bounds.midX, y: bounds.midY)
         emitterLayer.emitterSize = bounds.size
 
@@ -52,16 +52,16 @@ final class EmitterView: NSView {
     }
 
     func setBirthRate(_ rate: Float) {
-        emitterLayer?.emitterCells?.forEach { $0.birthRate = min(100000, rate) }
+        emitterLayer?.emitterCells?.forEach { $0.birthRate = min(100_000, rate) }
     }
 }
 
 struct SpoilerView: NSViewRepresentable {
-    func makeNSView(context: Context) -> EmitterView {
+    func makeNSView(context _: Context) -> EmitterView {
         EmitterView()
     }
 
-    func updateNSView(_ nsView: EmitterView, context: Context) {
+    func updateNSView(_ nsView: EmitterView, context _: Context) {
         nsView.setBirthRate(Float(nsView.bounds.width * nsView.bounds.height * 0.2))
     }
 }

@@ -29,9 +29,9 @@ struct SettingsView: View {
 
     init(updater: SPUUpdater) {
         self.updater = updater
-        self.automaticallyChecksForUpdates = updater.automaticallyChecksForUpdates
-        self.automaticallyDownloadsUpdates = updater.automaticallyDownloadsUpdates
-        self.updateCheckInterval = updater.updateCheckInterval
+        automaticallyChecksForUpdates = updater.automaticallyChecksForUpdates
+        automaticallyDownloadsUpdates = updater.automaticallyDownloadsUpdates
+        updateCheckInterval = updater.updateCheckInterval
     }
 
     var body: some View {
@@ -57,7 +57,8 @@ struct SettingsView: View {
                                         mirrorValid = if let mirror,
                                                          !mirror.isFileURL,
                                                          let host = mirror.host(),
-                                                         host != currentMirror.host() {
+                                                         host != currentMirror.host()
+                                        {
                                             true
                                         } else {
                                             false
@@ -389,8 +390,8 @@ struct SettingsView: View {
 enum UpdateInterval: Double, CaseIterable, Identifiable {
     case hourly = 3600
     case daily = 86400
-    case weekly = 604800
-    case monthly = 2629800
+    case weekly = 604_800
+    case monthly = 2_629_800
 
     var id: Self { self }
 
