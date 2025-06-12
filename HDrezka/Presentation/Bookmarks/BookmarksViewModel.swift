@@ -46,7 +46,7 @@ class BookmarksViewModel: ObservableObject {
                 guard case let .failure(error) = completion else { return }
 
                 withAnimation(.easeInOut) {
-                    self.bookmarksState = .error(error as NSError)
+                    self.bookmarksState = .error(error)
                 }
             } receiveValue: { result in
                 withAnimation(.easeInOut) {
@@ -66,9 +66,9 @@ class BookmarksViewModel: ObservableObject {
 
                 withAnimation(.easeInOut) {
                     if isInitial {
-                        self.bookmarkState = .error(error as NSError)
+                        self.bookmarkState = .error(error)
                     } else {
-                        self.paginationState = .error(error as NSError)
+                        self.paginationState = .error(error)
                     }
                 }
             } receiveValue: { result in
@@ -82,7 +82,7 @@ class BookmarksViewModel: ObservableObject {
                             self.bookmarkState.append(result)
                             self.paginationState = .idle
                         } else {
-                            self.paginationState = .error(HDrezkaError.unknown as NSError)
+                            self.paginationState = .error(HDrezkaError.unknown)
                         }
                     }
                 }

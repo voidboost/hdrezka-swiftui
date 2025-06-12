@@ -109,9 +109,9 @@ class ListViewModel: ObservableObject {
 
                     withAnimation(.easeInOut) {
                         if isInitial {
-                            self.state = .error(error as NSError)
+                            self.state = .error(error)
                         } else {
-                            self.paginationState = .error(error as NSError)
+                            self.paginationState = .error(error)
                         }
                     }
                 } receiveValue: { result in
@@ -142,9 +142,9 @@ class ListViewModel: ObservableObject {
 
                     withAnimation(.easeInOut) {
                         if isInitial {
-                            self.state = .error(error as NSError)
+                            self.state = .error(error)
                         } else {
-                            self.paginationState = .error(error as NSError)
+                            self.paginationState = .error(error)
                         }
                     }
                 } receiveValue: { result in
@@ -168,9 +168,9 @@ class ListViewModel: ObservableObject {
 
                     withAnimation(.easeInOut) {
                         if isInitial {
-                            self.state = .error(error as NSError)
+                            self.state = .error(error)
                         } else {
-                            self.paginationState = .error(error as NSError)
+                            self.paginationState = .error(error)
                         }
                     }
                 } receiveValue: { result in
@@ -194,9 +194,9 @@ class ListViewModel: ObservableObject {
 
                     withAnimation(.easeInOut) {
                         if isInitial {
-                            self.state = .error(error as NSError)
+                            self.state = .error(error)
                         } else {
-                            self.paginationState = .error(error as NSError)
+                            self.paginationState = .error(error)
                         }
                     }
                 } receiveValue: { result in
@@ -220,9 +220,9 @@ class ListViewModel: ObservableObject {
 
                     withAnimation(.easeInOut) {
                         if isInitial {
-                            self.state = .error(error as NSError)
+                            self.state = .error(error)
                         } else {
-                            self.paginationState = .error(error as NSError)
+                            self.paginationState = .error(error)
                         }
                     }
                 } receiveValue: { result in
@@ -241,9 +241,9 @@ class ListViewModel: ObservableObject {
         } else {
             withAnimation(.easeInOut) {
                 if isInitial {
-                    self.state = .error(HDrezkaError.unknown as NSError)
+                    self.state = .error(HDrezkaError.unknown)
                 } else {
-                    self.paginationState = .error(HDrezkaError.unknown as NSError)
+                    self.paginationState = .error(HDrezkaError.unknown)
                 }
             }
         }

@@ -3,10 +3,14 @@ import Foundation
 enum DataState<T: Hashable>: Hashable {
     case data(T)
     case loading
-    case error(NSError)
+    case nsError(NSError)
 }
 
 extension DataState {
+    static func error(_ error: Error) -> DataState {
+        .nsError(error as NSError)
+    }
+
     var data: T? {
         guard case let .data(data) = self else { return nil }
 
@@ -14,7 +18,7 @@ extension DataState {
     }
 
     var error: Error? {
-        guard case let .error(error) = self else { return nil }
+        guard case let .nsError(error) = self else { return nil }
 
         return error
     }
@@ -33,12 +37,16 @@ extension DataState where T: RangeReplaceableCollection {
 enum DataPaginationState: Hashable {
     case idle
     case loading
-    case error(NSError)
+    case nsError(NSError)
 }
 
 extension DataPaginationState {
+    static func error(_ error: Error) -> DataPaginationState {
+        .nsError(error as NSError)
+    }
+
     var error: Error? {
-        guard case let .error(error) = self else { return nil }
+        guard case let .nsError(error) = self else { return nil }
 
         return error
     }
@@ -47,5 +55,11 @@ extension DataPaginationState {
 enum EmptyState: Hashable {
     case data
     case loading
-    case error(NSError)
+    case nsError(NSError)
+}
+
+extension EmptyState {
+    static func error(_ error: Error) -> EmptyState {
+        .nsError(error as NSError)
+    }
 }

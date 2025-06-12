@@ -586,7 +586,7 @@ struct SignUpSheetView: View {
                             .buttonStyle(.plain)
                         }
                     }
-                case .error:
+                case .nsError:
                     VStack(alignment: .center, spacing: 25) {
                         VStack(alignment: .center, spacing: 5) {
                             Image(systemName: "person.crop.circle.badge.plus")
@@ -653,7 +653,7 @@ struct SignUpSheetView: View {
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation(.easeInOut) {
-                        state = .error(error as NSError)
+                        state = .error(error)
                     }
                 }
             } receiveValue: { success in
@@ -662,7 +662,7 @@ struct SignUpSheetView: View {
                         dismiss()
                     } else {
                         withAnimation(.easeInOut) {
-                            state = .error(HDrezkaError.unknown as NSError)
+                            state = .error(HDrezkaError.unknown)
                         }
                     }
                 }

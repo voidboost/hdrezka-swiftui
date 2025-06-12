@@ -68,7 +68,7 @@ struct CommentReportSheet: View {
 
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                         withAnimation(.easeInOut) {
-                                            state = .error(error as NSError)
+                                            state = .error(error)
                                         }
                                     }
                                 } receiveValue: { success in
@@ -78,7 +78,7 @@ struct CommentReportSheet: View {
                                         }
                                     } else {
                                         withAnimation(.easeInOut) {
-                                            state = .error(HDrezkaError.unknown as NSError)
+                                            state = .error(HDrezkaError.unknown)
                                         }
                                     }
                                 }
@@ -141,7 +141,7 @@ struct CommentReportSheet: View {
                         .buttonStyle(.plain)
                     }
                 }
-            case .error:
+            case .nsError:
                 VStack(alignment: .center, spacing: 25) {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "exclamationmark.bubble.fill")
