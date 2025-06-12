@@ -5,7 +5,7 @@ import Foundation
 struct Download: Identifiable, Hashable {
     let id: String
     let progress: Progress
-    let cancellable: AnyCancellable
+    private let cancellable: AnyCancellable
 
     init(id: String, request: DownloadRequest) {
         self.id = id
