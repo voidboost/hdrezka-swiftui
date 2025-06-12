@@ -107,7 +107,7 @@ struct SeriesUpdatesSheetView: View {
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation(.easeInOut) {
-                        self.state = .error(error as NSError)
+                        self.state = .error(error)
                     }
                 }
             } receiveValue: { seriesUpdates in

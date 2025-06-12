@@ -41,9 +41,9 @@ class HomeViewModel: ObservableObject {
                 if case let .failure(error) = completion {
                     withAnimation(.easeInOut) {
                         if isInitial {
-                            self.state = .error(error as NSError)
+                            self.state = .error(error)
                         } else {
-                            self.paginationState = .error(error as NSError)
+                            self.paginationState = .error(error)
                         }
                     }
                 }

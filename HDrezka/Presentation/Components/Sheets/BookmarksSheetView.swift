@@ -243,7 +243,7 @@ struct BookmarksSheetView: View {
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation(.easeInOut) {
-                        state = .error(error as NSError)
+                        state = .error(error)
                     }
                 }
             } receiveValue: { bookmarks in

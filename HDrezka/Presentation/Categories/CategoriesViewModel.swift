@@ -18,7 +18,7 @@ class CategoriesViewModel: ObservableObject {
                 guard case let .failure(error) = completion else { return }
 
                 withAnimation(.easeInOut) {
-                    self.state = .error(error as NSError)
+                    self.state = .error(error)
                 }
             } receiveValue: { types in
                 withAnimation(.easeInOut) {

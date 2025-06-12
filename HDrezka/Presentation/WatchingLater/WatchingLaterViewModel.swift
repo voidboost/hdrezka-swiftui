@@ -23,7 +23,7 @@ class WatchingLaterViewModel: ObservableObject {
                 guard case let .failure(error) = completion else { return }
 
                 withAnimation(.easeInOut) {
-                    self.state = .error(error as NSError)
+                    self.state = .error(error)
                 }
             } receiveValue: { result in
                 withAnimation(.easeInOut) {
