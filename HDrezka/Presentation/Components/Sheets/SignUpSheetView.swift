@@ -586,7 +586,7 @@ struct SignUpSheetView: View {
                             .buttonStyle(.plain)
                         }
                     }
-                case .nsError:
+                case .error:
                     VStack(alignment: .center, spacing: 25) {
                         VStack(alignment: .center, spacing: 5) {
                             Image(systemName: "person.crop.circle.badge.plus")
@@ -649,11 +649,11 @@ struct SignUpSheetView: View {
         signUpUseCase(email: email, login: username, password: password1)
             .receive(on: DispatchQueue.main)
             .sink { completion in
-                guard case let .failure(error) = completion else { return }
+                guard case .failure = completion else { return }
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation(.easeInOut) {
-                        state = .error(error)
+                        state = .error
                     }
                 }
             } receiveValue: { success in
@@ -662,7 +662,7 @@ struct SignUpSheetView: View {
                         dismiss()
                     } else {
                         withAnimation(.easeInOut) {
-                            state = .error(HDrezkaError.unknown)
+                            state = .error
                         }
                     }
                 }
