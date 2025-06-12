@@ -8,11 +8,11 @@ public struct Library: Identifiable, Hashable {
     public let version: String
 
     init(sourcePackagesParserLibrary: SourcePackagesParserLibrary) {
-        self.id = .init()
-        self.name = sourcePackagesParserLibrary.name
-        self.url = URL(string: sourcePackagesParserLibrary.url)
-        self.licenseBody = sourcePackagesParserLibrary.licenseBody
-        self.version = sourcePackagesParserLibrary.version
+        id = .init()
+        name = sourcePackagesParserLibrary.name
+        url = URL(string: sourcePackagesParserLibrary.url)
+        licenseBody = sourcePackagesParserLibrary.licenseBody
+        version = sourcePackagesParserLibrary.version
     }
 }
 

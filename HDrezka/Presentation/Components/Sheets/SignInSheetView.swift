@@ -130,7 +130,7 @@ struct SignInSheetView: View {
                                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                                                         focusedField = .password
                                                     }
-                                                }
+                                                },
                                         )
                                 }
                             }

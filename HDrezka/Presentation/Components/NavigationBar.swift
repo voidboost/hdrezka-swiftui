@@ -141,19 +141,19 @@ struct NavbarButtonStyle: ButtonStyle {
 }
 
 extension View {
-    func navigationBar<Navbar: View, Toolbar: View>(
+    func navigationBar(
         title: String,
         showBar: Bool,
-        @ViewBuilder navbar: @escaping () -> Navbar,
-        @ViewBuilder toolbar: @escaping () -> Toolbar
+        @ViewBuilder navbar: @escaping () -> some View,
+        @ViewBuilder toolbar: @escaping () -> some View
     ) -> some View {
         modifier(NavigationBar(title: title, showBar: showBar, navbar: navbar, toolbar: toolbar))
     }
 
-    func navigationBar<Navbar: View>(
+    func navigationBar(
         title: String,
         showBar: Bool,
-        @ViewBuilder navbar: @escaping () -> Navbar
+        @ViewBuilder navbar: @escaping () -> some View
     ) -> some View {
         modifier(NavigationBar(title: title, showBar: showBar, navbar: navbar))
     }

@@ -22,8 +22,8 @@ struct CollectionCardView: View {
                                 .transition(
                                     .asymmetric(
                                         insertion: .wipe(blurRadius: 10),
-                                        removal: .wipe(reversed: true, blurRadius: 10)
-                                    )
+                                        removal: .wipe(reversed: true, blurRadius: 10),
+                                    ),
                                 )
                         } else {
                             Color.gray
@@ -31,8 +31,8 @@ struct CollectionCardView: View {
                                 .transition(
                                     .asymmetric(
                                         insertion: .wipe(blurRadius: 10),
-                                        removal: .wipe(reversed: true, blurRadius: 10)
-                                    )
+                                        removal: .wipe(reversed: true, blurRadius: 10),
+                                    ),
                                 )
                         }
                     }

@@ -19,20 +19,20 @@ class PeopleParser {
 
         try site.getPeopleDetails { name, value in
             switch name {
-                case "Карьера":
-                    career = value
-                case "Дата рождения":
-                    birthDate = value
-                case "Место рождения":
-                    birthPlace = value
-                case "Дата смерти":
-                    deathDate = value
-                case "Место смерти":
-                    deathPlace = value
-                case "Рост":
-                    height = value
-                default:
-                    break
+            case "Карьера":
+                career = value
+            case "Дата рождения":
+                birthDate = value
+            case "Место рождения":
+                birthPlace = value
+            case "Дата смерти":
+                deathDate = value
+            case "Место смерти":
+                deathPlace = value
+            case "Рост":
+                height = value
+            default:
+                break
             }
         }
 
@@ -48,26 +48,26 @@ class PeopleParser {
 
         try site.getPeopleMovies { name, value in
             switch name {
-                case "rezhisser":
-                    directorMovies = try value.getMovies()
-                case "akter":
-                    actorMovies = try value.getMovies()
-                case "prodyuser":
-                    producerMovies = try value.getMovies()
-                case "scenarist":
-                    screenwriterMovies = try value.getMovies()
-                case "operator":
-                    operatorMovies = try value.getMovies()
-                case "montazher":
-                    editorMovies = try value.getMovies()
-                case "hudozhnik":
-                    artistMovies = try value.getMovies()
-                case "aktrisa":
-                    actressMovies = try value.getMovies()
-                case "kompozitor":
-                    composerMovies = try value.getMovies()
-                default:
-                    break
+            case "rezhisser":
+                directorMovies = try value.getMovies()
+            case "akter":
+                actorMovies = try value.getMovies()
+            case "prodyuser":
+                producerMovies = try value.getMovies()
+            case "scenarist":
+                screenwriterMovies = try value.getMovies()
+            case "operator":
+                operatorMovies = try value.getMovies()
+            case "montazher":
+                editorMovies = try value.getMovies()
+            case "hudozhnik":
+                artistMovies = try value.getMovies()
+            case "aktrisa":
+                actressMovies = try value.getMovies()
+            case "kompozitor":
+                composerMovies = try value.getMovies()
+            default:
+                break
             }
         }
 
@@ -90,7 +90,7 @@ class PeopleParser {
             operatorMovies: operatorMovies,
             editorMovies: editorMovies,
             artistMovies: artistMovies,
-            composerMovies: composerMovies
+            composerMovies: composerMovies,
         )
     }
 }
@@ -145,7 +145,7 @@ private extension Elements {
                 details: $0.getDetails(),
                 poster: $0.getPoster(),
                 cat: $0.getCat(),
-                info: $0.getInfo()
+                info: $0.getInfo(),
             )
         }
     }

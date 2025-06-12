@@ -38,7 +38,7 @@ final class SourcePackagesParser {
                 url: dependency.packageRef.location.replacingOccurrences(of: ".git", with: ""),
                 licenseBody: licenseBody,
                 version: dependency.state.checkoutState.version,
-                identity: dependency.packageRef.identity.components(separatedBy: .letters.inverted).filter { !$0.isEmpty }.joined(separator: "_")
+                identity: dependency.packageRef.identity.components(separatedBy: .letters.inverted).filter { !$0.isEmpty }.joined(separator: "_"),
             )
         }
         .sorted { $0.name.lowercased() < $1.name.lowercased() }
@@ -108,7 +108,7 @@ final class SourcePackagesParser {
                 makeComputedProperty(libraries, variableName: "name", keyPath: \.name),
                 makeComputedProperty(libraries, variableName: "url", keyPath: \.url),
                 makeComputedProperty(libraries, variableName: "licenseBody", keyPath: \.licenseBody),
-                makeComputedProperty(libraries, variableName: "version", keyPath: \.version)
+                makeComputedProperty(libraries, variableName: "version", keyPath: \.version),
             ].joined(separator: "\n\n")
         }
 

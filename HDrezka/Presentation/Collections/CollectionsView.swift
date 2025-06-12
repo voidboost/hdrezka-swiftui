@@ -7,7 +7,7 @@ struct CollectionsView: View {
     @StateObject private var viewModel = CollectionsViewModel()
 
     private let columns = [
-        GridItem(.adaptive(minimum: 200, maximum: .infinity), spacing: 18, alignment: .topLeading)
+        GridItem(.adaptive(minimum: 200, maximum: .infinity), spacing: 18, alignment: .topLeading),
     ]
 
     @State private var showBar: Bool = false

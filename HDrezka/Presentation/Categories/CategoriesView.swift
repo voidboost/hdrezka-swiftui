@@ -103,8 +103,8 @@ struct CategoriesView: View {
 
             guard let genre = type.best.genres.first, let year = type.best.years.first else { return nil }
 
-            self.bestGenre = genre
-            self.bestYear = year
+            bestGenre = genre
+            bestYear = year
         }
 
         @EnvironmentObject private var appState: AppState

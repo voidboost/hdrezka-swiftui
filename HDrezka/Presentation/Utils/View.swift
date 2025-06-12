@@ -10,7 +10,7 @@ extension View {
             .aspectRatio(ratio, contentMode: .fit)
     }
 
-    @ViewBuilder func customOnChange<V: Equatable>(of value: V, _ action: @escaping () -> Void) -> some View {
+    @ViewBuilder func customOnChange(of value: some Equatable, _ action: @escaping () -> Void) -> some View {
         if #available(macOS 14, *) {
             onChange(of: value) {
                 action()
@@ -22,8 +22,8 @@ extension View {
         }
     }
 
-    @ViewBuilder func viewModifier<Content: View>(
-        @ViewBuilder body: (_ content: Self) -> Content
+    @ViewBuilder func viewModifier(
+        @ViewBuilder body: (_ content: Self) -> some View
     ) -> some View {
         body(self)
     }

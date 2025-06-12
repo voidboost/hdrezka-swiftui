@@ -20,16 +20,16 @@ struct ImageView: View {
                         .transition(
                             .asymmetric(
                                 insertion: .wipe(blurRadius: 10),
-                                removal: .wipe(reversed: true, blurRadius: 10)
-                            )
+                                removal: .wipe(reversed: true, blurRadius: 10),
+                            ),
                         )
                 } else {
                     ProgressView()
                         .transition(
                             .asymmetric(
                                 insertion: .wipe(blurRadius: 10),
-                                removal: .wipe(reversed: true, blurRadius: 10)
-                            )
+                                removal: .wipe(reversed: true, blurRadius: 10),
+                            ),
                         )
                 }
             }
@@ -104,9 +104,7 @@ struct ImageView: View {
                             TapGesture(count: 1)
                                 .onEnded {
                                     dismiss()
-                                }
-                        )
-                )
+                                })),
         )
     }
 }

@@ -10,7 +10,7 @@ struct WatchingLaterView: View {
     @StateObject private var viewModel = WatchingLaterViewModel()
 
     private let columns = [
-        GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading)
+        GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading),
     ]
 
     @State private var showBar: Bool = false

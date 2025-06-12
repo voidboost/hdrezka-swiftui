@@ -20,7 +20,7 @@ class Const {
 
     static let premiumGradient = LinearGradient(colors: [
         .init(red: 222.0 / 255.0, green: 21.0 / 255.0, blue: 226.0 / 255.0),
-        .init(red: 138.0 / 255.0, green: 0.0, blue: 173.0 / 255.0)
+        .init(red: 138.0 / 255.0, green: 0.0, blue: 173.0 / 255.0),
     ], startPoint: .leading, endPoint: .trailing)
 
     static var userAgent: String {
@@ -53,8 +53,8 @@ class Const {
             Defaults[.useHeaders] ? [
                 .init(name: "X-Hdrezka-Android-App", value: "1"),
                 .init(name: "X-Hdrezka-Android-App-Version", value: Defaults[.lastHdrezkaAppVersion]),
-                .userAgent(userAgent)
-            ] : [.userAgent(userAgent)]
+                .userAgent(userAgent),
+            ] : [.userAgent(userAgent)],
         )
     }
 }

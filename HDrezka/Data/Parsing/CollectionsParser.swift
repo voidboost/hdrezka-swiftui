@@ -11,7 +11,7 @@ class CollectionsParser {
                     collectionId: collection.getCollectionId(),
                     name: collection.getCollectionName(),
                     poster: collection.getCollectionPoster(),
-                    count: collection.getCollectionCountOfMovies()
+                    count: collection.getCollectionCountOfMovies(),
                 )
             }
     }
@@ -27,7 +27,7 @@ class CollectionsParser {
                     details: movie.getDetails(),
                     poster: movie.getPoster(),
                     cat: movie.getCat(),
-                    info: movie.getInfo()
+                    info: movie.getInfo(),
                 )
             }
     }

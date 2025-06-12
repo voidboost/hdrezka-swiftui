@@ -41,7 +41,7 @@ class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
         replaceCurrentItem(with: playerItem)
     }
 
-    func resourceLoader(_ resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
+    func resourceLoader(_: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
         guard let scheme = loadingRequest.request.url?.scheme else {
             return false
         }
@@ -71,8 +71,8 @@ class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
                     return
                 }
 
-                self.processPlaylist(string)
-                self.finishRequestWithMainPlaylist(request)
+                processPlaylist(string)
+                finishRequestWithMainPlaylist(request)
             }
 
         request.resume()

@@ -22,7 +22,7 @@ struct RenameBookmarkSheetView: View {
 
     init(bookmark: Bookmark) {
         self.bookmark = bookmark
-        self.name = bookmark.name
+        name = bookmark.name
     }
 
     var body: some View {

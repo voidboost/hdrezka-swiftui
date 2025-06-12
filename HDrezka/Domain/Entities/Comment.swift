@@ -88,8 +88,8 @@ struct Comment: Identifiable, Hashable {
                         x: abs(max(textRect.origin.x, usedRect.origin.x)),
                         y: abs(max(textRect.origin.y, usedRect.origin.y)),
                         width: abs(min(textRect.size.width, usedRect.size.width) - (textRect.size.width > usedRect.size.width ? abs(textRect.origin.x - usedRect.origin.x) : 0)),
-                        height: abs(min(textRect.size.height, usedRect.size.height) - (textRect.size.height > usedRect.size.height ? abs(textRect.origin.y - usedRect.origin.y) : 0))
-                    )
+                        height: abs(min(textRect.size.height, usedRect.size.height) - (textRect.size.height > usedRect.size.height ? abs(textRect.origin.y - usedRect.origin.y) : 0)),
+                    ),
                 )
             }
 
@@ -104,7 +104,7 @@ struct Comment: Identifiable, Hashable {
                     }
                     .filter { rect in
                         rect.width > 0 && rect.height > 0
-                    }
+                    },
             )
         }
     }

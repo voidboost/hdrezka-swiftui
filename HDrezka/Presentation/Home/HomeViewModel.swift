@@ -65,13 +65,13 @@ class HomeViewModel: ObservableObject {
 
     private func getPublisher(category: Categories) -> AnyPublisher<[MovieSimple], Error> {
         switch category {
-            case .hot: getHotMoviesUseCase(genre: 0)
+        case .hot: getHotMoviesUseCase(genre: 0)
 //            case .featured: getFeaturedMoviesUseCase(page: 1, genre: 0)
-            case .watchingNow: getWatchingNowMoviesUseCase(page: 1, genre: 0)
-            case .latest: getLatestMoviesUseCase(page: 1, genre: 0)
-            case .newest: getLatestNewestMoviesUseCase(page: 1, genre: 0)
-            case .popular: getPopularMoviesUseCase(page: 1, genre: 0)
-            case .soon: getSoonMoviesUseCase(page: 1, genre: 0)
+        case .watchingNow: getWatchingNowMoviesUseCase(page: 1, genre: 0)
+        case .latest: getLatestMoviesUseCase(page: 1, genre: 0)
+        case .newest: getLatestNewestMoviesUseCase(page: 1, genre: 0)
+        case .popular: getPopularMoviesUseCase(page: 1, genre: 0)
+        case .soon: getSoonMoviesUseCase(page: 1, genre: 0)
         }
     }
 

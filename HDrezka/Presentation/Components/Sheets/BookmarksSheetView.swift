@@ -11,7 +11,7 @@ struct BookmarksSheetView: View {
 
     init(id: String, isCreateBookmarkPresented: Binding<Bool>) {
         self.id = id
-        self._isCreateBookmarkPresented = isCreateBookmarkPresented
+        _isCreateBookmarkPresented = isCreateBookmarkPresented
     }
 
     @Injected(\.addToBookmarksUseCase) private var addToBookmarksUseCase
@@ -92,7 +92,7 @@ struct BookmarksSheetView: View {
                                                             guard case let .failure(error) = completion else { return }
 
                                                             self.error = error
-                                                            self.isErrorPresented = true
+                                                            isErrorPresented = true
                                                         } receiveValue: { success in
                                                             if success {
                                                                 bookmarks[index] -= 1
@@ -110,7 +110,7 @@ struct BookmarksSheetView: View {
                                                             guard case let .failure(error) = completion else { return }
 
                                                             self.error = error
-                                                            self.isErrorPresented = true
+                                                            isErrorPresented = true
                                                         } receiveValue: { success in
                                                             if success {
                                                                 bookmarks[index] += 1
@@ -154,7 +154,7 @@ struct BookmarksSheetView: View {
                                                 Text(verbatim: bookmarks[index].firstState != true ? "+1" : "-1")
                                                 Text(verbatim: bookmarks[index].firstState != true ? "-1" : "+1")
                                             },
-                                            value: bookmark.count
+                                            value: bookmark.count,
                                         )
                                         .disabled(id.id == nil)
                                     }
@@ -165,7 +165,7 @@ struct BookmarksSheetView: View {
                                 geometry.size
                             } action: { size in
                                 withAnimation(.easeInOut) {
-                                    self.scrollViewContentSize = size
+                                    scrollViewContentSize = size
                                 }
                             }
                         }
@@ -248,7 +248,7 @@ struct BookmarksSheetView: View {
                 }
             } receiveValue: { bookmarks in
                 withAnimation(.easeInOut) {
-                    self.state = .data(bookmarks)
+                    state = .data(bookmarks)
                 }
             }
             .store(in: &subscriptions)

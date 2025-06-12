@@ -72,7 +72,7 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     }
 
     func getMovieList(listId: String, page: Int) -> AnyPublisher<(String, [MovieSimple]), Error> {
-        let list = listId.components(separatedBy: "/").filter({ !$0.isEmpty })
+        let list = listId.components(separatedBy: "/").filter { !$0.isEmpty }
 
         guard list.count > 1 else {
             return Fail(error: HDrezkaError.null(#function, #line, #column))
@@ -95,7 +95,7 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     }
 
     func getPopularMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let parts = countryId.components(separatedBy: "/").filter({ !$0.isEmpty })
+        let parts = countryId.components(separatedBy: "/").filter { !$0.isEmpty }
 
         guard parts.count == 2 else {
             return Fail(error: HDrezkaError.null(#function, #line, #column))
@@ -117,7 +117,7 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     }
 
     func getLatestMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let parts = countryId.components(separatedBy: "/").filter({ !$0.isEmpty })
+        let parts = countryId.components(separatedBy: "/").filter { !$0.isEmpty }
 
         guard parts.count == 2 else {
             return Fail(error: HDrezkaError.null(#function, #line, #column))
@@ -139,7 +139,7 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     }
 
     func getSoonMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let parts = countryId.components(separatedBy: "/").filter({ !$0.isEmpty })
+        let parts = countryId.components(separatedBy: "/").filter { !$0.isEmpty }
 
         guard parts.count == 2 else {
             return Fail(error: HDrezkaError.null(#function, #line, #column))
@@ -161,7 +161,7 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     }
 
     func getWatchingNowMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let parts = countryId.components(separatedBy: "/").filter({ !$0.isEmpty })
+        let parts = countryId.components(separatedBy: "/").filter { !$0.isEmpty }
 
         guard parts.count == 2 else {
             return Fail(error: HDrezkaError.null(#function, #line, #column))
@@ -183,7 +183,7 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     }
 
     func getPopularMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let parts = genreId.components(separatedBy: "/").filter({ !$0.isEmpty })
+        let parts = genreId.components(separatedBy: "/").filter { !$0.isEmpty }
 
         guard !parts.isEmpty else {
             return Fail(error: HDrezkaError.null(#function, #line, #column))
@@ -205,7 +205,7 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     }
 
     func getLatestMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let parts = genreId.components(separatedBy: "/").filter({ !$0.isEmpty })
+        let parts = genreId.components(separatedBy: "/").filter { !$0.isEmpty }
 
         guard !parts.isEmpty else {
             return Fail(error: HDrezkaError.null(#function, #line, #column))
@@ -227,7 +227,7 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     }
 
     func getSoonMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let parts = genreId.components(separatedBy: "/").filter({ !$0.isEmpty })
+        let parts = genreId.components(separatedBy: "/").filter { !$0.isEmpty }
 
         guard !parts.isEmpty else {
             return Fail(error: HDrezkaError.null(#function, #line, #column))
@@ -249,7 +249,7 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     }
 
     func getWatchingNowMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let parts = genreId.components(separatedBy: "/").filter({ !$0.isEmpty })
+        let parts = genreId.components(separatedBy: "/").filter { !$0.isEmpty }
 
         guard !parts.isEmpty else {
             return Fail(error: HDrezkaError.null(#function, #line, #column))

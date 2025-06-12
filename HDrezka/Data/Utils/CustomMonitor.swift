@@ -4,7 +4,7 @@ import FirebaseCrashlytics
 import Foundation
 
 final class CustomMonitor: EventMonitor {
-    func request<Value>(_: DataRequest, didParseResponse response: DataResponse<Value, AFError>) {
+    func request(_: DataRequest, didParseResponse response: DataResponse<some Any, AFError>) {
         #if DEBUG
             print(response.customDebugDescription)
         #else
@@ -103,7 +103,8 @@ private enum DebugDescription {
 
     static func description(for data: Data?,
                             headers: HTTPHeaders,
-                            allowingPrintableTypes printableTypes: [String] = ["json", "xml", "text", "x-www-form-urlencoded"]) -> String {
+                            allowingPrintableTypes printableTypes: [String] = ["json", "xml", "text", "x-www-form-urlencoded"]) -> String
+    {
         guard let data, !data.isEmpty else { return "[Body]: None" }
 
         var maximumLength: Int {

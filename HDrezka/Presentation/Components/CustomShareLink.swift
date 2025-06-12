@@ -5,11 +5,11 @@ struct CustomSharingsPicker: NSViewRepresentable {
     private let sharingItems: [Any]
 
     init(isPresented: Binding<Bool>, sharingItems: [Any]) {
-        self._isPresented = isPresented
+        _isPresented = isPresented
         self.sharingItems = sharingItems
     }
 
-    func makeNSView(context: Context) -> NSView {
+    func makeNSView(context _: Context) -> NSView {
         let view = NSView()
         return view
     }
@@ -36,7 +36,7 @@ struct CustomSharingsPicker: NSViewRepresentable {
             self.owner = owner
         }
 
-        func sharingServicePicker(_ sharingServicePicker: NSSharingServicePicker, sharingServicesForItems items: [Any], proposedSharingServices proposedServices: [NSSharingService]) -> [NSSharingService] {
+        func sharingServicePicker(_: NSSharingServicePicker, sharingServicesForItems items: [Any], proposedSharingServices proposedServices: [NSSharingService]) -> [NSSharingService] {
             let urls = items.compactMap { $0 as? URL }
 
             guard !urls.isEmpty else { return proposedServices }
@@ -64,7 +64,7 @@ struct CustomSharingsPicker: NSViewRepresentable {
             return share
         }
 
-        func sharingServicePicker(_ sharingServicePicker: NSSharingServicePicker, didChoose service: NSSharingService?) {
+        func sharingServicePicker(_ sharingServicePicker: NSSharingServicePicker, didChoose _: NSSharingService?) {
             sharingServicePicker.delegate = nil
             owner.isPresented = false
         }
@@ -84,7 +84,7 @@ struct CustomShareLink<Label>: View where Label: View {
 
     var body: some View {
         Button {
-            self.showPicker = true
+            showPicker = true
         } label: {
             label()
         }

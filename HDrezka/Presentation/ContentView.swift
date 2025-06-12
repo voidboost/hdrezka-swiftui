@@ -209,9 +209,9 @@ struct ContentView: View {
                                     .conditionalEffect(
                                         .repeat(
                                             .glow(color: .init(red: 138.0 / 255.0, green: 0.0, blue: 173.0 / 255.0), radius: 10),
-                                            every: 5
+                                            every: 5,
                                         ),
-                                        condition: isUserPremium <= 3
+                                        condition: isUserPremium <= 3,
                                     )
                                 }
                                 .buttonStyle(.plain)
@@ -371,7 +371,7 @@ struct SidebarButtonStyle: ButtonStyle {
         .animation(.easeInOut(duration: 0.15), value: isHovered)
         .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
         .onHover { over in
-            self.isHovered = over
+            isHovered = over
         }
     }
 }
@@ -404,7 +404,7 @@ enum Destinations: Hashable {
     case person(PersonSimple)
     case comments(MovieDetailed)
 
-    static func fromNamed<T: Named>(_ item: T) -> Destinations {
+    static func fromNamed(_ item: some Named) -> Destinations {
         if let country = item as? MovieCountry {
             return .country(country)
         } else if let genre = item as? MovieGenre {
@@ -422,7 +422,7 @@ enum Destinations: Hashable {
 }
 
 struct BlurredView: NSViewRepresentable {
-    func makeNSView(context: Context) -> some NSVisualEffectView {
+    func makeNSView(context _: Context) -> some NSVisualEffectView {
         let view = NSVisualEffectView()
         view.material = .sidebar
         view.blendingMode = .behindWindow
@@ -430,5 +430,5 @@ struct BlurredView: NSViewRepresentable {
         return view
     }
 
-    func updateNSView(_ nsView: NSViewType, context: Context) {}
+    func updateNSView(_: NSViewType, context _: Context) {}
 }

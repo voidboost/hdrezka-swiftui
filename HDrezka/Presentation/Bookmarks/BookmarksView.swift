@@ -9,7 +9,7 @@ struct BookmarksView: View {
     @StateObject private var viewModel = BookmarksViewModel()
 
     private let columns = [
-        GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading)
+        GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading),
     ]
 
     @Default(.isLoggedIn) private var isLoggedIn
@@ -79,7 +79,7 @@ struct BookmarksView: View {
                                     .lineLimit(1)
                                     .badge(
                                         Text(bookmark.count.description)
-                                            .monospacedDigit()
+                                            .monospacedDigit(),
                                     )
                                     .viewModifier { view in
                                         if #available(macOS 14, *) {

@@ -12,8 +12,8 @@ struct DetailsView: View {
     @StateObject private var viewModel: DetailsViewModel
 
     init(movie: MovieSimple) {
-        self.title = movie.name
-        self._viewModel = StateObject(wrappedValue: DetailsViewModel(id: movie.movieId))
+        title = movie.name
+        _viewModel = StateObject(wrappedValue: DetailsViewModel(id: movie.movieId))
     }
 
     @State private var isBookmarksPresented = false
@@ -99,7 +99,7 @@ struct DetailsView: View {
 
                 CustomShareLink(items: [
                     (mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: viewModel.id, directoryHint: .notDirectory),
-                    Const.details.appending(queryItems: [.init(name: "id", value: viewModel.id)])
+                    Const.details.appending(queryItems: [.init(name: "id", value: viewModel.id)]),
                 ]) {
                     Image(systemName: "square.and.arrow.up")
                 }
@@ -151,7 +151,7 @@ struct DetailsView: View {
         init(details: MovieDetailed, trailer: YouTubePlayer?, isSchedulePresented: Binding<Bool>) {
             self.details = details
             self.trailer = trailer
-            self._isSchedulePresented = isSchedulePresented
+            _isSchedulePresented = isSchedulePresented
         }
 
         @State private var isPlayPresented: Bool = false
@@ -180,8 +180,8 @@ struct DetailsView: View {
                                         .transition(
                                             .asymmetric(
                                                 insertion: .wipe(blurRadius: 10),
-                                                removal: .wipe(reversed: true, blurRadius: 10)
-                                            )
+                                                removal: .wipe(reversed: true, blurRadius: 10),
+                                            ),
                                         )
                                 } else {
                                     LazyImage(url: URL(string: details.poster), transaction: .init(animation: .easeInOut)) { state in
@@ -190,8 +190,8 @@ struct DetailsView: View {
                                                 .transition(
                                                     .asymmetric(
                                                         insertion: .wipe(blurRadius: 10),
-                                                        removal: .wipe(reversed: true, blurRadius: 10)
-                                                    )
+                                                        removal: .wipe(reversed: true, blurRadius: 10),
+                                                    ),
                                                 )
                                         } else {
                                             Color.gray
@@ -199,8 +199,8 @@ struct DetailsView: View {
                                                 .transition(
                                                     .asymmetric(
                                                         insertion: .wipe(blurRadius: 10),
-                                                        removal: .wipe(reversed: true, blurRadius: 10)
-                                                    )
+                                                        removal: .wipe(reversed: true, blurRadius: 10),
+                                                    ),
                                                 )
                                         }
                                     }
@@ -208,8 +208,8 @@ struct DetailsView: View {
                                     .transition(
                                         .asymmetric(
                                             insertion: .wipe(blurRadius: 10),
-                                            removal: .wipe(reversed: true, blurRadius: 10)
-                                        )
+                                            removal: .wipe(reversed: true, blurRadius: 10),
+                                        ),
                                     )
                                 }
                             }
@@ -316,7 +316,8 @@ struct DetailsView: View {
                                 ||
                                 details.collections?.isEmpty == false
                                 ||
-                                details.rating != nil {
+                                details.rating != nil
+                            {
                                 VStack(alignment: .leading, spacing: 0) {
                                     if let slogan = details.slogan, !slogan.isEmpty {
                                         InfoRow(String(localized: "key.info.slogan"), slogan)
@@ -407,7 +408,7 @@ struct DetailsView: View {
                 .onGeometryChange(for: CGFloat.self) { geometry in
                     geometry.size.height
                 } action: { height in
-                    self.blurHeght = height
+                    blurHeght = height
                 }
 
                 if details.imdbRating != nil
@@ -418,7 +419,8 @@ struct DetailsView: View {
                     ||
                     details.duration != nil
                     ||
-                    details.ageRestriction != nil {
+                    details.ageRestriction != nil
+                {
                     HStack(alignment: .center) {
                         if let imdbRating = details.imdbRating {
                             let color = if #available(macOS 15, *) {
@@ -427,7 +429,7 @@ struct DetailsView: View {
                                 Color(
                                     NSColor
                                         .red
-                                        .blended(withFraction: CGFloat(imdbRating.value / 10.0), of: NSColor.green) ?? NSColor.labelColor
+                                        .blended(withFraction: CGFloat(imdbRating.value / 10.0), of: NSColor.green) ?? NSColor.labelColor,
                                 )
                             }
 
@@ -441,7 +443,7 @@ struct DetailsView: View {
                                 Color(
                                     NSColor
                                         .red
-                                        .blended(withFraction: CGFloat(kpRating.value / 10.0), of: NSColor.green) ?? NSColor.labelColor
+                                        .blended(withFraction: CGFloat(kpRating.value / 10.0), of: NSColor.green) ?? NSColor.labelColor,
                                 )
                             }
 
@@ -455,7 +457,7 @@ struct DetailsView: View {
                                 Color(
                                     NSColor
                                         .red
-                                        .blended(withFraction: CGFloat(waRating.value / 10.0), of: NSColor.green) ?? NSColor.labelColor
+                                        .blended(withFraction: CGFloat(waRating.value / 10.0), of: NSColor.green) ?? NSColor.labelColor,
                                 )
                             }
 
@@ -521,7 +523,7 @@ struct DetailsView: View {
                         .mask {
                             LinearGradient(stops: [
                                 .init(color: .black.opacity(0.3), location: 0.9),
-                                .init(color: .black, location: 1.0)
+                                .init(color: .black, location: 1.0),
                             ],
                             startPoint: .top,
                             endPoint: .bottom)
@@ -530,7 +532,7 @@ struct DetailsView: View {
                 .task {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                         withAnimation(.easeInOut) {
-                            self.showImage = true
+                            showImage = true
                         }
                     }
                 }
@@ -607,7 +609,7 @@ struct DetailsView: View {
                                                             Color(
                                                                 NSColor
                                                                     .red
-                                                                    .blended(withFraction: CGFloat(rating / 10.0), of: NSColor.green) ?? NSColor.labelColor
+                                                                    .blended(withFraction: CGFloat(rating / 10.0), of: NSColor.green) ?? NSColor.labelColor,
                                                             )
                                                         }
 
@@ -669,7 +671,7 @@ struct DetailsView: View {
                                                         Color(
                                                             NSColor
                                                                 .red
-                                                                .blended(withFraction: CGFloat(rating / 10.0), of: NSColor.green) ?? NSColor.labelColor
+                                                                .blended(withFraction: CGFloat(rating / 10.0), of: NSColor.green) ?? NSColor.labelColor,
                                                         )
                                                     }
 
@@ -901,7 +903,7 @@ struct DetailsView: View {
                                                 } else {
                                                     text.foregroundColor(.secondary)
                                                 }
-                                            }
+                                            },
                                     )
                                     .font(.system(size: 13))
                                     .lineLimit(1)
@@ -985,7 +987,7 @@ struct DetailsView: View {
                                                             } else {
                                                                 text.foregroundColor(.secondary)
                                                             }
-                                                        }
+                                                        },
                                                 )
                                                 .font(.system(size: 13))
                                                 .lineLimit(nil)
@@ -1158,8 +1160,8 @@ struct DetailsView: View {
                                 .transition(
                                     .asymmetric(
                                         insertion: .wipe(blurRadius: 10),
-                                        removal: .wipe(reversed: true, blurRadius: 10)
-                                    )
+                                        removal: .wipe(reversed: true, blurRadius: 10),
+                                    ),
                                 )
                         } else {
                             Color.gray
@@ -1167,8 +1169,8 @@ struct DetailsView: View {
                                 .transition(
                                     .asymmetric(
                                         insertion: .wipe(blurRadius: 10),
-                                        removal: .wipe(reversed: true, blurRadius: 10)
-                                    )
+                                        removal: .wipe(reversed: true, blurRadius: 10),
+                                    ),
                                 )
                         }
                     }

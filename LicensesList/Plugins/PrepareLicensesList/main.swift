@@ -39,21 +39,21 @@ struct PrepareLicensesList: BuildToolPlugin {
             executable: executableURL,
             arguments: [
                 outputURL.absoluteURL.path(),
-                sourcePackagesURL.absoluteURL.path()
+                sourcePackagesURL.absoluteURL.path(),
             ],
             outputFiles: [
-                outputURL
-            ]
+                outputURL,
+            ],
         )
     }
 
-    func createBuildCommands(context: PluginContext, target: Target) async throws -> [Command] {
+    func createBuildCommands(context: PluginContext, target _: Target) async throws -> [Command] {
         try [
             makeBuildCommand(
                 executableURL: context.tool(named: "SourcePackagesParser").url,
                 sourcePackagesURL: sourcePackages(context.pluginWorkDirectoryURL),
-                outputURL: context.pluginWorkDirectoryURL.appending(path: "LicensesList.swift")
-            )
+                outputURL: context.pluginWorkDirectoryURL.appending(path: "LicensesList.swift"),
+            ),
         ]
     }
 }

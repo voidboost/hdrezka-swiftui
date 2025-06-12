@@ -11,8 +11,8 @@ struct CommentsView: View {
     @StateObject private var viewModel: CommentsViewModel
 
     init(details: MovieDetailed) {
-        self.title = details.commentsCount > 0 ? String(localized: "key.comments-\(details.commentsCount.description)") : String(localized: "key.comments")
-        self._viewModel = StateObject(wrappedValue: CommentsViewModel(id: details.movieId, adb: details.adb, type: details.type))
+        title = details.commentsCount > 0 ? String(localized: "key.comments-\(details.commentsCount.description)") : String(localized: "key.comments")
+        _viewModel = StateObject(wrappedValue: CommentsViewModel(id: details.movieId, adb: details.adb, type: details.type))
     }
 
     @State private var showBar: Bool = false
@@ -230,8 +230,8 @@ struct CommentsView: View {
                                     .transition(
                                         .asymmetric(
                                             insertion: .wipe(blurRadius: 10),
-                                            removal: .wipe(reversed: true, blurRadius: 10)
-                                        )
+                                            removal: .wipe(reversed: true, blurRadius: 10),
+                                        ),
                                     )
                             } else {
                                 Color.gray
@@ -239,8 +239,8 @@ struct CommentsView: View {
                                     .transition(
                                         .asymmetric(
                                             insertion: .wipe(blurRadius: 10),
-                                            removal: .wipe(reversed: true, blurRadius: 10)
-                                        )
+                                            removal: .wipe(reversed: true, blurRadius: 10),
+                                        ),
                                     )
                             }
                         }

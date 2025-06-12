@@ -102,13 +102,9 @@ struct WatchSheetView: View {
                                         Spacer()
 
                                         Menu {
-                                            if acting.filter({ $0 != selectedActing }).contains(where: {
-                                                $0.isPremium
-                                            }) {
+                                            if acting.filter({ $0 != selectedActing }).contains(where: \.isPremium) {
                                                 Section {
-                                                    ForEach(acting.filter {
-                                                        $0.isPremium
-                                                    }.filter { $0 != selectedActing }) { acting in
+                                                    ForEach(acting.filter(\.isPremium).filter { $0 != selectedActing }) { acting in
                                                         Button {
                                                             if isUserPremium != nil {
                                                                 withAnimation(.easeInOut) {
@@ -392,7 +388,7 @@ struct WatchSheetView: View {
 
                         openWindow(
                             id: "player",
-                            value: PlayerData(details: details, selectedActing: selectedActing, seasons: seasons, selectedSeason: selectedSeason, selectedEpisode: selectedEpisode, selectedQuality: selectedQuality, movie: movie)
+                            value: PlayerData(details: details, selectedActing: selectedActing, seasons: seasons, selectedSeason: selectedSeason, selectedEpisode: selectedEpisode, selectedQuality: selectedQuality, movie: movie),
                         )
                     }
                 } label: {
@@ -463,7 +459,7 @@ struct WatchSheetView: View {
                     guard case let .failure(error) = completion else { return }
 
                     self.error = error
-                    self.isErrorPresented = true
+                    isErrorPresented = true
                 } receiveValue: { details in
                     withAnimation(.easeInOut) {
                         self.details = details
@@ -476,10 +472,12 @@ struct WatchSheetView: View {
                 withAnimation(.easeInOut) {
                     selectedActing = if !isLoggedIn,
                                         let position = selectPositions.first(where: { $0.id == details.movieId.id }),
-                                        let first = acting.filter({ isUserPremium != nil || !$0.isPremium }).first(where: { $0.translatorId == position.acting }) {
+                                        let first = acting.filter({ isUserPremium != nil || !$0.isPremium }).first(where: { $0.translatorId == position.acting })
+                    {
                         first
                     } else if let series = details.series,
-                              let first = acting.filter({ isUserPremium != nil || !$0.isPremium }).first(where: { $0.translatorId == series.acting }) {
+                              let first = acting.filter({ isUserPremium != nil || !$0.isPremium }).first(where: { $0.translatorId == series.acting })
+                    {
                         first
                     } else if let first = acting.filter({ isUserPremium != nil || !$0.isPremium }).first(where: { $0.isSelected }) {
                         first
@@ -511,17 +509,19 @@ struct WatchSheetView: View {
                                 guard case let .failure(error) = completion else { return }
 
                                 self.error = error
-                                self.isErrorPresented = true
+                                isErrorPresented = true
                             } receiveValue: { seasons in
                                 withAnimation(.easeInOut) {
                                     self.seasons = seasons
 
                                     selectedSeason = if !isLoggedIn,
                                                         let position = selectPositions.first(where: { $0.id == selectedActing.voiceId }),
-                                                        let first = seasons.first(where: { $0.seasonId == position.season }) {
+                                                        let first = seasons.first(where: { $0.seasonId == position.season })
+                                    {
                                         first
                                     } else if let series = details.series,
-                                              let first = seasons.first(where: { $0.seasonId == series.season }) {
+                                              let first = seasons.first(where: { $0.seasonId == series.season })
+                                    {
                                         first
                                     } else if let first = seasons.first(where: { $0.isSelected }) {
                                         first
@@ -534,8 +534,8 @@ struct WatchSheetView: View {
                             }
                             .store(in: &subscriptions)
                     } else {
-                        if !self.isErrorPresented {
-                            self.isErrorPresented = true
+                        if !isErrorPresented {
+                            isErrorPresented = true
                         }
                     }
                 } else {
@@ -545,7 +545,7 @@ struct WatchSheetView: View {
                             guard case let .failure(error) = completion else { return }
 
                             self.error = error
-                            self.isErrorPresented = true
+                            isErrorPresented = true
                         } receiveValue: { movie in
                             if movie.needPremium {
                                 dismiss()
@@ -557,11 +557,13 @@ struct WatchSheetView: View {
 
                                     if defaultQuality != .ask,
                                        defaultQuality != .highest,
-                                       movie.getAvailableQualities().contains(defaultQuality.rawValue) {
-                                        self.selectedQuality = defaultQuality.rawValue
+                                       movie.getAvailableQualities().contains(defaultQuality.rawValue)
+                                    {
+                                        selectedQuality = defaultQuality.rawValue
                                     } else if defaultQuality == .highest,
-                                              let highest = movie.getAvailableQualities().last {
-                                        self.selectedQuality = highest
+                                              let highest = movie.getAvailableQualities().last
+                                    {
+                                        selectedQuality = highest
                                     }
                                 }
                             }
@@ -577,10 +579,12 @@ struct WatchSheetView: View {
 
                 selectedEpisode = if !isLoggedIn,
                                      let position = selectPositions.first(where: { $0.id == selectedActing?.voiceId }),
-                                     let first = selectedSeason?.episodes.first(where: { $0.episodeId == position.episode }) {
+                                     let first = selectedSeason?.episodes.first(where: { $0.episodeId == position.episode })
+                {
                     first
                 } else if let series = details?.series,
-                          let first = selectedSeason?.episodes.first(where: { $0.episodeId == series.episode }) {
+                          let first = selectedSeason?.episodes.first(where: { $0.episodeId == series.episode })
+                {
                     first
                 } else if let first = selectedSeason?.episodes.first(where: { $0.isSelected }) {
                     first
@@ -604,7 +608,7 @@ struct WatchSheetView: View {
                         guard case let .failure(error) = completion else { return }
 
                         self.error = error
-                        self.isErrorPresented = true
+                        isErrorPresented = true
                     } receiveValue: { movie in
                         if movie.needPremium {
                             dismiss()
@@ -616,11 +620,13 @@ struct WatchSheetView: View {
 
                                 if defaultQuality != .ask,
                                    defaultQuality != .highest,
-                                   movie.getAvailableQualities().contains(defaultQuality.rawValue) {
-                                    self.selectedQuality = defaultQuality.rawValue
+                                   movie.getAvailableQualities().contains(defaultQuality.rawValue)
+                                {
+                                    selectedQuality = defaultQuality.rawValue
                                 } else if defaultQuality == .highest,
-                                          let highest = movie.getAvailableQualities().last {
-                                    self.selectedQuality = highest
+                                          let highest = movie.getAvailableQualities().last
+                                {
+                                    selectedQuality = highest
                                 }
                             }
                         }

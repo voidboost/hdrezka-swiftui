@@ -9,13 +9,13 @@ import SwiftUI
 import UserNotifications
 
 class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
-    func applicationDidFinishLaunching(_ notifcation: Notification) {
+    func applicationDidFinishLaunching(_: Notification) {
         UNUserNotificationCenter.current().delegate = self
 
         NSWindow.allowsAutomaticWindowTabbing = false
 
         UserDefaults.standard.register(
-            defaults: ["NSApplicationCrashOnExceptions": true]
+            defaults: ["NSApplicationCrashOnExceptions": true],
         )
 
         FirebaseApp.configure()
@@ -27,13 +27,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         #endif
     }
 
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+    func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
         AppState.shared.path.removeAll()
 
         return Downloader.shared.downloads.isEmpty
     }
 
-    func applicationWillTerminate(_ notification: Notification) {
+    func applicationWillTerminate(_: Notification) {
         if !Downloader.shared.downloads.isEmpty {
             let notificationCenter = UNUserNotificationCenter.current()
 
@@ -47,15 +47,15 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         }
     }
 
-    func application(_ application: NSApplication, willEncodeRestorableState coder: NSCoder) {}
+    func application(_: NSApplication, willEncodeRestorableState _: NSCoder) {}
 
-    func application(_ application: NSApplication, didDecodeRestorableState coder: NSCoder) {}
+    func application(_: NSApplication, didDecodeRestorableState _: NSCoder) {}
 
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    func userNotificationCenter(_: UNUserNotificationCenter, willPresent _: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.list, .banner, .sound, .badge])
     }
 
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+    func userNotificationCenter(_: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
 
         switch response.actionIdentifier {

@@ -80,7 +80,7 @@ struct LicensesView: View {
             let urls: [URL?] = inputText.match(URL.regexPattern)
                 .map { URL(string: String(inputText[$0])) }
             let ranges = attributedText.match(URL.regexPattern)
-            for case (let range, let url?) in zip(ranges, urls) {
+            for case let (range, url?) in zip(ranges, urls) {
                 attributedText[range].link = url
             }
             return attributedText

@@ -56,8 +56,8 @@ extension String {
 
             let abbreviations: [Abbrevation] = [.init(threshold: 0, divisor: 1, suffix: ""),
                                                 .init(threshold: 1000.0, divisor: 1000.0, suffix: "K"),
-                                                .init(threshold: 1000000.0, divisor: 1000000.0, suffix: "M"),
-                                                .init(threshold: 1000000000.0, divisor: 1000000000.0, suffix: "B")]
+                                                .init(threshold: 1_000_000.0, divisor: 1_000_000.0, suffix: "M"),
+                                                .init(threshold: 1_000_000_000.0, divisor: 1_000_000_000.0, suffix: "B")]
 
             let startValue = Double(abs(number))
             var abbreviation: Abbrevation {
@@ -91,7 +91,7 @@ extension String {
     }
 
     func removeMirror(_ scheme: String = "http") -> String {
-        return if hasPrefix(scheme) {
+        if hasPrefix(scheme) {
             components(separatedBy: "/").filter { !$0.isEmpty }.dropFirst(2).joined(separator: "/")
         } else if hasPrefix("/") {
             String(dropFirst())
@@ -101,11 +101,11 @@ extension String {
     }
 
     func isNotEqualAndNotEmpty(_ str: String) -> Bool {
-        return self != str && !isEmpty
+        self != str && !isEmpty
     }
 
     func isEqual(_ str: String) -> Bool {
-        return self == str
+        self == str
     }
 
     func page(_ page: Int) -> String {
@@ -141,7 +141,7 @@ class AttributedTextStyle {
         italic: Bool = false,
         underline: Bool = false,
         strikethrough: Bool = false,
-        link: String? = nil
+        link: String? = nil,
     ) {
         var font = NSFont.systemFont(ofSize: 13)
         let fontManager = NSFontManager.shared

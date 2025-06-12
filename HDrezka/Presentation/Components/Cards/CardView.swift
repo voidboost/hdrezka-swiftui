@@ -26,8 +26,8 @@ struct CardView: View {
                                 .transition(
                                     .asymmetric(
                                         insertion: .wipe(blurRadius: 10),
-                                        removal: .wipe(reversed: true, blurRadius: 10)
-                                    )
+                                        removal: .wipe(reversed: true, blurRadius: 10),
+                                    ),
                                 )
                         } else {
                             Color.gray
@@ -35,8 +35,8 @@ struct CardView: View {
                                 .transition(
                                     .asymmetric(
                                         insertion: .wipe(blurRadius: 10),
-                                        removal: .wipe(reversed: true, blurRadius: 10)
-                                    )
+                                        removal: .wipe(reversed: true, blurRadius: 10),
+                                    ),
                                 )
                         }
                     }
@@ -53,7 +53,7 @@ struct CardView: View {
                                             Text(verbatim: "\(cat.title) (") +
                                                 Text(rating.description).fontWeight(.medium) +
                                                 Text(verbatim: ") ") +
-                                                Text(Image(systemName: cat.icon))
+                                                Text(Image(systemName: cat.icon)),
                                         )
                                         .font(.system(size: 10))
                                         .textModifier { text in
@@ -70,7 +70,7 @@ struct CardView: View {
                                     } else {
                                         (
                                             Text(verbatim: "\(cat.title) ") +
-                                                Text(Image(systemName: cat.icon))
+                                                Text(Image(systemName: cat.icon)),
                                         )
                                         .font(.system(size: 10))
                                         .textModifier { text in
