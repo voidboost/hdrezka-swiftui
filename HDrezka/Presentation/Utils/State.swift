@@ -55,11 +55,5 @@ extension DataPaginationState {
 enum EmptyState: Hashable {
     case data
     case loading
-    case nsError(NSError)
-}
-
-extension EmptyState {
-    static func error(_ error: Error) -> EmptyState {
-        .nsError(error as NSError)
-    }
+    case error
 }

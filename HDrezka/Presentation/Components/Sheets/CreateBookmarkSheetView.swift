@@ -127,7 +127,7 @@ struct CreateBookmarkSheetView: View {
                         .buttonStyle(.plain)
                     }
                 }
-            case .nsError:
+            case .error:
                 VStack(alignment: .center, spacing: 25) {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "bookmark.circle")
@@ -189,11 +189,11 @@ struct CreateBookmarkSheetView: View {
         createBookmarksCategoryUseCase(name: name.trimmingCharacters(in: .whitespacesAndNewlines))
             .receive(on: DispatchQueue.main)
             .sink { completion in
-                guard case let .failure(error) = completion else { return }
+                guard case .failure = completion else { return }
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation(.easeInOut) {
-                        state = .error(error)
+                        state = .error
                     }
                 }
             } receiveValue: { _ in
