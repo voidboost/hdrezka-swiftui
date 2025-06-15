@@ -572,13 +572,11 @@ struct PlayerView: View {
             window.contentView?.focusRingType = .none
             window.isMovableByWindowBackground = true
 
-            guard playerFullscreen,
-                  !window.styleMask.contains(.fullScreen)
-            else {
-                return
+            if playerFullscreen,
+               !window.styleMask.contains(.fullScreen)
+            {
+                window.toggleFullScreen(nil)
             }
-
-            window.toggleFullScreen(nil)
         })
         .preferredColorScheme(.dark)
         .tint(.primary)
