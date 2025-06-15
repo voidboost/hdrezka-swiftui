@@ -8,8 +8,6 @@ class Const {
 
     static let redirectMirror = URL(string: "https://rzk.link/")!
 
-    static let details = URL(string: "hdrezka://details/")!
-
     static let github = URL(string: "https://github.com/voidboost/hdrezka-macos")!
 
     static let helpUkraine = URL(string: "https://u24.gov.ua/")!

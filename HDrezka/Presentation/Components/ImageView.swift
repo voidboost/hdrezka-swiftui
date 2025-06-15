@@ -42,7 +42,7 @@ struct ImageView: View {
                 HStack {
                     Spacer()
 
-                    CustomShareLink(items: [url]) {
+                    ShareLink(item: url) {
                         Image(systemName: "square.and.arrow.up")
                     }
                     .buttonStyle(NavbarButtonStyle(width: 30, height: 22))
@@ -111,9 +111,7 @@ struct ImageView: View {
                             TapGesture(count: 1)
                                 .onEnded {
                                     dismiss()
-                                }
-                        )
-                ),
+                                })),
         )
     }
 }
