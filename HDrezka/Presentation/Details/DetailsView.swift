@@ -1,7 +1,5 @@
 import CoreImage.CIFilterBuiltins
 import Defaults
-import Nuke
-import NukeUI
 import SwiftUI
 import Vision
 import YouTubePlayerKit
@@ -171,21 +169,19 @@ struct DetailsView: View {
                                 openWindow(id: "imageViewer", value: url)
                             }
                         } label: {
-                            LazyImage(url: URL(string: details.hposter), transaction: .init(animation: .easeInOut)) { state in
-                                if let image = state.image {
+                            AsyncImage(url: URL(string: details.hposter), transaction: .init(animation: .easeInOut)) { phase in
+                                if let image = phase.image {
                                     image.resizable()
                                 } else {
-                                    LazyImage(url: URL(string: details.poster), transaction: .init(animation: .easeInOut)) { state in
-                                        if let image = state.image {
+                                    AsyncImage(url: URL(string: details.poster), transaction: .init(animation: .easeInOut)) { phase in
+                                        if let image = phase.image {
                                             image.resizable()
                                         } else {
                                             Color.gray.shimmering()
                                         }
                                     }
-                                    .onDisappear(.cancel)
                                 }
                             }
-                            .onDisappear(.cancel)
                             .imageFill(2 / 3)
                             .frame(width: 300)
                             .clipShape(.rect(cornerRadius: 6))
@@ -454,14 +450,13 @@ struct DetailsView: View {
             .background {
                 ZStack(alignment: .topLeading) {
                     if showImage {
-                        LazyImage(url: URL(string: details.poster), transaction: .init(animation: .easeInOut)) { state in
-                            if let image = state.image {
+                        AsyncImage(url: URL(string: details.poster), transaction: .init(animation: .easeInOut)) { phase in
+                            if let image = phase.image {
                                 image.resizable()
                             } else {
                                 Color.gray
                             }
                         }
-                        .onDisappear(.cancel)
                         .scaledToFill()
                         .frame(maxWidth: .infinity)
                         .frame(height: blurHeght)
@@ -927,15 +922,13 @@ struct DetailsView: View {
                                         } label: {
                                             if let person = item as? PersonSimple, !person.photo.isEmpty {
                                                 HStack(alignment: .center, spacing: 8) {
-                                                    LazyImage(url: URL(string: person.photo), transaction: .init(animation: .easeInOut)) { state in
-                                                        if let image = state.image {
-                                                            image.resizable()
+                                                    AsyncImage(url: URL(string: person.photo), transaction: .init(animation: .easeInOut)) { phase in
+                                                        if let image = phase.image, let nsImage = ImageRenderer(content: image).cgImage?.removeBackground() {
+                                                            Image(nsImage: nsImage).resizable()
                                                         } else {
                                                             Color.gray.shimmering()
                                                         }
                                                     }
-                                                    .processors([.process(id: person.photo) { $0.removeBackground() }])
-                                                    .onDisappear(.cancel)
                                                     .imageFill(2 / 3)
                                                     .frame(width: 36, height: 36)
                                                     .background(.quinary)
@@ -1125,15 +1118,13 @@ struct DetailsView: View {
                     show = $0
                 }
                 .popover(isPresented: $show) {
-                    LazyImage(url: URL(string: person.photo), transaction: .init(animation: .easeInOut)) { state in
-                        if let image = state.image {
-                            image.resizable()
+                    AsyncImage(url: URL(string: person.photo), transaction: .init(animation: .easeInOut)) { phase in
+                        if let image = phase.image, let nsImage = ImageRenderer(content: image).cgImage?.removeBackground() {
+                            Image(nsImage: nsImage).resizable()
                         } else {
                             Color.gray.shimmering()
                         }
                     }
-                    .processors([.process(id: person.photo) { $0.removeBackground() }])
-                    .onDisappear(.cancel)
                     .imageFill(2 / 3)
                     .frame(width: 64, height: 64)
                     .background(.quinary)
@@ -1287,43 +1278,48 @@ struct DetailsView: View {
     }
 }
 
-private extension PlatformImage {
-    func removeBackground() -> PlatformImage? {
-        guard #available(macOS 14, *) else { return self }
-
-        func processImage(image: CGImage) -> PlatformImage? {
-            let inputImage = CIImage(cgImage: image)
-            let handler = VNImageRequestHandler(ciImage: inputImage)
-            let request = VNGenerateForegroundInstanceMaskRequest()
-
-            do { try handler.perform([request]) } catch { return nil }
-
-            guard let result = request.results?.first,
-                  let maskPixelBuffer = try? result.generateScaledMaskForImage(forInstances: result.allInstances, from: handler),
-                  let outputImage = apply(maskImage: CIImage(cvPixelBuffer: maskPixelBuffer), to: inputImage)
-            else {
-                return nil
-            }
-
-            return render(ciImage: outputImage)
+private extension CGImage {
+    func removeBackground() -> NSImage? {
+        guard #available(macOS 14, *),
+              let nsImage = processImage(image: self)
+        else {
+            return NSImage(cgImage: self, size: CGSize(width: width, height: height))
         }
 
-        func apply(maskImage: CIImage, to inputImage: CIImage) -> CIImage? {
-            let filter = CIFilter.blendWithMask()
-            filter.inputImage = inputImage
-            filter.maskImage = maskImage
-            filter.backgroundImage = CIImage.empty()
-            return filter.outputImage
+        return nsImage
+    }
+
+    @available(macOS 14, *)
+    func processImage(image: CGImage) -> NSImage? {
+        let inputImage = CIImage(cgImage: image)
+        let handler = VNImageRequestHandler(ciImage: inputImage)
+        let request = VNGenerateForegroundInstanceMaskRequest()
+
+        do { try handler.perform([request]) } catch { return nil }
+
+        guard let result = request.results?.first,
+              let maskPixelBuffer = try? result.generateScaledMaskForImage(forInstances: result.allInstances, from: handler),
+              let outputImage = inputImage.apply(maskImage: CIImage(cvPixelBuffer: maskPixelBuffer))
+        else {
+            return nil
         }
 
-        func render(ciImage: CIImage) -> PlatformImage? {
-            guard let cgImage = CIContext(options: nil).createCGImage(ciImage, from: ciImage.extent) else { return nil }
+        return outputImage.render()
+    }
+}
 
-            return .init(cgImage: cgImage, size: CGSize(width: cgImage.width, height: cgImage.height))
-        }
+private extension CIImage {
+    func render() -> NSImage? {
+        guard let cgImage = CIContext(options: nil).createCGImage(self, from: extent) else { return nil }
 
-        guard let cgImage = cgImage(forProposedRect: nil, context: nil, hints: nil) else { return self }
+        return NSImage(cgImage: cgImage, size: CGSize(width: cgImage.width, height: cgImage.height))
+    }
 
-        return processImage(image: cgImage) ?? self
+    func apply(maskImage: CIImage) -> CIImage? {
+        let filter = CIFilter.blendWithMask()
+        filter.inputImage = self
+        filter.maskImage = maskImage
+        filter.backgroundImage = CIImage.empty()
+        return filter.outputImage
     }
 }

@@ -1,4 +1,3 @@
-import NukeUI
 import SwiftUI
 
 struct CollectionCardView: View {
@@ -16,14 +15,13 @@ struct CollectionCardView: View {
         } label: {
             VStack {
                 if let poster = collection.poster {
-                    LazyImage(url: URL(string: poster), transaction: .init(animation: .easeInOut)) { state in
-                        if let image = state.image {
+                    AsyncImage(url: URL(string: poster), transaction: .init(animation: .easeInOut)) { phase in
+                        if let image = phase.image {
                             image.resizable()
                         } else {
                             Color.gray.shimmering()
                         }
                     }
-                    .onDisappear(.cancel)
                     .imageFill(5 / 3)
                     .overlay {
                         ZStack(alignment: .center) {

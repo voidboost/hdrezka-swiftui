@@ -1,4 +1,3 @@
-import NukeUI
 import SwiftUI
 
 struct WatchingLaterCardView: View {
@@ -18,14 +17,13 @@ struct WatchingLaterCardView: View {
             appState.path.append(.details(MovieSimple(movieId: movie.watchLaterId, name: movie.name, poster: movie.cover)))
         } label: {
             VStack(alignment: .leading, spacing: 6) {
-                LazyImage(url: URL(string: movie.cover), transaction: .init(animation: .easeInOut)) { state in
-                    if let image = state.image {
+                AsyncImage(url: URL(string: movie.cover), transaction: .init(animation: .easeInOut)) { phase in
+                    if let image = phase.image {
                         image.resizable()
                     } else {
                         Color.gray.shimmering()
                     }
                 }
-                .onDisappear(.cancel)
                 .imageFill(2 / 3)
                 .overlay {
                     VStack(alignment: .leading) {

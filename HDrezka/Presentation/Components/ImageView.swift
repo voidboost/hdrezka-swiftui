@@ -1,4 +1,3 @@
-import NukeUI
 import SwiftUI
 
 struct ImageView: View {
@@ -14,14 +13,13 @@ struct ImageView: View {
 
     var body: some View {
         ZStack(alignment: .center) {
-            LazyImage(url: url, transaction: .init(animation: .easeInOut)) { state in
-                if let image = state.image {
+            AsyncImage(url: url, transaction: .init(animation: .easeInOut)) { phase in
+                if let image = phase.image {
                     image.resizable()
                 } else {
                     ProgressView()
                 }
             }
-            .onDisappear(.cancel)
             .scaledToFit()
 
             VStack {
@@ -67,14 +65,13 @@ struct ImageView: View {
         }
         .background {
             ZStack(alignment: .topLeading) {
-                LazyImage(url: url, transaction: .init(animation: .easeInOut)) { state in
-                    if let image = state.image {
+                AsyncImage(url: url, transaction: .init(animation: .easeInOut)) { phase in
+                    if let image = phase.image {
                         image.resizable()
                     } else {
                         Color.gray
                     }
                 }
-                .onDisappear(.cancel)
                 .scaledToFill()
                 .frame(maxWidth: .infinity)
                 .clipShape(.rect)

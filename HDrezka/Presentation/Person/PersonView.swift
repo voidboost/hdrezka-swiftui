@@ -1,5 +1,4 @@
 import Defaults
-import NukeUI
 import SwiftUI
 
 struct PersonView: View {
@@ -93,21 +92,19 @@ struct PersonView: View {
                         openWindow(id: "imageViewer", value: url)
                     }
                 } label: {
-                    LazyImage(url: URL(string: details.hphoto), transaction: .init(animation: .easeInOut)) { state in
-                        if let image = state.image {
+                    AsyncImage(url: URL(string: details.hphoto), transaction: .init(animation: .easeInOut)) { phase in
+                        if let image = phase.image {
                             image.resizable()
                         } else {
-                            LazyImage(url: URL(string: details.photo), transaction: .init(animation: .easeInOut)) { state in
-                                if let image = state.image {
+                            AsyncImage(url: URL(string: details.photo), transaction: .init(animation: .easeInOut)) { phase in
+                                if let image = phase.image {
                                     image.resizable()
                                 } else {
                                     Color.gray.shimmering()
                                 }
                             }
-                            .onDisappear(.cancel)
                         }
                     }
-                    .onDisappear(.cancel)
                     .imageFill(2 / 3)
                     .frame(width: 250)
                     .clipShape(.rect(cornerRadius: 6))

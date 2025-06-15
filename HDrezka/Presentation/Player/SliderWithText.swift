@@ -1,6 +1,4 @@
 import AVFoundation
-import Nuke
-import NukeUI
 import SwiftUI
 
 struct SliderWithText<T: BinaryFloatingPoint>: View {
@@ -124,15 +122,13 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                     .overlay {
                         if showSeekImage || isActive, let cue = thumbnails?.cues.first(where: { TimeInterval(unitSeekImage) * TimeInterval(inRange.upperBound) > $0.timeStart && TimeInterval(unitSeekImage) * TimeInterval(inRange.upperBound) < $0.timeEnd }), let imageUrl = cue.imageUrl, let frame = cue.frame {
                             ZStack {
-                                LazyImage(url: URL(string: imageUrl), transaction: .init(animation: .easeInOut)) { state in
-                                    if let image = state.image {
-                                        image.resizable()
+                                AsyncImage(url: URL(string: imageUrl), transaction: .init(animation: .easeInOut)) { phase in
+                                    if let image = phase.image, let nsImage = ImageRenderer(content: image).cgImage?.crop(to: frame) {
+                                        Image(nsImage: nsImage).resizable()
                                     } else {
                                         ProgressView().scaleEffect(0.75)
                                     }
                                 }
-                                .processors([.process(id: "\(frame.minX.description)\(frame.minY.description)\(frame.width.description)\(frame.height.description)") { $0.crop(to: .init(x: frame.minX, y: frame.minY, width: frame.width, height: frame.height)) }])
-                                .onDisappear(.cancel)
                                 .scaledToFill()
                                 .frame(width: frame.width, height: frame.height)
                                 .background(.ultraThinMaterial)
@@ -211,14 +207,10 @@ extension BinaryFloatingPoint {
     }
 }
 
-private extension PlatformImage {
-    func crop(to rect: CGRect) -> PlatformImage? {
-        guard let cgImage = cgImage(forProposedRect: nil, context: nil, hints: nil),
-              let cutImageRef = cgImage.cropping(to: rect)
-        else {
-            return nil
-        }
+private extension CGImage {
+    func crop(to rect: CGRect) -> NSImage? {
+        guard let cutImageRef = cropping(to: rect) else { return nil }
 
-        return .init(cgImage: cutImageRef, size: .init(width: CGFloat(cutImageRef.width), height: CGFloat(cutImageRef.height)))
+        return NSImage(cgImage: cutImageRef, size: .init(width: CGFloat(cutImageRef.width), height: CGFloat(cutImageRef.height)))
     }
 }

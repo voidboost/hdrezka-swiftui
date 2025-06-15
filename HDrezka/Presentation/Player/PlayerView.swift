@@ -4,10 +4,10 @@ import CoreData
 import Defaults
 import FactoryKit
 import MediaPlayer
-import Nuke
 import SwiftUI
 
 struct PlayerView: View {
+    @Injected(\.session) private var session
     @Injected(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
     @Injected(\.getMovieThumbnailsUseCase) private var getMovieThumbnailsUseCase
     @Injected(\.getMovieVideoUseCase) private var getMovieVideoUseCase
@@ -1011,11 +1011,20 @@ struct PlayerView: View {
             }
 
             if let url = URL(string: poster) {
-                ImagePipeline.shared.loadImage(with: url) { result in
-                    guard case let .success(response) = result else { return }
+                session.request(url, method: .get, headers: [.userAgent(Const.userAgent)])
+                    .validate(statusCode: 200 ..< 400)
+                    .responseData { response in
+                        guard let data = response.value,
+                              !data.isEmpty,
+                              response.error == nil,
+                              let nsImage = NSImage(data: data)
+                        else {
+                            return
+                        }
 
-                    nowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: response.image.size) { _ in response.image }
-                }
+                        nowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: nsImage.size) { _ in nsImage }
+                    }
+                    .resume()
             }
 
             remoteCommandCenter.playCommand.addTarget { _ in

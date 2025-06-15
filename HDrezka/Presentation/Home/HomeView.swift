@@ -10,6 +10,8 @@ struct HomeView: View {
 
     @Default(.isLoggedIn) private var isLoggedIn
 
+    @EnvironmentObject private var appState: AppState
+
     var body: some View {
         Group {
             if let error = viewModel.state.error {
@@ -45,16 +47,49 @@ struct HomeView: View {
 
                                 LazyVStack(alignment: .leading, spacing: 18) {
                                     ForEach(categories) { category in
-                                        CategorySection(title: category.title, category: category.category, movies: category.movies)
-                                            .task {
-                                                if categories.last == category, viewModel.paginationState == .idle {
-                                                    viewModel.loadMore()
+                                        Section {
+                                            ScrollView(.horizontal) {
+                                                LazyHStack(alignment: .top, spacing: 18) {
+                                                    ForEach(category.movies) { movie in
+                                                        CardView(movie: movie, reservesSpace: true)
+                                                            .frame(width: 150)
+                                                    }
                                                 }
+                                                .padding(.horizontal, 36)
                                             }
+                                            .scrollIndicators(.never)
+                                        } header: {
+                                            HStack(alignment: .center, spacing: 9) {
+                                                Text(category.title).font(.system(size: 22, weight: .semibold))
+
+                                                Spacer()
+
+                                                Button {
+                                                    appState.path.append(.category(category.category))
+                                                } label: {
+                                                    HStack(alignment: .center) {
+                                                        Text("key.see_all")
+                                                            .font(.system(size: 12))
+                                                            .foregroundStyle(Color.accentColor)
+
+                                                        Image(systemName: "chevron.right")
+                                                            .font(.system(size: 12))
+                                                            .foregroundStyle(Color.accentColor)
+                                                    }
+                                                    .highlightOnHover()
+                                                }
+                                                .buttonStyle(.plain)
+                                            }
+                                            .padding(.horizontal, 36)
+                                        }
+                                        .task {
+                                            if categories.last == category, viewModel.paginationState == .idle {
+                                                viewModel.loadMore()
+                                            }
+                                        }
 
                                         if category.category != Categories.allCases.last {
-                                            Divider()
-                                                .padding(.horizontal, 36)
+                                            Divider().padding(.horizontal, 36)
                                         }
                                     }
                                 }
@@ -117,60 +152,6 @@ struct HomeView: View {
         .background(.background)
         .sheet(isPresented: $viewModel.isSeriesUpdatesPresented) {
             SeriesUpdatesSheetView()
-        }
-    }
-
-    private struct CategorySection: View {
-        private let title: String
-
-        private let category: Categories
-
-        private let movies: [MovieSimple]
-
-        @EnvironmentObject private var appState: AppState
-
-        init(title: String, category: Categories, movies: [MovieSimple]) {
-            self.title = title
-            self.category = category
-            self.movies = movies
-        }
-
-        var body: some View {
-            VStack(alignment: .leading, spacing: 18) {
-                HStack(alignment: .center, spacing: 9) {
-                    Text(title).font(.system(size: 22, weight: .semibold))
-
-                    Spacer()
-
-                    Button {
-                        appState.path.append(.category(category))
-                    } label: {
-                        HStack(alignment: .center) {
-                            Text("key.see_all")
-                                .font(.system(size: 12))
-                                .foregroundStyle(Color.accentColor)
-
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 12))
-                                .foregroundStyle(Color.accentColor)
-                        }
-                        .highlightOnHover()
-                    }
-                    .buttonStyle(.plain)
-                }
-                .padding(.horizontal, 36)
-
-                ScrollView(.horizontal) {
-                    LazyHStack(alignment: .top, spacing: 18) {
-                        ForEach(movies) { movie in
-                            CardView(movie: movie, reservesSpace: true)
-                                .frame(width: 150)
-                        }
-                    }
-                    .padding(.horizontal, 36)
-                }
-                .scrollIndicators(.never)
-            }
         }
     }
 }
