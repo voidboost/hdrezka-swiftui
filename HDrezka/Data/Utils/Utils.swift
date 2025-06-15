@@ -121,7 +121,7 @@ extension Optional {
     func orThrow(
         functionName: String = #function,
         lineNumber: Int = #line,
-        columnNumber: Int = #column
+        columnNumber: Int = #column,
     ) throws -> Wrapped {
         guard let self else {
             let error = HDrezkaError.null(functionName, lineNumber, columnNumber)

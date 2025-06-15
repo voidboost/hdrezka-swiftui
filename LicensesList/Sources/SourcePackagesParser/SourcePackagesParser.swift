@@ -86,7 +86,7 @@ final class SourcePackagesParser {
     private func makeComputedProperty(
         _ libraries: [Library],
         variableName: String,
-        keyPath: KeyPath<Library, String>
+        keyPath: KeyPath<Library, String>,
     ) -> String {
         let cases = libraries
             .map { "case .\($0.identity): \($0[keyPath: keyPath].debugDescription)" }
