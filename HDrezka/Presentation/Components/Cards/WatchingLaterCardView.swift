@@ -21,21 +21,8 @@ struct WatchingLaterCardView: View {
                 LazyImage(url: URL(string: movie.cover), transaction: .init(animation: .easeInOut)) { state in
                     if let image = state.image {
                         image.resizable()
-                            .transition(
-                                .asymmetric(
-                                    insertion: .wipe(blurRadius: 10),
-                                    removal: .wipe(reversed: true, blurRadius: 10),
-                                ),
-                            )
                     } else {
-                        Color.gray
-                            .shimmering()
-                            .transition(
-                                .asymmetric(
-                                    insertion: .wipe(blurRadius: 10),
-                                    removal: .wipe(reversed: true, blurRadius: 10),
-                                ),
-                            )
+                        Color.gray.shimmering()
                     }
                 }
                 .onDisappear(.cancel)

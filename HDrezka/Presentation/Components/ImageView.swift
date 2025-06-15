@@ -17,20 +17,8 @@ struct ImageView: View {
             LazyImage(url: url, transaction: .init(animation: .easeInOut)) { state in
                 if let image = state.image {
                     image.resizable()
-                        .transition(
-                            .asymmetric(
-                                insertion: .wipe(blurRadius: 10),
-                                removal: .wipe(reversed: true, blurRadius: 10),
-                            ),
-                        )
                 } else {
                     ProgressView()
-                        .transition(
-                            .asymmetric(
-                                insertion: .wipe(blurRadius: 10),
-                                removal: .wipe(reversed: true, blurRadius: 10),
-                            ),
-                        )
                 }
             }
             .onDisappear(.cancel)

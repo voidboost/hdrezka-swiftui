@@ -127,21 +127,8 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                 LazyImage(url: URL(string: imageUrl), transaction: .init(animation: .easeInOut)) { state in
                                     if let image = state.image {
                                         image.resizable()
-                                            .transition(
-                                                .asymmetric(
-                                                    insertion: .wipe(blurRadius: 10),
-                                                    removal: .wipe(reversed: true, blurRadius: 10),
-                                                ),
-                                            )
                                     } else {
-                                        ProgressView()
-                                            .scaleEffect(0.75)
-                                            .transition(
-                                                .asymmetric(
-                                                    insertion: .wipe(blurRadius: 10),
-                                                    removal: .wipe(reversed: true, blurRadius: 10),
-                                                ),
-                                            )
+                                        ProgressView().scaleEffect(0.75)
                                     }
                                 }
                                 .processors([.process(id: "\(frame.minX.description)\(frame.minY.description)\(frame.width.description)\(frame.height.description)") { $0.crop(to: .init(x: frame.minX, y: frame.minY, width: frame.width, height: frame.height)) }])
