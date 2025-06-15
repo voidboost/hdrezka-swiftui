@@ -97,10 +97,7 @@ struct DetailsView: View {
                         .padding(.vertical, 18)
                 }
 
-                CustomShareLink(items: [
-                    (mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: viewModel.id, directoryHint: .notDirectory),
-                    Const.details.appending(queryItems: [.init(name: "id", value: viewModel.id)]),
-                ]) {
+                ShareLink(item: (mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: viewModel.id, directoryHint: .notDirectory)) {
                     Image(systemName: "square.and.arrow.up")
                 }
                 .buttonStyle(NavbarButtonStyle(width: 30, height: 22))

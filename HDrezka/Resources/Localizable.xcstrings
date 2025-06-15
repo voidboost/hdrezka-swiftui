@@ -815,50 +815,6 @@
         }
       }
     },
-    "key.copy.link" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy link"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Копировать ссылку"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Копіювати посилання"
-          }
-        }
-      }
-    },
-    "key.copy.link.internal" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy internal link"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Копировать внутреннюю ссылку"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Копіювати внутрішнє посилання"
-          }
-        }
-      }
-    },
     "key.create" : {
       "localizations" : {
         "en" : {

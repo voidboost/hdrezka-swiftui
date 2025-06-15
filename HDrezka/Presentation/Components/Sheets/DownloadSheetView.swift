@@ -274,7 +274,7 @@ struct DownloadSheetView: View {
                                 Text("key.quality")
 
                                 if let selectedQuality, let movie, let link = movie.getClosestTo(quality: selectedQuality) {
-                                    CustomShareLink(items: [link]) {
+                                    ShareLink(item: link) {
                                         Image(systemName: "square.and.arrow.up")
                                             .foregroundStyle(.secondary)
                                             .font(.system(size: 11))
@@ -353,7 +353,7 @@ struct DownloadSheetView: View {
                                 Text("key.subtitles")
 
                                 if let selectedSubtitles, let subtitles = movie.subtitles.first(where: { $0 == selectedSubtitles }), let url = URL(string: subtitles.link) {
-                                    CustomShareLink(items: [url]) {
+                                    ShareLink(item: url) {
                                         Image(systemName: "square.and.arrow.up")
                                             .foregroundStyle(.secondary)
                                             .font(.system(size: 11))

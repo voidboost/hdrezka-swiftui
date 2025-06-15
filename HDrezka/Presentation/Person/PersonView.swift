@@ -60,7 +60,7 @@ struct PersonView: View {
             }
         }, toolbar: {
             if case .data = viewModel.state {
-                CustomShareLink(items: [(mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: viewModel.id, directoryHint: .notDirectory)]) {
+                ShareLink(item: (mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: viewModel.id, directoryHint: .notDirectory)) {
                     Image(systemName: "square.and.arrow.up")
                 }
                 .buttonStyle(NavbarButtonStyle(width: 30, height: 22))

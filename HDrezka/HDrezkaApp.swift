@@ -104,19 +104,6 @@ struct HDrezkaApp: App {
                 .background(WindowAccessor { window in
                     appState.window = window
                 })
-                .onOpenURL { url in
-                    guard let scheme = Const.details.scheme,
-                          url.scheme == scheme
-                    else {
-                        return
-                    }
-
-                    if let host = Const.details.host(), url.host() == host, let movieId = URLComponents(url: url, resolvingAgainstBaseURL: true)?.queryItems?.first(where: { $0.name == "id" })?.value, movieId.id != nil {
-                        appState.path.append(.details(.init(movieId: movieId)))
-                    } else if url.absoluteString.removeMirror(scheme).id != nil {
-                        appState.path.append(.details(.init(movieId: url.absoluteString.removeMirror(scheme))))
-                    }
-                }
         }
         .windowResizability(.contentMinSize)
         .defaultPosition(.center)
