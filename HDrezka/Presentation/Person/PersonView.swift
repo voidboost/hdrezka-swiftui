@@ -96,40 +96,15 @@ struct PersonView: View {
                     LazyImage(url: URL(string: details.hphoto), transaction: .init(animation: .easeInOut)) { state in
                         if let image = state.image {
                             image.resizable()
-                                .transition(
-                                    .asymmetric(
-                                        insertion: .wipe(blurRadius: 10),
-                                        removal: .wipe(reversed: true, blurRadius: 10),
-                                    ),
-                                )
                         } else {
                             LazyImage(url: URL(string: details.photo), transaction: .init(animation: .easeInOut)) { state in
                                 if let image = state.image {
                                     image.resizable()
-                                        .transition(
-                                            .asymmetric(
-                                                insertion: .wipe(blurRadius: 10),
-                                                removal: .wipe(reversed: true, blurRadius: 10),
-                                            ),
-                                        )
                                 } else {
-                                    Color.gray
-                                        .shimmering()
-                                        .transition(
-                                            .asymmetric(
-                                                insertion: .wipe(blurRadius: 10),
-                                                removal: .wipe(reversed: true, blurRadius: 10),
-                                            ),
-                                        )
+                                    Color.gray.shimmering()
                                 }
                             }
                             .onDisappear(.cancel)
-                            .transition(
-                                .asymmetric(
-                                    insertion: .wipe(blurRadius: 10),
-                                    removal: .wipe(reversed: true, blurRadius: 10),
-                                ),
-                            )
                         }
                     }
                     .onDisappear(.cancel)
