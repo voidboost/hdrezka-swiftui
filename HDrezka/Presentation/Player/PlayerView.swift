@@ -68,6 +68,7 @@ struct PlayerView: View {
     @State private var delayHide: DispatchWorkItem?
     @State private var subtitlesOptions: [AVMediaSelectionOption] = []
     @State private var thumbnails: WebVTT?
+    @State private var window: NSWindow?
 
     init(data: PlayerData) {
         poster = data.details.poster
@@ -98,19 +99,6 @@ struct PlayerView: View {
                 .padding(.horizontal, 36)
             } else if let player = playerLayer.player {
                 CustomAVPlayerView(playerLayer: playerLayer)
-                    .task {
-                        guard let window = playerLayer.window else { return }
-
-                        window.isMovableByWindowBackground = true
-
-                        guard playerFullscreen,
-                              !window.styleMask.contains(.fullScreen)
-                        else {
-                            return
-                        }
-
-                        window.toggleFullScreen(nil)
-                    }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
 
                 VStack(alignment: .center) {
@@ -142,7 +130,7 @@ struct PlayerView: View {
                                 }
                                 .frame(width: 120, height: 10)
                                 .onHover { hovering in
-                                    guard let window = playerLayer.window else { return }
+                                    guard let window else { return }
 
                                     window.isMovableByWindowBackground = !hovering
                                 }
@@ -439,7 +427,7 @@ struct PlayerView: View {
                             }, inRange: 0 ... duration, buffers: loadedTimeRanges, activeFillColor: .primary, fillColor: .primary.opacity(0.7), emptyColor: .primary.opacity(0.3), height: 6, thumbnails: thumbnails) { _ in }
                                 .frame(height: 23)
                                 .onHover { hovering in
-                                    guard let window = playerLayer.window else { return }
+                                    guard let window else { return }
 
                                     window.isMovableByWindowBackground = !hovering
                                 }
@@ -579,7 +567,18 @@ struct PlayerView: View {
         .focusable()
         .frame(minWidth: 900, minHeight: 900 / 16 * 9)
         .background(WindowAccessor { window in
+            self.window = window
+
             window.contentView?.focusRingType = .none
+            window.isMovableByWindowBackground = true
+
+            guard playerFullscreen,
+                  !window.styleMask.contains(.fullScreen)
+            else {
+                return
+            }
+
+            window.toggleFullScreen(nil)
         })
         .preferredColorScheme(.dark)
         .tint(.primary)
@@ -591,7 +590,7 @@ struct PlayerView: View {
 
             guard let player = playerLayer.player,
                   player.status == .readyToPlay,
-                  let window = playerLayer.window,
+                  let window,
                   window.styleMask.contains(.fullScreen)
             else {
                 return
@@ -645,7 +644,7 @@ struct PlayerView: View {
                         .onEnded {
                             guard let player = playerLayer.player,
                                   player.status == .readyToPlay,
-                                  let window = playerLayer.window,
+                                  let window,
                                   !isPictureInPictureActive || (isPictureInPictureActive && window.styleMask.contains(.fullScreen))
                             else {
                                 return
@@ -973,13 +972,13 @@ struct PlayerView: View {
 
                         updateNextTimer()
 
-                        //                    if let window = playerLayer.window {
-                        //                        if isPictureInPictureActive {
-                        //                            window.miniaturize(nil)
-                        //                        } else {
-                        //                            window.deminiaturize(nil)
-                        //                        }
-                        //                    }
+//                        if let window {
+//                            if isPictureInPictureActive {
+//                                window.miniaturize(nil)
+//                            } else {
+//                                window.deminiaturize(nil)
+//                            }
+//                        }
                     }
                     .store(in: &subscriptions)
 
@@ -1485,21 +1484,5 @@ struct CustomAVPlayerView: NSViewRepresentable {
 
     func updateNSView(_ nsView: NSView, context _: Context) {
         playerLayer.frame = nsView.bounds
-    }
-}
-
-extension AVPlayerLayer {
-    var window: NSWindow? {
-        var layer: CALayer? = self
-
-        while let currentLayer = layer {
-            if let view = currentLayer.delegate as? NSView {
-                return view.window
-            }
-
-            layer = currentLayer.superlayer
-        }
-
-        return nil
     }
 }
