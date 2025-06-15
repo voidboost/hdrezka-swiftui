@@ -1,7 +1,6 @@
 import Algorithms
 import Combine
 import Defaults
-import NukeUI
 import Pow
 import SwiftUI
 
@@ -224,14 +223,13 @@ struct CommentsView: View {
             VStack(alignment: .leading, spacing: 16) {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(alignment: .center, spacing: 8) {
-                        LazyImage(url: URL(string: comment.photo), transaction: .init(animation: .easeInOut)) { state in
-                            if let image = state.image {
+                        AsyncImage(url: URL(string: comment.photo), transaction: .init(animation: .easeInOut)) { phase in
+                            if let image = phase.image {
                                 image.resizable()
                             } else {
                                 Color.gray.shimmering()
                             }
                         }
-                        .onDisappear(.cancel)
                         .scaledToFill()
                         .frame(width: 24, height: 24)
                         .clipShape(.rect(cornerRadius: 12))
@@ -317,14 +315,13 @@ struct CommentsView: View {
                                         HStack(alignment: .center, spacing: 10) {
                                             ForEach(likes) { like in
                                                 VStack(alignment: .center, spacing: 5) {
-                                                    LazyImage(url: URL(string: like.photo), transaction: .init(animation: .easeInOut)) { state in
-                                                        if let image = state.image {
+                                                    AsyncImage(url: URL(string: like.photo), transaction: .init(animation: .easeInOut)) { phase in
+                                                        if let image = phase.image {
                                                             image.resizable()
                                                         } else {
                                                             Color.gray.shimmering()
                                                         }
                                                     }
-                                                    .onDisappear(.cancel)
                                                     .scaledToFill()
                                                     .frame(width: 60, height: 60)
                                                     .clipShape(.rect(cornerRadius: 30))

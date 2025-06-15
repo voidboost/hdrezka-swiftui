@@ -1,4 +1,3 @@
-import NukeUI
 import SwiftUI
 
 struct CardView: View {
@@ -20,14 +19,13 @@ struct CardView: View {
         } label: {
             VStack(alignment: .leading, spacing: 6) {
                 if let poster = movie.poster {
-                    LazyImage(url: URL(string: poster), transaction: .init(animation: .easeInOut)) { state in
-                        if let image = state.image {
+                    AsyncImage(url: URL(string: poster), transaction: .init(animation: .easeInOut)) { phase in
+                        if let image = phase.image {
                             image.resizable()
                         } else {
                             Color.gray.shimmering()
                         }
                     }
-                    .onDisappear(.cancel)
                     .imageFill(2 / 3)
                     .overlay {
                         VStack {
