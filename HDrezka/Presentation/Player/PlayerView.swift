@@ -565,12 +565,22 @@ struct PlayerView: View {
         }
         .ignoresSafeArea()
         .focusable()
+        .viewModifier { view in
+            if #available(macOS 14, *) {
+                view.focusEffectDisabled()
+            } else {
+                view
+            }
+        }
         .frame(minWidth: 900, minHeight: 900 / 16 * 9)
         .background(WindowAccessor { window in
             self.window = window
 
-            window.contentView?.focusRingType = .none
             window.isMovableByWindowBackground = true
+
+            if #unavailable(macOS 14) {
+                window.contentView?.focusRingType = .none
+            }
 
             if playerFullscreen,
                !window.styleMask.contains(.fullScreen)
