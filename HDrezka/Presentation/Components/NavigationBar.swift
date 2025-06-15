@@ -145,7 +145,7 @@ extension View {
         title: String,
         showBar: Bool,
         @ViewBuilder navbar: @escaping () -> some View,
-        @ViewBuilder toolbar: @escaping () -> some View
+        @ViewBuilder toolbar: @escaping () -> some View,
     ) -> some View {
         modifier(NavigationBar(title: title, showBar: showBar, navbar: navbar, toolbar: toolbar))
     }
@@ -153,7 +153,7 @@ extension View {
     func navigationBar(
         title: String,
         showBar: Bool,
-        @ViewBuilder navbar: @escaping () -> some View
+        @ViewBuilder navbar: @escaping () -> some View,
     ) -> some View {
         modifier(NavigationBar(title: title, showBar: showBar, navbar: navbar))
     }
