@@ -51,21 +51,18 @@ struct ImageView: View {
             }
         }
         .navigationTitle("key.imageViewer")
-        .task {
-            guard let window else { return }
-
-            window.isMovableByWindowBackground = true
-
-            if !window.styleMask.contains(.fullScreen) {
-                window.toggleFullScreen(nil)
-            }
-        }
         .ignoresSafeArea()
         .focusable()
         .frame(minWidth: 300 * (16 / 9), maxWidth: .infinity, minHeight: 300, maxHeight: .infinity)
         .background(WindowAccessor { window in
             self.window = window
+
             window.contentView?.focusRingType = .none
+            window.isMovableByWindowBackground = true
+
+            if !window.styleMask.contains(.fullScreen) {
+                window.toggleFullScreen(nil)
+            }
         })
         .onExitCommand {
             dismiss()
