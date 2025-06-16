@@ -2,17 +2,18 @@ import Combine
 import FactoryKit
 import SwiftUI
 
-class CommentsViewModel: ObservableObject {
-    @Injected(\.getCommentsPageUseCase) private var getCommentsPageUseCase
-    @Injected(\.getCommentUseCase) private var getCommentUseCase
-    @Injected(\.toggleLikeCommentUseCase) private var toggleLikeCommentUseCase
-    @Injected(\.deleteCommentUseCase) private var deleteCommentUseCase
-    @Injected(\.sendCommentUseCase) private var sendCommentUseCase
-    @Injected(\.getLikesUseCase) private var getLikesUseCase
+@Observable
+class CommentsViewModel {
+    @ObservationIgnored @Injected(\.getCommentsPageUseCase) private var getCommentsPageUseCase
+    @ObservationIgnored @Injected(\.getCommentUseCase) private var getCommentUseCase
+    @ObservationIgnored @Injected(\.toggleLikeCommentUseCase) private var toggleLikeCommentUseCase
+    @ObservationIgnored @Injected(\.deleteCommentUseCase) private var deleteCommentUseCase
+    @ObservationIgnored @Injected(\.sendCommentUseCase) private var sendCommentUseCase
+    @ObservationIgnored @Injected(\.getLikesUseCase) private var getLikesUseCase
 
-    private let id: String
-    private let adb: String?
-    private let type: String?
+    @ObservationIgnored private let id: String
+    @ObservationIgnored private let adb: String?
+    @ObservationIgnored private let type: String?
 
     init(id: String, adb: String?, type: String?) {
         self.id = id
@@ -20,23 +21,23 @@ class CommentsViewModel: ObservableObject {
         self.type = type
     }
 
-    private var subscriptions: Set<AnyCancellable> = []
+    @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
-    @Published private(set) var state: DataState<[Comment]> = .loading
-    @Published private(set) var paginationState: DataPaginationState = .idle
+    private(set) var state: DataState<[Comment]> = .loading
+    private(set) var paginationState: DataPaginationState = .idle
 
-    @Published var reply: String?
-    @Published var reportComment: Comment?
-    @Published var deleteComment: Comment?
-    @Published private(set) var comment: Comment?
-    @Published var isCommentPresented: Bool = false
-    @Published private(set) var error: Error?
-    @Published var isErrorPresented: Bool = false
-    @Published var isOnModerationPresented: Bool = false
-    @Published private(set) var message: String?
-    @Published var likes: [String: Likes] = [:]
+    var reply: String?
+    var reportComment: Comment?
+    var deleteComment: Comment?
+    private(set) var comment: Comment?
+    var isCommentPresented: Bool = false
+    private(set) var error: Error?
+    var isErrorPresented: Bool = false
+    var isOnModerationPresented: Bool = false
+    private(set) var message: String?
+    var likes: [String: Likes] = [:]
 
-    private var page = 1
+    @ObservationIgnored private var page = 1
 
     func getData(movieId: String, isInitial: Bool = true) {
         getCommentsPageUseCase(movieId: movieId, page: page)

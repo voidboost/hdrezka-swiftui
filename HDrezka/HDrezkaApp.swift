@@ -1,10 +1,10 @@
 import Combine
-import CoreData
 import Defaults
 import FirebaseAnalytics
 import FirebaseCore
 import FirebaseCrashlytics
 import Sparkle
+import SwiftData
 import SwiftUI
 import UserNotifications
 
@@ -84,27 +84,38 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 @main
 struct HDrezkaApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
-    @StateObject private var appState: AppState = .shared
-    @StateObject private var downloader: Downloader = .shared
-    @StateObject private var persistenceController: PersistenceController = .shared
+    @State private var appState: AppState = .shared
+    @State private var downloader: Downloader = .shared
     @Environment(\.openWindow) private var openWindow
 
     private let updaterController: SPUStandardUpdaterController
+    private let modelContainer: ModelContainer
 
     init() {
         updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
+
+        do {
+            let schema = Schema([PlayerPosition.self, SelectPosition.self])
+            let modelContainer = try ModelContainer(for: schema)
+            modelContainer.mainContext.autosaveEnabled = true
+            self.modelContainer = modelContainer
+
+            Downloader.shared.setModelContext(modelContext: modelContainer.mainContext)
+        } catch {
+            fatalError("Could not create ModelContainer: \(error)")
+        }
     }
 
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(appState)
-                .environmentObject(downloader)
-                .environment(\.managedObjectContext, persistenceController.viewContext)
+                .environment(appState)
+                .environment(downloader)
                 .background(WindowAccessor { window in
                     appState.window = window
                 })
         }
+        .modelContainer(modelContainer)
         .windowResizability(.contentMinSize)
         .defaultPosition(.center)
         .windowStyle(.hiddenTitleBar)
@@ -115,10 +126,10 @@ struct HDrezkaApp: App {
         WindowGroup("key.player", id: "player", for: PlayerData.self) { $data in
             if let data {
                 PlayerView(data: data)
-                    .environmentObject(appState)
-                    .environment(\.managedObjectContext, persistenceController.viewContext)
+                    .environment(appState)
             }
         }
+        .modelContainer(modelContainer)
         .defaultPosition(.center)
         .windowStyle(.hiddenTitleBar)
         .restorationBehavior(.disabled)
@@ -147,8 +158,8 @@ struct HDrezkaApp: App {
 
         Settings {
             SettingsView(updater: updaterController.updater)
-                .environment(\.managedObjectContext, persistenceController.viewContext)
         }
+        .modelContainer(modelContainer)
         .windowResizability(.contentSize)
         .defaultPosition(.center)
         .restorationBehavior(.disabled)
@@ -159,7 +170,7 @@ struct HDrezkaApp: App {
             !downloader.downloads.isEmpty
         } set: { _ in }) {
             DownloadsView()
-                .environmentObject(downloader)
+                .environment(downloader)
         } label: {
             MenuBarIcon()
         }

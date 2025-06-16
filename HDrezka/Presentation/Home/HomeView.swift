@@ -4,13 +4,13 @@ import SwiftUI
 struct HomeView: View {
     private let title = String(localized: "key.home")
 
-    @StateObject private var viewModel = HomeViewModel()
+    @State private var viewModel = HomeViewModel()
 
     @State private var showBar: Bool = false
 
     @Default(.isLoggedIn) private var isLoggedIn
 
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState
 
     var body: some View {
         Group {

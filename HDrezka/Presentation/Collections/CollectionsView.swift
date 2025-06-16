@@ -4,7 +4,7 @@ import SwiftUI
 struct CollectionsView: View {
     private let title = String(localized: "key.collections")
 
-    @StateObject private var viewModel = CollectionsViewModel()
+    @State private var viewModel = CollectionsViewModel()
 
     private let columns = [
         GridItem(.adaptive(minimum: 200, maximum: .infinity), spacing: 18, alignment: .topLeading),

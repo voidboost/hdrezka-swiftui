@@ -1,13 +1,13 @@
 import Combine
-import CoreData
 import Defaults
 import FactoryKit
+import SwiftData
 import SwiftUI
 
 struct WatchingLaterView: View {
     private let title = String(localized: "key.watching_later")
 
-    @StateObject private var viewModel = WatchingLaterViewModel()
+    @State private var viewModel = WatchingLaterViewModel()
 
     private let columns = [
         GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading),
@@ -16,6 +16,10 @@ struct WatchingLaterView: View {
     @State private var showBar: Bool = false
 
     @Default(.isLoggedIn) private var isLoggedIn
+
+    @Environment(\.modelContext) private var modelContext
+
+    @Query private var playerPositions: [PlayerPosition]
 
     var body: some View {
         Group {
@@ -60,6 +64,10 @@ struct WatchingLaterView: View {
 
                                             Button {
                                                 viewModel.removeWatchingItem(movie: movie)
+
+                                                playerPositions
+                                                    .filter { $0.id == movie.watchLaterId.id }
+                                                    .forEach { modelContext.delete($0) }
                                             } label: {
                                                 Text("key.delete")
                                             }

@@ -4,11 +4,11 @@ import SwiftUI
 struct PersonView: View {
     private let title: String
 
-    @StateObject private var viewModel: PersonViewModel
+    @State private var viewModel: PersonViewModel
 
     init(person: PersonSimple) {
         title = person.name
-        _viewModel = StateObject(wrappedValue: PersonViewModel(id: person.personId))
+        viewModel = PersonViewModel(id: person.personId)
     }
 
     @State private var showBar: Bool = false
@@ -286,7 +286,7 @@ struct PersonView: View {
         private let title: String
         private let movies: [MovieSimple]
 
-        @EnvironmentObject private var appState: AppState
+        @Environment(AppState.self) private var appState
 
         init(_ title: String, _ movies: [MovieSimple]) {
             self.title = title

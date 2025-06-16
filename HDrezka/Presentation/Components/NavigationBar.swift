@@ -9,7 +9,7 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
 
     private let height: CGFloat = 52
 
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState
 
     @Default(.isLoggedIn) private var isLoggedIn
 

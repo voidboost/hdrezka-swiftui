@@ -62,7 +62,7 @@ final class SourcePackagesParser {
             }
             .first
 
-        guard let licenseURL, let text = try? String(contentsOf: licenseURL) else {
+        guard let licenseURL, let text = try? String(contentsOf: licenseURL, encoding: .utf8) else {
             return nil
         }
 

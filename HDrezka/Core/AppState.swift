@@ -1,18 +1,19 @@
 import SwiftUI
 
-class AppState: ObservableObject {
-    static let shared = AppState()
+@Observable
+class AppState {
+    @ObservationIgnored static let shared = AppState()
 
-    @Published var isSignInPresented = false
-    @Published var isSignUpPresented = false
-    @Published var isRestorePresented = false
-    @Published var isSignOutPresented = false
+    var isSignInPresented = false
+    var isSignUpPresented = false
+    var isRestorePresented = false
+    var isSignOutPresented = false
 
-    @Published var commentsRulesPresented = false
+    var commentsRulesPresented = false
 
-    @Published var isPremiumPresented = false
+    var isPremiumPresented = false
 
-    @Published var path: [Destinations] = []
+    var path: [Destinations] = []
 
-    @Published var window: NSWindow?
+    var window: NSWindow?
 }

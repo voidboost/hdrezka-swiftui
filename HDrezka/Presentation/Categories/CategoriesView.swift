@@ -5,7 +5,7 @@ import SwiftUI
 struct CategoriesView: View {
     private let title = String(localized: "key.categories")
 
-    @StateObject private var viewModel = CategoriesViewModel()
+    @State private var viewModel = CategoriesViewModel()
 
     @State private var showBar: Bool = false
 
@@ -107,7 +107,7 @@ struct CategoriesView: View {
             bestYear = year
         }
 
-        @EnvironmentObject private var appState: AppState
+        @Environment(AppState.self) private var appState
 
         @State private var bestGenre: MovieGenre
         @State private var bestYear: MovieYear

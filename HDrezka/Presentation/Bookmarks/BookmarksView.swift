@@ -6,7 +6,7 @@ import SwiftUI
 struct BookmarksView: View {
     private let title = String(localized: "key.bookmarks")
 
-    @StateObject private var viewModel = BookmarksViewModel()
+    @State private var viewModel = BookmarksViewModel()
 
     private let columns = [
         GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading),
