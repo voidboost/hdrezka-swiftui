@@ -34,7 +34,7 @@ class CommentsViewModel: ObservableObject {
     @Published var isErrorPresented: Bool = false
     @Published var isOnModerationPresented: Bool = false
     @Published private(set) var message: String?
-    @Published private(set) var likes: [String: (Bool, [Like])] = [:]
+    @Published var likes: [String: Likes] = [:]
 
     private var page = 1
 
@@ -178,10 +178,10 @@ class CommentsViewModel: ObservableObject {
         }
     }
 
-    func getLikes(hovering: Bool, comment: Comment) {
+    func getLikes(comment: Comment) {
         if comment.likesCount > 0 {
-            if hovering, likes[comment.commentId]?.1.count != comment.likesCount {
-                likes[comment.commentId] = (hovering, [])
+            if likes[comment.commentId, default: .init()].likes.count != comment.likesCount {
+                likes[comment.commentId, default: .init()] = .init()
 
                 getLikesUseCase(id: comment.commentId)
                     .receive(on: DispatchQueue.main)
@@ -200,13 +200,11 @@ class CommentsViewModel: ObservableObject {
                             self.isErrorPresented = true
                         } else {
                             withAnimation(.easeInOut) {
-                                self.likes[comment.commentId] = (hovering, likes)
+                                self.likes[comment.commentId, default: .init()] = .init(likes: likes)
                             }
                         }
                     }
                     .store(in: &subscriptions)
-            } else {
-                likes[comment.commentId]?.0 = hovering
             }
         } else {
             likes[comment.commentId] = nil

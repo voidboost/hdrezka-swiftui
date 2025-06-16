@@ -290,24 +290,18 @@ struct CommentsView: View {
 
                             if hovering {
                                 delayShow = DispatchWorkItem {
-                                    viewModel.getLikes(hovering: hovering, comment: comment)
+                                    viewModel.getLikes(comment: comment)
                                 }
 
                                 if let delayShow {
                                     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5, execute: delayShow)
                                 }
-                            } else {
-                                viewModel.getLikes(hovering: hovering, comment: comment)
                             }
                         }
-                        .popover(isPresented: Binding {
-                            viewModel.likes[comment.commentId]?.0 == true
-                        } set: {
-                            viewModel.getLikes(hovering: $0, comment: comment)
-                        }, attachmentAnchor: .rect(.bounds), arrowEdge: .top) {
+                        .popover(item: $viewModel.likes[comment.commentId], attachmentAnchor: .rect(.bounds), arrowEdge: .top) { like in
                             VStack(alignment: .center, spacing: 10) {
-                                if let like = viewModel.likes[comment.commentId], !like.1.isEmpty {
-                                    let chunks = like.1.chunks(ofCount: 8)
+                                if !like.likes.isEmpty {
+                                    let chunks = like.likes.chunks(ofCount: 8)
 
                                     ForEach(chunks.indices, id: \.self) { chunkIndex in
                                         let likes = chunks[chunkIndex]
