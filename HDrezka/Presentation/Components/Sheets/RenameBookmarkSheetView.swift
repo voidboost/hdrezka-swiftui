@@ -118,8 +118,7 @@ struct RenameBookmarkSheetView: View {
 
                     VStack(alignment: .center, spacing: 10) {
                         Button {
-                            subscriptions.forEach { $0.cancel() }
-                            subscriptions.removeAll()
+                            subscriptions.flush()
 
                             withAnimation(.easeInOut) {
                                 state = .data

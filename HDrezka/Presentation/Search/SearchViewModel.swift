@@ -54,8 +54,7 @@ class SearchViewModel: ObservableObject {
         searchWork = DispatchWorkItem {
             self.paginationState = .idle
             self.page = 1
-            self.subscriptions.forEach { $0.cancel() }
-            self.subscriptions.removeAll()
+            self.subscriptions.flush()
 
             if !query.isEmpty {
                 self.state = .loading

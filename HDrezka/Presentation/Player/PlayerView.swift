@@ -1113,8 +1113,7 @@ struct PlayerView: View {
             self.timeObserverToken = nil
         }
 
-        subscriptions.forEach { $0.cancel() }
-        subscriptions.removeAll()
+        subscriptions.flush()
 
         nowPlayingInfoCenter.playbackState = .stopped
         nowPlayingInfoCenter.nowPlayingInfo = nil
