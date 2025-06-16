@@ -2,30 +2,30 @@ import Defaults
 import SwiftUI
 
 struct ListView: View {
-    @StateObject private var viewModel: ListViewModel
+    @State private var viewModel: ListViewModel
 
     init(movies: [MovieSimple], title: String) {
-        _viewModel = StateObject(wrappedValue: ListViewModel(movies: movies, title: title))
+        viewModel = ListViewModel(movies: movies, title: title)
     }
 
     init(list: MovieList) {
-        _viewModel = StateObject(wrappedValue: ListViewModel(list: list))
+        viewModel = ListViewModel(list: list)
     }
 
     init(country: MovieCountry) {
-        _viewModel = StateObject(wrappedValue: ListViewModel(country: country))
+        viewModel = ListViewModel(country: country)
     }
 
     init(genre: MovieGenre) {
-        _viewModel = StateObject(wrappedValue: ListViewModel(genre: genre))
+        viewModel = ListViewModel(genre: genre)
     }
 
     init(category: Categories) {
-        _viewModel = StateObject(wrappedValue: ListViewModel(category: category))
+        viewModel = ListViewModel(category: category)
     }
 
     init(collection: MoviesCollection) {
-        _viewModel = StateObject(wrappedValue: ListViewModel(collection: collection))
+        viewModel = ListViewModel(collection: collection)
     }
 
     private let columns = [GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading)]

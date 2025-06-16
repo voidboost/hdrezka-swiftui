@@ -7,11 +7,11 @@ import SwiftUI
 struct CommentsView: View {
     private let title: String
 
-    @StateObject private var viewModel: CommentsViewModel
+    @State private var viewModel: CommentsViewModel
 
     init(details: MovieDetailed) {
         title = details.commentsCount > 0 ? String(localized: "key.comments-\(details.commentsCount.description)") : String(localized: "key.comments")
-        _viewModel = StateObject(wrappedValue: CommentsViewModel(id: details.movieId, adb: details.adb, type: details.type))
+        viewModel = CommentsViewModel(id: details.movieId, adb: details.adb, type: details.type)
     }
 
     @State private var showBar: Bool = false
@@ -57,6 +57,7 @@ struct CommentsView: View {
                     }
                     .coordinateSpace(name: "scroll")
                     .scrollIndicators(.never)
+                    .environment(viewModel)
                 } else {
                     VStack {
                         ScrollView(.vertical) {
@@ -103,7 +104,7 @@ struct CommentsView: View {
                         }
                         .coordinateSpace(name: "scroll")
                         .scrollIndicators(.never)
-                        .environmentObject(viewModel)
+                        .environment(viewModel)
 
                         if viewModel.paginationState == .loading {
                             LoadingPaginationStateView()
@@ -160,7 +161,7 @@ struct CommentsView: View {
                         CommentsViewComponent(comment: comment)
                     }
                     .scrollIndicators(.never)
-                    .environmentObject(viewModel)
+                    .environment(viewModel)
                 } else {
                     ProgressView()
                 }
@@ -216,8 +217,8 @@ struct CommentsView: View {
 
         @Default(.isLoggedIn) private var isLoggedIn
 
-        @EnvironmentObject private var appState: AppState
-        @EnvironmentObject private var viewModel: CommentsViewModel
+        @Environment(AppState.self) private var appState
+        @Environment(CommentsViewModel.self) private var viewModel
 
         var body: some View {
             VStack(alignment: .leading, spacing: 16) {
@@ -247,6 +248,8 @@ struct CommentsView: View {
                     CommentText(comment: comment)
 
                     HStack(alignment: .center, spacing: 8) {
+                        @Bindable var viewModel = viewModel
+
                         Button {
                             if isLoggedIn {
                                 viewModel.like(comment: comment)
@@ -408,8 +411,8 @@ struct CommentsView: View {
     private struct CommentText: View {
         @State private var comment: Comment
 
-        @EnvironmentObject private var appState: AppState
-        @EnvironmentObject private var viewModel: CommentsViewModel
+        @Environment(AppState.self) private var appState
+        @Environment(CommentsViewModel.self) private var viewModel
 
         init(comment: Comment) {
             self.comment = comment
@@ -479,8 +482,8 @@ struct CommentsView: View {
         @Default(.isLoggedIn) private var isLoggedIn
         @Default(.allowedComments) private var allowedComments
 
-        @EnvironmentObject private var appState: AppState
-        @EnvironmentObject private var viewModel: CommentsViewModel
+        @Environment(AppState.self) private var appState
+        @Environment(CommentsViewModel.self) private var viewModel
 
         var body: some View {
             VStack(alignment: .leading, spacing: 8) {

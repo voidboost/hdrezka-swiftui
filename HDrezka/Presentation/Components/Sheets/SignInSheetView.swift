@@ -8,7 +8,7 @@ struct SignInSheetView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState
 
     @State private var username: String = ""
     @State private var password: String = ""

@@ -3,21 +3,22 @@ import FactoryKit
 import SwiftUI
 import YouTubePlayerKit
 
-class DetailsViewModel: ObservableObject {
-    @Injected(\.getMovieDetailsUseCase) private var getMovieDetailsUseCase
-    @Injected(\.getMovieTrailerIdUseCase) private var getMovieTrailerIdUseCase
-    @Injected(\.rateUseCase) private var rateUseCase
+@Observable
+class DetailsViewModel {
+    @ObservationIgnored @Injected(\.getMovieDetailsUseCase) private var getMovieDetailsUseCase
+    @ObservationIgnored @Injected(\.getMovieTrailerIdUseCase) private var getMovieTrailerIdUseCase
+    @ObservationIgnored @Injected(\.rateUseCase) private var rateUseCase
 
-    let id: String
+    @ObservationIgnored let id: String
 
     init(id: String) {
         self.id = id
     }
 
-    private var subscriptions: Set<AnyCancellable> = []
+    @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
-    @Published private(set) var state: DataState<MovieDetailed> = .loading
-    @Published private(set) var trailer: YouTubePlayer?
+    private(set) var state: DataState<MovieDetailed> = .loading
+    private(set) var trailer: YouTubePlayer?
 
     func load() {
         state = .loading
@@ -71,8 +72,8 @@ class DetailsViewModel: ObservableObject {
             .store(in: &subscriptions)
     }
 
-    @Published var isErrorPresented: Bool = false
-    @Published var error: Error?
+    var isErrorPresented: Bool = false
+    var error: Error?
 
     func rate(rating: Int) {
         if let id = id.id {

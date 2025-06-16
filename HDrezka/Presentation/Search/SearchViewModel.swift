@@ -2,19 +2,20 @@ import Combine
 import FactoryKit
 import SwiftUI
 
-class SearchViewModel: ObservableObject {
-    @Injected(\.searchUseCase) private var searchUseCase
+@Observable
+class SearchViewModel {
+    @ObservationIgnored @Injected(\.searchUseCase) private var searchUseCase
 
-    @Published private(set) var state: DataState<[MovieSimple]> = .loading
-    @Published private(set) var paginationState: DataPaginationState = .idle
+    private(set) var state: DataState<[MovieSimple]> = .loading
+    private(set) var paginationState: DataPaginationState = .idle
 
-    @Published private(set) var title: String = .init(localized: "key.search")
+    private(set) var title: String = .init(localized: "key.search")
 
-    private var searchWork: DispatchWorkItem?
+    @ObservationIgnored private var searchWork: DispatchWorkItem?
 
-    private var subscriptions: Set<AnyCancellable> = []
+    @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
-    private var page = 1
+    @ObservationIgnored private var page = 1
 
     private func getData(query: String, isInitial: Bool = true) {
         searchUseCase(query: query, page: page)

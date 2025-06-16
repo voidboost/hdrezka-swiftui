@@ -2,16 +2,17 @@ import Combine
 import FactoryKit
 import SwiftUI
 
-class HomeViewModel: ObservableObject {
-    @Injected(\.getHotMoviesUseCase) private var getHotMoviesUseCase
-//    @Injected(\.getFeaturedMoviesUseCase) private var getFeaturedMoviesUseCase
-    @Injected(\.getWatchingNowMoviesUseCase) private var getWatchingNowMoviesUseCase
-    @Injected(\.getLatestMoviesUseCase) private var getLatestMoviesUseCase
-    @Injected(\.getLatestNewestMoviesUseCase) private var getLatestNewestMoviesUseCase
-    @Injected(\.getPopularMoviesUseCase) private var getPopularMoviesUseCase
-    @Injected(\.getSoonMoviesUseCase) private var getSoonMoviesUseCase
+@Observable
+class HomeViewModel {
+    @ObservationIgnored @Injected(\.getHotMoviesUseCase) private var getHotMoviesUseCase
+//    @ObservationIgnored @Injected(\.getFeaturedMoviesUseCase) private var getFeaturedMoviesUseCase
+    @ObservationIgnored @Injected(\.getWatchingNowMoviesUseCase) private var getWatchingNowMoviesUseCase
+    @ObservationIgnored @Injected(\.getLatestMoviesUseCase) private var getLatestMoviesUseCase
+    @ObservationIgnored @Injected(\.getLatestNewestMoviesUseCase) private var getLatestNewestMoviesUseCase
+    @ObservationIgnored @Injected(\.getPopularMoviesUseCase) private var getPopularMoviesUseCase
+    @ObservationIgnored @Injected(\.getSoonMoviesUseCase) private var getSoonMoviesUseCase
 
-    private var subscriptions: Set<AnyCancellable> = []
+    @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
     struct Category: Identifiable, Hashable {
         let category: Categories
@@ -27,12 +28,12 @@ class HomeViewModel: ObservableObject {
         }
     }
 
-    @Published private(set) var state: DataState<[Category]> = .loading
-    @Published private(set) var paginationState: DataPaginationState = .idle
+    private(set) var state: DataState<[Category]> = .loading
+    private(set) var paginationState: DataPaginationState = .idle
 
-    @Published var isSeriesUpdatesPresented: Bool = false
+    var isSeriesUpdatesPresented: Bool = false
 
-    private var page: Categories?
+    @ObservationIgnored private var page: Categories?
 
     private func getData(category: Categories, isInitial: Bool = true) {
         getPublisher(category: category)

@@ -1,9 +1,9 @@
 import AVKit
 import Combine
-import CoreData
 import Defaults
 import FactoryKit
 import MediaPlayer
+import SwiftData
 import SwiftUI
 
 struct PlayerView: View {
@@ -16,13 +16,13 @@ struct PlayerView: View {
     @Default(.playerFullscreen) private var playerFullscreen
     @Default(.spatialAudio) private var spatialAudio
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
 
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState
 
-    @FetchRequest(fetchRequest: PlayerPosition.fetch()) private var playerPositions: FetchedResults<PlayerPosition>
-    @FetchRequest(fetchRequest: SelectPosition.fetch()) private var selectPositions: FetchedResults<SelectPosition>
+    @Query private var playerPositions: [PlayerPosition]
+    @Query private var selectPositions: [SelectPosition]
 
     @State private var subscriptions: Set<AnyCancellable> = []
 
@@ -690,17 +690,16 @@ struct PlayerView: View {
                         position.episode == episode?.episodeId
                 }) {
                     position.position = currentTime
-
-                    position.managedObjectContext?.saveContext()
                 } else {
-                    let position = PlayerPosition(context: viewContext)
-                    position.id = voiceActing.voiceId
-                    position.acting = voiceActing.translatorId
-                    position.season = season?.seasonId
-                    position.episode = episode?.episodeId
-                    position.position = currentTime
+                    let position = PlayerPosition(
+                        id: voiceActing.voiceId,
+                        acting: voiceActing.translatorId,
+                        season: season?.seasonId,
+                        episode: episode?.episodeId,
+                        position: currentTime,
+                    )
 
-                    viewContext.saveContext()
+                    modelContext.insert(position)
                 }
 
                 updateNextTimer()
@@ -1141,17 +1140,16 @@ struct PlayerView: View {
                     position.id == voiceActing.voiceId
                 }) {
                     position.subtitles = language
-
-                    position.managedObjectContext?.saveContext()
                 } else {
-                    let position = SelectPosition(context: viewContext)
-                    position.id = voiceActing.voiceId
-                    position.acting = voiceActing.translatorId
-                    position.season = season?.seasonId
-                    position.episode = episode?.episodeId
-                    position.subtitles = language
+                    let position = SelectPosition(
+                        id: voiceActing.voiceId,
+                        acting: voiceActing.translatorId,
+                        season: season?.seasonId,
+                        episode: episode?.episodeId,
+                        subtitles: language,
+                    )
 
-                    viewContext.saveContext()
+                    modelContext.insert(position)
                 }
             }
         }
@@ -1260,16 +1258,15 @@ struct PlayerView: View {
                                 position.season = season.seasonId
                                 position.episode = prevEpisode.episodeId
 
-                                position.managedObjectContext?.saveContext()
                             } else {
-                                let position = SelectPosition(context: viewContext)
+                                let position = SelectPosition(
+                                    id: voiceActing.voiceId,
+                                    acting: voiceActing.translatorId,
+                                    season: season.seasonId,
+                                    episode: prevEpisode.episodeId,
+                                )
 
-                                position.id = voiceActing.voiceId
-                                position.acting = voiceActing.translatorId
-                                position.season = season.seasonId
-                                position.episode = prevEpisode.episodeId
-
-                                viewContext.saveContext()
+                                modelContext.insert(position)
                             }
 
                             self.movie = movie
@@ -1314,17 +1311,15 @@ struct PlayerView: View {
                                 position.acting = voiceActing.translatorId
                                 position.season = prevSeason.seasonId
                                 position.episode = prevEpisode.episodeId
-
-                                position.managedObjectContext?.saveContext()
                             } else {
-                                let position = SelectPosition(context: viewContext)
+                                let position = SelectPosition(
+                                    id: voiceActing.voiceId,
+                                    acting: voiceActing.translatorId,
+                                    season: prevSeason.seasonId,
+                                    episode: prevEpisode.episodeId,
+                                )
 
-                                position.id = voiceActing.voiceId
-                                position.acting = voiceActing.translatorId
-                                position.season = prevSeason.seasonId
-                                position.episode = prevEpisode.episodeId
-
-                                viewContext.saveContext()
+                                modelContext.insert(position)
                             }
 
                             self.movie = movie
@@ -1374,17 +1369,15 @@ struct PlayerView: View {
                                 position.acting = voiceActing.translatorId
                                 position.season = season.seasonId
                                 position.episode = nextEpisode.episodeId
-
-                                position.managedObjectContext?.saveContext()
                             } else {
-                                let position = SelectPosition(context: viewContext)
+                                let position = SelectPosition(
+                                    id: voiceActing.voiceId,
+                                    acting: voiceActing.translatorId,
+                                    season: season.seasonId,
+                                    episode: nextEpisode.episodeId,
+                                )
 
-                                position.id = voiceActing.voiceId
-                                position.acting = voiceActing.translatorId
-                                position.season = season.seasonId
-                                position.episode = nextEpisode.episodeId
-
-                                viewContext.saveContext()
+                                modelContext.insert(position)
                             }
 
                             self.movie = movie
@@ -1429,17 +1422,15 @@ struct PlayerView: View {
                                 position.acting = voiceActing.translatorId
                                 position.season = nextSeason.seasonId
                                 position.episode = nextEpisode.episodeId
-
-                                position.managedObjectContext?.saveContext()
                             } else {
-                                let position = SelectPosition(context: viewContext)
+                                let position = SelectPosition(
+                                    id: voiceActing.voiceId,
+                                    acting: voiceActing.translatorId,
+                                    season: nextSeason.seasonId,
+                                    episode: nextEpisode.episodeId,
+                                )
 
-                                position.id = voiceActing.voiceId
-                                position.acting = voiceActing.translatorId
-                                position.season = nextSeason.seasonId
-                                position.episode = nextEpisode.episodeId
-
-                                viewContext.saveContext()
+                                modelContext.insert(position)
                             }
 
                             self.movie = movie

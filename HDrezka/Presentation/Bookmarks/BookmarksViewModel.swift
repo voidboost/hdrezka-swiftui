@@ -2,32 +2,33 @@ import Combine
 import FactoryKit
 import SwiftUI
 
-class BookmarksViewModel: ObservableObject {
-    @Injected(\.getBookmarksUseCase) private var getBookmarksUseCase
-    @Injected(\.getBookmarksByCategoryAddedUseCase) private var getBookmarksByCategoryAddedUseCase
-    @Injected(\.getBookmarksByCategoryPopularUseCase) private var getBookmarksByCategoryPopularUseCase
-    @Injected(\.getBookmarksByCategoryYearUseCase) private var getBookmarksByCategoryYearUseCase
-    @Injected(\.deleteBookmarksCategoryUseCase) private var deleteBookmarksCategoryUseCase
-    @Injected(\.moveBetweenBookmarksUseCase) private var moveBetweenBookmarksUseCase
-    @Injected(\.reorderBookmarksCategoriesUseCase) private var reorderBookmarksCategoriesUseCase
-    @Injected(\.removeFromBookmarksUseCase) private var removeFromBookmarksUseCase
+@Observable
+class BookmarksViewModel {
+    @ObservationIgnored @Injected(\.getBookmarksUseCase) private var getBookmarksUseCase
+    @ObservationIgnored @Injected(\.getBookmarksByCategoryAddedUseCase) private var getBookmarksByCategoryAddedUseCase
+    @ObservationIgnored @Injected(\.getBookmarksByCategoryPopularUseCase) private var getBookmarksByCategoryPopularUseCase
+    @ObservationIgnored @Injected(\.getBookmarksByCategoryYearUseCase) private var getBookmarksByCategoryYearUseCase
+    @ObservationIgnored @Injected(\.deleteBookmarksCategoryUseCase) private var deleteBookmarksCategoryUseCase
+    @ObservationIgnored @Injected(\.moveBetweenBookmarksUseCase) private var moveBetweenBookmarksUseCase
+    @ObservationIgnored @Injected(\.reorderBookmarksCategoriesUseCase) private var reorderBookmarksCategoriesUseCase
+    @ObservationIgnored @Injected(\.removeFromBookmarksUseCase) private var removeFromBookmarksUseCase
 
-    private var subscriptions: Set<AnyCancellable> = []
+    @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
-    @Published private(set) var bookmarksState: DataState<[Bookmark]> = .loading
-    @Published private(set) var bookmarkState: DataState<[MovieSimple]> = .data([])
-    @Published private(set) var paginationState: DataPaginationState = .loading
+    private(set) var bookmarksState: DataState<[Bookmark]> = .loading
+    private(set) var bookmarkState: DataState<[MovieSimple]> = .data([])
+    private(set) var paginationState: DataPaginationState = .loading
 
-    @Published var selectedBookmark: Int = -1
+    var selectedBookmark: Int = -1
 
-    @Published private(set) var error: Error?
-    @Published var isErrorPresented: Bool = false
+    private(set) var error: Error?
+    var isErrorPresented: Bool = false
 
-    @Published var renameBookmark: Bookmark?
-    @Published var isCreateBookmarkPresented: Bool = false
+    var renameBookmark: Bookmark?
+    var isCreateBookmarkPresented: Bool = false
 
-    @Published var genre = Genres.all
-    @Published var filter = BookmarkFilters.added
+    var genre = Genres.all
+    var filter = BookmarkFilters.added
 
     func getBookmarks(reset: Bool = false) {
         if reset {
@@ -56,7 +57,7 @@ class BookmarksViewModel: ObservableObject {
             .store(in: &subscriptions)
     }
 
-    private var page = 1
+    @ObservationIgnored private var page = 1
 
     private func getBookmark(isInitial: Bool = true) {
         getPublisher(id: selectedBookmark, filter: filter, genre: genre)

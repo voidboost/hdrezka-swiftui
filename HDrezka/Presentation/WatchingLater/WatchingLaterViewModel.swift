@@ -2,17 +2,18 @@ import Combine
 import FactoryKit
 import SwiftUI
 
-class WatchingLaterViewModel: ObservableObject {
-    @Injected(\.getWatchingLaterMoviesUseCase) private var getWatchingLaterMoviesUseCase
-    @Injected(\.switchWatchedItemUseCase) private var switchWatchedItemUseCase
-    @Injected(\.removeWatchingItemUseCase) private var removeWatchingItemUseCase
+@Observable
+class WatchingLaterViewModel {
+    @ObservationIgnored @Injected(\.getWatchingLaterMoviesUseCase) private var getWatchingLaterMoviesUseCase
+    @ObservationIgnored @Injected(\.switchWatchedItemUseCase) private var switchWatchedItemUseCase
+    @ObservationIgnored @Injected(\.removeWatchingItemUseCase) private var removeWatchingItemUseCase
 
-    private var subscriptions: Set<AnyCancellable> = []
+    @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
-    @Published private(set) var state: DataState<[MovieWatchLater]> = .loading
+    private(set) var state: DataState<[MovieWatchLater]> = .loading
 
-    @Published private(set) var error: Error?
-    @Published var isErrorPresented: Bool = false
+    private(set) var error: Error?
+    var isErrorPresented: Bool = false
 
     func load() {
         state = .loading
@@ -79,12 +80,6 @@ class WatchingLaterViewModel: ObservableObject {
                     withAnimation(.easeInOut) {
                         self.state = .data(movies)
                     }
-
-                    try? PersistenceController.shared.viewContext.fetch(PlayerPosition.fetch())
-                        .filter { $0.id == movie.watchLaterId.id }
-                        .forEach(PersistenceController.shared.viewContext.delete)
-
-                    PersistenceController.shared.viewContext.saveContext()
                 }
             }
             .store(in: &subscriptions)

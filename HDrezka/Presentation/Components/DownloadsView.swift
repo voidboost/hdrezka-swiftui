@@ -2,7 +2,7 @@ import Combine
 import SwiftUI
 
 struct DownloadsView: View {
-    @EnvironmentObject private var downloader: Downloader
+    @Environment(Downloader.self) private var downloader
 
     var body: some View {
         ScrollView(.vertical) {

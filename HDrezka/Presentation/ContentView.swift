@@ -15,7 +15,7 @@ struct ContentView: View {
     @Default(.isUserPremium) private var isUserPremium
     @Default(.lastHdrezkaAppVersion) private var lastHdrezkaAppVersion
 
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState
 
     @Namespace var mainNamespace
     @Environment(\.resetFocus) var resetFocus
@@ -27,6 +27,8 @@ struct ContentView: View {
     @State private var subscriptions: Set<AnyCancellable> = []
 
     var body: some View {
+        @Bindable var appState = appState
+
         HStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 20) {
                 TextField("key.search", text: $query)

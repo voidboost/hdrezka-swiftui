@@ -1,7 +1,7 @@
 import Combine
-import CoreData
 import Defaults
 import FactoryKit
+import SwiftData
 import SwiftUI
 
 struct WatchSheetView: View {
@@ -14,11 +14,11 @@ struct WatchSheetView: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openWindow) private var openWindow
-    @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.modelContext) private var modelContext
 
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState
 
-    @FetchRequest(fetchRequest: SelectPosition.fetch()) private var selectPositions: FetchedResults<SelectPosition>
+    @Query private var selectPositions: [SelectPosition]
 
     @Default(.isUserPremium) private var isUserPremium
     @Default(.isLoggedIn) private var isLoggedIn
@@ -370,16 +370,15 @@ struct WatchSheetView: View {
                             position.acting = selectedActing.translatorId
                             position.season = selectedSeason?.seasonId
                             position.episode = selectedEpisode?.episodeId
-
-                            position.managedObjectContext?.saveContext()
                         } else {
-                            let position = SelectPosition(context: viewContext)
-                            position.id = selectedActing.voiceId
-                            position.acting = selectedActing.translatorId
-                            position.season = selectedSeason?.seasonId
-                            position.episode = selectedEpisode?.episodeId
+                            let position = SelectPosition(
+                                id: selectedActing.voiceId,
+                                acting: selectedActing.translatorId,
+                                season: selectedSeason?.seasonId,
+                                episode: selectedEpisode?.episodeId,
+                            )
 
-                            viewContext.saveContext()
+                            modelContext.insert(position)
                         }
 
                         if !isLoggedIn {

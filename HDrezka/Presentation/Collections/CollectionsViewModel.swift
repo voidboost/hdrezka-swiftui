@@ -2,15 +2,16 @@ import Combine
 import FactoryKit
 import SwiftUI
 
-class CollectionsViewModel: ObservableObject {
-    @Injected(\.getCollectionsUseCase) private var getCollectionsUseCase
+@Observable
+class CollectionsViewModel {
+    @ObservationIgnored @Injected(\.getCollectionsUseCase) private var getCollectionsUseCase
 
-    private var subscriptions: Set<AnyCancellable> = []
+    @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
-    @Published private(set) var state: DataState<[MoviesCollection]> = .loading
-    @Published private(set) var paginationState: DataPaginationState = .idle
+    private(set) var state: DataState<[MoviesCollection]> = .loading
+    private(set) var paginationState: DataPaginationState = .idle
 
-    private var page = 1
+    @ObservationIgnored private var page = 1
 
     private func getData(isInitial: Bool = true) {
         getCollectionsUseCase(page: page)

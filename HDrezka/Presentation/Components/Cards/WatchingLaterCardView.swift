@@ -3,7 +3,7 @@ import SwiftUI
 struct WatchingLaterCardView: View {
     private let movie: MovieWatchLater
 
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState
 
     init(movie: MovieWatchLater) {
         self.movie = movie

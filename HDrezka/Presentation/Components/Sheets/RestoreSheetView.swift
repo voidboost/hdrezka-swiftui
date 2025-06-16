@@ -9,7 +9,7 @@ struct RestoreSheetView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState
 
     @State private var login: String = ""
     @State private var state: EmptyState = .data

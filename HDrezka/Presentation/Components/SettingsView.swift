@@ -1,7 +1,7 @@
 import AVFoundation
-import CoreData
 import Defaults
 import Sparkle
+import SwiftData
 import SwiftUI
 
 struct SettingsView: View {
@@ -12,10 +12,10 @@ struct SettingsView: View {
     @Default(.defaultQuality) private var defaultQuality
     @Default(.spatialAudio) private var spatialAudio
 
-    @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.modelContext) private var modelContext
 
-    @FetchRequest(fetchRequest: PlayerPosition.fetch(), animation: .easeInOut) private var playerPositions: FetchedResults<PlayerPosition>
-    @FetchRequest(fetchRequest: SelectPosition.fetch(), animation: .easeInOut) private var selectPositions: FetchedResults<SelectPosition>
+    @Query(animation: .easeInOut) private var playerPositions: [PlayerPosition]
+    @Query(animation: .easeInOut) private var selectPositions: [SelectPosition]
 
     @State private var mirror: URL?
     @State private var mirrorValid: Bool?
@@ -210,9 +210,9 @@ struct SettingsView: View {
                     Spacer()
 
                     Button {
-                        playerPositions.forEach(viewContext.delete)
-
-                        viewContext.saveContext()
+                        for position in playerPositions {
+                            modelContext.delete(position)
+                        }
                     } label: {
                         Image(systemName: "trash")
                             .foregroundStyle(Color.accentColor)
@@ -239,9 +239,9 @@ struct SettingsView: View {
                         Spacer()
 
                         Button {
-                            selectPositions.forEach(viewContext.delete)
-
-                            viewContext.saveContext()
+                            for position in selectPositions {
+                                modelContext.delete(position)
+                            }
                         } label: {
                             Image(systemName: "trash")
                                 .foregroundStyle(Color.accentColor)

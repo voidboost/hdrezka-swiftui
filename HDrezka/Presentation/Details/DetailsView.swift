@@ -7,11 +7,11 @@ import YouTubePlayerKit
 struct DetailsView: View {
     private let title: String?
 
-    @StateObject private var viewModel: DetailsViewModel
+    @State private var viewModel: DetailsViewModel
 
     init(movie: MovieSimple) {
         title = movie.name
-        _viewModel = StateObject(wrappedValue: DetailsViewModel(id: movie.movieId))
+        viewModel = DetailsViewModel(id: movie.movieId)
     }
 
     @State private var isBookmarksPresented = false
@@ -23,7 +23,7 @@ struct DetailsView: View {
     @Default(.isLoggedIn) private var isLoggedIn
     @Default(.mirror) private var mirror
 
-    @EnvironmentObject private var appState: AppState
+    @Environment(AppState.self) private var appState
 
     var body: some View {
         Group {
@@ -37,7 +37,7 @@ struct DetailsView: View {
                 ScrollView(.vertical) {
                     LazyVStack(alignment: .leading, spacing: 18) {
                         DetailsViewComponent(details: details, trailer: viewModel.trailer, isSchedulePresented: $isSchedulePresented)
-                            .environmentObject(viewModel)
+                            .environment(viewModel)
                     }
                     .onGeometryChange(for: Bool.self) { geometry in
                         -geometry.frame(in: .named("scroll")).origin.y / 52 >= 1
@@ -141,7 +141,7 @@ struct DetailsView: View {
         private let trailer: YouTubePlayer?
         @Binding private var isSchedulePresented: Bool
 
-        @EnvironmentObject private var appState: AppState
+        @Environment(AppState.self) private var appState
 
         init(details: MovieDetailed, trailer: YouTubePlayer?, isSchedulePresented: Binding<Bool>) {
             self.details = details
@@ -767,7 +767,7 @@ struct DetailsView: View {
 
         @State private var isPresented: Bool = false
 
-        @EnvironmentObject private var appState: AppState
+        @Environment(AppState.self) private var appState
 
         init(_ title: String, _ description: String, _ data: [T]) {
             self.title = title
@@ -913,7 +913,7 @@ struct DetailsView: View {
 
         @Default(.isLoggedIn) private var isLoggedIn
 
-        @EnvironmentObject private var viewModel: DetailsViewModel
+        @Environment(DetailsViewModel.self) private var viewModel
 
         init(_ title: String, _ rating: Float, _ rated: Bool, _ votes: String?) {
             self.title = title
