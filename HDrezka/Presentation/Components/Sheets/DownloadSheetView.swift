@@ -524,7 +524,7 @@ struct DownloadSheetView: View {
                 }
                 .store(in: &subscriptions)
         }
-        .customOnChange(of: details) {
+        .onChange(of: details) {
             if let details, let acting = details.voiceActing {
                 withAnimation(.easeInOut) {
                     selectedActing = if !isLoggedIn,
@@ -548,7 +548,7 @@ struct DownloadSheetView: View {
                 }
             }
         }
-        .customOnChange(of: selectedActing) {
+        .onChange(of: selectedActing) {
             withAnimation(.easeInOut) {
                 selectedSeason = nil
                 selectedEpisode = nil
@@ -631,7 +631,7 @@ struct DownloadSheetView: View {
                 }
             }
         }
-        .customOnChange(of: selectedSeason) {
+        .onChange(of: selectedSeason) {
             withAnimation(.easeInOut) {
                 selectedQuality = nil
                 movie = nil
@@ -654,7 +654,7 @@ struct DownloadSheetView: View {
                 }
             }
         }
-        .customOnChange(of: selectedEpisode) {
+        .onChange(of: selectedEpisode) {
             withAnimation(.easeInOut) {
                 selectedQuality = nil
                 movie = nil

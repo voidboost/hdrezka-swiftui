@@ -81,13 +81,7 @@ struct BookmarksView: View {
                                         Text(bookmark.count.description)
                                             .monospacedDigit(),
                                     )
-                                    .viewModifier { view in
-                                        if #available(macOS 14, *) {
-                                            view.contentTransition(.numericText(value: Double(bookmark.count)))
-                                        } else {
-                                            view
-                                        }
-                                    }
+                                    .contentTransition(.numericText(value: Double(bookmark.count)))
                                     .tag(bookmark.bookmarkId)
                                     .padding(7)
                                     .listRowInsets(.init())
@@ -275,15 +269,8 @@ struct BookmarksView: View {
                 }
                 .labelsHidden()
                 .pickerStyle(.menu)
-                .viewModifier { view in
-                    if #available(macOS 14, *) {
-                        view
-                            .buttonStyle(.accessoryBar)
-                            .controlSize(.large)
-                    } else {
-                        view
-                    }
-                }
+                .buttonStyle(.accessoryBar)
+                .controlSize(.large)
                 .background(.tertiary.opacity(0.05))
                 .clipShape(.rect(cornerRadius: 6))
                 .contentShape(.rect(cornerRadius: 6))
@@ -299,40 +286,32 @@ struct BookmarksView: View {
                 }
                 .labelsHidden()
                 .pickerStyle(.menu)
-                .viewModifier { view in
-                    if #available(macOS 14, *) {
-                        view
-                            .buttonStyle(.accessoryBar)
-                            .controlSize(.large)
-                    } else {
-                        view
-                    }
-                }
+                .buttonStyle(.accessoryBar)
                 .background(.tertiary.opacity(0.05))
                 .clipShape(.rect(cornerRadius: 6))
                 .contentShape(.rect(cornerRadius: 6))
                 .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
             }
         })
-        .customOnChange(of: viewModel.selectedBookmark) {
+        .onChange(of: viewModel.selectedBookmark) {
             if viewModel.selectedBookmark != -1 {
                 viewModel.load()
             }
         }
-        .customOnChange(of: viewModel.isCreateBookmarkPresented) {
+        .onChange(of: viewModel.isCreateBookmarkPresented) {
             if !viewModel.isCreateBookmarkPresented {
                 viewModel.getBookmarks(reset: true)
             }
         }
-        .customOnChange(of: viewModel.renameBookmark) {
+        .onChange(of: viewModel.renameBookmark) {
             if viewModel.renameBookmark == nil {
                 viewModel.getBookmarks(reset: true)
             }
         }
-        .customOnChange(of: viewModel.filter) {
+        .onChange(of: viewModel.filter) {
             viewModel.load()
         }
-        .customOnChange(of: viewModel.genre) {
+        .onChange(of: viewModel.genre) {
             viewModel.load()
         }
         .task(id: isLoggedIn) {

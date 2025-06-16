@@ -235,7 +235,7 @@ struct CommentReportSheet: View {
             .overlay(isSelected ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
             .onTapGesture { isSelected = true }
             .animation(.easeInOut, value: isSelected)
-            .customOnChange(of: isSelected) {
+            .onChange(of: isSelected) {
                 if isSelected, tag == .other {
                     focused = true
                 } else {

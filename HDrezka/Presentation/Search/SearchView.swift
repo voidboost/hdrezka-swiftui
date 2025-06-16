@@ -103,7 +103,7 @@ struct SearchView: View {
             }
         }
         .background(.background)
-        .customOnChange(of: searchText.trimmingCharacters(in: .whitespacesAndNewlines)) {
+        .onChange(of: searchText.trimmingCharacters(in: .whitespacesAndNewlines)) {
             viewModel.load(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
         }
     }

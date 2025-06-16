@@ -53,7 +53,7 @@ struct SignInSheetView: View {
                                     .textFieldStyle(.plain)
                                     .multilineTextAlignment(.trailing)
                                     .focused($focusedField, equals: .username)
-                                    .customOnChange(of: username) {
+                                    .onChange(of: username) {
                                         let newValue = String(username.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
                                         if newValue != username {
                                             username = newValue
@@ -75,7 +75,7 @@ struct SignInSheetView: View {
                                         .textFieldStyle(.plain)
                                         .multilineTextAlignment(.trailing)
                                         .focused($focusedField, equals: .password)
-                                        .customOnChange(of: password) {
+                                        .onChange(of: password) {
                                             let newValue = String(password.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
                                             if newValue != password {
                                                 password = newValue
@@ -95,7 +95,7 @@ struct SignInSheetView: View {
                                         .textFieldStyle(.plain)
                                         .multilineTextAlignment(.trailing)
                                         .focused($focusedField, equals: .password)
-                                        .customOnChange(of: password) {
+                                        .onChange(of: password) {
                                             let newValue = String(password.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
                                             if newValue != password {
                                                 password = newValue

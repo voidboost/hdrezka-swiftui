@@ -108,6 +108,7 @@ struct HDrezkaApp: App {
         .windowResizability(.contentMinSize)
         .defaultPosition(.center)
         .windowStyle(.hiddenTitleBar)
+        .restorationBehavior(.disabled)
         .commands(content: customCommands)
         .commands(content: removed)
 
@@ -120,7 +121,7 @@ struct HDrezkaApp: App {
         }
         .defaultPosition(.center)
         .windowStyle(.hiddenTitleBar)
-        .applyRestorationBehavior()
+        .restorationBehavior(.disabled)
         .commands(content: customCommands)
         .commands(content: removed)
 
@@ -131,7 +132,7 @@ struct HDrezkaApp: App {
         }
         .defaultPosition(.center)
         .windowStyle(.hiddenTitleBar)
-        .applyRestorationBehavior()
+        .restorationBehavior(.disabled)
         .commands(content: customCommands)
         .commands(content: removed)
 
@@ -140,7 +141,7 @@ struct HDrezkaApp: App {
         }
         .defaultPosition(.center)
         .windowResizability(.contentSize)
-        .applyRestorationBehavior()
+        .restorationBehavior(.disabled)
         .commands(content: customCommands)
         .commands(content: removed)
 
@@ -150,6 +151,7 @@ struct HDrezkaApp: App {
         }
         .windowResizability(.contentSize)
         .defaultPosition(.center)
+        .restorationBehavior(.disabled)
         .commands(content: customCommands)
         .commands(content: removed)
 
@@ -162,6 +164,7 @@ struct HDrezkaApp: App {
             MenuBarIcon()
         }
         .menuBarExtraStyle(.window)
+        .restorationBehavior(.disabled)
         .commands(content: customCommands)
         .commands(content: removed)
     }
@@ -169,23 +172,10 @@ struct HDrezkaApp: App {
     @CommandsBuilder
     func customCommands() -> some Commands {
         CommandGroup(replacing: .appSettings) {
-            if #available(macOS 14, *) {
-                SettingsLink {
-                    Text("key.settings")
-                }
-                .keyboardShortcut(",", modifiers: .command)
-            } else {
-                Button {
-                    if #available(macOS 13, *) {
-                        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-                    } else {
-                        NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
-                    }
-                } label: {
-                    Text("key.settings")
-                }
-                .keyboardShortcut(",", modifiers: .command)
+            SettingsLink {
+                Text("key.settings")
             }
+            .keyboardShortcut(",", modifiers: .command)
 
             UpdateButton(updater: updaterController.updater)
 

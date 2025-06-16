@@ -64,14 +64,14 @@ struct SliderWithoutText<T: BinaryFloatingPoint>: View {
                 )
             }
             .frame(width: bounds.size.width, height: bounds.size.height)
-            .customOnChange(of: isActive) {
+            .onChange(of: isActive) {
                 value = max(min(getPrgValue(), inRange.upperBound), inRange.lowerBound)
                 onEditingChanged(isActive)
             }
             .task {
                 localRealProgress = getPrgPercentage(value)
             }
-            .customOnChange(of: value) {
+            .onChange(of: value) {
                 if !isActive {
                     localRealProgress = getPrgPercentage(value)
                 }

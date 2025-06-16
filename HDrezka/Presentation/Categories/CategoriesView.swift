@@ -167,15 +167,8 @@ struct CategoriesView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .viewModifier { view in
-                        if #available(macOS 14, *) {
-                            view
-                                .buttonStyle(.accessoryBar)
-                                .controlSize(.large)
-                        } else {
-                            view
-                        }
-                    }
+                    .buttonStyle(.accessoryBar)
+                    .controlSize(.large)
                     .frame(height: 28)
                     .background(.tertiary.opacity(0.05))
                     .clipShape(.rect(cornerRadius: 6))
@@ -190,15 +183,8 @@ struct CategoriesView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .viewModifier { view in
-                        if #available(macOS 14, *) {
-                            view
-                                .buttonStyle(.accessoryBar)
-                                .controlSize(.large)
-                        } else {
-                            view
-                        }
-                    }
+                    .buttonStyle(.accessoryBar)
+                    .controlSize(.large)
                     .frame(height: 28)
                     .background(.tertiary.opacity(0.05))
                     .clipShape(.rect(cornerRadius: 6))

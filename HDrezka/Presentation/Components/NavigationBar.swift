@@ -83,13 +83,7 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
                     .frame(maxWidth: .infinity)
                     .frame(height: height)
                     .background(.bar.opacity(showBar ? 1 : 0))
-                    .viewModifier { view in
-                        if #available(macOS 15, *) {
-                            view.gesture(WindowDragGesture())
-                        } else {
-                            view
-                        }
-                    }
+                    .gesture(WindowDragGesture())
 
                     Spacer()
                 }

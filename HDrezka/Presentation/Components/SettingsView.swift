@@ -44,7 +44,7 @@ struct SettingsView: View {
                         .textFieldStyle(.plain)
                         .multilineTextAlignment(.trailing)
                         .autocorrectionDisabled()
-                        .customOnChange(of: mirror) {
+                        .onChange(of: mirror) {
                             withAnimation(.easeInOut) {
                                 mirrorValid = nil
                             }
@@ -167,15 +167,8 @@ struct SettingsView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .viewModifier { view in
-                        if #available(macOS 14, *) {
-                            view
-                                .buttonStyle(.accessoryBar)
-                                .controlSize(.large)
-                        } else {
-                            view
-                        }
-                    }
+                    .buttonStyle(.accessoryBar)
+                    .controlSize(.large)
                     .background(.tertiary.opacity(0.05))
                     .clipShape(.rect(cornerRadius: 6))
                     .contentShape(.rect(cornerRadius: 6))
@@ -198,15 +191,8 @@ struct SettingsView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .viewModifier { view in
-                        if #available(macOS 14, *) {
-                            view
-                                .buttonStyle(.accessoryBar)
-                                .controlSize(.large)
-                        } else {
-                            view
-                        }
-                    }
+                    .buttonStyle(.accessoryBar)
+                    .controlSize(.large)
                     .background(.tertiary.opacity(0.05))
                     .clipShape(.rect(cornerRadius: 6))
                     .contentShape(.rect(cornerRadius: 6))
@@ -219,13 +205,7 @@ struct SettingsView: View {
                 HStack(alignment: .center, spacing: 8) {
                     Text("key.playerPositions-\(playerPositions.count.description)")
                         .monospacedDigit()
-                        .viewModifier { view in
-                            if #available(macOS 14, *) {
-                                view.contentTransition(.numericText(value: Double(playerPositions.count)))
-                            } else {
-                                view
-                            }
-                        }
+                        .contentTransition(.numericText(value: Double(playerPositions.count)))
 
                     Spacer()
 
@@ -254,13 +234,7 @@ struct SettingsView: View {
                     HStack(alignment: .center, spacing: 8) {
                         Text("key.selectPositions-\(selectPositions.count.description)")
                             .monospacedDigit()
-                            .viewModifier { view in
-                                if #available(macOS 14, *) {
-                                    view.contentTransition(.numericText(value: Double(selectPositions.count)))
-                                } else {
-                                    view
-                                }
-                            }
+                            .contentTransition(.numericText(value: Double(selectPositions.count)))
 
                         Spacer()
 
@@ -300,7 +274,7 @@ struct SettingsView: View {
                         .labelsHidden()
                 }
                 .frame(height: 40)
-                .customOnChange(of: automaticallyChecksForUpdates) {
+                .onChange(of: automaticallyChecksForUpdates) {
                     updater.automaticallyChecksForUpdates = automaticallyChecksForUpdates
                 }
 
@@ -317,7 +291,7 @@ struct SettingsView: View {
                 }
                 .frame(height: 40)
                 .disabled(!automaticallyChecksForUpdates)
-                .customOnChange(of: automaticallyDownloadsUpdates) {
+                .onChange(of: automaticallyDownloadsUpdates) {
                     updater.automaticallyDownloadsUpdates = automaticallyDownloadsUpdates
                 }
 
@@ -336,15 +310,7 @@ struct SettingsView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .viewModifier { view in
-                        if #available(macOS 14, *) {
-                            view
-                                .buttonStyle(.accessoryBar)
-                                .controlSize(.large)
-                        } else {
-                            view
-                        }
-                    }
+                    .buttonStyle(.accessoryBar)
                     .background(.tertiary.opacity(0.05))
                     .clipShape(.rect(cornerRadius: 6))
                     .contentShape(.rect(cornerRadius: 6))
@@ -352,7 +318,7 @@ struct SettingsView: View {
                 }
                 .frame(height: 40)
                 .disabled(!automaticallyChecksForUpdates)
-                .customOnChange(of: updateCheckInterval) {
+                .onChange(of: updateCheckInterval) {
                     updater.updateCheckInterval = updateCheckInterval
                 }
             }
@@ -363,7 +329,7 @@ struct SettingsView: View {
         }
         .padding(25)
         .background(.background)
-        .customOnChange(of: currentMirror) {
+        .onChange(of: currentMirror) {
             mirror = nil
         }
     }

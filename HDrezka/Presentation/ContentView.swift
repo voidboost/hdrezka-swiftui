@@ -304,7 +304,7 @@ struct ContentView: View {
                 }
                 .store(in: &subscriptions)
         }
-        .customOnChange(of: query.trimmingCharacters(in: .whitespacesAndNewlines)) {
+        .onChange(of: query.trimmingCharacters(in: .whitespacesAndNewlines)) {
             let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
 
             guard !trimmed.isEmpty else { return }
@@ -319,7 +319,7 @@ struct ContentView: View {
                 appState.path.append(.search)
             }
         }
-        .customOnChange(of: isLoggedIn) {
+        .onChange(of: isLoggedIn) {
             while !isLoggedIn, appState.path.last == .watchingLater || appState.path.last == .bookmarks {
                 appState.path.removeLast()
             }
