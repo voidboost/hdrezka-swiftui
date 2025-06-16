@@ -480,7 +480,7 @@ struct CommentsView: View {
     private struct CommentTextArea: View {
         @State private var feedback: String = ""
         @State private var name: String = ""
-        @State private var selection: NSRange = .init(location: 0, length: 0)
+        @State private var selection: TextSelection?
 
         @Default(.isLoggedIn) private var isLoggedIn
         @Default(.allowedComments) private var allowedComments
@@ -492,10 +492,16 @@ struct CommentsView: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .center, spacing: 8) {
                     Button {
-                        feedback.insert(contentsOf: "[/b]", at: String.Index(utf16Offset: selection.location + selection.length, in: feedback))
-                        feedback.insert(contentsOf: "[b]", at: String.Index(utf16Offset: selection.location, in: feedback))
+                        if case let .selection(range) = selection?.indices {
+                            feedback.insert(contentsOf: "[/b]", at: range.upperBound)
+                            feedback.insert(contentsOf: "[b]", at: range.lowerBound)
 
-                        selection = NSRange(location: selection.location + 3, length: selection.length)
+                            selection = TextSelection(range: feedback.index(range.lowerBound, offsetBy: 3) ..< feedback.index(range.upperBound, offsetBy: 3))
+                        } else {
+                            feedback.append("[b][/b]")
+
+                            selection = TextSelection(insertionPoint: feedback.index(feedback.startIndex, offsetBy: 3))
+                        }
                     } label: {
                         Image(systemName: "bold")
                             .font(.system(size: 17))
@@ -509,10 +515,16 @@ struct CommentsView: View {
                     .buttonStyle(.plain)
 
                     Button {
-                        feedback.insert(contentsOf: "[/i]", at: String.Index(utf16Offset: selection.location + selection.length, in: feedback))
-                        feedback.insert(contentsOf: "[i]", at: String.Index(utf16Offset: selection.location, in: feedback))
+                        if case let .selection(range) = selection?.indices {
+                            feedback.insert(contentsOf: "[/i]", at: range.upperBound)
+                            feedback.insert(contentsOf: "[i]", at: range.lowerBound)
 
-                        selection = NSRange(location: selection.location + 3, length: selection.length)
+                            selection = TextSelection(range: feedback.index(range.lowerBound, offsetBy: 3) ..< feedback.index(range.upperBound, offsetBy: 3))
+                        } else {
+                            feedback.append("[i][/i]")
+
+                            selection = TextSelection(insertionPoint: feedback.index(feedback.startIndex, offsetBy: 3))
+                        }
                     } label: {
                         Image(systemName: "italic")
                             .font(.system(size: 17))
@@ -526,10 +538,16 @@ struct CommentsView: View {
                     .buttonStyle(.plain)
 
                     Button {
-                        feedback.insert(contentsOf: "[/u]", at: String.Index(utf16Offset: selection.location + selection.length, in: feedback))
-                        feedback.insert(contentsOf: "[u]", at: String.Index(utf16Offset: selection.location, in: feedback))
+                        if case let .selection(range) = selection?.indices {
+                            feedback.insert(contentsOf: "[/u]", at: range.upperBound)
+                            feedback.insert(contentsOf: "[u]", at: range.lowerBound)
 
-                        selection = NSRange(location: selection.location + 3, length: selection.length)
+                            selection = TextSelection(range: feedback.index(range.lowerBound, offsetBy: 3) ..< feedback.index(range.upperBound, offsetBy: 3))
+                        } else {
+                            feedback.append("[u][/u]")
+
+                            selection = TextSelection(insertionPoint: feedback.index(feedback.startIndex, offsetBy: 3))
+                        }
                     } label: {
                         Image(systemName: "underline")
                             .font(.system(size: 17))
@@ -543,10 +561,16 @@ struct CommentsView: View {
                     .buttonStyle(.plain)
 
                     Button {
-                        feedback.insert(contentsOf: "[/s]", at: String.Index(utf16Offset: selection.location + selection.length, in: feedback))
-                        feedback.insert(contentsOf: "[s]", at: String.Index(utf16Offset: selection.location, in: feedback))
+                        if case let .selection(range) = selection?.indices {
+                            feedback.insert(contentsOf: "[/s]", at: range.upperBound)
+                            feedback.insert(contentsOf: "[s]", at: range.lowerBound)
 
-                        selection = NSRange(location: selection.location + 3, length: selection.length)
+                            selection = TextSelection(range: feedback.index(range.lowerBound, offsetBy: 3) ..< feedback.index(range.upperBound, offsetBy: 3))
+                        } else {
+                            feedback.append("[s][/s]")
+
+                            selection = TextSelection(insertionPoint: feedback.index(feedback.startIndex, offsetBy: 3))
+                        }
                     } label: {
                         Image(systemName: "strikethrough")
                             .font(.system(size: 17))
@@ -560,10 +584,16 @@ struct CommentsView: View {
                     .buttonStyle(.plain)
 
                     Button {
-                        feedback.insert(contentsOf: "[/spoiler]", at: String.Index(utf16Offset: selection.location + selection.length, in: feedback))
-                        feedback.insert(contentsOf: "[spoiler]", at: String.Index(utf16Offset: selection.location, in: feedback))
+                        if case let .selection(range) = selection?.indices {
+                            feedback.insert(contentsOf: "[/spoiler]", at: range.upperBound)
+                            feedback.insert(contentsOf: "[spoiler]", at: range.lowerBound)
 
-                        selection = NSRange(location: selection.location + 9, length: selection.length)
+                            selection = TextSelection(range: feedback.index(range.lowerBound, offsetBy: 9) ..< feedback.index(range.upperBound, offsetBy: 9))
+                        } else {
+                            feedback.append("[spoiler][/spoiler]")
+
+                            selection = TextSelection(insertionPoint: feedback.index(feedback.startIndex, offsetBy: 9))
+                        }
                     } label: {
                         Text("Spoiler!".uppercased())
                             .font(.system(size: 15, weight: .bold, design: .rounded))
@@ -611,7 +641,9 @@ struct CommentsView: View {
                     .animation(.easeInOut, value: feedback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || (!isLoggedIn && name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) || !allowedComments)
                 }
 
-                CursorPositionTextView(text: $feedback, selection: $selection, prompt: String(localized: "key.comments.placeholder").lowercased())
+                TextField("key.comments", text: $feedback, selection: $selection, prompt: Text(String(localized: "key.comments.placeholder").lowercased()))
+                    .textFieldStyle(.plain)
+                    .textSelectionAffinity(.downstream)
             }
             .padding(12)
             .clipShape(.rect(cornerRadius: 6))
