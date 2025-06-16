@@ -41,13 +41,7 @@ struct CardView: View {
                                                 Text(Image(systemName: cat.icon)),
                                         )
                                         .font(.system(size: 10))
-                                        .textModifier { text in
-                                            if #available(macOS 14, *) {
-                                                text.foregroundStyle(.white)
-                                            } else {
-                                                text.foregroundColor(.white)
-                                            }
-                                        }
+                                        .foregroundStyle(.white)
                                         .padding(.vertical, 3)
                                         .padding(.horizontal, 6)
                                         .background(cat.color)
@@ -58,13 +52,7 @@ struct CardView: View {
                                                 Text(Image(systemName: cat.icon)),
                                         )
                                         .font(.system(size: 10))
-                                        .textModifier { text in
-                                            if #available(macOS 14, *) {
-                                                text.foregroundStyle(.white)
-                                            } else {
-                                                text.foregroundColor(.white)
-                                            }
-                                        }
+                                        .foregroundStyle(.white)
                                         .padding(.vertical, 3)
                                         .padding(.horizontal, 6)
                                         .background(cat.color)

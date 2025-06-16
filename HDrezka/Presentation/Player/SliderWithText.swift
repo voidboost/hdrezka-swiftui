@@ -165,7 +165,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .customOnChange(of: isActive) {
+        .onChange(of: isActive) {
             value = max(min(getPrgValue(), inRange.upperBound), inRange.lowerBound)
             onEditingChanged(isActive)
         }
@@ -173,7 +173,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
             localRealProgress = getPrgPercentage(value)
             progressDuration = inRange.upperBound * localRealProgress
         }
-        .customOnChange(of: value) {
+        .onChange(of: value) {
             if !isActive {
                 localRealProgress = getPrgPercentage(value)
                 progressDuration = inRange.upperBound * localRealProgress

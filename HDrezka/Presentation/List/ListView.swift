@@ -124,15 +124,8 @@ struct ListView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .viewModifier { view in
-                        if #available(macOS 14, *) {
-                            view
-                                .buttonStyle(.accessoryBar)
-                                .controlSize(.large)
-                        } else {
-                            view
-                        }
-                    }
+                    .buttonStyle(.accessoryBar)
+                    .controlSize(.large)
                     .background(.tertiary.opacity(0.05))
                     .clipShape(.rect(cornerRadius: 6))
                     .contentShape(.rect(cornerRadius: 6))
@@ -147,15 +140,8 @@ struct ListView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .viewModifier { view in
-                        if #available(macOS 14, *) {
-                            view
-                                .buttonStyle(.accessoryBar)
-                                .controlSize(.large)
-                        } else {
-                            view
-                        }
-                    }
+                    .buttonStyle(.accessoryBar)
+                    .controlSize(.large)
                     .background(.tertiary.opacity(0.05))
                     .clipShape(.rect(cornerRadius: 6))
                     .contentShape(.rect(cornerRadius: 6))
@@ -178,15 +164,8 @@ struct ListView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .viewModifier { view in
-                        if #available(macOS 14, *) {
-                            view
-                                .buttonStyle(.accessoryBar)
-                                .controlSize(.large)
-                        } else {
-                            view
-                        }
-                    }
+                    .buttonStyle(.accessoryBar)
+                    .controlSize(.large)
                     .background(.tertiary.opacity(0.05))
                     .clipShape(.rect(cornerRadius: 6))
                     .contentShape(.rect(cornerRadius: 6))
@@ -202,13 +181,13 @@ struct ListView: View {
                 viewModel.load()
             }
         }
-        .customOnChange(of: viewModel.filterGenre) {
+        .onChange(of: viewModel.filterGenre) {
             viewModel.load()
         }
-        .customOnChange(of: viewModel.filter) {
+        .onChange(of: viewModel.filter) {
             viewModel.load()
         }
-        .customOnChange(of: viewModel.newFilter) {
+        .onChange(of: viewModel.newFilter) {
             viewModel.load()
         }
         .background(.background)

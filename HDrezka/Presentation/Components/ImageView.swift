@@ -39,22 +39,10 @@ struct ImageView: View {
         .navigationTitle("key.imageViewer")
         .ignoresSafeArea()
         .focusable()
-        .viewModifier { view in
-            if #available(macOS 14, *) {
-                view.focusEffectDisabled()
-            } else {
-                view
-            }
-        }
+        .focusEffectDisabled()
         .frame(minWidth: 300 * (16 / 9), maxWidth: .infinity, minHeight: 300, maxHeight: .infinity)
         .background(WindowAccessor { window in
             self.window = window
-
-            window.isMovableByWindowBackground = true
-
-            if #unavailable(macOS 14) {
-                window.contentView?.focusRingType = .none
-            }
 
             if !window.styleMask.contains(.fullScreen) {
                 window.toggleFullScreen(nil)
@@ -84,7 +72,7 @@ struct ImageView: View {
         .contentShape(.rect)
         .toolbar(.hidden)
         .gesture(
-            DragGesture()
+            WindowDragGesture()
                 .exclusively(before:
                     TapGesture(count: 2)
                         .onEnded {

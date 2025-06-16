@@ -51,7 +51,7 @@ struct RestoreSheetView: View {
                                     .textFieldStyle(.plain)
                                     .multilineTextAlignment(.trailing)
                                     .focused($focusedField, equals: .login)
-                                    .customOnChange(of: login) {
+                                    .onChange(of: login) {
                                         let newValue = String(login.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
                                         if newValue != login {
                                             login = newValue

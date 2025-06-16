@@ -195,7 +195,7 @@ struct SignUpSheetView: View {
                                             .textFieldStyle(.plain)
                                             .multilineTextAlignment(.trailing)
                                             .focused($focusedField, equals: FocusedField.email)
-                                            .customOnChange(of: email) {
+                                            .onChange(of: email) {
                                                 let newValue = String(email.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
                                                 if newValue != email {
                                                     email = newValue
@@ -246,7 +246,7 @@ struct SignUpSheetView: View {
                                             .textFieldStyle(.plain)
                                             .multilineTextAlignment(.trailing)
                                             .focused($focusedField, equals: .username)
-                                            .customOnChange(of: username) {
+                                            .onChange(of: username) {
                                                 let newValue = String(username.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) }.prefix(30))
                                                 if newValue != username {
                                                     username = newValue
@@ -297,7 +297,7 @@ struct SignUpSheetView: View {
                                                 .textFieldStyle(.plain)
                                                 .multilineTextAlignment(.trailing)
                                                 .focused($focusedField, equals: .password1)
-                                                .customOnChange(of: password1) {
+                                                .onChange(of: password1) {
                                                     let newValue = String(password1.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
                                                     if newValue != password1 {
                                                         password1 = newValue
@@ -332,7 +332,7 @@ struct SignUpSheetView: View {
                                                 .textFieldStyle(.plain)
                                                 .multilineTextAlignment(.trailing)
                                                 .focused($focusedField, equals: .password1)
-                                                .customOnChange(of: password1) {
+                                                .onChange(of: password1) {
                                                     let newValue = String(password1.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
                                                     if newValue != password1 {
                                                         password1 = newValue
@@ -405,7 +405,7 @@ struct SignUpSheetView: View {
                                                 .textFieldStyle(.plain)
                                                 .multilineTextAlignment(.trailing)
                                                 .focused($focusedField, equals: .password2)
-                                                .customOnChange(of: password2) {
+                                                .onChange(of: password2) {
                                                     let newValue = String(password2.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
                                                     if newValue != password2 {
                                                         password2 = newValue
@@ -438,7 +438,7 @@ struct SignUpSheetView: View {
                                                 .textFieldStyle(.plain)
                                                 .multilineTextAlignment(.trailing)
                                                 .focused($focusedField, equals: .password2)
-                                                .customOnChange(of: password2) {
+                                                .onChange(of: password2) {
                                                     let newValue = String(password2.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
                                                     if newValue != password2 {
                                                         password2 = newValue

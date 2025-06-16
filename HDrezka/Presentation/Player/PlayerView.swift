@@ -69,6 +69,7 @@ struct PlayerView: View {
     @State private var subtitlesOptions: [AVMediaSelectionOption] = []
     @State private var thumbnails: WebVTT?
     @State private var window: NSWindow?
+    @State private var isGestureEnabled: Bool = true
 
     init(data: PlayerData) {
         poster = data.details.poster
@@ -130,9 +131,7 @@ struct PlayerView: View {
                                 }
                                 .frame(width: 120, height: 10)
                                 .onHover { hovering in
-                                    guard let window else { return }
-
-                                    window.isMovableByWindowBackground = !hovering
+                                    isGestureEnabled = !hovering
                                 }
                                 .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
 
@@ -146,13 +145,7 @@ struct PlayerView: View {
                                     } label: {
                                         Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(volume))
                                             .font(.system(size: 17))
-                                            .viewModifier { view in
-                                                if #available(macOS 14, *) {
-                                                    view.contentTransition(.symbolEffect(.replace))
-                                                } else {
-                                                    view
-                                                }
-                                            }
+                                            .contentTransition(.symbolEffect(.replace))
                                     }
                                     .buttonStyle(.plain)
                                     .keyboardShortcut("m", modifiers: [])
@@ -201,13 +194,7 @@ struct PlayerView: View {
                                 } label: {
                                     Image(systemName: isPlaying ? "pause.fill" : "play.fill")
                                         .font(.system(size: 43))
-                                        .viewModifier { view in
-                                            if #available(macOS 14, *) {
-                                                view.contentTransition(.symbolEffect(.replace))
-                                            } else {
-                                                view
-                                            }
-                                        }
+                                        .contentTransition(.symbolEffect(.replace))
                                 }
                                 .buttonStyle(.plain)
                                 .keyboardShortcut(.space, modifiers: [])
@@ -276,13 +263,7 @@ struct PlayerView: View {
                                         Label("key.video_gravity", systemImage: videoGravity == .resizeAspect ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
                                             .labelStyle(.iconOnly)
                                             .font(.system(size: 17))
-                                            .viewModifier { view in
-                                                if #available(macOS 14, *) {
-                                                    view.contentTransition(.symbolEffect(.replace))
-                                                } else {
-                                                    view
-                                                }
-                                            }
+                                            .contentTransition(.symbolEffect(.replace))
                                     }
                                     .buttonStyle(.plain)
                                     .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
@@ -427,9 +408,7 @@ struct PlayerView: View {
                             }, inRange: 0 ... duration, buffers: loadedTimeRanges, activeFillColor: .primary, fillColor: .primary.opacity(0.7), emptyColor: .primary.opacity(0.3), height: 6, thumbnails: thumbnails) { _ in }
                                 .frame(height: 23)
                                 .onHover { hovering in
-                                    guard let window else { return }
-
-                                    window.isMovableByWindowBackground = !hovering
+                                    isGestureEnabled = !hovering
                                 }
                                 .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                         }
@@ -537,7 +516,7 @@ struct PlayerView: View {
                 setMask((isLoading || !isPlaying) && !isPictureInPictureActive)
             }
         }
-        .customOnChange(of: scenePhase) {
+        .onChange(of: scenePhase) {
             guard let player = playerLayer.player,
                   player.status == .readyToPlay
             else {
@@ -553,7 +532,7 @@ struct PlayerView: View {
                 }
             }
         }
-        .customOnChange(of: spatialAudio) {
+        .onChange(of: spatialAudio) {
             guard let player = playerLayer.player,
                   player.status == .readyToPlay,
                   let currentItem = player.currentItem
@@ -565,22 +544,10 @@ struct PlayerView: View {
         }
         .ignoresSafeArea()
         .focusable()
-        .viewModifier { view in
-            if #available(macOS 14, *) {
-                view.focusEffectDisabled()
-            } else {
-                view
-            }
-        }
+        .focusEffectDisabled()
         .frame(minWidth: 900, minHeight: 900 / 16 * 9)
         .background(WindowAccessor { window in
             self.window = window
-
-            window.isMovableByWindowBackground = true
-
-            if #unavailable(macOS 14) {
-                window.contentView?.focusRingType = .none
-            }
 
             if playerFullscreen,
                !window.styleMask.contains(.fullScreen)
@@ -646,7 +613,7 @@ struct PlayerView: View {
             }
         }
         .gesture(
-            DragGesture()
+            WindowDragGesture()
                 .exclusively(before:
                     TapGesture(count: 2)
                         .onEnded {
@@ -677,6 +644,7 @@ struct PlayerView: View {
                                         player.playImmediately(atRate: rate)
                                     }
                                 })),
+            isEnabled: isGestureEnabled,
         )
     }
 
@@ -979,6 +947,10 @@ struct PlayerView: View {
                         setMask(!isPictureInPictureActive)
 
                         updateNextTimer()
+
+                        if let window,!isPictureInPictureActive {
+                            window.makeKeyAndOrderFront(nil)
+                        }
 
 //                        if let window {
 //                            if isPictureInPictureActive {

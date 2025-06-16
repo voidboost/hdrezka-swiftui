@@ -130,7 +130,7 @@ struct DetailsView: View {
             }
         }
         .dialogSeverity(.critical)
-        .customOnChange(of: isCreateBookmarkPresented) {
+        .onChange(of: isCreateBookmarkPresented) {
             isBookmarksPresented = !isCreateBookmarkPresented
         }
         .background(.background)
@@ -391,43 +391,19 @@ struct DetailsView: View {
                 {
                     HStack(alignment: .center) {
                         if let imdbRating = details.imdbRating {
-                            let color = if #available(macOS 15, *) {
-                                Color.red.mix(with: .green, by: Double(imdbRating.value / 10.0))
-                            } else {
-                                Color(
-                                    NSColor
-                                        .red
-                                        .blended(withFraction: CGFloat(imdbRating.value / 10.0), of: NSColor.green) ?? NSColor.labelColor,
-                                )
-                            }
+                            let color = Color.red.mix(with: .green, by: Double(imdbRating.value / 10.0))
 
                             InfoColumn("IMDb", imdbRating.value.description, StarsView(rating: imdbRating.value * 0.5, color: color), valueColor: color, hover: imdbRating.votesCount, url: URL(string: imdbRating.link))
                         }
 
                         if let kpRating = details.kpRating {
-                            let color = if #available(macOS 15, *) {
-                                Color.red.mix(with: .green, by: Double(kpRating.value / 10.0))
-                            } else {
-                                Color(
-                                    NSColor
-                                        .red
-                                        .blended(withFraction: CGFloat(kpRating.value / 10.0), of: NSColor.green) ?? NSColor.labelColor,
-                                )
-                            }
+                            let color = Color.red.mix(with: .green, by: Double(kpRating.value / 10.0))
 
                             InfoColumn("КиноПоиск", kpRating.value.description, StarsView(rating: kpRating.value * 0.5, color: color), valueColor: color, hover: kpRating.votesCount, url: URL(string: kpRating.link))
                         }
 
                         if let waRating = details.waRating {
-                            let color = if #available(macOS 15, *) {
-                                Color.red.mix(with: .green, by: Double(waRating.value / 10.0))
-                            } else {
-                                Color(
-                                    NSColor
-                                        .red
-                                        .blended(withFraction: CGFloat(waRating.value / 10.0), of: NSColor.green) ?? NSColor.labelColor,
-                                )
-                            }
+                            let color = Color.red.mix(with: .green, by: Double(waRating.value / 10.0))
 
                             InfoColumn("World Art", waRating.value.description, StarsView(rating: waRating.value * 0.5, color: color), valueColor: color, hover: waRating.votesCount, url: URL(string: waRating.link))
                         }
@@ -570,33 +546,13 @@ struct DetailsView: View {
                                                         .lineLimit(1)
 
                                                     if let rating = fr.rating {
-                                                        let color = if #available(macOS 15, *) {
-                                                            Color.red.mix(with: .green, by: Double(rating / 10.0))
-                                                        } else {
-                                                            Color(
-                                                                NSColor
-                                                                    .red
-                                                                    .blended(withFraction: CGFloat(rating / 10.0), of: NSColor.green) ?? NSColor.labelColor,
-                                                            )
-                                                        }
+                                                        let color = Color.red.mix(with: .green, by: Double(rating / 10.0))
 
                                                         (
                                                             Text("key.franchise.year-\(fr.year)") +
                                                                 Text(verbatim: " • ") +
-                                                                Text(verbatim: "\(rating.description) ").textModifier { text in
-                                                                    if #available(macOS 14, *) {
-                                                                        text.foregroundStyle(color)
-                                                                    } else {
-                                                                        text.foregroundColor(color)
-                                                                    }
-                                                                } +
-                                                                Text(Image(systemName: "star.fill")).textModifier { text in
-                                                                    if #available(macOS 14, *) {
-                                                                        text.foregroundStyle(color)
-                                                                    } else {
-                                                                        text.foregroundColor(color)
-                                                                    }
-                                                                }
+                                                                Text(verbatim: "\(rating.description) ").foregroundStyle(color) +
+                                                                Text(Image(systemName: "star.fill")).foregroundStyle(color)
                                                         )
                                                         .font(.system(size: 11))
                                                         .foregroundStyle(.secondary)
@@ -632,33 +588,13 @@ struct DetailsView: View {
                                                     .lineLimit(1)
 
                                                 if let rating = fr.rating {
-                                                    let color = if #available(macOS 15, *) {
-                                                        Color.red.mix(with: .green, by: Double(rating / 10.0))
-                                                    } else {
-                                                        Color(
-                                                            NSColor
-                                                                .red
-                                                                .blended(withFraction: CGFloat(rating / 10.0), of: NSColor.green) ?? NSColor.labelColor,
-                                                        )
-                                                    }
+                                                    let color = Color.red.mix(with: .green, by: Double(rating / 10.0))
 
                                                     (
                                                         Text("key.franchise.year-\(fr.year)") +
                                                             Text(verbatim: " • ") +
-                                                            Text(verbatim: "\(rating.description) ").textModifier { text in
-                                                                if #available(macOS 14, *) {
-                                                                    text.foregroundStyle(color)
-                                                                } else {
-                                                                    text.foregroundColor(color)
-                                                                }
-                                                            } +
-                                                            Text(Image(systemName: "star.fill")).textModifier { text in
-                                                                if #available(macOS 14, *) {
-                                                                    text.foregroundStyle(color)
-                                                                } else {
-                                                                    text.foregroundColor(color)
-                                                                }
-                                                            }
+                                                            Text(verbatim: "\(rating.description) ").foregroundStyle(color) +
+                                                            Text(Image(systemName: "star.fill")).foregroundStyle(color)
                                                     )
                                                     .font(.system(size: 11))
                                                     .foregroundStyle(.secondary)
@@ -857,20 +793,8 @@ struct DetailsView: View {
                                         .contentShape(.rect)
                                 } else if let list = item as? MovieList, let position = list.moviePosition?.toNumeral() {
                                     (
-                                        Text(verbatim: "\(list.name) ").textModifier { text in
-                                            if #available(macOS 14, *) {
-                                                text.foregroundStyle(.secondary)
-                                            } else {
-                                                text.foregroundColor(.secondary)
-                                            }
-                                        } +
-                                            Text("key.place-\(position)").textModifier { text in
-                                                if #available(macOS 14, *) {
-                                                    text.foregroundStyle(.tertiary)
-                                                } else {
-                                                    text.foregroundColor(.secondary)
-                                                }
-                                            },
+                                        Text(verbatim: "\(list.name) ").foregroundStyle(.secondary) +
+                                            Text("key.place-\(position)").foregroundStyle(.tertiary),
                                     )
                                     .font(.system(size: 13))
                                     .lineLimit(1)
@@ -945,13 +869,7 @@ struct DetailsView: View {
                                             } else if let list = item as? MovieList, let position = list.moviePosition?.toNumeral() {
                                                 (
                                                     Text(verbatim: "\(list.name) ") +
-                                                        Text("key.place-\(position)").textModifier { text in
-                                                            if #available(macOS 14, *) {
-                                                                text.foregroundStyle(.secondary)
-                                                            } else {
-                                                                text.foregroundColor(.secondary)
-                                                            }
-                                                        },
+                                                        Text("key.place-\(position)").foregroundStyle(.secondary),
                                                 )
                                                 .font(.system(size: 13))
                                                 .lineLimit(nil)
@@ -1062,25 +980,13 @@ struct DetailsView: View {
                         Text(rating.description)
                             .font(.system(size: 13).monospacedDigit())
                             .foregroundStyle(.secondary)
-                            .viewModifier { view in
-                                if #available(macOS 14, *) {
-                                    view.contentTransition(.numericText(value: Double(rating)))
-                                } else {
-                                    view
-                                }
-                            }
+                            .contentTransition(.numericText(value: Double(rating)))
 
                         if let votes, vote {
                             Text(verbatim: "(\(votes))")
                                 .font(.system(size: 9).monospacedDigit())
                                 .foregroundStyle(.secondary)
-                                .viewModifier { view in
-                                    if #available(macOS 14, *) {
-                                        view.contentTransition(.numericText())
-                                    } else {
-                                        view
-                                    }
-                                }
+                                .contentTransition(.numericText())
                         }
                     }
                     .viewModifier { view in
@@ -1280,16 +1186,13 @@ struct DetailsView: View {
 
 private extension CGImage {
     func removeBackground() -> NSImage? {
-        guard #available(macOS 14, *),
-              let nsImage = processImage(image: self)
-        else {
+        guard let nsImage = processImage(image: self) else {
             return NSImage(cgImage: self, size: CGSize(width: width, height: height))
         }
 
         return nsImage
     }
 
-    @available(macOS 14, *)
     func processImage(image: CGImage) -> NSImage? {
         let inputImage = CIImage(cgImage: image)
         let handler = VNImageRequestHandler(ciImage: inputImage)

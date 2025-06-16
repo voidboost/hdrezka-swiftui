@@ -126,25 +126,13 @@ struct BookmarksSheetView: View {
                                         } label: {
                                             HStack(alignment: .center) {
                                                 Image(systemName: isChecked ? "bookmark.fill" : "bookmark")
-                                                    .viewModifier { view in
-                                                        if #available(macOS 14, *) {
-                                                            view.contentTransition(.symbolEffect(.replace))
-                                                        } else {
-                                                            view
-                                                        }
-                                                    }
+                                                    .contentTransition(.symbolEffect(.replace))
 
                                                 Text(verbatim: "\(bookmark.name) (\(bookmark.count.description))")
                                                     .monospacedDigit()
                                                     .lineLimit(nil)
                                                     .multilineTextAlignment(.center)
-                                                    .viewModifier { view in
-                                                        if #available(macOS 14, *) {
-                                                            view.contentTransition(.numericText(value: Double(bookmark.count)))
-                                                        } else {
-                                                            view
-                                                        }
-                                                    }
+                                                    .contentTransition(.numericText(value: Double(bookmark.count)))
                                             }
                                             .highlightOnHover()
                                         }

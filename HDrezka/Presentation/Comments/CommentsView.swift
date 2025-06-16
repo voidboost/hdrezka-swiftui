@@ -269,13 +269,7 @@ struct CommentsView: View {
                                 if comment.likesCount > 0 {
                                     Text(comment.likesCount.description)
                                         .font(.system(size: 13, weight: .semibold).monospacedDigit())
-                                        .viewModifier { view in
-                                            if #available(macOS 14, *) {
-                                                view.contentTransition(.numericText(value: Double(comment.likesCount)))
-                                            } else {
-                                                view
-                                            }
-                                        }
+                                        .contentTransition(.numericText(value: Double(comment.likesCount)))
                                 }
                             }
                             .frame(height: 28)
@@ -614,7 +608,7 @@ struct CommentsView: View {
                             .font(.system(size: 13))
                             .multilineTextAlignment(.trailing)
                             .lineLimit(1)
-                            .customOnChange(of: name) {
+                            .onChange(of: name) {
                                 if name.count > 60 {
                                     name = String(name.prefix(60))
                                 }
@@ -648,7 +642,7 @@ struct CommentsView: View {
             .padding(12)
             .clipShape(.rect(cornerRadius: 6))
             .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
-            .customOnChange(of: feedback) {
+            .onChange(of: feedback) {
                 if !allowedComments, !feedback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     appState.commentsRulesPresented = true
                 }
