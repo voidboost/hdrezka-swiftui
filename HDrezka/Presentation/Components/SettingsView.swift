@@ -11,6 +11,7 @@ struct SettingsView: View {
     @Default(.hideMainWindow) private var hideMainWindow
     @Default(.defaultQuality) private var defaultQuality
     @Default(.spatialAudio) private var spatialAudio
+    @Default(.theme) private var theme
 
     @Environment(\.modelContext) private var modelContext
 
@@ -128,6 +129,30 @@ struct SettingsView: View {
             .frame(height: 40)
 
             VStack(spacing: 0) {
+                HStack(alignment: .center, spacing: 8) {
+                    Text("key.theme")
+
+                    Spacer()
+
+                    Picker("key.theme", selection: $theme) {
+                        ForEach(Theme.allCases) { theme in
+                            Text(theme.localizedKey)
+                                .tag(theme)
+                        }
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .buttonStyle(.accessoryBar)
+                    .controlSize(.large)
+                    .background(.tertiary.opacity(0.05))
+                    .clipShape(.rect(cornerRadius: 6))
+                    .contentShape(.rect(cornerRadius: 6))
+                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                }
+                .frame(height: 40)
+
+                Divider()
+
                 HStack(alignment: .center, spacing: 8) {
                     Text("key.playerFullscreen")
 
@@ -443,6 +468,36 @@ enum SpatialAudio: Int, CaseIterable, Identifiable, Defaults.Serializable {
             .multichannel
         case .monoStereoAndMultichannel:
             .monoStereoAndMultichannel
+        }
+    }
+}
+
+enum Theme: Int, CaseIterable, Identifiable, Defaults.Serializable {
+    case system = 0
+    case light
+    case dark
+
+    var id: Self { self }
+
+    var localizedKey: LocalizedStringKey {
+        switch self {
+        case .system:
+            "key.theme.system"
+        case .light:
+            "key.theme.light"
+        case .dark:
+            "key.theme.dark"
+        }
+    }
+
+    var scheme: ColorScheme? {
+        switch self {
+        case .system:
+            nil
+        case .light:
+            .light
+        case .dark:
+            .dark
         }
     }
 }

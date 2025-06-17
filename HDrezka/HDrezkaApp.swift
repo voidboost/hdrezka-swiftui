@@ -91,6 +91,8 @@ struct HDrezkaApp: App {
     private let updaterController: SPUStandardUpdaterController
     private let modelContainer: ModelContainer
 
+    @Default(.theme) private var theme
+
     init() {
         updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
 
@@ -114,6 +116,7 @@ struct HDrezkaApp: App {
                 .background(WindowAccessor { window in
                     appState.window = window
                 })
+                .preferredColorScheme(theme.scheme)
         }
         .modelContainer(modelContainer)
         .windowResizability(.contentMinSize)
@@ -138,7 +141,7 @@ struct HDrezkaApp: App {
 
         WindowGroup("key.imageViewer", id: "imageViewer", for: URL.self) { $url in
             if let url {
-                ImageView(url: url)
+                ImageView(url: url).preferredColorScheme(theme.scheme)
             }
         }
         .defaultPosition(.center)
@@ -148,7 +151,7 @@ struct HDrezkaApp: App {
         .commands(content: removed)
 
         WindowGroup("key.licenses", id: "licenses") {
-            LicensesView()
+            LicensesView().preferredColorScheme(theme.scheme)
         }
         .defaultPosition(.center)
         .windowResizability(.contentSize)
@@ -157,7 +160,7 @@ struct HDrezkaApp: App {
         .commands(content: removed)
 
         Settings {
-            SettingsView(updater: updaterController.updater)
+            SettingsView(updater: updaterController.updater).preferredColorScheme(theme.scheme)
         }
         .modelContainer(modelContainer)
         .windowResizability(.contentSize)
@@ -171,6 +174,7 @@ struct HDrezkaApp: App {
         } set: { _ in }) {
             DownloadsView()
                 .environment(downloader)
+                .preferredColorScheme(theme.scheme)
         } label: {
             MenuBarIcon()
         }
