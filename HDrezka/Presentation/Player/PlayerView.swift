@@ -251,23 +251,6 @@ struct PlayerView: View {
                                 Spacer()
 
                                 HStack(alignment: .center) {
-                                    Button {
-                                        withAnimation(.easeInOut) {
-                                            if videoGravity == .resizeAspect {
-                                                playerLayer.videoGravity = .resizeAspectFill
-                                            } else {
-                                                playerLayer.videoGravity = .resizeAspect
-                                            }
-                                        }
-                                    } label: {
-                                        Label("key.video_gravity", systemImage: videoGravity == .resizeAspect ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
-                                            .labelStyle(.iconOnly)
-                                            .font(.system(size: 17))
-                                            .contentTransition(.symbolEffect(.replace))
-                                    }
-                                    .buttonStyle(.plain)
-                                    .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
-
                                     if !subtitlesOptions.isEmpty {
                                         Menu {
                                             Picker(selection: Binding {
@@ -330,6 +313,28 @@ struct PlayerView: View {
                                             .pickerStyle(.inline)
                                         } label: {
                                             Label("key.timer", systemImage: "timer")
+                                                .labelStyle(.titleOnly)
+                                                .font(.system(size: 17))
+                                        }
+                                        .buttonStyle(.plain)
+
+                                        Menu {
+                                            Picker(selection: Binding {
+                                                videoGravity
+                                            } set: {
+                                                playerLayer.videoGravity = $0
+                                            }) {
+                                                Text("key.video_gravity.fit").tag(AVLayerVideoGravity.resizeAspect)
+
+                                                Text("key.video_gravity.fill").tag(AVLayerVideoGravity.resizeAspectFill)
+
+                                                Text("key.video_gravity.stretch").tag(AVLayerVideoGravity.resize)
+                                            } label: {
+                                                EmptyView()
+                                            }
+                                            .pickerStyle(.inline)
+                                        } label: {
+                                            Label("key.video_gravity", systemImage: "arrow.up.left.and.arrow.down.right")
                                                 .labelStyle(.titleOnly)
                                                 .font(.system(size: 17))
                                         }

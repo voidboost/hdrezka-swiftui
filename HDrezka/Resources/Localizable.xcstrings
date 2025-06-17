@@ -6454,7 +6454,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Video gravity"
+            "value" : "Video aspect ratio"
           }
         },
         "ru" : {
@@ -6467,6 +6467,72 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Співвідношення сторін відео"
+          }
+        }
+      }
+    },
+    "key.video_gravity.fill" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fill"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заполнить"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заповнити"
+          }
+        }
+      }
+    },
+    "key.video_gravity.fit" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fit"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вместить"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вмістити"
+          }
+        }
+      }
+    },
+    "key.video_gravity.stretch" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stretch"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Растянуть"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Розтягнути"
           }
         }
       }
