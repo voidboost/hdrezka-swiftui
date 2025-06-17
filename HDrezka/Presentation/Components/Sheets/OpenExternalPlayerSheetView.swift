@@ -4,7 +4,7 @@ import FactoryKit
 import SwiftData
 import SwiftUI
 
-struct WatchSheetView: View {
+struct OpenExternalPlayerSheetView: View {
     @Injected(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
     @Injected(\.getMovieDetailsUseCase) private var getMovieDetailsUseCase
     @Injected(\.getMovieVideoUseCase) private var getMovieVideoUseCase
@@ -12,9 +12,8 @@ struct WatchSheetView: View {
 
     @State private var subscriptions: Set<AnyCancellable> = []
 
+    @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.openWindow) private var openWindow
-    @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.modelContext) private var modelContext
 
     @Environment(AppState.self) private var appState
@@ -33,6 +32,7 @@ struct WatchSheetView: View {
     @State private var selectedSeason: MovieSeason?
     @State private var selectedEpisode: MovieEpisode?
     @State private var selectedQuality: String?
+    @State private var selectedSubtitles: MovieSubtitles?
     @State private var movie: MovieVideo?
 
     @State private var error: Error?
@@ -49,14 +49,14 @@ struct WatchSheetView: View {
     var body: some View {
         VStack(alignment: .center, spacing: 25) {
             VStack(alignment: .center, spacing: 5) {
-                Image(systemName: "videoprojector")
+                Image(systemName: "arrow.up.forward.app")
                     .font(.system(size: 48))
                     .foregroundStyle(Color.accentColor)
 
                 Text("key.before_starting")
                     .font(.largeTitle.weight(.semibold))
 
-                Text("key.watch.description")
+                Text("key.open.description")
                     .font(.title3)
                     .lineLimit(2, reservesSpace: true)
                     .multilineTextAlignment(.center)
@@ -348,56 +348,331 @@ struct WatchSheetView: View {
                         .clipShape(.rect(cornerRadius: 6))
                         .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
+
+                    if let movie, !movie.subtitles.isEmpty {
+                        ZStack(alignment: .center) {
+                            HStack {
+                                Text("key.subtitles")
+
+                                if let selectedSubtitles, let subtitles = movie.subtitles.first(where: { $0 == selectedSubtitles }), let url = URL(string: subtitles.link) {
+                                    ShareLink(item: url) {
+                                        Image(systemName: "square.and.arrow.up")
+                                            .foregroundStyle(.secondary)
+                                            .font(.system(size: 11))
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+
+                                Spacer()
+
+                                Menu {
+                                    if selectedSubtitles != nil {
+                                        Button {
+                                            withAnimation(.easeInOut) {
+                                                selectedSubtitles = nil
+                                            }
+                                        } label: {
+                                            Text("key.none")
+                                        }
+                                    }
+
+                                    ForEach(movie.subtitles.filter { $0 != selectedSubtitles }) { subtitles in
+                                        Button {
+                                            withAnimation(.easeInOut) {
+                                                selectedSubtitles = subtitles
+                                            }
+                                        } label: {
+                                            Text(subtitles.name)
+                                        }
+                                    }
+                                } label: {
+                                    let name = if let selectedSubtitles {
+                                        if selectedSubtitles.name.isEmpty {
+                                            String(localized: "key.default")
+                                        } else {
+                                            selectedSubtitles.name
+                                        }
+                                    } else {
+                                        String(localized: "key.subtitles.select")
+                                    }
+
+                                    Label(name, systemImage: "chevron.up.chevron.down")
+                                }
+                                .menuStyle(.button)
+                                .menuIndicator(.hidden)
+                                .buttonStyle(.plain)
+                                .labelStyle(CustomLabelStyle(iconVisible: movie.subtitles.count > 0))
+                            }
+                            .padding(.vertical, 10)
+                        }
+                        .padding(.horizontal, 15)
+                        .padding(.vertical, 5)
+                        .background(.quinary)
+                        .clipShape(.rect(cornerRadius: 6))
+                        .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                    }
                 }
             } else {
                 ProgressView()
             }
 
             VStack(alignment: .center, spacing: 10) {
-                Button {
-                    if let details, let selectedActing, let selectedQuality, let movie {
-                        if isLoggedIn {
-                            saveWatchingStateUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode, position: 0, total: 0)
-                                .sink { _ in } receiveValue: { _ in }
-                                .store(in: &subscriptions)
+                if ExternalPlayers.allCases.contains(where: { NSWorkspace.shared.urlForApplication(withBundleIdentifier: $0.rawValue) != nil }) {
+                    if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: ExternalPlayers.iina.rawValue) {
+                        Button {
+                            if let selectedActing {
+                                if isLoggedIn {
+                                    saveWatchingStateUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode, position: 0, total: 0)
+                                        .sink { _ in } receiveValue: { _ in }
+                                        .store(in: &subscriptions)
+                                }
+
+                                if let position = selectPositions.first(where: { position in
+                                    position.id == selectedActing.voiceId
+                                }) {
+                                    position.acting = selectedActing.translatorId
+                                    position.season = selectedSeason?.seasonId
+                                    position.episode = selectedEpisode?.episodeId
+                                } else {
+                                    let position = SelectPosition(
+                                        id: selectedActing.voiceId,
+                                        acting: selectedActing.translatorId,
+                                        season: selectedSeason?.seasonId,
+                                        episode: selectedEpisode?.episodeId,
+                                    )
+
+                                    modelContext.insert(position)
+                                }
+                            }
+
+                            if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality), let selectedSubtitles, let subtitlesURL = URL(string: selectedSubtitles.link) {
+                                do {
+                                    try Process.run(
+                                        appURL.appending(path: "Contents", directoryHint: .isDirectory).appending(path: "MacOS", directoryHint: .isDirectory).appending(path: appURL.deletingPathExtension().lastPathComponent, directoryHint: .notDirectory),
+                                        arguments: [
+                                            "--separate-windows",
+                                            "--no-stdin",
+                                            "--mpv-keep-open=yes",
+                                            "--mpv-loop=no",
+                                            "--mpv-sub-file=\(subtitlesURL.absoluteString)",
+                                            movieURL.absoluteString,
+                                        ],
+                                    )
+                                } catch {
+                                    self.error = error
+                                    isErrorPresented = true
+                                }
+                            } else if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality) {
+                                do {
+                                    try Process.run(
+                                        appURL.appending(path: "Contents", directoryHint: .isDirectory).appending(path: "MacOS", directoryHint: .isDirectory).appending(path: appURL.deletingPathExtension().lastPathComponent, directoryHint: .notDirectory),
+                                        arguments: [
+                                            movieURL.absoluteString,
+                                        ],
+                                    )
+                                } catch {
+                                    self.error = error
+                                    isErrorPresented = true
+                                }
+                            }
+                        } label: {
+                            Text(ExternalPlayers.iina.localizedKey)
+                                .frame(width: 250, height: 30)
+                                .foregroundStyle(.white)
+                                .background(selectedQuality != nil ? Color.accentColor : Color.secondary)
+                                .clipShape(.rect(cornerRadius: 6))
+                                .contentShape(.rect(cornerRadius: 6))
                         }
-
-                        if let position = selectPositions.first(where: { position in
-                            position.id == selectedActing.voiceId
-                        }) {
-                            position.acting = selectedActing.translatorId
-                            position.season = selectedSeason?.seasonId
-                            position.episode = selectedEpisode?.episodeId
-                        } else {
-                            let position = SelectPosition(
-                                id: selectedActing.voiceId,
-                                acting: selectedActing.translatorId,
-                                season: selectedSeason?.seasonId,
-                                episode: selectedEpisode?.episodeId,
-                            )
-
-                            modelContext.insert(position)
-                        }
-
-                        dismissWindow(id: "player")
-
-                        openWindow(
-                            id: "player",
-                            value: PlayerData(details: details, selectedActing: selectedActing, seasons: seasons, selectedSeason: selectedSeason, selectedEpisode: selectedEpisode, selectedQuality: selectedQuality, movie: movie),
-                        )
-
-                        dismiss()
+                        .buttonStyle(.plain)
+                        .disabled(selectedQuality == nil)
                     }
-                } label: {
-                    Text("key.watch")
+
+                    if NSWorkspace.shared.urlForApplication(withBundleIdentifier: ExternalPlayers.infuse.rawValue) != nil,
+                       let infuseURL = URL(string: "infuse://x-callback-url/play"),
+                       NSWorkspace.shared.urlForApplication(toOpen: infuseURL) != nil
+                    {
+                        Button {
+                            if let selectedActing {
+                                if isLoggedIn {
+                                    saveWatchingStateUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode, position: 0, total: 0)
+                                        .sink { _ in } receiveValue: { _ in }
+                                        .store(in: &subscriptions)
+                                }
+
+                                if let position = selectPositions.first(where: { position in
+                                    position.id == selectedActing.voiceId
+                                }) {
+                                    position.acting = selectedActing.translatorId
+                                    position.season = selectedSeason?.seasonId
+                                    position.episode = selectedEpisode?.episodeId
+                                } else {
+                                    let position = SelectPosition(
+                                        id: selectedActing.voiceId,
+                                        acting: selectedActing.translatorId,
+                                        season: selectedSeason?.seasonId,
+                                        episode: selectedEpisode?.episodeId,
+                                    )
+
+                                    modelContext.insert(position)
+                                }
+                            }
+
+                            if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality), let selectedSubtitles, let subtitlesURL = URL(string: selectedSubtitles.link) {
+                                openURL(infuseURL.appending(queryItems: [.init(name: "url", value: movieURL.absoluteString), .init(name: "sub", value: subtitlesURL.absoluteString)]))
+                            } else if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality) {
+                                openURL(infuseURL.appending(queryItems: [.init(name: "url", value: movieURL.absoluteString)]))
+                            }
+                        } label: {
+                            Text(ExternalPlayers.infuse.localizedKey)
+                                .frame(width: 250, height: 30)
+                                .foregroundStyle(.white)
+                                .background(selectedQuality != nil ? Color.accentColor : Color.secondary)
+                                .clipShape(.rect(cornerRadius: 6))
+                                .contentShape(.rect(cornerRadius: 6))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(selectedQuality == nil)
+                    }
+
+                    if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: ExternalPlayers.mpv.rawValue) {
+                        Button {
+                            if let selectedActing {
+                                if isLoggedIn {
+                                    saveWatchingStateUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode, position: 0, total: 0)
+                                        .sink { _ in } receiveValue: { _ in }
+                                        .store(in: &subscriptions)
+                                }
+
+                                if let position = selectPositions.first(where: { position in
+                                    position.id == selectedActing.voiceId
+                                }) {
+                                    position.acting = selectedActing.translatorId
+                                    position.season = selectedSeason?.seasonId
+                                    position.episode = selectedEpisode?.episodeId
+                                } else {
+                                    let position = SelectPosition(
+                                        id: selectedActing.voiceId,
+                                        acting: selectedActing.translatorId,
+                                        season: selectedSeason?.seasonId,
+                                        episode: selectedEpisode?.episodeId,
+                                    )
+
+                                    modelContext.insert(position)
+                                }
+                            }
+
+                            if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality), let selectedSubtitles, let subtitlesURL = URL(string: selectedSubtitles.link) {
+                                do {
+                                    try Process.run(
+                                        appURL.appending(path: "Contents", directoryHint: .isDirectory).appending(path: "MacOS", directoryHint: .isDirectory).appending(path: appURL.deletingPathExtension().lastPathComponent, directoryHint: .notDirectory),
+                                        arguments: [
+                                            "--keep-open=yes",
+                                            "--loop=no",
+                                            "--sub-file=\(subtitlesURL.absoluteString)",
+                                            movieURL.absoluteString,
+                                        ],
+                                    )
+                                } catch {
+                                    self.error = error
+                                    isErrorPresented = true
+                                }
+                            } else if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality) {
+                                do {
+                                    try Process.run(
+                                        appURL.appending(path: "Contents", directoryHint: .isDirectory).appending(path: "MacOS", directoryHint: .isDirectory).appending(path: appURL.deletingPathExtension().lastPathComponent, directoryHint: .notDirectory),
+                                        arguments: [
+                                            movieURL.absoluteString,
+                                        ],
+                                    )
+                                } catch {
+                                    self.error = error
+                                    isErrorPresented = true
+                                }
+                            }
+                        } label: {
+                            Text(ExternalPlayers.mpv.localizedKey)
+                                .frame(width: 250, height: 30)
+                                .foregroundStyle(.white)
+                                .background(selectedQuality != nil ? Color.accentColor : Color.secondary)
+                                .clipShape(.rect(cornerRadius: 6))
+                                .contentShape(.rect(cornerRadius: 6))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(selectedQuality == nil)
+                    }
+
+                    if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: ExternalPlayers.vlc.rawValue) {
+                        Button {
+                            if let selectedActing {
+                                if isLoggedIn {
+                                    saveWatchingStateUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode, position: 0, total: 0)
+                                        .sink { _ in } receiveValue: { _ in }
+                                        .store(in: &subscriptions)
+                                }
+
+                                if let position = selectPositions.first(where: { position in
+                                    position.id == selectedActing.voiceId
+                                }) {
+                                    position.acting = selectedActing.translatorId
+                                    position.season = selectedSeason?.seasonId
+                                    position.episode = selectedEpisode?.episodeId
+                                } else {
+                                    let position = SelectPosition(
+                                        id: selectedActing.voiceId,
+                                        acting: selectedActing.translatorId,
+                                        season: selectedSeason?.seasonId,
+                                        episode: selectedEpisode?.episodeId,
+                                    )
+
+                                    modelContext.insert(position)
+                                }
+                            }
+
+                            if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality), let selectedSubtitles, let subtitlesURL = URL(string: selectedSubtitles.link), subtitlesURL.pathExtension == "srt" {
+                                do {
+                                    try Process.run(
+                                        appURL.appending(path: "Contents", directoryHint: .isDirectory).appending(path: "MacOS", directoryHint: .isDirectory).appending(path: appURL.deletingPathExtension().lastPathComponent, directoryHint: .notDirectory),
+                                        arguments: [
+                                            "--sub-file=\(subtitlesURL.absoluteString)",
+                                            movieURL.absoluteString,
+                                        ],
+                                    )
+                                } catch {
+                                    self.error = error
+                                    isErrorPresented = true
+                                }
+                            } else if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality) {
+                                do {
+                                    try Process.run(
+                                        appURL.appending(path: "Contents", directoryHint: .isDirectory).appending(path: "MacOS", directoryHint: .isDirectory).appending(path: appURL.deletingPathExtension().lastPathComponent, directoryHint: .notDirectory),
+                                        arguments: [
+                                            movieURL.absoluteString,
+                                        ],
+                                    )
+                                } catch {
+                                    self.error = error
+                                    isErrorPresented = true
+                                }
+                            }
+                        } label: {
+                            Text(ExternalPlayers.vlc.localizedKey)
+                                .frame(width: 250, height: 30)
+                                .foregroundStyle(.white)
+                                .background(selectedQuality != nil ? Color.accentColor : Color.secondary)
+                                .clipShape(.rect(cornerRadius: 6))
+                                .contentShape(.rect(cornerRadius: 6))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(selectedQuality == nil)
+                    }
+                } else {
+                    Text("key.open.empty")
                         .frame(width: 250, height: 30)
                         .foregroundStyle(.white)
-                        .background(selectedQuality != nil ? Color.accentColor : Color.secondary)
+                        .background(Color.accentColor)
                         .clipShape(.rect(cornerRadius: 6))
                         .contentShape(.rect(cornerRadius: 6))
                 }
-                .buttonStyle(.plain)
-                .disabled(selectedQuality == nil)
 
                 Button {
                     dismiss()
@@ -562,6 +837,8 @@ struct WatchSheetView: View {
                                     {
                                         selectedQuality = highest
                                     }
+
+                                    selectedSubtitles = movie.subtitles.first(where: { $0.lang == selectPositions.first(where: { position in position.id == selectedActing.voiceId })?.subtitles?.replacingOccurrences(of: "uk", with: "ua") })
                                 }
                             }
                         }
@@ -625,6 +902,8 @@ struct WatchSheetView: View {
                                 {
                                     selectedQuality = highest
                                 }
+
+                                selectedSubtitles = movie.subtitles.first(where: { $0.lang == selectPositions.first(where: { position in position.id == selectedActing.voiceId })?.subtitles?.replacingOccurrences(of: "uk", with: "ua") })
                             }
                         }
                     }
@@ -648,6 +927,28 @@ struct WatchSheetView: View {
                     configuration.icon
                 }
             }
+        }
+    }
+}
+
+enum ExternalPlayers: String, CaseIterable, Identifiable {
+    case iina = "com.colliderli.iina"
+    case infuse = "com.firecore.infuse"
+    case mpv = "io.mpv"
+    case vlc = "org.videolan.vlc"
+
+    var id: Self { self }
+
+    var localizedKey: LocalizedStringKey {
+        switch self {
+        case .iina:
+            "key.open.iina"
+        case .infuse:
+            "key.open.infuse"
+        case .mpv:
+            "key.open.mpv"
+        case .vlc:
+            "key.open.vlc"
         }
     }
 }
