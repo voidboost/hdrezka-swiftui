@@ -246,7 +246,7 @@ struct DetailsView: View {
                                         DownloadSheetView(id: details.movieId)
                                     }
 
-                                    if ExternalPlayers.allCases.contains(where: { NSWorkspace.shared.urlForApplication(withBundleIdentifier: $0.rawValue) != nil }) {
+                                    if !ExternalPlayers.allCases.compactMap({ NSWorkspace.shared.urlForApplication(withBundleIdentifier: $0.bundleIdentifier) }).isEmpty || !ExternalPlayers.allCases.compactMap({ NSWorkspace.shared.urlForApplication(toOpen: $0.url) }).isEmpty {
                                         Button {
                                             isOpenExternalPlayerPresented = true
                                         } label: {

@@ -417,8 +417,8 @@ struct OpenExternalPlayerSheetView: View {
             }
 
             VStack(alignment: .center, spacing: 10) {
-                if ExternalPlayers.allCases.contains(where: { NSWorkspace.shared.urlForApplication(withBundleIdentifier: $0.rawValue) != nil }) {
-                    if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: ExternalPlayers.iina.rawValue) {
+                if !ExternalPlayers.allCases.compactMap({ NSWorkspace.shared.urlForApplication(withBundleIdentifier: $0.bundleIdentifier) }).isEmpty || !ExternalPlayers.allCases.compactMap({ NSWorkspace.shared.urlForApplication(toOpen: $0.url) }).isEmpty {
+                    if NSWorkspace.shared.urlForApplication(toOpen: ExternalPlayers.iina.url) != nil {
                         Button {
                             if let selectedActing {
                                 if isLoggedIn {
@@ -446,34 +446,20 @@ struct OpenExternalPlayerSheetView: View {
                             }
 
                             if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality), let selectedSubtitles, let subtitlesURL = URL(string: selectedSubtitles.link) {
-                                do {
-                                    try Process.run(
-                                        appURL.appending(path: "Contents", directoryHint: .isDirectory).appending(path: "MacOS", directoryHint: .isDirectory).appending(path: appURL.deletingPathExtension().lastPathComponent, directoryHint: .notDirectory),
-                                        arguments: [
-                                            "--separate-windows",
-                                            "--no-stdin",
-                                            "--mpv-keep-open=yes",
-                                            "--mpv-loop=no",
-                                            "--mpv-sub-file=\(subtitlesURL.absoluteString)",
-                                            movieURL.absoluteString,
-                                        ],
-                                    )
-                                } catch {
-                                    self.error = error
-                                    isErrorPresented = true
-                                }
+                                openURL(
+                                    ExternalPlayers.iina.url.appending(queryItems: [
+                                        .init(name: "url", value: movieURL.absoluteString),
+                                        .init(name: "mpv_sub-files", value: subtitlesURL.absoluteString.replacingOccurrences(of: ":", with: "\\:")),
+                                        .init(name: "new_window", value: "1"),
+                                    ]),
+                                )
                             } else if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality) {
-                                do {
-                                    try Process.run(
-                                        appURL.appending(path: "Contents", directoryHint: .isDirectory).appending(path: "MacOS", directoryHint: .isDirectory).appending(path: appURL.deletingPathExtension().lastPathComponent, directoryHint: .notDirectory),
-                                        arguments: [
-                                            movieURL.absoluteString,
-                                        ],
-                                    )
-                                } catch {
-                                    self.error = error
-                                    isErrorPresented = true
-                                }
+                                openURL(
+                                    ExternalPlayers.iina.url.appending(queryItems: [
+                                        .init(name: "url", value: movieURL.absoluteString),
+                                        .init(name: "new_window", value: "1"),
+                                    ]),
+                                )
                             }
                         } label: {
                             Text(ExternalPlayers.iina.localizedKey)
@@ -487,10 +473,7 @@ struct OpenExternalPlayerSheetView: View {
                         .disabled(selectedQuality == nil)
                     }
 
-                    if NSWorkspace.shared.urlForApplication(withBundleIdentifier: ExternalPlayers.infuse.rawValue) != nil,
-                       let infuseURL = URL(string: "infuse://x-callback-url/play"),
-                       NSWorkspace.shared.urlForApplication(toOpen: infuseURL) != nil
-                    {
+                    if NSWorkspace.shared.urlForApplication(toOpen: ExternalPlayers.infuse.url) != nil {
                         Button {
                             if let selectedActing {
                                 if isLoggedIn {
@@ -518,9 +501,18 @@ struct OpenExternalPlayerSheetView: View {
                             }
 
                             if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality), let selectedSubtitles, let subtitlesURL = URL(string: selectedSubtitles.link) {
-                                openURL(infuseURL.appending(queryItems: [.init(name: "url", value: movieURL.absoluteString), .init(name: "sub", value: subtitlesURL.absoluteString)]))
+                                openURL(
+                                    ExternalPlayers.infuse.url.appending(queryItems: [
+                                        .init(name: "url", value: movieURL.absoluteString),
+                                        .init(name: "sub", value: subtitlesURL.absoluteString),
+                                    ]),
+                                )
                             } else if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality) {
-                                openURL(infuseURL.appending(queryItems: [.init(name: "url", value: movieURL.absoluteString)]))
+                                openURL(
+                                    ExternalPlayers.infuse.url.appending(queryItems: [
+                                        .init(name: "url", value: movieURL.absoluteString),
+                                    ]),
+                                )
                             }
                         } label: {
                             Text(ExternalPlayers.infuse.localizedKey)
@@ -534,7 +526,7 @@ struct OpenExternalPlayerSheetView: View {
                         .disabled(selectedQuality == nil)
                     }
 
-                    if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: ExternalPlayers.mpv.rawValue) {
+                    if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: ExternalPlayers.mpv.bundleIdentifier) {
                         Button {
                             if let selectedActing {
                                 if isLoggedIn {
@@ -566,9 +558,7 @@ struct OpenExternalPlayerSheetView: View {
                                     try Process.run(
                                         appURL.appending(path: "Contents", directoryHint: .isDirectory).appending(path: "MacOS", directoryHint: .isDirectory).appending(path: appURL.deletingPathExtension().lastPathComponent, directoryHint: .notDirectory),
                                         arguments: [
-                                            "--keep-open=yes",
-                                            "--loop=no",
-                                            "--sub-file=\(subtitlesURL.absoluteString)",
+                                            "--sub-files=\(subtitlesURL.absoluteString.replacingOccurrences(of: ":", with: "\\:"))",
                                             movieURL.absoluteString,
                                         ],
                                     )
@@ -601,7 +591,7 @@ struct OpenExternalPlayerSheetView: View {
                         .disabled(selectedQuality == nil)
                     }
 
-                    if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: ExternalPlayers.vlc.rawValue) {
+                    if let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: ExternalPlayers.vlc.bundleIdentifier) {
                         Button {
                             if let selectedActing {
                                 if isLoggedIn {
@@ -931,13 +921,39 @@ struct OpenExternalPlayerSheetView: View {
     }
 }
 
-enum ExternalPlayers: String, CaseIterable, Identifiable {
-    case iina = "com.colliderli.iina"
-    case infuse = "com.firecore.infuse"
-    case mpv = "io.mpv"
-    case vlc = "org.videolan.vlc"
+enum ExternalPlayers: Int, CaseIterable, Identifiable {
+    case iina = 0
+    case infuse
+    case mpv
+    case vlc
 
     var id: Self { self }
+
+    var url: URL {
+        switch self {
+        case .iina:
+            URL(string: "iina://open")!
+        case .infuse:
+            URL(string: "infuse://x-callback-url/play")!
+        case .mpv:
+            URL(string: "mpv://temp")!
+        case .vlc:
+            URL(string: "vlc://temp")!
+        }
+    }
+
+    var bundleIdentifier: String {
+        switch self {
+        case .iina:
+            "com.colliderli.iina"
+        case .infuse:
+            "com.firecore.infuse"
+        case .mpv:
+            "io.mpv"
+        case .vlc:
+            "org.videolan.vlc"
+        }
+    }
 
     var localizedKey: LocalizedStringKey {
         switch self {
