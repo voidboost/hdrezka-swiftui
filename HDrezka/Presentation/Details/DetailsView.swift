@@ -151,6 +151,7 @@ struct DetailsView: View {
 
         @State private var isPlayPresented: Bool = false
         @State private var isDownloadPresented: Bool = false
+        @State private var isOpenExternalPlayerPresented: Bool = false
 
         @State private var franchiseExpanded: Bool = false
 
@@ -159,6 +160,7 @@ struct DetailsView: View {
 
         @Environment(\.colorScheme) private var colorScheme
         @Environment(\.openWindow) private var openWindow
+        @Environment(\.dismissWindow) private var dismissWindow
 
         var body: some View {
             VStack(spacing: 18) {
@@ -166,6 +168,8 @@ struct DetailsView: View {
                     HStack(alignment: .bottom, spacing: 27) {
                         Button {
                             if let url = URL(string: details.hposter) ?? URL(string: details.poster) {
+                                dismissWindow(id: "imageViewer")
+
                                 openWindow(id: "imageViewer", value: url)
                             }
                         } label: {
@@ -213,6 +217,7 @@ struct DetailsView: View {
                                             .foregroundStyle(.white)
                                             .padding(.horizontal, 14)
                                             .padding(.vertical, 7)
+                                            .lineLimit(1)
                                     }
                                     .buttonStyle(.plain)
                                     .background(Color.accentColor)
@@ -230,6 +235,7 @@ struct DetailsView: View {
                                             .foregroundStyle(Color.accentColor)
                                             .padding(.horizontal, 14)
                                             .padding(.vertical, 7)
+                                            .lineLimit(1)
                                     }
                                     .buttonStyle(.plain)
                                     .background(.tertiary.opacity(0.05))
@@ -238,6 +244,27 @@ struct DetailsView: View {
                                     .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 40).stroke(lineWidth: 1))
                                     .sheet(isPresented: $isDownloadPresented) {
                                         DownloadSheetView(id: details.movieId)
+                                    }
+
+                                    if ExternalPlayers.allCases.contains(where: { NSWorkspace.shared.urlForApplication(withBundleIdentifier: $0.rawValue) != nil }) {
+                                        Button {
+                                            isOpenExternalPlayerPresented = true
+                                        } label: {
+                                            Label("key.open.external", systemImage: "arrow.up.forward.app")
+                                                .font(.system(size: 13))
+                                                .foregroundStyle(Color.accentColor)
+                                                .padding(.horizontal, 14)
+                                                .padding(.vertical, 7)
+                                                .lineLimit(1)
+                                        }
+                                        .buttonStyle(.plain)
+                                        .background(.tertiary.opacity(0.05))
+                                        .clipShape(.rect(cornerRadius: 40))
+                                        .contentShape(.rect(cornerRadius: 40))
+                                        .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 40).stroke(lineWidth: 1))
+                                        .sheet(isPresented: $isOpenExternalPlayerPresented) {
+                                            OpenExternalPlayerSheetView(id: details.movieId)
+                                        }
                                     }
                                 } else if details.comingSoon {
                                     Button {} label: {

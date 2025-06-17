@@ -14,6 +14,7 @@ struct WatchSheetView: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.modelContext) private var modelContext
 
     @Environment(AppState.self) private var appState
@@ -357,10 +358,7 @@ struct WatchSheetView: View {
                     if let details, let selectedActing, let selectedQuality, let movie {
                         if isLoggedIn {
                             saveWatchingStateUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode, position: 0, total: 0)
-                                .receive(on: DispatchQueue.main)
-                                .sink { _ in
-                                    dismiss()
-                                } receiveValue: { _ in }
+                                .sink { _ in } receiveValue: { _ in }
                                 .store(in: &subscriptions)
                         }
 
@@ -381,14 +379,14 @@ struct WatchSheetView: View {
                             modelContext.insert(position)
                         }
 
-                        if !isLoggedIn {
-                            dismiss()
-                        }
+                        dismissWindow(id: "player")
 
                         openWindow(
                             id: "player",
                             value: PlayerData(details: details, selectedActing: selectedActing, seasons: seasons, selectedSeason: selectedSeason, selectedEpisode: selectedEpisode, selectedQuality: selectedQuality, movie: movie),
                         )
+
+                        dismiss()
                     }
                 } label: {
                     Text("key.watch")
