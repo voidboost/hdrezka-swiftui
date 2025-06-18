@@ -5,6 +5,7 @@ import SwiftData
 import SwiftUI
 
 struct DownloadSheetView: View {
+    @Injected(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
     @Injected(\.getMovieDetailsUseCase) private var getMovieDetailsUseCase
     @Injected(\.getMovieVideoUseCase) private var getMovieVideoUseCase
     @Injected(\.getSeriesSeasonsUseCase) private var getSeriesSeasonsUseCase
@@ -12,6 +13,8 @@ struct DownloadSheetView: View {
     @State private var subscriptions: Set<AnyCancellable> = []
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+    @Environment(\.modelContext) private var modelContext
 
     @Environment(AppState.self) private var appState
     @Environment(Downloader.self) private var downloader
@@ -433,6 +436,59 @@ struct DownloadSheetView: View {
                         $0.id == "\(details?.movieId ?? "")\(selectedSeason?.seasonId ?? "")\(selectedEpisode?.episodeId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded || $0.id == "\(details?.movieId ?? "")\(selectedSeason?.seasonId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded
                     }))
 
+                if NSWorkspace.shared.urlForApplication(toOpen: ExternalDownloaders.motrix.url) != nil {
+                    Button {
+                        if let selectedActing {
+                            if isLoggedIn {
+                                saveWatchingStateUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode, position: 0, total: 0)
+                                    .sink { _ in } receiveValue: { _ in }
+                                    .store(in: &subscriptions)
+                            }
+
+                            if let position = selectPositions.first(where: { position in
+                                position.id == selectedActing.voiceId
+                            }) {
+                                position.acting = selectedActing.translatorId
+                                position.season = selectedSeason?.seasonId
+                                position.episode = selectedEpisode?.episodeId
+                            } else {
+                                let position = SelectPosition(
+                                    id: selectedActing.voiceId,
+                                    acting: selectedActing.translatorId,
+                                    season: selectedSeason?.seasonId,
+                                    episode: selectedEpisode?.episodeId,
+                                )
+
+                                modelContext.insert(position)
+                            }
+                        }
+
+                        if let selectedQuality, let movie, let movieURL = movie.getClosestTo(quality: selectedQuality), let selectedSubtitles, let subtitlesURL = URL(string: selectedSubtitles.link) {
+                            openURL(
+                                ExternalDownloaders.motrix.url.appending(queryItems: [
+                                    .init(name: "uris", value: "\(movieURL.absoluteString)\n\(subtitlesURL.absoluteString)"),
+                                ]),
+                            )
+                        } else if let selectedQuality, let movie, let movieURL = movie.getClosestTo(quality: selectedQuality) {
+                            openURL(
+                                ExternalDownloaders.motrix.url.appending(queryItems: [
+                                    .init(name: "uri", value: movieURL.absoluteString),
+                                ]),
+                            )
+                        }
+
+                    } label: {
+                        Text(ExternalDownloaders.motrix.localizedKey)
+                            .frame(width: 250, height: 30)
+                            .foregroundStyle(.white)
+                            .background(selectedQuality != nil ? Color.accentColor : Color.secondary)
+                            .clipShape(.rect(cornerRadius: 6))
+                            .contentShape(.rect(cornerRadius: 6))
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(selectedQuality == nil)
+                }
+
                 if let details, details.series != nil {
                     Button {
                         if let selectedActing, let selectedQuality, let selectedSeason {
@@ -712,6 +768,33 @@ struct DownloadSheetView: View {
                     configuration.icon
                 }
             }
+        }
+    }
+}
+
+enum ExternalDownloaders: Int, CaseIterable, Identifiable {
+    case motrix = 0
+
+    var id: Self { self }
+
+    var url: URL {
+        switch self {
+        case .motrix:
+            URL(string: "motrix://new-task")!
+        }
+    }
+
+    var bundleIdentifier: String {
+        switch self {
+        case .motrix:
+            "app.motrix.native"
+        }
+    }
+
+    var localizedKey: LocalizedStringKey {
+        switch self {
+        case .motrix:
+            "key.download.motrix"
         }
     }
 }

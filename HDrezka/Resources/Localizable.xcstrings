@@ -1399,6 +1399,28 @@
         }
       }
     },
+    "key.download.motrix" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download in Motrix"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скачать в Motrix"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завантажити в Motrix"
+          }
+        }
+      }
+    },
     "key.download.needPremium" : {
       "localizations" : {
         "en" : {
