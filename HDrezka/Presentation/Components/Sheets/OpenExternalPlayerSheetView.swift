@@ -445,7 +445,7 @@ struct OpenExternalPlayerSheetView: View {
                                 }
                             }
 
-                            if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality), let selectedSubtitles, let subtitlesURL = URL(string: selectedSubtitles.link) {
+                            if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality)?.hls, let selectedSubtitles, let subtitlesURL = URL(string: selectedSubtitles.link) {
                                 openURL(
                                     ExternalPlayers.iina.url.appending(queryItems: [
                                         .init(name: "url", value: movieURL.absoluteString),
@@ -453,7 +453,7 @@ struct OpenExternalPlayerSheetView: View {
                                         .init(name: "new_window", value: "1"),
                                     ]),
                                 )
-                            } else if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality) {
+                            } else if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality)?.hls {
                                 openURL(
                                     ExternalPlayers.iina.url.appending(queryItems: [
                                         .init(name: "url", value: movieURL.absoluteString),
@@ -553,7 +553,7 @@ struct OpenExternalPlayerSheetView: View {
                                 }
                             }
 
-                            if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality), let selectedSubtitles, let subtitlesURL = URL(string: selectedSubtitles.link) {
+                            if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality)?.hls, let selectedSubtitles, let subtitlesURL = URL(string: selectedSubtitles.link) {
                                 do {
                                     try Process.run(
                                         appURL.appending(path: "Contents", directoryHint: .isDirectory).appending(path: "MacOS", directoryHint: .isDirectory).appending(path: appURL.deletingPathExtension().lastPathComponent, directoryHint: .notDirectory),
@@ -566,7 +566,7 @@ struct OpenExternalPlayerSheetView: View {
                                     self.error = error
                                     isErrorPresented = true
                                 }
-                            } else if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality) {
+                            } else if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality)?.hls {
                                 do {
                                     try Process.run(
                                         appURL.appending(path: "Contents", directoryHint: .isDirectory).appending(path: "MacOS", directoryHint: .isDirectory).appending(path: appURL.deletingPathExtension().lastPathComponent, directoryHint: .notDirectory),
@@ -618,7 +618,7 @@ struct OpenExternalPlayerSheetView: View {
                                 }
                             }
 
-                            if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality), let selectedSubtitles, let subtitlesURL = URL(string: selectedSubtitles.link), subtitlesURL.pathExtension == "srt" {
+                            if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality)?.hls, let selectedSubtitles, let subtitlesURL = URL(string: selectedSubtitles.link), subtitlesURL.pathExtension == "srt" {
                                 do {
                                     try Process.run(
                                         appURL.appending(path: "Contents", directoryHint: .isDirectory).appending(path: "MacOS", directoryHint: .isDirectory).appending(path: appURL.deletingPathExtension().lastPathComponent, directoryHint: .notDirectory),
@@ -631,7 +631,7 @@ struct OpenExternalPlayerSheetView: View {
                                     self.error = error
                                     isErrorPresented = true
                                 }
-                            } else if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality) {
+                            } else if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality)?.hls {
                                 do {
                                     try Process.run(
                                         appURL.appending(path: "Contents", directoryHint: .isDirectory).appending(path: "MacOS", directoryHint: .isDirectory).appending(path: appURL.deletingPathExtension().lastPathComponent, directoryHint: .notDirectory),

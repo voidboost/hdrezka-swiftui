@@ -654,11 +654,7 @@ struct PlayerView: View {
     }
 
     private func setupPlayer(seek: CMTime? = nil, isPlaying playing: Bool = true, isMuted muted: Bool = false, subtitles: String? = nil, volume vol: Float = 1.0) {
-        guard let link = movie.getClosestTo(quality: quality),
-              let url = URL(string: "\(link.absoluteString):hls:manifest.m3u8")
-        else {
-            return
-        }
+        guard let url = movie.getClosestTo(quality: quality)?.hls else { return }
 
         let player = CustomAVPlayer(m3u8: url, subtitles: movie.subtitles)
 
