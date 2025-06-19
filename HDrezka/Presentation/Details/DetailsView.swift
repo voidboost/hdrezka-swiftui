@@ -574,15 +574,12 @@ struct DetailsView: View {
 
                                                     if let rating = fr.rating {
                                                         let color = Color.red.mix(with: .green, by: Double(rating / 10.0))
+                                                        let rating = Text(rating.description).foregroundStyle(color)
+                                                        let star = Text(Image(systemName: "star.fill")).foregroundStyle(color)
 
-                                                        (
-                                                            Text("key.franchise.year-\(fr.year)") +
-                                                                Text(verbatim: " • ") +
-                                                                Text(verbatim: "\(rating.description) ").foregroundStyle(color) +
-                                                                Text(Image(systemName: "star.fill")).foregroundStyle(color)
-                                                        )
-                                                        .font(.system(size: 11))
-                                                        .foregroundStyle(.secondary)
+                                                        Text("key.franchise.year-\(fr.year)-\(rating)-\(star)")
+                                                            .font(.system(size: 11))
+                                                            .foregroundStyle(.secondary)
                                                     } else {
                                                         Text("key.franchise.year-\(fr.year)").font(.system(size: 11)).foregroundStyle(.secondary)
                                                     }
@@ -616,15 +613,14 @@ struct DetailsView: View {
 
                                                 if let rating = fr.rating {
                                                     let color = Color.red.mix(with: .green, by: Double(rating / 10.0))
+                                                    let rating = Text(rating.description).foregroundStyle(color)
+                                                    let star = Text(Image(systemName: "star.fill")).foregroundStyle(color)
 
-                                                    (
-                                                        Text("key.franchise.year-\(fr.year)") +
-                                                            Text(verbatim: " • ") +
-                                                            Text(verbatim: "\(rating.description) ").foregroundStyle(color) +
-                                                            Text(Image(systemName: "star.fill")).foregroundStyle(color)
-                                                    )
-                                                    .font(.system(size: 11))
-                                                    .foregroundStyle(.secondary)
+                                                    Text("key.franchise.year-\(fr.year)-\(rating)-\(star)")
+                                                        .font(.system(size: 11))
+                                                        .foregroundStyle(.secondary)
+
+                                                    //  •
                                                 } else {
                                                     Text("key.franchise.year-\(fr.year)").font(.system(size: 11)).foregroundStyle(.secondary)
                                                 }
@@ -819,14 +815,14 @@ struct DetailsView: View {
                                     PersonTextWithPhoto(person: person)
                                         .contentShape(.rect)
                                 } else if let list = item as? MovieList, let position = list.moviePosition?.toNumeral() {
-                                    (
-                                        Text(verbatim: "\(list.name) ").foregroundStyle(.secondary) +
-                                            Text("key.place-\(position)").foregroundStyle(.tertiary),
-                                    )
-                                    .font(.system(size: 13))
-                                    .lineLimit(1)
-                                    .truncationMode(.middle)
-                                    .contentShape(.rect)
+                                    let place = Text("key.place-\(position)").foregroundStyle(.tertiary)
+
+                                    Text("key.list-\(list.name)-\(place)")
+                                        .foregroundStyle(.secondary)
+                                        .font(.system(size: 13))
+                                        .lineLimit(1)
+                                        .truncationMode(.middle)
+                                        .contentShape(.rect)
                                 } else {
                                     Text(item.name)
                                         .font(.system(size: 13))
@@ -894,14 +890,13 @@ struct DetailsView: View {
                                                 }
                                                 .contentShape(.rect)
                                             } else if let list = item as? MovieList, let position = list.moviePosition?.toNumeral() {
-                                                (
-                                                    Text(verbatim: "\(list.name) ") +
-                                                        Text("key.place-\(position)").foregroundStyle(.secondary),
-                                                )
-                                                .font(.system(size: 13))
-                                                .lineLimit(nil)
-                                                .multilineTextAlignment(.center)
-                                                .contentShape(.rect)
+                                                let place = Text("key.place-\(position)").foregroundStyle(.secondary)
+
+                                                Text("key.list-\(list.name)-\(place)")
+                                                    .font(.system(size: 13))
+                                                    .lineLimit(nil)
+                                                    .multilineTextAlignment(.center)
+                                                    .contentShape(.rect)
                                             } else {
                                                 Text(item.name)
                                                     .font(.system(size: 13))

@@ -34,29 +34,26 @@ struct CardView: View {
                                     Spacer()
 
                                     if let rating = cat.rating {
-                                        (
-                                            Text(verbatim: "\(cat.title) (") +
-                                                Text(rating.description).fontWeight(.medium) +
-                                                Text(verbatim: ") ") +
-                                                Text(Image(systemName: cat.icon)),
-                                        )
-                                        .font(.system(size: 10))
-                                        .foregroundStyle(.white)
-                                        .padding(.vertical, 3)
-                                        .padding(.horizontal, 6)
-                                        .background(cat.color)
-                                        .clipShape(.rect(bottomLeadingRadius: 6))
+                                        let rating = Text(rating.description).fontWeight(.medium)
+                                        let icon = Text(Image(systemName: cat.icon))
+
+                                        Text("key.cat-\(cat.title)-\(rating)-\(icon)")
+                                            .font(.system(size: 10))
+                                            .foregroundStyle(.white)
+                                            .padding(.vertical, 3)
+                                            .padding(.horizontal, 6)
+                                            .background(cat.color)
+                                            .clipShape(.rect(bottomLeadingRadius: 6))
                                     } else {
-                                        (
-                                            Text(verbatim: "\(cat.title) ") +
-                                                Text(Image(systemName: cat.icon)),
-                                        )
-                                        .font(.system(size: 10))
-                                        .foregroundStyle(.white)
-                                        .padding(.vertical, 3)
-                                        .padding(.horizontal, 6)
-                                        .background(cat.color)
-                                        .clipShape(.rect(bottomLeadingRadius: 6))
+                                        let icon = Text(Image(systemName: cat.icon))
+
+                                        Text("key.cat-\(cat.title)-\(icon)")
+                                            .font(.system(size: 10))
+                                            .foregroundStyle(.white)
+                                            .padding(.vertical, 3)
+                                            .padding(.horizontal, 6)
+                                            .background(cat.color)
+                                            .clipShape(.rect(bottomLeadingRadius: 6))
                                     }
                                 }
                             }
