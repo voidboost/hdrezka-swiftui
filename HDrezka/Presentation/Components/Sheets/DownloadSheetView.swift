@@ -436,6 +436,61 @@ struct DownloadSheetView: View {
                         $0.id == "\(details?.movieId ?? "")\(selectedSeason?.seasonId ?? "")\(selectedEpisode?.episodeId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded || $0.id == "\(details?.movieId ?? "")\(selectedSeason?.seasonId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded
                     }))
 
+                if NSWorkspace.shared.urlForApplication(toOpen: ExternalDownloaders.folx.url) != nil {
+                    Button {
+                        if let selectedActing {
+                            if isLoggedIn {
+                                saveWatchingStateUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode, position: 0, total: 0)
+                                    .sink { _ in } receiveValue: { _ in }
+                                    .store(in: &subscriptions)
+                            }
+
+                            if let position = selectPositions.first(where: { position in
+                                position.id == selectedActing.voiceId
+                            }) {
+                                position.acting = selectedActing.translatorId
+                                position.season = selectedSeason?.seasonId
+                                position.episode = selectedEpisode?.episodeId
+                            } else {
+                                let position = SelectPosition(
+                                    id: selectedActing.voiceId,
+                                    acting: selectedActing.translatorId,
+                                    season: selectedSeason?.seasonId,
+                                    episode: selectedEpisode?.episodeId,
+                                )
+
+                                modelContext.insert(position)
+                            }
+                        }
+
+                        if let selectedQuality, let movie, let movieURL = movie.getClosestTo(quality: selectedQuality), let selectedSubtitles, let subtitlesURL = URL(string: selectedSubtitles.link) {
+                            openURL(
+                                ExternalDownloaders.folx.url.appending(queryItems: [
+                                    .init(name: "urls", value: "\(movieURL.absoluteString)||\(subtitlesURL.absoluteString)"),
+                                    .init(name: "urlsCount", value: "2"),
+                                ]),
+                            )
+                        } else if let selectedQuality, let movie, let movieURL = movie.getClosestTo(quality: selectedQuality) {
+                            openURL(
+                                ExternalDownloaders.folx.url.appending(queryItems: [
+                                    .init(name: "urls", value: movieURL.absoluteString),
+                                    .init(name: "urlsCount", value: "1"),
+                                ]),
+                            )
+                        }
+
+                    } label: {
+                        Text(ExternalDownloaders.folx.localizedKey)
+                            .frame(width: 250, height: 30)
+                            .foregroundStyle(.white)
+                            .background(selectedQuality != nil ? Color.accentColor : Color.secondary)
+                            .clipShape(.rect(cornerRadius: 6))
+                            .contentShape(.rect(cornerRadius: 6))
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(selectedQuality == nil)
+                }
+
                 if NSWorkspace.shared.urlForApplication(toOpen: ExternalDownloaders.motrix.url) != nil {
                     Button {
                         if let selectedActing {
@@ -773,12 +828,15 @@ struct DownloadSheetView: View {
 }
 
 enum ExternalDownloaders: Int, CaseIterable, Identifiable {
-    case motrix = 0
+    case folx = 0
+    case motrix
 
     var id: Self { self }
 
     var url: URL {
         switch self {
+        case .folx:
+            URL(string: "openinfolx3://downloadAllWithFolx")!
         case .motrix:
             URL(string: "motrix://new-task")!
         }
@@ -786,6 +844,8 @@ enum ExternalDownloaders: Int, CaseIterable, Identifiable {
 
     var bundleIdentifier: String {
         switch self {
+        case .folx:
+            "com.eltima.Folx3"
         case .motrix:
             "app.motrix.native"
         }
@@ -793,6 +853,8 @@ enum ExternalDownloaders: Int, CaseIterable, Identifiable {
 
     var localizedKey: LocalizedStringKey {
         switch self {
+        case .folx:
+            "key.download.folx"
         case .motrix:
             "key.download.motrix"
         }
