@@ -619,8 +619,6 @@ struct DetailsView: View {
                                                     Text("key.franchise.year-\(fr.year)-\(rating)-\(star)")
                                                         .font(.system(size: 11))
                                                         .foregroundStyle(.secondary)
-
-                                                    //  •
                                                 } else {
                                                     Text("key.franchise.year-\(fr.year)").font(.system(size: 11)).foregroundStyle(.secondary)
                                                 }
