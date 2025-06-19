@@ -1399,6 +1399,28 @@
         }
       }
     },
+    "key.download.folx" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download in Folx"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скачать в Folx"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завантажити в Folx"
+          }
+        }
+      }
+    },
     "key.download.motrix" : {
       "localizations" : {
         "en" : {
