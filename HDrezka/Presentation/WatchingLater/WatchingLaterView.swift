@@ -78,16 +78,15 @@ struct WatchingLaterView: View {
                         }
                         .padding(.vertical, 52)
                         .padding(.horizontal, 36)
-                        .onGeometryChange(for: Bool.self) { geometry in
-                            -geometry.frame(in: .named("scroll")).origin.y / 52 >= 1
-                        } action: { showBar in
-                            withAnimation(.easeInOut(duration: 0.15)) {
-                                self.showBar = showBar
-                            }
+                    }
+                    .scrollIndicators(.never)
+                    .onScrollGeometryChange(for: Bool.self) { geometry in
+                        geometry.contentOffset.y >= 52
+                    } action: { _, showBar in
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            self.showBar = showBar
                         }
                     }
-                    .coordinateSpace(name: "scroll")
-                    .scrollIndicators(.never)
                 }
             } else {
                 LoadingStateView(title)

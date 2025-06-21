@@ -82,29 +82,29 @@ struct HomeView: View {
                                             }
                                             .padding(.horizontal, 36)
                                         }
-                                        .task {
-                                            if categories.last == category, viewModel.paginationState == .idle {
-                                                viewModel.loadMore()
-                                            }
-                                        }
 
                                         if category.category != Categories.allCases.last {
                                             Divider().padding(.horizontal, 36)
                                         }
                                     }
                                 }
+                                .scrollTargetLayout()
                             }
                             .padding(.vertical, 52)
-                            .onGeometryChange(for: Bool.self) { geometry in
-                                -geometry.frame(in: .named("scroll")).origin.y / 52 >= 1
-                            } action: { showBar in
-                                withAnimation(.easeInOut(duration: 0.15)) {
-                                    self.showBar = showBar
-                                }
+                        }
+                        .scrollIndicators(.never)
+                        .onScrollGeometryChange(for: Bool.self) { geometry in
+                            geometry.contentOffset.y >= 52
+                        } action: { _, showBar in
+                            withAnimation(.easeInOut(duration: 0.15)) {
+                                self.showBar = showBar
                             }
                         }
-                        .coordinateSpace(name: "scroll")
-                        .scrollIndicators(.never)
+                        .onScrollTargetVisibilityChange(idType: Category.ID.self) { onScreenCategories in
+                            if let last = categories.last, onScreenCategories.contains(where: { $0 == last.id }), viewModel.paginationState == .idle {
+                                viewModel.loadMore()
+                            }
+                        }
 
                         if let error = viewModel.paginationState.error {
                             ErrorPaginationStateView(error) {
