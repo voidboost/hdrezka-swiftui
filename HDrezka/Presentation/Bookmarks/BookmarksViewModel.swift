@@ -4,14 +4,14 @@ import SwiftUI
 
 @Observable
 class BookmarksViewModel {
-    @ObservationIgnored @Injected(\.getBookmarksUseCase) private var getBookmarksUseCase
-    @ObservationIgnored @Injected(\.getBookmarksByCategoryAddedUseCase) private var getBookmarksByCategoryAddedUseCase
-    @ObservationIgnored @Injected(\.getBookmarksByCategoryPopularUseCase) private var getBookmarksByCategoryPopularUseCase
-    @ObservationIgnored @Injected(\.getBookmarksByCategoryYearUseCase) private var getBookmarksByCategoryYearUseCase
-    @ObservationIgnored @Injected(\.deleteBookmarksCategoryUseCase) private var deleteBookmarksCategoryUseCase
-    @ObservationIgnored @Injected(\.moveBetweenBookmarksUseCase) private var moveBetweenBookmarksUseCase
-    @ObservationIgnored @Injected(\.reorderBookmarksCategoriesUseCase) private var reorderBookmarksCategoriesUseCase
-    @ObservationIgnored @Injected(\.removeFromBookmarksUseCase) private var removeFromBookmarksUseCase
+    @ObservationIgnored @LazyInjected(\.getBookmarksUseCase) private var getBookmarksUseCase
+    @ObservationIgnored @LazyInjected(\.getBookmarksByCategoryAddedUseCase) private var getBookmarksByCategoryAddedUseCase
+    @ObservationIgnored @LazyInjected(\.getBookmarksByCategoryPopularUseCase) private var getBookmarksByCategoryPopularUseCase
+    @ObservationIgnored @LazyInjected(\.getBookmarksByCategoryYearUseCase) private var getBookmarksByCategoryYearUseCase
+    @ObservationIgnored @LazyInjected(\.deleteBookmarksCategoryUseCase) private var deleteBookmarksCategoryUseCase
+    @ObservationIgnored @LazyInjected(\.moveBetweenBookmarksUseCase) private var moveBetweenBookmarksUseCase
+    @ObservationIgnored @LazyInjected(\.reorderBookmarksCategoriesUseCase) private var reorderBookmarksCategoriesUseCase
+    @ObservationIgnored @LazyInjected(\.removeFromBookmarksUseCase) private var removeFromBookmarksUseCase
 
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 

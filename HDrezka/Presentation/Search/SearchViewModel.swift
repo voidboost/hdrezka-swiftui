@@ -4,7 +4,7 @@ import SwiftUI
 
 @Observable
 class SearchViewModel {
-    @ObservationIgnored @Injected(\.searchUseCase) private var searchUseCase
+    @ObservationIgnored @LazyInjected(\.searchUseCase) private var searchUseCase
 
     private(set) var state: DataState<[MovieSimple]> = .loading
     private(set) var paginationState: DataPaginationState = .idle

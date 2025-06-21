@@ -4,13 +4,13 @@ import SwiftUI
 
 @Observable
 class HomeViewModel {
-    @ObservationIgnored @Injected(\.getHotMoviesUseCase) private var getHotMoviesUseCase
-//    @ObservationIgnored @Injected(\.getFeaturedMoviesUseCase) private var getFeaturedMoviesUseCase
-    @ObservationIgnored @Injected(\.getWatchingNowMoviesUseCase) private var getWatchingNowMoviesUseCase
-    @ObservationIgnored @Injected(\.getLatestMoviesUseCase) private var getLatestMoviesUseCase
-    @ObservationIgnored @Injected(\.getLatestNewestMoviesUseCase) private var getLatestNewestMoviesUseCase
-    @ObservationIgnored @Injected(\.getPopularMoviesUseCase) private var getPopularMoviesUseCase
-    @ObservationIgnored @Injected(\.getSoonMoviesUseCase) private var getSoonMoviesUseCase
+    @ObservationIgnored @LazyInjected(\.getHotMoviesUseCase) private var getHotMoviesUseCase
+//    @ObservationIgnored @LazyInjected(\.getFeaturedMoviesUseCase) private var getFeaturedMoviesUseCase
+    @ObservationIgnored @LazyInjected(\.getWatchingNowMoviesUseCase) private var getWatchingNowMoviesUseCase
+    @ObservationIgnored @LazyInjected(\.getLatestMoviesUseCase) private var getLatestMoviesUseCase
+    @ObservationIgnored @LazyInjected(\.getLatestNewestMoviesUseCase) private var getLatestNewestMoviesUseCase
+    @ObservationIgnored @LazyInjected(\.getPopularMoviesUseCase) private var getPopularMoviesUseCase
+    @ObservationIgnored @LazyInjected(\.getSoonMoviesUseCase) private var getSoonMoviesUseCase
 
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 

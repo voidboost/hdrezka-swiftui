@@ -5,28 +5,28 @@ import SwiftUI
 
 @Observable
 class ListViewModel {
-//    @ObservationIgnored @Injected(\.getFeaturedMoviesUseCase) private var getFeaturedMoviesUseCase
-    @ObservationIgnored @Injected(\.getHotMoviesUseCase) private var getHotMoviesUseCase
-    @ObservationIgnored @Injected(\.getLatestMoviesByCountryUseCase) private var getLatestMoviesByCountryUseCase
-    @ObservationIgnored @Injected(\.getLatestMoviesByGenreUseCase) private var getLatestMoviesByGenreUseCase
-    @ObservationIgnored @Injected(\.getLatestMoviesUseCase) private var getLatestMoviesUseCase
-    @ObservationIgnored @Injected(\.getLatestNewestMoviesUseCase) private var getLatestNewestMoviesUseCase
-    @ObservationIgnored @Injected(\.getMovieListUseCase) private var getMovieListUseCase
-    @ObservationIgnored @Injected(\.getPopularMoviesByCountryUseCase) private var getPopularMoviesByCountryUseCase
-    @ObservationIgnored @Injected(\.getPopularMoviesByGenreUseCase) private var getPopularMoviesByGenreUseCase
-    @ObservationIgnored @Injected(\.getPopularMoviesUseCase) private var getPopularMoviesUseCase
-    @ObservationIgnored @Injected(\.getPopularNewestMoviesUseCase) private var getPopularNewestMoviesUseCase
-    @ObservationIgnored @Injected(\.getSoonMoviesByCountryUseCase) private var getSoonMoviesByCountryUseCase
-    @ObservationIgnored @Injected(\.getSoonMoviesByGenreUseCase) private var getSoonMoviesByGenreUseCase
-    @ObservationIgnored @Injected(\.getSoonMoviesUseCase) private var getSoonMoviesUseCase
-    @ObservationIgnored @Injected(\.getWatchingNowMoviesByCountryUseCase) private var getWatchingNowMoviesByCountryUseCase
-    @ObservationIgnored @Injected(\.getWatchingNowMoviesByGenreUseCase) private var getWatchingNowMoviesByGenreUseCase
-    @ObservationIgnored @Injected(\.getWatchingNowMoviesUseCase) private var getWatchingNowMoviesUseCase
-    @ObservationIgnored @Injected(\.getWatchingNowNewestMoviesUseCase) private var getWatchingNowNewestMoviesUseCase
-    @ObservationIgnored @Injected(\.getLatestMoviesInCollectionUseCase) private var getLatestMoviesInCollectionUseCase
-    @ObservationIgnored @Injected(\.getSoonMoviesInCollectionUseCase) private var getSoonMoviesInCollectionUseCase
-    @ObservationIgnored @Injected(\.getPopularMoviesInCollectionUseCase) private var getPopularMoviesInCollectionUseCase
-    @ObservationIgnored @Injected(\.getWatchingNowMoviesInCollectionUseCase) private var getWatchingNowMoviesInCollectionUseCase
+//    @ObservationIgnored @LazyInjected(\.getFeaturedMoviesUseCase) private var getFeaturedMoviesUseCase
+    @ObservationIgnored @LazyInjected(\.getHotMoviesUseCase) private var getHotMoviesUseCase
+    @ObservationIgnored @LazyInjected(\.getLatestMoviesByCountryUseCase) private var getLatestMoviesByCountryUseCase
+    @ObservationIgnored @LazyInjected(\.getLatestMoviesByGenreUseCase) private var getLatestMoviesByGenreUseCase
+    @ObservationIgnored @LazyInjected(\.getLatestMoviesUseCase) private var getLatestMoviesUseCase
+    @ObservationIgnored @LazyInjected(\.getLatestNewestMoviesUseCase) private var getLatestNewestMoviesUseCase
+    @ObservationIgnored @LazyInjected(\.getMovieListUseCase) private var getMovieListUseCase
+    @ObservationIgnored @LazyInjected(\.getPopularMoviesByCountryUseCase) private var getPopularMoviesByCountryUseCase
+    @ObservationIgnored @LazyInjected(\.getPopularMoviesByGenreUseCase) private var getPopularMoviesByGenreUseCase
+    @ObservationIgnored @LazyInjected(\.getPopularMoviesUseCase) private var getPopularMoviesUseCase
+    @ObservationIgnored @LazyInjected(\.getPopularNewestMoviesUseCase) private var getPopularNewestMoviesUseCase
+    @ObservationIgnored @LazyInjected(\.getSoonMoviesByCountryUseCase) private var getSoonMoviesByCountryUseCase
+    @ObservationIgnored @LazyInjected(\.getSoonMoviesByGenreUseCase) private var getSoonMoviesByGenreUseCase
+    @ObservationIgnored @LazyInjected(\.getSoonMoviesUseCase) private var getSoonMoviesUseCase
+    @ObservationIgnored @LazyInjected(\.getWatchingNowMoviesByCountryUseCase) private var getWatchingNowMoviesByCountryUseCase
+    @ObservationIgnored @LazyInjected(\.getWatchingNowMoviesByGenreUseCase) private var getWatchingNowMoviesByGenreUseCase
+    @ObservationIgnored @LazyInjected(\.getWatchingNowMoviesUseCase) private var getWatchingNowMoviesUseCase
+    @ObservationIgnored @LazyInjected(\.getWatchingNowNewestMoviesUseCase) private var getWatchingNowNewestMoviesUseCase
+    @ObservationIgnored @LazyInjected(\.getLatestMoviesInCollectionUseCase) private var getLatestMoviesInCollectionUseCase
+    @ObservationIgnored @LazyInjected(\.getSoonMoviesInCollectionUseCase) private var getSoonMoviesInCollectionUseCase
+    @ObservationIgnored @LazyInjected(\.getPopularMoviesInCollectionUseCase) private var getPopularMoviesInCollectionUseCase
+    @ObservationIgnored @LazyInjected(\.getWatchingNowMoviesInCollectionUseCase) private var getWatchingNowMoviesInCollectionUseCase
 
     @ObservationIgnored private let list: MovieList?
     @ObservationIgnored private let country: MovieCountry?

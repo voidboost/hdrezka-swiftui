@@ -74,7 +74,6 @@ struct WatchingLaterView: View {
                                         }
                                 }
                             }
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                         }
                         .padding(.vertical, 52)
                         .padding(.horizontal, 36)
