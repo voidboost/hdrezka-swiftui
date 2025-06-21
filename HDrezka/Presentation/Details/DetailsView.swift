@@ -530,6 +530,13 @@ struct DetailsView: View {
                     .frame(maxWidth: .infinity)
                     .clipShape(.rect(cornerRadius: 6))
                     .contentShape(.rect(cornerRadius: 6))
+                    .onScrollVisibilityChange { isVisible in
+                        if !isVisible, trailer.isPlaying {
+                            Task {
+                                try? await trailer.pause()
+                            }
+                        }
+                    }
                 }
             }
             .padding(.horizontal, 36)
