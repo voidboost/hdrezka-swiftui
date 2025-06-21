@@ -39,16 +39,15 @@ struct DetailsView: View {
                         DetailsViewComponent(details: details, trailer: viewModel.trailer, isSchedulePresented: $isSchedulePresented)
                             .environment(viewModel)
                     }
-                    .onGeometryChange(for: Bool.self) { geometry in
-                        -geometry.frame(in: .named("scroll")).origin.y / 52 >= 1
-                    } action: { showBar in
-                        withAnimation(.easeInOut(duration: 0.15)) {
-                            self.showBar = showBar
-                        }
-                    }
                 }
                 .scrollIndicators(.never)
-                .coordinateSpace(name: "scroll")
+                .onScrollGeometryChange(for: Bool.self) { geometry in
+                    geometry.contentOffset.y >= 52
+                } action: { _, showBar in
+                    withAnimation(.easeInOut(duration: 0.15)) {
+                        self.showBar = showBar
+                    }
+                }
             } else {
                 LoadingStateView(title)
                     .padding(.vertical, 52)

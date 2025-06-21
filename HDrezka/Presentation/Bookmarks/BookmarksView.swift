@@ -213,18 +213,18 @@ struct BookmarksView: View {
                                             }
                                             .disabled(movie.movieId.id == nil)
                                         }
-                                        .task {
-                                            if movies.last == movie, viewModel.paginationState == .idle {
-                                                viewModel.loadMore()
-                                            }
-                                        }
                                 }
                             }
                             .padding(.top, 52)
                             .padding(18)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .scrollTargetLayout()
                         }
                         .scrollIndicators(.never)
+                        .onScrollTargetVisibilityChange(idType: MovieSimple.ID.self) { onScreenCards in
+                            if let last = movies.last, onScreenCards.contains(where: { $0 == last.id }), viewModel.paginationState == .idle {
+                                viewModel.loadMore()
+                            }
+                        }
 
                         if viewModel.paginationState == .loading {
                             LoadingPaginationStateView()

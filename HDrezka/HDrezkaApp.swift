@@ -216,13 +216,13 @@ struct HDrezkaApp: App {
                     credits.append(NSAttributedString(string: "HDrezka macOS", attributes: [.link: Const.github]))
                     credits.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: credits.length))
 
-                    NSApp.orderFrontStandardAboutPanel(options: [NSApplication.AboutPanelOptionKey.credits: credits])
+                    NSApp.orderFrontStandardAboutPanel(options: [.credits: credits])
                 } else {
                     let credits = NSMutableAttributedString(string: "© 2025 ")
                     credits.append(NSAttributedString(string: "HDrezka macOS", attributes: [.link: Const.github]))
                     credits.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: credits.length))
 
-                    NSApp.orderFrontStandardAboutPanel(options: [NSApplication.AboutPanelOptionKey.credits: credits])
+                    NSApp.orderFrontStandardAboutPanel(options: [.credits: credits])
                 }
             } label: {
                 Text("key.about-\(Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String ?? "HDrezka")")

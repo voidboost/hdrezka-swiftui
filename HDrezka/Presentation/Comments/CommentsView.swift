@@ -47,16 +47,15 @@ struct CommentsView: View {
                         }
                         .padding(.vertical, 52)
                         .padding(.horizontal, 36)
-                        .onGeometryChange(for: Bool.self) { geometry in
-                            -geometry.frame(in: .named("scroll")).origin.y / 52 >= 1
-                        } action: { showBar in
-                            withAnimation(.easeInOut(duration: 0.15)) {
-                                self.showBar = showBar
-                            }
+                    }
+                    .scrollIndicators(.never)
+                    .onScrollGeometryChange(for: Bool.self) { geometry in
+                        geometry.contentOffset.y >= 52
+                    } action: { _, showBar in
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            self.showBar = showBar
                         }
                     }
-                    .coordinateSpace(name: "scroll")
-                    .scrollIndicators(.never)
                     .environment(viewModel)
                 } else {
                     VStack {
@@ -83,27 +82,27 @@ struct CommentsView: View {
                                     LazyVStack(alignment: .leading, spacing: 16) {
                                         ForEach(comments) { comment in
                                             CommentsViewComponent(comment: comment)
-                                                .task {
-                                                    if comments.last == comment, viewModel.paginationState == .idle {
-                                                        viewModel.loadMore()
-                                                    }
-                                                }
                                         }
                                     }
+                                    .scrollTargetLayout()
                                 }
                             }
                             .padding(.vertical, 52)
                             .padding(.horizontal, 36)
-                            .onGeometryChange(for: Bool.self) { geometry in
-                                -geometry.frame(in: .named("scroll")).origin.y / 52 >= 1
-                            } action: { showBar in
-                                withAnimation(.easeInOut(duration: 0.15)) {
-                                    self.showBar = showBar
-                                }
+                        }
+                        .scrollIndicators(.never)
+                        .onScrollGeometryChange(for: Bool.self) { geometry in
+                            geometry.contentOffset.y >= 52
+                        } action: { _, showBar in
+                            withAnimation(.easeInOut(duration: 0.15)) {
+                                self.showBar = showBar
                             }
                         }
-                        .coordinateSpace(name: "scroll")
-                        .scrollIndicators(.never)
+                        .onScrollTargetVisibilityChange(idType: Comment.ID.self) { onScreenComments in
+                            if let last = comments.last, onScreenComments.contains(where: { $0 == last.id }), viewModel.paginationState == .idle {
+                                viewModel.loadMore()
+                            }
+                        }
                         .environment(viewModel)
 
                         if viewModel.paginationState == .loading {

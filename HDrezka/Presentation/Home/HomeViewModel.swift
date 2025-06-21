@@ -14,20 +14,6 @@ class HomeViewModel {
 
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
-    struct Category: Identifiable, Hashable {
-        let category: Categories
-        let title: String
-        let movies: [MovieSimple]
-        let id: UUID
-
-        init(category: Categories, title: String, movies: [MovieSimple], id: UUID = .init()) {
-            self.category = category
-            self.title = title
-            self.movies = movies
-            self.id = id
-        }
-    }
-
     private(set) var state: DataState<[Category]> = .loading
     private(set) var paginationState: DataPaginationState = .idle
 
@@ -95,6 +81,20 @@ class HomeViewModel {
         }
 
         getData(category: page, isInitial: false)
+    }
+}
+
+struct Category: Identifiable, Hashable {
+    let category: Categories
+    let title: String
+    let movies: [MovieSimple]
+    let id: UUID
+
+    init(category: Categories, title: String, movies: [MovieSimple], id: UUID = .init()) {
+        self.category = category
+        self.title = title
+        self.movies = movies
+        self.id = id
     }
 }
 

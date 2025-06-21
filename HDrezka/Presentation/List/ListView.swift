@@ -69,27 +69,26 @@ struct ListView: View {
                                 LazyVGrid(columns: columns, alignment: .leading, spacing: 18) {
                                     ForEach(movies) { movie in
                                         CardView(movie: movie)
-                                            .task {
-                                                if movies.last == movie, viewModel.paginationState == .idle {
-                                                    viewModel.loadMore()
-                                                }
-                                            }
                                     }
                                 }
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .scrollTargetLayout()
                             }
                             .padding(.vertical, 52)
                             .padding(.horizontal, 36)
-                            .onGeometryChange(for: Bool.self) { geometry in
-                                -geometry.frame(in: .named("scroll")).origin.y / 52 >= 1
-                            } action: { showBar in
-                                withAnimation(.easeInOut(duration: 0.15)) {
-                                    self.showBar = showBar
-                                }
+                        }
+                        .scrollIndicators(.never)
+                        .onScrollGeometryChange(for: Bool.self) { geometry in
+                            geometry.contentOffset.y >= 52
+                        } action: { _, showBar in
+                            withAnimation(.easeInOut(duration: 0.15)) {
+                                self.showBar = showBar
                             }
                         }
-                        .coordinateSpace(name: "scroll")
-                        .scrollIndicators(.never)
+                        .onScrollTargetVisibilityChange(idType: MovieSimple.ID.self) { onScreenCards in
+                            if let last = movies.last, onScreenCards.contains(where: { $0 == last.id }), viewModel.paginationState == .idle {
+                                viewModel.loadMore()
+                            }
+                        }
 
                         if viewModel.paginationState == .loading {
                             LoadingPaginationStateView()
