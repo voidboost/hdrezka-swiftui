@@ -4,7 +4,7 @@ import FactoryKit
 import Foundation
 
 class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
-    @Injected(\.session) private var session
+    @LazyInjected(\.session) private var session
 
     private let mainScheme = "mainm3u8"
     private let fragmentsScheme = "fragmentsm3u8"

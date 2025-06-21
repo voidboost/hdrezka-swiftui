@@ -4,7 +4,7 @@ import SwiftUI
 
 @Observable
 class CategoriesViewModel {
-    @ObservationIgnored @Injected(\.categoriesUseCase) private var categoriesUseCase
+    @ObservationIgnored @LazyInjected(\.categoriesUseCase) private var categoriesUseCase
 
     private(set) var state: DataState<[MovieType]> = .loading
 

@@ -12,9 +12,9 @@ class Downloader {
 
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
-    @ObservationIgnored @Injected(\.session) private var session
-    @ObservationIgnored @Injected(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
-    @ObservationIgnored @Injected(\.getMovieVideoUseCase) private var getMovieVideoUseCase
+    @ObservationIgnored @LazyInjected(\.session) private var session
+    @ObservationIgnored @LazyInjected(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
+    @ObservationIgnored @LazyInjected(\.getMovieVideoUseCase) private var getMovieVideoUseCase
 
     var downloads: [Download] = []
 

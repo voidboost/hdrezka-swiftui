@@ -4,7 +4,7 @@ import SwiftUI
 
 @Observable
 class PersonViewModel {
-    @ObservationIgnored @Injected(\.getPersonDetailsUseCase) private var getPersonDetailsUseCase
+    @ObservationIgnored @LazyInjected(\.getPersonDetailsUseCase) private var getPersonDetailsUseCase
 
     @ObservationIgnored let id: String
 

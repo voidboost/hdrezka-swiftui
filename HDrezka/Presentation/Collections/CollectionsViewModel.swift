@@ -4,7 +4,7 @@ import SwiftUI
 
 @Observable
 class CollectionsViewModel {
-    @ObservationIgnored @Injected(\.getCollectionsUseCase) private var getCollectionsUseCase
+    @ObservationIgnored @LazyInjected(\.getCollectionsUseCase) private var getCollectionsUseCase
 
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 

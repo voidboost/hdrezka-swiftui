@@ -4,9 +4,9 @@ import SwiftUI
 
 @Observable
 class WatchingLaterViewModel {
-    @ObservationIgnored @Injected(\.getWatchingLaterMoviesUseCase) private var getWatchingLaterMoviesUseCase
-    @ObservationIgnored @Injected(\.switchWatchedItemUseCase) private var switchWatchedItemUseCase
-    @ObservationIgnored @Injected(\.removeWatchingItemUseCase) private var removeWatchingItemUseCase
+    @ObservationIgnored @LazyInjected(\.getWatchingLaterMoviesUseCase) private var getWatchingLaterMoviesUseCase
+    @ObservationIgnored @LazyInjected(\.switchWatchedItemUseCase) private var switchWatchedItemUseCase
+    @ObservationIgnored @LazyInjected(\.removeWatchingItemUseCase) private var removeWatchingItemUseCase
 
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 

@@ -5,9 +5,9 @@ import YouTubePlayerKit
 
 @Observable
 class DetailsViewModel {
-    @ObservationIgnored @Injected(\.getMovieDetailsUseCase) private var getMovieDetailsUseCase
-    @ObservationIgnored @Injected(\.getMovieTrailerIdUseCase) private var getMovieTrailerIdUseCase
-    @ObservationIgnored @Injected(\.rateUseCase) private var rateUseCase
+    @ObservationIgnored @LazyInjected(\.getMovieDetailsUseCase) private var getMovieDetailsUseCase
+    @ObservationIgnored @LazyInjected(\.getMovieTrailerIdUseCase) private var getMovieTrailerIdUseCase
+    @ObservationIgnored @LazyInjected(\.rateUseCase) private var rateUseCase
 
     @ObservationIgnored let id: String
 
