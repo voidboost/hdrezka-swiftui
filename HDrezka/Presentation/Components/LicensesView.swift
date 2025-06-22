@@ -47,12 +47,9 @@ struct LicensesView: View {
                 }
 
                 if let url = library.url {
-                    Button {
-                        NSWorkspace.shared.open(url)
-                    } label: {
+                    Link(destination: url) {
                         Text(url.absoluteString)
                     }
-                    .buttonStyle(.link)
                 }
 
                 Button {
@@ -66,7 +63,7 @@ struct LicensesView: View {
                 .buttonStyle(.plain)
 
                 if showLicense {
-                    Text(attribute(library.licenseBody))
+                    Text(attributedString(library.licenseBody))
                         .multilineTextAlignment(.leading)
                         .textSelection(.enabled)
                         .padding()
@@ -75,37 +72,27 @@ struct LicensesView: View {
             .padding(.vertical, 10)
         }
 
-        private func attribute(_ inputText: String) -> AttributedString {
-            var attributedText = AttributedString(inputText)
-            let urls: [URL?] = inputText.match(URL.regexPattern)
-                .map { URL(string: String(inputText[$0])) }
-            let ranges = attributedText.match(URL.regexPattern)
-            for case let (range, url?) in zip(ranges, urls) {
-                attributedText[range].link = url
+        private func attributedString(_ input: String) -> AttributedString {
+            var attributedString = AttributedString(input)
+
+            guard let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) else {
+                return attributedString
             }
-            return attributedText
-        }
-    }
-}
 
-extension URL {
-    static let regexPattern = "https?://[A-Za-z0-9-.!@#$%&=+/?:_~]+"
-}
+            let matches = detector.matches(in: input, options: [], range: NSRange(location: 0, length: input.utf16.count))
 
-extension StringProtocol {
-    func match(_ pattern: String) -> [Range<Index>] {
-        guard let range = range(of: pattern, options: .regularExpression) else {
-            return []
-        }
-        return [range] + self[range.upperBound...].match(pattern)
-    }
-}
+            for match in matches {
+                guard let range = Range(match.range, in: input),
+                      let attributedRange = Range(match.range, in: attributedString),
+                      let url = URL(string: String(input[range]))
+                else {
+                    continue
+                }
 
-extension AttributedStringProtocol {
-    func match(_ pattern: String) -> [Range<AttributedString.Index>] {
-        guard let range = range(of: pattern, options: .regularExpression) else {
-            return []
+                attributedString[attributedRange].link = url
+            }
+
+            return attributedString
         }
-        return [range] + self[range.upperBound...].match(pattern)
     }
 }
