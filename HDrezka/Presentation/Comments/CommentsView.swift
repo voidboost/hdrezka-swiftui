@@ -488,15 +488,29 @@ struct CommentsView: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .center, spacing: 8) {
                     Button {
-                        if case let .selection(range) = selection?.indices {
+                        switch selection?.indices {
+                        case let .selection(range):
                             feedback.insert(contentsOf: "[/b]", at: range.upperBound)
                             feedback.insert(contentsOf: "[b]", at: range.lowerBound)
 
                             selection = TextSelection(range: feedback.index(range.lowerBound, offsetBy: 3) ..< feedback.index(range.upperBound, offsetBy: 3))
-                        } else {
+                        case let .multiSelection(rangeSet):
+                            let sortedRanges = rangeSet.ranges.sorted(by: { $0.lowerBound > $1.lowerBound })
+
+                            for range in sortedRanges {
+                                feedback.insert(contentsOf: "[/b]", at: range.upperBound)
+                                feedback.insert(contentsOf: "[b]", at: range.lowerBound)
+                            }
+
+                            let updatedRanges = sortedRanges.indexed().map { index, range in
+                                feedback.index(range.lowerBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1)) ..< feedback.index(range.upperBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1))
+                            }
+
+                            selection = TextSelection(ranges: .init(updatedRanges))
+                        default:
                             feedback.append("[b][/b]")
 
-                            selection = TextSelection(insertionPoint: feedback.index(feedback.startIndex, offsetBy: 3))
+                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -4))
                         }
                     } label: {
                         Image(systemName: "bold")
@@ -511,15 +525,29 @@ struct CommentsView: View {
                     .buttonStyle(.plain)
 
                     Button {
-                        if case let .selection(range) = selection?.indices {
+                        switch selection?.indices {
+                        case let .selection(range):
                             feedback.insert(contentsOf: "[/i]", at: range.upperBound)
                             feedback.insert(contentsOf: "[i]", at: range.lowerBound)
 
                             selection = TextSelection(range: feedback.index(range.lowerBound, offsetBy: 3) ..< feedback.index(range.upperBound, offsetBy: 3))
-                        } else {
+                        case let .multiSelection(rangeSet):
+                            let sortedRanges = rangeSet.ranges.sorted(by: { $0.lowerBound > $1.lowerBound })
+
+                            for range in sortedRanges {
+                                feedback.insert(contentsOf: "[/i]", at: range.upperBound)
+                                feedback.insert(contentsOf: "[i]", at: range.lowerBound)
+                            }
+
+                            let updatedRanges = sortedRanges.indexed().map { index, range in
+                                feedback.index(range.lowerBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1)) ..< feedback.index(range.upperBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1))
+                            }
+
+                            selection = TextSelection(ranges: .init(updatedRanges))
+                        default:
                             feedback.append("[i][/i]")
 
-                            selection = TextSelection(insertionPoint: feedback.index(feedback.startIndex, offsetBy: 3))
+                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -4))
                         }
                     } label: {
                         Image(systemName: "italic")
@@ -534,15 +562,29 @@ struct CommentsView: View {
                     .buttonStyle(.plain)
 
                     Button {
-                        if case let .selection(range) = selection?.indices {
+                        switch selection?.indices {
+                        case let .selection(range):
                             feedback.insert(contentsOf: "[/u]", at: range.upperBound)
                             feedback.insert(contentsOf: "[u]", at: range.lowerBound)
 
                             selection = TextSelection(range: feedback.index(range.lowerBound, offsetBy: 3) ..< feedback.index(range.upperBound, offsetBy: 3))
-                        } else {
+                        case let .multiSelection(rangeSet):
+                            let sortedRanges = rangeSet.ranges.sorted(by: { $0.lowerBound > $1.lowerBound })
+
+                            for range in sortedRanges {
+                                feedback.insert(contentsOf: "[/u]", at: range.upperBound)
+                                feedback.insert(contentsOf: "[u]", at: range.lowerBound)
+                            }
+
+                            let updatedRanges = sortedRanges.indexed().map { index, range in
+                                feedback.index(range.lowerBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1)) ..< feedback.index(range.upperBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1))
+                            }
+
+                            selection = TextSelection(ranges: .init(updatedRanges))
+                        default:
                             feedback.append("[u][/u]")
 
-                            selection = TextSelection(insertionPoint: feedback.index(feedback.startIndex, offsetBy: 3))
+                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -4))
                         }
                     } label: {
                         Image(systemName: "underline")
@@ -557,15 +599,29 @@ struct CommentsView: View {
                     .buttonStyle(.plain)
 
                     Button {
-                        if case let .selection(range) = selection?.indices {
+                        switch selection?.indices {
+                        case let .selection(range):
                             feedback.insert(contentsOf: "[/s]", at: range.upperBound)
                             feedback.insert(contentsOf: "[s]", at: range.lowerBound)
 
                             selection = TextSelection(range: feedback.index(range.lowerBound, offsetBy: 3) ..< feedback.index(range.upperBound, offsetBy: 3))
-                        } else {
+                        case let .multiSelection(rangeSet):
+                            let sortedRanges = rangeSet.ranges.sorted(by: { $0.lowerBound > $1.lowerBound })
+
+                            for range in sortedRanges {
+                                feedback.insert(contentsOf: "[/s]", at: range.upperBound)
+                                feedback.insert(contentsOf: "[s]", at: range.lowerBound)
+                            }
+
+                            let updatedRanges = sortedRanges.indexed().map { index, range in
+                                feedback.index(range.lowerBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1)) ..< feedback.index(range.upperBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1))
+                            }
+
+                            selection = TextSelection(ranges: .init(updatedRanges))
+                        default:
                             feedback.append("[s][/s]")
 
-                            selection = TextSelection(insertionPoint: feedback.index(feedback.startIndex, offsetBy: 3))
+                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -4))
                         }
                     } label: {
                         Image(systemName: "strikethrough")
@@ -580,15 +636,29 @@ struct CommentsView: View {
                     .buttonStyle(.plain)
 
                     Button {
-                        if case let .selection(range) = selection?.indices {
+                        switch selection?.indices {
+                        case let .selection(range):
                             feedback.insert(contentsOf: "[/spoiler]", at: range.upperBound)
                             feedback.insert(contentsOf: "[spoiler]", at: range.lowerBound)
 
-                            selection = TextSelection(range: feedback.index(range.lowerBound, offsetBy: 9) ..< feedback.index(range.upperBound, offsetBy: 9))
-                        } else {
+                            selection = TextSelection(range: feedback.index(range.lowerBound, offsetBy: 3) ..< feedback.index(range.upperBound, offsetBy: 3))
+                        case let .multiSelection(rangeSet):
+                            let sortedRanges = rangeSet.ranges.sorted(by: { $0.lowerBound > $1.lowerBound })
+
+                            for range in sortedRanges {
+                                feedback.insert(contentsOf: "[/spoiler]", at: range.upperBound)
+                                feedback.insert(contentsOf: "[spoiler]", at: range.lowerBound)
+                            }
+
+                            let updatedRanges = sortedRanges.indexed().map { index, range in
+                                feedback.index(range.lowerBound, offsetBy: 9 + 19 * (sortedRanges.count - index - 1)) ..< feedback.index(range.upperBound, offsetBy: 9 + 19 * (sortedRanges.count - index - 1))
+                            }
+
+                            selection = TextSelection(ranges: .init(updatedRanges))
+                        default:
                             feedback.append("[spoiler][/spoiler]")
 
-                            selection = TextSelection(insertionPoint: feedback.index(feedback.startIndex, offsetBy: 9))
+                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -10))
                         }
                     } label: {
                         Text("Spoiler!".uppercased())
