@@ -37,7 +37,6 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
         content
             .navigationTitle(Text(verbatim: "HDrezka - \(title)"))
             .transition(.opacity)
-            .ignoresSafeArea(edges: .top)
             .overlay {
                 VStack {
                     ZStack(alignment: .bottom) {
