@@ -88,8 +88,8 @@ struct HDrezkaApp: App {
     @State private var downloader: Downloader = .shared
     @Environment(\.openWindow) private var openWindow
 
-    private let updaterController: SPUStandardUpdaterController
-    private let modelContainer: ModelContainer
+    @State private var updaterController: SPUStandardUpdaterController
+    @State private var modelContainer: ModelContainer
 
     @Default(.theme) private var theme
 
