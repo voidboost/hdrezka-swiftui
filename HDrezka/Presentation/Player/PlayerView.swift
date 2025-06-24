@@ -486,7 +486,24 @@ struct PlayerView: View {
             }
         }
         .navigationTitle(Text(verbatim: "Player - \(name)"))
-        .padding(1)
+        .toolbar(.hidden)
+        .frame(minWidth: 900, minHeight: 900 / 16 * 9)
+        .ignoresSafeArea()
+        .focusable()
+        .focusEffectDisabled()
+        .background(Color.black)
+        .background(WindowAccessor { window in
+            self.window = window
+
+            if playerFullscreen,
+               !window.styleMask.contains(.fullScreen)
+            {
+                window.toggleFullScreen(nil)
+            }
+        })
+        .preferredColorScheme(.dark)
+        .tint(.primary)
+        .contentShape(.rect)
         .task {
             setupPlayer(subtitles: selectPositions.first(where: { position in position.id == voiceActing.voiceId })?.subtitles)
 
@@ -547,24 +564,6 @@ struct PlayerView: View {
 
             currentItem.allowedAudioSpatializationFormats = spatialAudio.format
         }
-        .ignoresSafeArea()
-        .focusable()
-        .focusEffectDisabled()
-        .frame(minWidth: 900, minHeight: 900 / 16 * 9)
-        .background(WindowAccessor { window in
-            self.window = window
-
-            if playerFullscreen,
-               !window.styleMask.contains(.fullScreen)
-            {
-                window.toggleFullScreen(nil)
-            }
-        })
-        .preferredColorScheme(.dark)
-        .tint(.primary)
-        .background(Color.black)
-        .contentShape(.rect)
-        .toolbar(.hidden)
         .onExitCommand {
             resetTimer()
 

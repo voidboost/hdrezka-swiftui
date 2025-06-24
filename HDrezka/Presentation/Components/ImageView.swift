@@ -37,13 +37,15 @@ struct ImageView: View {
             }
         }
         .navigationTitle("key.imageViewer")
+        .toolbar(.hidden)
+        .frame(minWidth: 300 * (16 / 9), maxWidth: .infinity, minHeight: 300, maxHeight: .infinity)
         .ignoresSafeArea()
         .focusable()
         .focusEffectDisabled()
-        .frame(minWidth: 300 * (16 / 9), maxWidth: .infinity, minHeight: 300, maxHeight: .infinity)
+        .contentShape(.rect)
+        .background(Color.clear)
         .background(WindowAccessor { window in
             self.window = window
-
             if !window.styleMask.contains(.fullScreen) {
                 window.toggleFullScreen(nil)
             }
@@ -69,8 +71,6 @@ struct ImageView: View {
                     .background(.ultraThickMaterial)
             }
         }
-        .contentShape(.rect)
-        .toolbar(.hidden)
         .gesture(
             WindowDragGesture()
                 .exclusively(before:
