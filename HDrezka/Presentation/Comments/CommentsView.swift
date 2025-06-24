@@ -641,7 +641,7 @@ struct CommentsView: View {
                             feedback.insert(contentsOf: "[/spoiler]", at: range.upperBound)
                             feedback.insert(contentsOf: "[spoiler]", at: range.lowerBound)
 
-                            selection = TextSelection(range: feedback.index(range.lowerBound, offsetBy: 3) ..< feedback.index(range.upperBound, offsetBy: 3))
+                            selection = TextSelection(range: feedback.index(range.lowerBound, offsetBy: 9) ..< feedback.index(range.upperBound, offsetBy: 9))
                         case let .multiSelection(rangeSet):
                             let sortedRanges = rangeSet.ranges.sorted(by: { $0.lowerBound > $1.lowerBound })
 
