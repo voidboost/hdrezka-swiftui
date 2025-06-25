@@ -232,8 +232,8 @@ struct CommentsView: View {
                         }
                         .scaledToFill()
                         .frame(width: 24, height: 24)
-                        .clipShape(.rect(cornerRadius: 12))
-                        .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 12).stroke(lineWidth: 1))
+                        .clipShape(.circle)
+                        .overlay(.tertiary.opacity(0.2), in: .circle.stroke(lineWidth: 1))
 
                         Text(comment.author)
                             .font(.system(size: 13, weight: .bold))
@@ -276,8 +276,8 @@ struct CommentsView: View {
                             }
                             .frame(height: 28)
                             .padding(.horizontal, 16)
-                            .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 100))
-                            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
+                            .background(.tertiary.opacity(0.05), in: .capsule)
+                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                         }
                         .buttonStyle(.plain)
                         .disabled(comment.selfComment)
@@ -314,7 +314,7 @@ struct CommentsView: View {
                                                     }
                                                     .scaledToFill()
                                                     .frame(width: 60, height: 60)
-                                                    .clipShape(.rect(cornerRadius: 30))
+                                                    .clipShape(.circle)
 
                                                     Text(like.name)
                                                         .lineLimit(1)
@@ -347,9 +347,9 @@ struct CommentsView: View {
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .background(.tertiary.opacity(0.05))
-                            .clipShape(.rect(cornerRadius: 100))
-                            .contentShape(.rect(cornerRadius: 100))
-                            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
+                            .clipShape(.capsule)
+                            .contentShape(.capsule)
+                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                         }
                         .buttonStyle(.plain)
 
@@ -363,9 +363,9 @@ struct CommentsView: View {
                                     .frame(height: 28)
                                     .padding(.horizontal, 16)
                                     .background(.tertiary.opacity(0.05))
-                                    .clipShape(.rect(cornerRadius: 100))
-                                    .contentShape(.rect(cornerRadius: 100))
-                                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
+                                    .clipShape(.capsule)
+                                    .contentShape(.capsule)
+                                    .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                             }
                             .buttonStyle(.plain)
                         }
@@ -382,9 +382,9 @@ struct CommentsView: View {
                                     .frame(height: 28)
                                     .padding(.horizontal, 16)
                                     .background(.tertiary.opacity(0.05))
-                                    .clipShape(.rect(cornerRadius: 100))
-                                    .contentShape(.rect(cornerRadius: 100))
-                                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
+                                    .clipShape(.capsule)
+                                    .contentShape(.capsule)
+                                    .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                             }
                             .buttonStyle(.plain)
                         }
@@ -518,9 +518,9 @@ struct CommentsView: View {
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .background(.tertiary.opacity(0.05))
-                            .clipShape(.rect(cornerRadius: 100))
-                            .contentShape(.rect(cornerRadius: 100))
-                            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
+                            .clipShape(.capsule)
+                            .contentShape(.capsule)
+                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
 
@@ -555,9 +555,9 @@ struct CommentsView: View {
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .background(.tertiary.opacity(0.05))
-                            .clipShape(.rect(cornerRadius: 100))
-                            .contentShape(.rect(cornerRadius: 100))
-                            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
+                            .clipShape(.capsule)
+                            .contentShape(.capsule)
+                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
 
@@ -592,9 +592,9 @@ struct CommentsView: View {
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .background(.tertiary.opacity(0.05))
-                            .clipShape(.rect(cornerRadius: 100))
-                            .contentShape(.rect(cornerRadius: 100))
-                            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
+                            .clipShape(.capsule)
+                            .contentShape(.capsule)
+                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
 
@@ -629,9 +629,9 @@ struct CommentsView: View {
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .background(.tertiary.opacity(0.05))
-                            .clipShape(.rect(cornerRadius: 100))
-                            .contentShape(.rect(cornerRadius: 100))
-                            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
+                            .clipShape(.capsule)
+                            .contentShape(.capsule)
+                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
 
@@ -666,9 +666,9 @@ struct CommentsView: View {
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .background(.tertiary.opacity(0.05))
-                            .clipShape(.rect(cornerRadius: 100))
-                            .contentShape(.rect(cornerRadius: 100))
-                            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
+                            .clipShape(.capsule)
+                            .contentShape(.capsule)
+                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
 
@@ -698,9 +698,9 @@ struct CommentsView: View {
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .background(.tertiary.opacity(0.05))
-                            .clipShape(.rect(cornerRadius: 100))
-                            .contentShape(.rect(cornerRadius: 100))
-                            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 100).stroke(lineWidth: 1))
+                            .clipShape(.capsule)
+                            .contentShape(.capsule)
+                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
                     .disabled(feedback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || (!isLoggedIn && name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) || !allowedComments)
