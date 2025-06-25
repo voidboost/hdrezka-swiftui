@@ -185,7 +185,7 @@ struct SeriesUpdatesSheetView: View {
                                                         .padding(.vertical, 2)
                                                         .padding(.horizontal, 6)
                                                         .background(Const.premiumGradient)
-                                                        .clipShape(.rect(cornerRadius: 40))
+                                                        .clipShape(.capsule)
                                                 } else {
                                                     view
                                                 }
@@ -240,7 +240,7 @@ struct SeriesUpdatesSheetView: View {
                                                         .padding(.vertical, 2)
                                                         .padding(.horizontal, 6)
                                                         .background(Const.premiumGradient)
-                                                        .clipShape(.rect(cornerRadius: 40))
+                                                        .clipShape(.capsule)
                                                 } else {
                                                     view
                                                 }

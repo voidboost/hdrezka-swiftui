@@ -220,8 +220,8 @@ struct DetailsView: View {
                                     }
                                     .buttonStyle(.plain)
                                     .background(Color.accentColor)
-                                    .clipShape(.rect(cornerRadius: 40))
-                                    .contentShape(.rect(cornerRadius: 40))
+                                    .clipShape(.capsule)
+                                    .contentShape(.capsule)
                                     .sheet(isPresented: $isPlayPresented) {
                                         WatchSheetView(id: details.movieId)
                                     }
@@ -238,9 +238,9 @@ struct DetailsView: View {
                                     }
                                     .buttonStyle(.plain)
                                     .background(.tertiary.opacity(0.05))
-                                    .clipShape(.rect(cornerRadius: 40))
-                                    .contentShape(.rect(cornerRadius: 40))
-                                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 40).stroke(lineWidth: 1))
+                                    .clipShape(.capsule)
+                                    .contentShape(.capsule)
+                                    .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                                     .sheet(isPresented: $isDownloadPresented) {
                                         DownloadSheetView(id: details.movieId)
                                     }
@@ -258,9 +258,9 @@ struct DetailsView: View {
                                         }
                                         .buttonStyle(.plain)
                                         .background(.tertiary.opacity(0.05))
-                                        .clipShape(.rect(cornerRadius: 40))
-                                        .contentShape(.rect(cornerRadius: 40))
-                                        .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 40).stroke(lineWidth: 1))
+                                        .clipShape(.capsule)
+                                        .contentShape(.capsule)
+                                        .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                                         .sheet(isPresented: $isOpenExternalPlayerPresented) {
                                             OpenExternalPlayerSheetView(id: details.movieId)
                                         }
@@ -275,7 +275,7 @@ struct DetailsView: View {
                                     }
                                     .buttonStyle(.plain)
                                     .background(Color.accentColor)
-                                    .clipShape(.rect(cornerRadius: 40))
+                                    .clipShape(.capsule)
                                     .disabled(true)
                                 } else {
                                     Button {} label: {
@@ -287,7 +287,7 @@ struct DetailsView: View {
                                     }
                                     .buttonStyle(.plain)
                                     .background(Color.accentColor)
-                                    .clipShape(.rect(cornerRadius: 40))
+                                    .clipShape(.capsule)
                                     .disabled(true)
                                 }
                             }
@@ -883,9 +883,9 @@ struct DetailsView: View {
                                                     .imageFill(2 / 3)
                                                     .frame(width: 36, height: 36)
                                                     .background(.quinary)
-                                                    .clipShape(.rect(cornerRadius: 18))
+                                                    .clipShape(.circle)
                                                     .padding(2)
-                                                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 20).stroke(lineWidth: 1))
+                                                    .overlay(.tertiary.opacity(0.2), in: .circle.stroke(lineWidth: 1))
 
                                                     Text(person.name)
                                                         .font(.system(size: 13))
@@ -1060,9 +1060,9 @@ struct DetailsView: View {
                     .imageFill(2 / 3)
                     .frame(width: 64, height: 64)
                     .background(.quinary)
-                    .clipShape(.rect(cornerRadius: 32))
+                    .clipShape(.circle)
                     .padding(4)
-                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 32).stroke(lineWidth: 1))
+                    .overlay(.tertiary.opacity(0.2), in: .circle.stroke(lineWidth: 1))
                     .padding(4)
                 }
         }
