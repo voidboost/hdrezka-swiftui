@@ -196,31 +196,26 @@ struct SignUpSheetView: View {
                                             .multilineTextAlignment(.trailing)
                                             .focused($focusedField, equals: FocusedField.email)
                                             .onChange(of: email) {
-                                                let newValue = String(email.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
-                                                if newValue != email {
-                                                    email = newValue
-                                                } else {
-                                                    emailValid = nil
+                                                emailValid = nil
 
-                                                    emailCheck?.cancel()
+                                                emailCheck?.cancel()
 
-                                                    if !email.isEmpty {
-                                                        emailCheck = DispatchWorkItem {
-                                                            checkEmailUseCase(email: email)
-                                                                .receive(on: DispatchQueue.main)
-                                                                .sink { completion in
-                                                                    guard case .failure = completion else { return }
+                                                if !email.isEmpty {
+                                                    emailCheck = DispatchWorkItem {
+                                                        checkEmailUseCase(email: email)
+                                                            .receive(on: DispatchQueue.main)
+                                                            .sink { completion in
+                                                                guard case .failure = completion else { return }
 
-                                                                    emailValid = false
-                                                                } receiveValue: { valid in
-                                                                    emailValid = valid
-                                                                }
-                                                                .store(in: &subscriptions)
-                                                        }
+                                                                emailValid = false
+                                                            } receiveValue: { valid in
+                                                                emailValid = valid
+                                                            }
+                                                            .store(in: &subscriptions)
+                                                    }
 
-                                                        if let emailCheck {
-                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: emailCheck)
-                                                        }
+                                                    if let emailCheck {
+                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: emailCheck)
                                                     }
                                                 }
                                             }
@@ -247,30 +242,26 @@ struct SignUpSheetView: View {
                                             .multilineTextAlignment(.trailing)
                                             .focused($focusedField, equals: .username)
                                             .onChange(of: username) {
-                                                let newValue = String(username.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) }.prefix(30))
-                                                if newValue != username {
-                                                    username = newValue
-                                                } else {
-                                                    usernameValid = nil
+                                                usernameValid = nil
 
-                                                    usernameCheck?.cancel()
-                                                    if !username.isEmpty {
-                                                        usernameCheck = DispatchWorkItem {
-                                                            checkUsernameUseCase(username: username)
-                                                                .receive(on: DispatchQueue.main)
-                                                                .sink { completion in
-                                                                    guard case .failure = completion else { return }
+                                                usernameCheck?.cancel()
 
-                                                                    usernameValid = false
-                                                                } receiveValue: { valid in
-                                                                    usernameValid = valid
-                                                                }
-                                                                .store(in: &subscriptions)
-                                                        }
+                                                if !username.isEmpty {
+                                                    usernameCheck = DispatchWorkItem {
+                                                        checkUsernameUseCase(username: username)
+                                                            .receive(on: DispatchQueue.main)
+                                                            .sink { completion in
+                                                                guard case .failure = completion else { return }
 
-                                                        if let usernameCheck {
-                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: usernameCheck)
-                                                        }
+                                                                usernameValid = false
+                                                            } receiveValue: { valid in
+                                                                usernameValid = valid
+                                                            }
+                                                            .store(in: &subscriptions)
+                                                    }
+
+                                                    if let usernameCheck {
+                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: usernameCheck)
                                                     }
                                                 }
                                             }
@@ -298,29 +289,25 @@ struct SignUpSheetView: View {
                                                 .multilineTextAlignment(.trailing)
                                                 .focused($focusedField, equals: .password1)
                                                 .onChange(of: password1) {
-                                                    let newValue = String(password1.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
-                                                    if newValue != password1 {
-                                                        password1 = newValue
-                                                    } else {
-                                                        withAnimation(.easeInOut(duration: 0.15)) {
-                                                            passwordIsEmpty = newValue.isEmpty
+                                                    withAnimation(.easeInOut(duration: 0.15)) {
+                                                        passwordIsEmpty = password1.isEmpty
+                                                    }
+
+                                                    passwordValid = nil
+
+                                                    passwordCheck?.cancel()
+
+                                                    if !password1.isEmpty {
+                                                        passwordCheck = DispatchWorkItem {
+                                                            passwordValid = password1.count >= 6
+
+                                                            if !password2.isEmpty {
+                                                                confirmPasswordValid = password1 == password2
+                                                            }
                                                         }
 
-                                                        passwordValid = nil
-
-                                                        passwordCheck?.cancel()
-                                                        if !password1.isEmpty {
-                                                            passwordCheck = DispatchWorkItem {
-                                                                passwordValid = password1.count >= 6
-
-                                                                if !password2.isEmpty {
-                                                                    confirmPasswordValid = password1 == password2
-                                                                }
-                                                            }
-
-                                                            if let passwordCheck {
-                                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: passwordCheck)
-                                                            }
+                                                        if let passwordCheck {
+                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: passwordCheck)
                                                         }
                                                     }
                                                 }
@@ -333,29 +320,25 @@ struct SignUpSheetView: View {
                                                 .multilineTextAlignment(.trailing)
                                                 .focused($focusedField, equals: .password1)
                                                 .onChange(of: password1) {
-                                                    let newValue = String(password1.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
-                                                    if newValue != password1 {
-                                                        password1 = newValue
-                                                    } else {
-                                                        withAnimation(.easeInOut(duration: 0.15)) {
-                                                            passwordIsEmpty = newValue.isEmpty
+                                                    withAnimation(.easeInOut(duration: 0.15)) {
+                                                        passwordIsEmpty = password1.isEmpty
+                                                    }
+
+                                                    passwordValid = nil
+
+                                                    passwordCheck?.cancel()
+
+                                                    if !password1.isEmpty {
+                                                        passwordCheck = DispatchWorkItem {
+                                                            passwordValid = password1.count >= 6
+
+                                                            if !password2.isEmpty {
+                                                                confirmPasswordValid = password1 == password2
+                                                            }
                                                         }
 
-                                                        passwordValid = nil
-
-                                                        passwordCheck?.cancel()
-                                                        if !password1.isEmpty {
-                                                            passwordCheck = DispatchWorkItem {
-                                                                passwordValid = password1.count >= 6
-
-                                                                if !password2.isEmpty {
-                                                                    confirmPasswordValid = password1 == password2
-                                                                }
-                                                            }
-
-                                                            if let passwordCheck {
-                                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: passwordCheck)
-                                                            }
+                                                        if let passwordCheck {
+                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: passwordCheck)
                                                         }
                                                     }
                                                 }
@@ -406,25 +389,21 @@ struct SignUpSheetView: View {
                                                 .multilineTextAlignment(.trailing)
                                                 .focused($focusedField, equals: .password2)
                                                 .onChange(of: password2) {
-                                                    let newValue = String(password2.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
-                                                    if newValue != password2 {
-                                                        password2 = newValue
-                                                    } else {
-                                                        withAnimation(.easeInOut(duration: 0.15)) {
-                                                            confirmPasswordIsEmpty = newValue.isEmpty
+                                                    withAnimation(.easeInOut(duration: 0.15)) {
+                                                        confirmPasswordIsEmpty = password2.isEmpty
+                                                    }
+
+                                                    confirmPasswordValid = nil
+
+                                                    confirmPasswordCheck?.cancel()
+
+                                                    if !password2.isEmpty {
+                                                        confirmPasswordCheck = DispatchWorkItem {
+                                                            confirmPasswordValid = password1 == password2
                                                         }
 
-                                                        confirmPasswordValid = nil
-
-                                                        confirmPasswordCheck?.cancel()
-                                                        if !password2.isEmpty {
-                                                            confirmPasswordCheck = DispatchWorkItem {
-                                                                confirmPasswordValid = password1 == password2
-                                                            }
-
-                                                            if let confirmPasswordCheck {
-                                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: confirmPasswordCheck)
-                                                            }
+                                                        if let confirmPasswordCheck {
+                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: confirmPasswordCheck)
                                                         }
                                                     }
                                                 }
@@ -439,25 +418,21 @@ struct SignUpSheetView: View {
                                                 .multilineTextAlignment(.trailing)
                                                 .focused($focusedField, equals: .password2)
                                                 .onChange(of: password2) {
-                                                    let newValue = String(password2.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
-                                                    if newValue != password2 {
-                                                        password2 = newValue
-                                                    } else {
-                                                        withAnimation(.easeInOut(duration: 0.15)) {
-                                                            confirmPasswordIsEmpty = newValue.isEmpty
+                                                    withAnimation(.easeInOut(duration: 0.15)) {
+                                                        confirmPasswordIsEmpty = password2.isEmpty
+                                                    }
+
+                                                    confirmPasswordValid = nil
+
+                                                    confirmPasswordCheck?.cancel()
+
+                                                    if !password2.isEmpty {
+                                                        confirmPasswordCheck = DispatchWorkItem {
+                                                            confirmPasswordValid = password1 == password2
                                                         }
 
-                                                        confirmPasswordValid = nil
-
-                                                        confirmPasswordCheck?.cancel()
-                                                        if !password2.isEmpty {
-                                                            confirmPasswordCheck = DispatchWorkItem {
-                                                                confirmPasswordValid = password1 == password2
-                                                            }
-
-                                                            if let confirmPasswordCheck {
-                                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: confirmPasswordCheck)
-                                                            }
+                                                        if let confirmPasswordCheck {
+                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: confirmPasswordCheck)
                                                         }
                                                     }
                                                 }
