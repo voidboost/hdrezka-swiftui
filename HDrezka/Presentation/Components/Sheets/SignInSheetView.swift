@@ -53,12 +53,6 @@ struct SignInSheetView: View {
                                     .textFieldStyle(.plain)
                                     .multilineTextAlignment(.trailing)
                                     .focused($focusedField, equals: .username)
-                                    .onChange(of: username) {
-                                        let newValue = String(username.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
-                                        if newValue != username {
-                                            username = newValue
-                                        }
-                                    }
                                     .onSubmit {
                                         focusedField = .password
                                     }
@@ -76,13 +70,8 @@ struct SignInSheetView: View {
                                         .multilineTextAlignment(.trailing)
                                         .focused($focusedField, equals: .password)
                                         .onChange(of: password) {
-                                            let newValue = String(password.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
-                                            if newValue != password {
-                                                password = newValue
-                                            } else {
-                                                withAnimation(.easeInOut(duration: 0.15)) {
-                                                    passwordIsEmpty = newValue.isEmpty
-                                                }
+                                            withAnimation(.easeInOut(duration: 0.15)) {
+                                                passwordIsEmpty = password.isEmpty
                                             }
                                         }
                                         .onSubmit {
@@ -96,13 +85,8 @@ struct SignInSheetView: View {
                                         .multilineTextAlignment(.trailing)
                                         .focused($focusedField, equals: .password)
                                         .onChange(of: password) {
-                                            let newValue = String(password.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
-                                            if newValue != password {
-                                                password = newValue
-                                            } else {
-                                                withAnimation(.easeInOut(duration: 0.15)) {
-                                                    passwordIsEmpty = newValue.isEmpty
-                                                }
+                                            withAnimation(.easeInOut(duration: 0.15)) {
+                                                passwordIsEmpty = password.isEmpty
                                             }
                                         }
                                         .onSubmit {
