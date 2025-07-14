@@ -189,8 +189,7 @@ class Downloader {
                         .store(in: &subscriptions)
                 } else {
                     notificate(id, String(localized: "key.download.failed"), String(localized:
-                        "key.download.failed.notification-\(name)-\(seasonName)-\(episodeName)-\(qualityName)-\(actingName)",
-                    ), "retry", ["data": retryData])
+                        "key.download.failed.notification-\(name)-\(seasonName)-\(episodeName)-\(qualityName)-\(actingName)"), "retry", ["data": retryData])
                 }
             } else if let season = data.season, let episode = season.episodes.first {
                 download(data.newEpisede(episode))
@@ -209,8 +208,7 @@ class Downloader {
                             guard case let .failure(error) = completion else { return }
 
                             self.notificate(id, String(localized: "key.download.failed"), String(localized:
-                                "key.download.failed.notification-\(name)-\(qualityName)-\(actingName)-\(error.localizedDescription)",
-                            ), "retry", ["data": retryData])
+                                "key.download.failed.notification-\(name)-\(qualityName)-\(actingName)-\(error.localizedDescription)"), "retry", ["data": retryData])
                         } receiveValue: { movie in
                             if movie.needPremium {
                                 self.notificate(id, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(name)-\(qualityName)-\(actingName)"), "need_premium")
@@ -239,8 +237,7 @@ class Downloader {
                                 }
 
                                 if let movieUrl = movie.getClosestTo(quality: data.quality) {
-                                    self.notificate(id, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(name)-\(qualityName)-\(actingName)",
-                                        ), "cancel", ["id": id])
+                                    self.notificate(id, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(name)-\(qualityName)-\(actingName)"), "cancel", ["id": id])
 
                                     let request = self.session.download(movieUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination, [.createIntermediateDirectories, .removePreviousFile]) })
                                         .validate(statusCode: 200 ..< 400)
