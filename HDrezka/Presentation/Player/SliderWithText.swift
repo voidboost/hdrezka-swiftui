@@ -29,7 +29,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
         emptyColor: Color,
         height: Double,
         thumbnails: WebVTT?,
-        onEditingChanged: @escaping (Bool) -> Void
+        onEditingChanged: @escaping (Bool) -> Void,
     ) {
         _value = value
         self.inRange = inRange

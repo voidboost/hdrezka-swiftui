@@ -18,7 +18,7 @@ class MovieListsParser {
                     let info = try movie.getInfo()
 
                     return MovieSimple(movieId: id, name: name, details: details, poster: poster, cat: cat, info: info)
-                }
+                },
         )
     }
 
