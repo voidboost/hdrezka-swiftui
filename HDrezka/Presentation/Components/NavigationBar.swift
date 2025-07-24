@@ -17,7 +17,7 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
         title: String,
         showBar: Bool,
         navbar: (() -> Navbar)?,
-        toolbar: (() -> Toolbar)?
+        toolbar: (() -> Toolbar)?,
     ) {
         self.title = title
         self.showBar = showBar
@@ -28,7 +28,7 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
     init(
         title: String,
         showBar: Bool,
-        navbar: (() -> Navbar)?
+        navbar: (() -> Navbar)?,
     ) where Toolbar == EmptyView {
         self.init(title: title, showBar: showBar, navbar: navbar, toolbar: nil)
     }
