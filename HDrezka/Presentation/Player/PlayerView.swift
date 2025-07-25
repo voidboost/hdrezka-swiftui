@@ -410,8 +410,8 @@ struct PlayerView: View {
                                         updateNextTimer()
                                     }
                                 }
-                            }, inRange: 0 ... duration, buffers: loadedTimeRanges, activeFillColor: .primary, fillColor: .primary.opacity(0.7), emptyColor: .primary.opacity(0.3), height: 6, thumbnails: thumbnails) { _ in }
-                                .frame(height: 23)
+                            }, inRange: 0 ... duration, buffers: loadedTimeRanges, activeFillColor: .primary, fillColor: .primary.opacity(0.7), emptyColor: .primary.opacity(0.3), height: 8, thumbnails: thumbnails) { _ in }
+                                .frame(height: 25)
                                 .onHover { hovering in
                                     isGestureEnabled = !hovering
                                 }
