@@ -14,7 +14,10 @@
 </ul>
 <p>And more!</p>
 <h2>Releases</h2>
-<a href="https://voidboost.github.io/hdrezka-releases/HDrezka.dmg">Download latest version</a>
+<ul>
+    <li><a href="https://voidboost.github.io/hdrezka-releases/HDrezka.dmg">Download latest version (macOS 15 Sequoia or later)</a></li>
+    <li><a href="https://voidboost.github.io/hdrezka-releases/HDrezka_old.dmg">Download latest version (macOS 13 Ventura or later)</a></li>
+</ul>
 <h2>Sponsor & Support</h2>
 <p>
     To keep this app maintained and up-to-date please consider sponsoring it on GitHub. Or if you are looking for a private support or help in customizing the experience, then reach out to me on Telegram
