@@ -12,6 +12,9 @@ struct SettingsView: View {
     @Default(.defaultQuality) private var defaultQuality
     @Default(.spatialAudio) private var spatialAudio
     @Default(.theme) private var theme
+    @Default(.maxConcurrentDownloads) private var maxConcurrentDownloads
+
+    @Environment(Downloader.self) private var downloader
 
     @Environment(\.modelContext) private var modelContext
 
@@ -228,7 +231,33 @@ struct SettingsView: View {
                 Divider()
 
                 HStack(alignment: .center, spacing: 8) {
-                    Text("key.playerPositions-\(playerPositions.count.description)")
+                    Text("key.maxConcurrentDownloads-\(maxConcurrentDownloads)")
+                        .monospacedDigit()
+                        .contentTransition(.numericText(value: Double(maxConcurrentDownloads)))
+                        .animation(.easeInOut, value: maxConcurrentDownloads)
+
+                    Spacer()
+
+                    Slider(value: Binding { Double(maxConcurrentDownloads) } set: { value in maxConcurrentDownloads = Int(value) }, in: 1 ... 10, step: 1) {
+                        Text("key.maxConcurrentDownloads-\(maxConcurrentDownloads)")
+                    } minimumValueLabel: {
+                        Text(verbatim: "1")
+                    } maximumValueLabel: {
+                        Text(verbatim: "10")
+                    } onEditingChanged: { isEditing in
+                        if !isEditing {
+                            downloader.maxConcurrentDownloadsChange()
+                        }
+                    }
+                    .labelsHidden()
+                    .controlSize(.large)
+                }
+                .frame(height: 40)
+
+                Divider()
+
+                HStack(alignment: .center, spacing: 8) {
+                    Text("key.playerPositions-\(playerPositions.count)")
                         .monospacedDigit()
                         .contentTransition(.numericText(value: Double(playerPositions.count)))
 
@@ -257,7 +286,7 @@ struct SettingsView: View {
                     Divider()
 
                     HStack(alignment: .center, spacing: 8) {
-                        Text("key.selectPositions-\(selectPositions.count.description)")
+                        Text("key.selectPositions-\(selectPositions.count)")
                             .monospacedDigit()
                             .contentTransition(.numericText(value: Double(selectPositions.count)))
 

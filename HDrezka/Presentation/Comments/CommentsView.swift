@@ -10,7 +10,7 @@ struct CommentsView: View {
     @State private var viewModel: CommentsViewModel
 
     init(details: MovieDetailed) {
-        title = details.commentsCount > 0 ? String(localized: "key.comments-\(details.commentsCount.description)") : String(localized: "key.comments")
+        title = details.commentsCount > 0 ? String(localized: "key.comments-\(details.commentsCount)") : String(localized: "key.comments")
         viewModel = CommentsViewModel(id: details.movieId, adb: details.adb, type: details.type)
     }
 
@@ -269,7 +269,7 @@ struct CommentsView: View {
                                 }
 
                                 if comment.likesCount > 0 {
-                                    Text(comment.likesCount.description)
+                                    Text(verbatim: "\(comment.likesCount)")
                                         .font(.system(size: 13, weight: .semibold).monospacedDigit())
                                         .contentTransition(.numericText(value: Double(comment.likesCount)))
                                 }

@@ -160,7 +160,9 @@ struct HDrezkaApp: App {
         .commands(content: removed)
 
         Settings {
-            SettingsView(updater: updaterController.updater).preferredColorScheme(theme.scheme)
+            SettingsView(updater: updaterController.updater)
+                .environment(downloader)
+                .preferredColorScheme(theme.scheme)
         }
         .modelContainer(modelContainer)
         .windowResizability(.contentSize)

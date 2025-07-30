@@ -34,7 +34,7 @@ struct CardView: View {
                                     Spacer()
 
                                     if let rating = cat.rating {
-                                        let rating = Text(rating.description).fontWeight(.medium)
+                                        let rating = Text(verbatim: "\(rating)").fontWeight(.medium)
                                         let icon = Text(Image(systemName: cat.icon))
 
                                         Text("key.cat-\(cat.title)-\(rating)-\(icon)")

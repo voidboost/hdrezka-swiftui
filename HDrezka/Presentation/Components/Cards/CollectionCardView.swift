@@ -34,7 +34,7 @@ struct CollectionCardView: View {
                                     HStack {
                                         Spacer()
 
-                                        Text(count.description)
+                                        Text(verbatim: "\(count)")
                                             .lineLimit(1)
                                             .font(.system(size: 10))
                                             .padding(.vertical, 3)

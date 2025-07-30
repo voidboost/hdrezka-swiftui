@@ -52,11 +52,7 @@ extension Download {
             case .paused:
                 progress.totalUnitCount = status.totalLength
                 progress.completedUnitCount = status.completedLength
-            case .error:
-                break
-            case .complete:
-                break
-            case .removed:
+            default:
                 break
             }
         }

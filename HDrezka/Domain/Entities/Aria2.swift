@@ -27,9 +27,8 @@ struct Aria2Error: Decodable, Error {
 }
 
 enum Aria2ErrorCode: Int, Codable {
-    case undefined = -1
     case finished = 0
-    case unknownError = 1
+    case unknownError
     case timeOut
     case resourceNotFound
     case maxFileNotFound
@@ -64,74 +63,72 @@ enum Aria2ErrorCode: Int, Codable {
 
     var description: String {
         switch self {
-        case .undefined:
-            "Undefined"
         case .finished:
-            "Finished"
+            String(localized: "key.aria2.error.finished")
         case .unknownError:
-            "Unknown error"
+            String(localized: "key.aria2.error.unknownError")
         case .timeOut:
-            "Timed out"
+            String(localized: "key.aria2.error.timeOut")
         case .resourceNotFound:
-            "Resource not found"
+            String(localized: "key.aria2.error.resourceNotFound")
         case .maxFileNotFound:
-            "Maximum number of file not found errors reached"
+            String(localized: "key.aria2.error.maxFileNotFound")
         case .tooSlowDownloadSpeed:
-            "Download speed too slow"
+            String(localized: "key.aria2.error.tooSlowDownloadSpeed")
         case .networkProblem:
-            "Network problem"
+            String(localized: "key.aria2.error.networkProblem")
         case .inProgress:
-            "Unfinished downloads in progress"
+            String(localized: "key.aria2.error.inProgress")
         case .cannotResume:
-            "Remote server did not support resume when resume was required to complete download"
+            String(localized: "key.aria2.error.cannotResume")
         case .notEnoughDiskSpace:
-            "Not enough disk space available"
+            String(localized: "key.aria2.error.notEnoughDiskSpace")
         case .pieceLengthChanged:
-            "Piece length was different from one in .aria2 control file"
+            String(localized: "key.aria2.error.pieceLengthChanged")
         case .duplicateDownload:
-            "Duplicate download"
+            String(localized: "key.aria2.error.duplicateDownload")
         case .duplicateInfoHash:
-            "Duplicate info hash torrent"
+            String(localized: "key.aria2.error.duplicateInfoHash")
         case .fileAlreadyExists:
-            "File already exists"
+            String(localized: "key.aria2.error.fileAlreadyExists")
         case .fileRenamingFailed:
-            "Renaming file failed"
+            String(localized: "key.aria2.error.fileRenamingFailed")
         case .fileOpenError:
-            "Could not open existing file"
+            String(localized: "key.aria2.error.fileOpenError")
         case .fileCreateError:
-            "Could not create new file or truncate existing file"
+            String(localized: "key.aria2.error.fileCreateError")
         case .fileIoError:
-            "File I/O error"
+            String(localized: "key.aria2.error.fileIoError")
         case .dirCreateError:
-            "Could not create directory"
+            String(localized: "key.aria2.error.dirCreateError")
         case .nameResolveError:
-            "Name resolution failed"
+            String(localized: "key.aria2.error.nameResolveError")
         case .metalinkParseError:
-            "Could not parse Metalink document"
+            String(localized: "key.aria2.error.metalinkParseError")
         case .ftpProtocolError:
-            "FTP command failed"
+            String(localized: "key.aria2.error.ftpProtocolError")
         case .httpProtocolError:
-            "HTTP response header was bad or unexpected"
+            String(localized: "key.aria2.error.httpProtocolError")
         case .httpTooManyRedirects:
-            "Too many redirects occurred"
+            String(localized: "key.aria2.error.httpTooManyRedirects")
         case .httpAuthFailed:
-            "HTTP authorization failed"
+            String(localized: "key.aria2.error.httpAuthFailed")
         case .bencodeParseError:
-            "Could not parse bencoded file (usually \".torrent\" file)"
+            String(localized: "key.aria2.error.bencodeParseError")
         case .bittorrentParseError:
-            "\".torrent\" file was corrupted or missing information"
+            String(localized: "key.aria2.error.bittorrentParseError")
         case .magnetParseError:
-            "Magnet URI was bad"
+            String(localized: "key.aria2.error.magnetParseError")
         case .optionError:
-            "Bad/unrecognized option was given or unexpected option argument was given"
+            String(localized: "key.aria2.error.optionError")
         case .httpServiceUnavailable:
-            "HTTP service unavailable"
+            String(localized: "key.aria2.error.httpServiceUnavailable")
         case .jsonParseError:
-            "Could not parse JSON-RPC request"
+            String(localized: "key.aria2.error.jsonParseError")
         case .removed:
-            "Reserved. Not used."
+            String(localized: "key.aria2.error.removed")
         case .checksumError:
-            "Checksum validation failed"
+            String(localized: "key.aria2.error.checksumError")
         }
     }
 }
