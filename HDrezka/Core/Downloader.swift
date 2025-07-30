@@ -200,7 +200,17 @@ class Downloader {
                                 }) {
                                     self.downloads[index].updateStatus(status)
                                 } else {
-                                    self.remove(status.gid)
+                                    self.callUseCase(
+                                        data: Aria2Request(
+                                            method: .removeDownloadResult,
+                                            params: GidParams(
+                                                token: Const.token,
+                                                gid: status.gid,
+                                            ),
+                                        ),
+                                    )
+                                    .sink { _ in } receiveValue: { (_: Aria2Response<String>) in }
+                                    .store(in: &self.subscriptions)
                                 }
                             }
                         }
