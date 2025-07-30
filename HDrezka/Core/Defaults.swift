@@ -9,6 +9,7 @@ extension Defaults.Keys {
     static let playerFullscreen = Key<Bool>("player_fullscreen", default: false)
     static let hideMainWindow = Key<Bool>("hide_main_window", default: false)
     static let spatialAudio = Key<SpatialAudio>("spatial_audio", default: .off)
+    static let maxConcurrentDownloads = Key<Int>("max_concurrent_downloads", default: 5)
 
     static let useHeaders = Key<Bool>("use_headers", default: true)
     static let lastHdrezkaAppVersion = Key<String>("last_hdrezka_app_version", default: Const.lastHdrezkaAppVersion)

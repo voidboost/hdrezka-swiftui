@@ -433,7 +433,7 @@ struct DownloadSheetView: View {
                 .buttonStyle(.plain)
                 .disabled(selectedQuality == nil
                     || downloader.downloads.contains(where: {
-                        $0.id == "\(details?.movieId ?? "")\(selectedSeason?.seasonId ?? "")\(selectedEpisode?.episodeId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded || $0.id == "\(details?.movieId ?? "")\(selectedSeason?.seasonId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded
+                        $0.data.notificationId == "\(details?.movieId ?? "")\(selectedSeason?.seasonId ?? "")\(selectedEpisode?.episodeId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded || $0.data.notificationId == "\(details?.movieId ?? "")\(selectedSeason?.seasonId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded
                     }))
 
                 if NSWorkspace.shared.urlForApplication(toOpen: ExternalDownloaders.folx.url) != nil {
@@ -547,12 +547,6 @@ struct DownloadSheetView: View {
                 if let details, details.series != nil {
                     Button {
                         if let selectedActing, let selectedQuality, let selectedSeason {
-                            for episode in selectedSeason.episodes {
-                                let id = "\(details.movieId)\(selectedSeason.seasonId)\(episode.episodeId)\(selectedActing.translatorId)\(selectedQuality)".base64Encoded
-
-                                downloader.downloads.first(where: { $0.id == id })?.cancel()
-                            }
-
                             downloader.download(.init(details: details, acting: selectedActing, season: selectedSeason, episode: selectedEpisode, quality: selectedQuality, subtitles: selectedSubtitles, all: true))
                         }
                     } label: {
@@ -566,7 +560,7 @@ struct DownloadSheetView: View {
                     .buttonStyle(.plain)
                     .disabled(selectedQuality == nil
                         || downloader.downloads.contains(where: {
-                            $0.id == "\(details.movieId)\(selectedSeason?.seasonId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded
+                            $0.data.notificationId == "\(details.movieId)\(selectedSeason?.seasonId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded
                         }))
                 }
 

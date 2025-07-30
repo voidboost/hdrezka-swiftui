@@ -1201,46 +1201,24 @@
         }
       }
     },
-    "key.download.canceled.notification-%@-%@-%@" : {
+    "key.download.canceled.notification-%@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@%2$@%3$@ download canceled"
+            "state" : "translated",
+            "value" : "%@ download canceled"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@%2$@%3$@ скачивание отменено"
+            "value" : "%@ скачивание отменено"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@%2$@%3$@ завантаження скасовано"
-          }
-        }
-      }
-    },
-    "key.download.canceled.notification-%@-%@-%@-%@-%@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ %2$@ %3$@%4$@%5$@ download canceled"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@%4$@%5$@ скачивание отменено"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@%4$@%5$@ завантаження скасовано"
+            "value" : "%@ завантаження скасовано"
           }
         }
       }
@@ -1289,46 +1267,24 @@
         }
       }
     },
-    "key.download.downloading.notification-%@-%@-%@" : {
+    "key.download.downloading.notification-%@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@%2$@%3$@ downloading"
+            "state" : "translated",
+            "value" : "%@ downloading"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@%2$@%3$@ скачивается"
+            "value" : "%@ скачивается"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@%2$@%3$@ завантажується"
-          }
-        }
-      }
-    },
-    "key.download.downloading.notification-%@-%@-%@-%@-%@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ %2$@ %3$@%4$@%5$@ downloading"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@%4$@%5$@ скачивается"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@%4$@%5$@ завантажується"
+            "value" : "%@ завантажується"
           }
         }
       }
@@ -1355,90 +1311,46 @@
         }
       }
     },
-    "key.download.failed.notification-%@-%@-%@" : {
+    "key.download.failed.notification-%@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@%2$@%3$@ failed to download"
+            "state" : "translated",
+            "value" : "%@ failed to download"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@%2$@%3$@ не удалось скачать"
+            "value" : "%@ не удалось скачать"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@%2$@%3$@ не вдалося завантажити"
+            "value" : "%@ не вдалося завантажити"
           }
         }
       }
     },
-    "key.download.failed.notification-%@-%@-%@-%@" : {
+    "key.download.failed.notification-%@-%@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@%2$@%3$@ failed to download\n%4$@"
+            "state" : "translated",
+            "value" : "%1$@ failed to download %2$@"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@%2$@%3$@ не удалось скачать\n%4$@"
+            "value" : "%1$@ не удалось скачать %2$@"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@%2$@%3$@ не вдалося завантажити\n%4$@"
-          }
-        }
-      }
-    },
-    "key.download.failed.notification-%@-%@-%@-%@-%@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ %2$@ %3$@%4$@%5$@ failed to download"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@%4$@%5$@ не удалось скачать"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@%4$@%5$@ не вдалося завантажити"
-          }
-        }
-      }
-    },
-    "key.download.failed.notification-%@-%@-%@-%@-%@-%@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@%4$@%5$@ failed to download\n%6$@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@%4$@%5$@ не удалось скачать\n%6$@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@%4$@%5$@ не вдалося завантажити\n%6$@"
+            "value" : "%1$@ не вдалося завантажити %2$@"
           }
         }
       }
@@ -1509,46 +1421,24 @@
         }
       }
     },
-    "key.download.needPremium.notification-%@-%@-%@" : {
+    "key.download.needPremium.notification-%@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@%2$@%3$@ failed to download, Premium required"
+            "value" : "%@ failed to download, Premium required"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@%2$@%3$@ не удалось скачать, требуется Премиум"
+            "value" : "%@ не удалось скачать, требуется Премиум"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@%2$@%3$@ не вдалося завантажити, потрібен Преміум"
-          }
-        }
-      }
-    },
-    "key.download.needPremium.notification-%@-%@-%@-%@-%@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@%4$@%5$@ failed to download, Premium required"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@%4$@%5$@ не удалось скачать, требуется Премиум"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@%4$@%5$@ не вдалося завантажити, потрібен Преміум"
+            "value" : "%@ не вдалося завантажити, потрібен Преміум"
           }
         }
       }
@@ -1597,46 +1487,24 @@
         }
       }
     },
-    "key.download.success.notification-%@-%@-%@" : {
+    "key.download.success.notification-%@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@%2$@%3$@ downloaded"
+            "state" : "translated",
+            "value" : "%@ downloaded"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@%2$@%3$@ скаченный"
+            "value" : "%@ скаченный"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$@%2$@%3$@ завантажений"
-          }
-        }
-      }
-    },
-    "key.download.success.notification-%@-%@-%@-%@-%@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ %2$@ %3$@%4$@%5$@ downloaded"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@%4$@%5$@ скаченный"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@ %2$@ %3$@%4$@%5$@ завантажений"
+            "value" : "%@ завантажений"
           }
         }
       }

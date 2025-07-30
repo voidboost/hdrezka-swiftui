@@ -60,8 +60,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
         switch response.actionIdentifier {
         case "cancel":
-            if let id = userInfo["id"] as? String, let download = Downloader.shared.downloads.first(where: { $0.id == id }) {
-                download.cancel()
+            if let gid = userInfo["gid"] as? String {
+                Downloader.shared.remove(gid)
             }
         case "open":
             if let url = userInfo["url"] as? String, let fileUrl = URL(string: url), fileUrl.isFileURL {

@@ -14,6 +14,10 @@ class Const {
 
     static let fakeUpdate = URL(string: "https://api.hdrezka.tech/")!
 
+    static let rpc = URL(string: "http://127.0.0.1:6800/")!
+
+    static let token = "HDrezka"
+
     static let lastHdrezkaAppVersion = "2.2.2"
 
     static let premiumGradient = LinearGradient(colors: [
