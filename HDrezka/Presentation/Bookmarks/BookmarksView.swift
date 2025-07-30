@@ -78,7 +78,7 @@ struct BookmarksView: View {
                                     .font(.system(size: 15))
                                     .lineLimit(1)
                                     .badge(
-                                        Text(bookmark.count.description)
+                                        Text(verbatim: "\(bookmark.count)")
                                             .monospacedDigit(),
                                     )
                                     .contentTransition(.numericText(value: Double(bookmark.count)))

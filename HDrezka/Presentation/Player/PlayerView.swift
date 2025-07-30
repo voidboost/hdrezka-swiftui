@@ -352,7 +352,7 @@ struct PlayerView: View {
                                                 }
                                             }) {
                                                 ForEach(rates, id: \.self) { value in
-                                                    Text(verbatim: "\(value.description)x").tag(value)
+                                                    Text(verbatim: "\(value)x").tag(value)
                                                 }
                                             } label: {
                                                 EmptyView()

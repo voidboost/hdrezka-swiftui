@@ -174,9 +174,9 @@ class Downloader {
                                         }
                                     } else {
                                         if let retryData = download.data.retryData {
-                                            self.notificate(download.data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(download.data.name)-\(Aria2ErrorCode.undefined.description)"), "retry", ["data": retryData])
+                                            self.notificate(download.data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(download.data.name)-\(Aria2ErrorCode.unknownError.description)"), "retry", ["data": retryData])
                                         } else {
-                                            self.notificate(download.data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(download.data.name)-\(Aria2ErrorCode.undefined.description)"))
+                                            self.notificate(download.data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(download.data.name)-\(Aria2ErrorCode.unknownError.description)"))
                                         }
                                     }
                                 }
@@ -338,7 +338,7 @@ class Downloader {
 
                                             self.notificate(data.notificationId, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(data.name)"), "cancel", ["gid": gid])
                                         } else if let error = response.error {
-                                            self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.message)"), "retry", ["data": retryData])
+                                            self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.code.description)"), "retry", ["data": retryData])
                                         } else {
                                             self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized:
                                                 "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
@@ -444,7 +444,7 @@ class Downloader {
                                             self.notificate(data.notificationId, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(data.name)"), "cancel", ["gid": gid])
                                         } else if let error = response.error {
                                             self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized:
-                                                "key.download.failed.notification-\(data.name)-\(error.message)"), "retry", ["data": retryData])
+                                                "key.download.failed.notification-\(data.name)-\(error.code.description)"), "retry", ["data": retryData])
                                         } else {
                                             self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
                                         }

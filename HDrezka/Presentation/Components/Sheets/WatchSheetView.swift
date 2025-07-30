@@ -87,7 +87,7 @@ struct WatchSheetView: View {
                                                             ProgressView(value: rate.percent / 100.0) {
                                                                 Text(rate.name)
                                                             } currentValueLabel: {
-                                                                Text(verbatim: "\(rate.percent.description)%")
+                                                                Text(verbatim: "\(rate.percent)%")
                                                             }
                                                         }
                                                     }
@@ -193,7 +193,7 @@ struct WatchSheetView: View {
                                         } label: {
                                             let name = if let selectedSeason {
                                                 if selectedSeason.name.isEmpty {
-                                                    String(localized: "key.season-\(1.description)")
+                                                    String(localized: "key.season-\(1)")
                                                 } else if selectedSeason.name.contains(/^\d/) {
                                                     String(localized: "key.season-\(selectedSeason.name)")
                                                 } else {
@@ -238,7 +238,7 @@ struct WatchSheetView: View {
                                         } label: {
                                             let name = if let selectedEpisode {
                                                 if selectedEpisode.name.isEmpty {
-                                                    String(localized: "key.episode-\(1.description)")
+                                                    String(localized: "key.episode-\(1)")
                                                 } else if selectedEpisode.name.contains(/^\d/) {
                                                     String(localized: "key.episode-\(selectedEpisode.name)")
                                                 } else {

@@ -191,7 +191,7 @@ struct CategoriesView: View {
                     .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
 
                     Button {
-                        appState.path.append(.list(.init(name: type.name, listId: bestGenre.genreId + (bestYear.year != 0 ? "\(bestYear.year.description)/" : ""))))
+                        appState.path.append(.list(.init(name: type.name, listId: bestGenre.genreId + (bestYear.year != 0 ? "\(bestYear.year)/" : ""))))
                     } label: {
                         Text("key.go")
                             .font(.system(size: 13))

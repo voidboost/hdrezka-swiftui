@@ -402,7 +402,7 @@ private extension Element {
     }
 
     func getComments(depth: Int = 0) throws -> [Comment] {
-        try select(".comments-tree-item[data-indent=\"\(depth.description)\"]").map {
+        try select(".comments-tree-item[data-indent=\"\(depth)\"]").map {
             let (text, spoilers) = try $0.select(".text").first().orThrow().getComment()
 
             return try Comment(

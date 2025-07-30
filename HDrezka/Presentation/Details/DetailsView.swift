@@ -73,7 +73,7 @@ struct DetailsView: View {
                         Image(systemName: "bubble.left.and.bubble.right")
 
                         if details.commentsCount > 0 {
-                            Text(verbatim: "(\(details.commentsCount.description))")
+                            Text(verbatim: "(\(details.commentsCount))")
                         }
                     }
                 }
@@ -564,7 +564,7 @@ struct DetailsView: View {
                                             HStack(alignment: .center, spacing: 4) {
                                                 ZStack(alignment: .center) {
                                                     ZStack(alignment: .center) {
-                                                        Text(fr.position.description)
+                                                        Text(verbatim: "\(fr.position)")
                                                             .font(.system(size: 11))
                                                             .foregroundStyle(.white)
                                                     }
@@ -580,7 +580,7 @@ struct DetailsView: View {
 
                                                     if let rating = fr.rating {
                                                         let color = Color.red.mix(with: .green, by: Double(rating / 10.0))
-                                                        let rating = Text(rating.description).foregroundStyle(color)
+                                                        let rating = Text(verbatim: "\(rating)").foregroundStyle(color)
                                                         let star = Text(Image(systemName: "star.fill")).foregroundStyle(color)
 
                                                         Text("key.franchise.year-\(fr.year)-\(rating)-\(star)")
@@ -619,7 +619,7 @@ struct DetailsView: View {
 
                                                 if let rating = fr.rating {
                                                     let color = Color.red.mix(with: .green, by: Double(rating / 10.0))
-                                                    let rating = Text(rating.description).foregroundStyle(color)
+                                                    let rating = Text(verbatim: "\(rating)").foregroundStyle(color)
                                                     let star = Text(Image(systemName: "star.fill")).foregroundStyle(color)
 
                                                     Text("key.franchise.year-\(fr.year)-\(rating)-\(star)")
@@ -1003,7 +1003,7 @@ struct DetailsView: View {
                         .foregroundStyle(.tertiary)
 
                     HStack(alignment: .firstTextBaseline, spacing: 2) {
-                        Text(rating.description)
+                        Text(verbatim: "\(rating)")
                             .font(.system(size: 13).monospacedDigit())
                             .foregroundStyle(.secondary)
                             .contentTransition(.numericText(value: Double(rating)))

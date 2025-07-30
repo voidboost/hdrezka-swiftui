@@ -105,7 +105,7 @@ extension MovieSimple {
             case .completed:
                 String(localized: "key.completed")
             case let .series(season, episode):
-                String(localized: "key.season-\(season.description).episode-\(episode.description)")
+                String(localized: "key.season-\(season).episode-\(episode)")
             case .wait:
                 String(localized: "key.waiting_release")
             }

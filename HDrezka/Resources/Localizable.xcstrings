@@ -265,6 +265,732 @@
         }
       }
     },
+    "key.aria2.error.bencodeParseError" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 could not parse bencoded file (usually \".torrent\" file)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 не удалось разобрать bencode-файл (обычно это \".torrent\" файл)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 не вдалося розібрати bencode-файл (зазвичай файл \".torrent\")"
+          }
+        }
+      }
+    },
+    "key.aria2.error.bittorrentParseError" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "\".torrent\" file was corrupted or missing information that aria2 needed"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файл \".torrent\" поврежден или в нём отсутствует необходимая информация"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файл \".torrent\" пошкоджено або в ньому бракує необхідної інформації"
+          }
+        }
+      }
+    },
+    "key.aria2.error.cannotResume" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remote server did not support resume when resume was required to complete download"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалённый сервер не поддерживает возобновление загрузки, которое было необходимо"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Віддалений сервер не підтримує відновлення завантаження, яке було необхідне"
+          }
+        }
+      }
+    },
+    "key.aria2.error.checksumError" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checksum validation failed"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверка контрольной суммы не прошла"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка перевірки контрольної суми"
+          }
+        }
+      }
+    },
+    "key.aria2.error.dirCreateError" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 could not create directory"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 не удалось создать каталог"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 не вдалося створити каталог"
+          }
+        }
+      }
+    },
+    "key.aria2.error.duplicateDownload" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 was downloading same file at that moment"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 уже загружает этот файл"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 вже завантажує цей файл"
+          }
+        }
+      }
+    },
+    "key.aria2.error.duplicateInfoHash" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 was downloading same info hash torrent at that moment"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 уже загружает торрент с таким же info hash"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 вже завантажує торрент із таким же info hash"
+          }
+        }
+      }
+    },
+    "key.aria2.error.fileAlreadyExists" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File already existed"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файл уже существует"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Файл уже існує"
+          }
+        }
+      }
+    },
+    "key.aria2.error.fileCreateError" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 could not create new file or truncate existing file"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось создать новый файл или обнулить существующий"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося створити новий файл або обнулити існуючий"
+          }
+        }
+      }
+    },
+    "key.aria2.error.fileIoError" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File I/O error occurred"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла ошибка ввода/вывода файла"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виникла помилка введення/виведення файлу"
+          }
+        }
+      }
+    },
+    "key.aria2.error.fileOpenError" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 could not open existing file"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 не удалось открыть существующий файл"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 не вдалося відкрити існуючий файл"
+          }
+        }
+      }
+    },
+    "key.aria2.error.fileRenamingFailed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renaming file failed"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось переименовать файл"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося перейменувати файл"
+          }
+        }
+      }
+    },
+    "key.aria2.error.finished" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All downloads were successful"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Все загрузки завершены успешно"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Усі завантаження завершено успішно"
+          }
+        }
+      }
+    },
+    "key.aria2.error.ftpProtocolError" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FTP command failed"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка FTP-команды"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка FTP-команди"
+          }
+        }
+      }
+    },
+    "key.aria2.error.httpAuthFailed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HTTP authorization failed"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ошибка авторизации HTTP"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помилка авторизації HTTP"
+          }
+        }
+      }
+    },
+    "key.aria2.error.httpProtocolError" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HTTP response header was bad or unexpected"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Некорректный или неожиданный HTTP-заголовок ответа"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неправильний або неочікуваний заголовок відповіді HTTP"
+          }
+        }
+      }
+    },
+    "key.aria2.error.httpServiceUnavailable" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The remote server was unable to handle the request due to a temporary overloading or maintenance"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалённый сервер перегружен или находится на обслуживании"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Віддалений сервер перевантажений або на обслуговуванні"
+          }
+        }
+      }
+    },
+    "key.aria2.error.httpTooManyRedirects" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Too many redirects occurred"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слишком много перенаправлений"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Занадто багато перенаправлень"
+          }
+        }
+      }
+    },
+    "key.aria2.error.inProgress" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There were unfinished downloads"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Есть незавершённые загрузки"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Є незавершені завантаження"
+          }
+        }
+      }
+    },
+    "key.aria2.error.jsonParseError" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 could not parse JSON-RPC request"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 не удалось разобрать JSON-RPC запрос"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 не вдалося розібрати запит JSON-RPC"
+          }
+        }
+      }
+    },
+    "key.aria2.error.magnetParseError" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Magnet URI was bad"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Неверный Magnet URI"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Невірний Magnet URI"
+          }
+        }
+      }
+    },
+    "key.aria2.error.maxFileNotFound" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 saw the specified number of \"resource not found\" error"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Достигнуто максимальное количество ошибок \"ресурс не найден\""
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Досягнуто максимальної кількості помилок \"ресурс не знайдено\""
+          }
+        }
+      }
+    },
+    "key.aria2.error.metalinkParseError" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 could not parse Metalink document"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 не удалось разобрать Metalink-документ"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aria2 не вдалося розібрати Metalink-документ"
+          }
+        }
+      }
+    },
+    "key.aria2.error.nameResolveError" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name resolution failed"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось разрешить имя хоста"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося вирішити ім'я хоста"
+          }
+        }
+      }
+    },
+    "key.aria2.error.networkProblem" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Network problem occurred"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла сетевая ошибка"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виникла мережева проблема"
+          }
+        }
+      }
+    },
+    "key.aria2.error.notEnoughDiskSpace" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There was not enough disk space available"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Недостаточно места на диске"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Недостатньо місця на диску"
+          }
+        }
+      }
+    },
+    "key.aria2.error.optionError" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bad/unrecognized option was given or unexpected option argument was given"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Указана неправильная/неизвестная опция или неожиданный аргумент"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Невірна або невідома опція, або неочікуваний аргумент"
+          }
+        }
+      }
+    },
+    "key.aria2.error.pieceLengthChanged" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Piece length was different from one in .aria2 control file"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Размер части отличается от указанного в .aria2-файле"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Довжина частини відрізняється від вказаної у файлі .aria2"
+          }
+        }
+      }
+    },
+    "key.aria2.error.removed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reserved. Not used"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зарезервировано. Не используется"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зарезервовано. Не використовується"
+          }
+        }
+      }
+    },
+    "key.aria2.error.resourceNotFound" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A resource was not found"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ресурс не найден"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ресурс не знайдено"
+          }
+        }
+      }
+    },
+    "key.aria2.error.timeOut" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time out occurred"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Истекло время ожидания"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Час очікування вичерпано"
+          }
+        }
+      }
+    },
+    "key.aria2.error.tooSlowDownloadSpeed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A download aborted because download speed was too slow"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загрузка прервана из-за слишком низкой скорости"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завантаження перервано через надто низьку швидкість"
+          }
+        }
+      }
+    },
+    "key.aria2.error.unknownError" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An unknown error occurred"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произошла неизвестная ошибка"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сталася невідома помилка"
+          }
+        }
+      }
+    },
     "key.ask" : {
       "localizations" : {
         "en" : {
@@ -771,24 +1497,24 @@
         }
       }
     },
-    "key.comments-%@" : {
+    "key.comments-%lld" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comments (%@)"
+            "value" : "Comments (%lld)"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Комментарии (%@)"
+            "value" : "Комментарии (%lld)"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Коментарі (% @)"
+            "value" : "Коментарі (%lld)"
           }
         }
       }
@@ -1637,6 +2363,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Серія %@"
+          }
+        }
+      }
+    },
+    "key.episode-%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Episode %lld"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Серия %lld"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Серія %lld"
           }
         }
       }
@@ -3259,6 +4007,28 @@
         }
       }
     },
+    "key.maxConcurrentDownloads-%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Max concurrent downloads (%lld)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Максимальное количество одновременных загрузок (%lld)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Максимальна кількість одночасних завантажень (%lld)"
+          }
+        }
+      }
+    },
     "key.message" : {
       "localizations" : {
         "en" : {
@@ -4293,24 +5063,24 @@
         }
       }
     },
-    "key.playerPositions-%@" : {
+    "key.playerPositions-%lld" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saved player positions (%@)"
+            "value" : "Saved player positions (%lld)"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сохраненные позиции плеера (%@)"
+            "value" : "Сохраненные позиции плеера (%lld)"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Збережені позиції плеєра (%@)"
+            "value" : "Збережені позиції плеєра (%lld)"
           }
         }
       }
@@ -5327,6 +6097,50 @@
         }
       }
     },
+    "key.season-%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Season %lld"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сезон %lld"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сезон %lld"
+          }
+        }
+      }
+    },
+    "key.season-%lld.episode-%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Season %1$lld Episode %2$lld"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сезон %1$lld Серия %2$lld"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сезон %1$lld Серія %2$lld"
+          }
+        }
+      }
+    },
     "key.season.select" : {
       "localizations" : {
         "en" : {
@@ -5371,24 +6185,24 @@
         }
       }
     },
-    "key.selectPositions-%@" : {
+    "key.selectPositions-%lld" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saved selection positions (%@)"
+            "value" : "Saved selection positions (%lld)"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Сохраненные позиции выбора (%@)"
+            "value" : "Сохраненные позиции выбора (%lld)"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Збережені позиції вибору (%@)"
+            "value" : "Збережені позиції вибору (%lld)"
           }
         }
       }
