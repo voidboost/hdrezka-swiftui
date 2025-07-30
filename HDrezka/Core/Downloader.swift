@@ -194,24 +194,10 @@ class Downloader {
                                 .store(in: &self.subscriptions)
 
                                 self.downloads.removeAll(where: { $0.gid == status.gid })
-                            } else {
-                                if let index = self.downloads.firstIndex(where: { download in
-                                    download.gid == status.gid
-                                }) {
-                                    self.downloads[index].updateStatus(status)
-                                } else {
-                                    self.callUseCase(
-                                        data: Aria2Request(
-                                            method: .removeDownloadResult,
-                                            params: GidParams(
-                                                token: Const.token,
-                                                gid: status.gid,
-                                            ),
-                                        ),
-                                    )
-                                    .sink { _ in } receiveValue: { (_: Aria2Response<String>) in }
-                                    .store(in: &self.subscriptions)
-                                }
+                            } else if let index = self.downloads.firstIndex(where: { download in
+                                download.gid == status.gid
+                            }) {
+                                self.downloads[index].updateStatus(status)
                             }
                         }
                     }
