@@ -10,13 +10,28 @@ struct DownloadsView: View {
                 if downloader.downloads.isEmpty {
                     Text("key.downloads.empty")
                 } else {
-                    ForEach(downloader.downloads) { download in
+                    ForEach(downloader.downloads, id: \.gid) { download in
                         HStack(alignment: .center, spacing: 15) {
                             ProgressView(download.progress)
                                 .progressViewStyle(.linear)
 
+                            if let status = download.status {
+                                Button {
+                                    if status.status == .paused {
+                                        downloader.unpause(download.gid)
+                                    } else {
+                                        downloader.pause(download.gid)
+                                    }
+                                } label: {
+                                    Image(systemName: status.status == .paused ? "play.circle.fill" : "pause.circle.fill")
+                                        .font(.system(size: 15))
+                                        .contentTransition(.symbolEffect(.replace))
+                                }
+                                .buttonStyle(.plain)
+                            }
+
                             Button {
-                                download.cancel()
+                                downloader.remove(download.gid)
                             } label: {
                                 Image(systemName: "xmark.circle.fill")
                                     .foregroundStyle(Color.accentColor)

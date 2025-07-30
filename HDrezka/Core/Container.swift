@@ -24,6 +24,7 @@ extension Container {
 
 extension Container {
     var accountRepository: Factory<AccountRepository> { self { AccountRepositoryImpl() }.singleton }
+    var aria2Repository: Factory<Aria2Repository> { self { Aria2RepositoryImpl() }.singleton }
     var collectionsRepository: Factory<CollectionsRepository> { self { CollectionsRepositoryImpl() }.singleton }
     var movieDetailsRepository: Factory<MovieDetailsRepository> { self { MovieDetailsRepositoryImpl() }.singleton }
     var movieListsRepository: Factory<MovieListsRepository> { self { MovieListsRepositoryImpl() }.singleton }
@@ -55,6 +56,11 @@ extension Container {
     var signInUseCase: Factory<SignInUseCase> { self { SignInUseCase(repository: self.accountRepository()) }.singleton }
     var signUpUseCase: Factory<SignUpUseCase> { self { SignUpUseCase(repository: self.accountRepository()) }.singleton }
     var switchWatchedItemUseCase: Factory<SwitchWatchedItemUseCase> { self { SwitchWatchedItemUseCase(repository: self.accountRepository()) }.singleton }
+}
+
+extension Container {
+    var callUseCase: Factory<CallUseCase> { self { CallUseCase(repository: self.aria2Repository()) }.singleton }
+    var multicallUseCase: Factory<MulticallUseCase> { self { MulticallUseCase(repository: self.aria2Repository()) }.singleton }
 }
 
 extension Container {
