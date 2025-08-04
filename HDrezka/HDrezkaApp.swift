@@ -8,7 +8,7 @@ import SwiftData
 import SwiftUI
 import UserNotifications
 
-class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate, SPUUpdaterDelegate, SPUStandardUserDriverDelegate {
     func applicationDidFinishLaunching(_: Notification) {
         UNUserNotificationCenter.current().delegate = self
 
@@ -56,28 +56,61 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     }
 
     func userNotificationCenter(_: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        let userInfo = response.notification.request.content.userInfo
+        if response.notification.request.identifier == updateNotificationIdentifier, response.actionIdentifier == UNNotificationDefaultActionIdentifier {
+            updaterController.checkForUpdates(nil)
+        } else {
+            let userInfo = response.notification.request.content.userInfo
 
-        switch response.actionIdentifier {
-        case "cancel":
-            if let gid = userInfo["gid"] as? String {
-                Downloader.shared.remove(gid)
+            switch response.actionIdentifier {
+            case "cancel":
+                if let gid = userInfo["gid"] as? String {
+                    Downloader.shared.remove(gid)
+                }
+            case "open":
+                if let url = userInfo["url"] as? String, let fileUrl = URL(string: url), fileUrl.isFileURL {
+                    NSWorkspace.shared.activateFileViewerSelecting([fileUrl])
+                }
+            case "retry":
+                if let retryData = userInfo["data"] as? Data, let data = try? JSONDecoder().decode(DownloadData.self, from: retryData) {
+                    Downloader.shared.download(data)
+                }
+            case "need_premium":
+                NSWorkspace.shared.open((Defaults[.mirror] != Defaults.Keys.mirror.defaultValue ? Defaults[.mirror] : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
+            default:
+                break
             }
-        case "open":
-            if let url = userInfo["url"] as? String, let fileUrl = URL(string: url), fileUrl.isFileURL {
-                NSWorkspace.shared.activateFileViewerSelecting([fileUrl])
-            }
-        case "retry":
-            if let retryData = userInfo["data"] as? Data, let data = try? JSONDecoder().decode(DownloadData.self, from: retryData) {
-                Downloader.shared.download(data)
-            }
-        case "need_premium":
-            NSWorkspace.shared.open((Defaults[.mirror] != Defaults.Keys.mirror.defaultValue ? Defaults[.mirror] : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
-        default:
-            break
         }
 
         completionHandler()
+    }
+
+    let updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
+    private let updateNotificationIdentifier = "UpdateCheck".base64Decoded
+
+    func updater(_: SPUUpdater, willScheduleUpdateCheckAfterDelay _: TimeInterval) {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound]) { _, _ in }
+    }
+
+    var supportsGentleScheduledUpdateReminders: Bool { true }
+
+    func standardUserDriverWillHandleShowingUpdate(_: Bool, forUpdate update: SUAppcastItem, state: SPUUserUpdateState) {
+        if !state.userInitiated {
+            NSApp.dockTile.badgeLabel = "1"
+
+            let content = UNMutableNotificationContent()
+            content.title = String(localized: "key.update")
+            content.body = String(localized: "key.update.description-\(update.displayVersionString)")
+
+            let request = UNNotificationRequest(identifier: updateNotificationIdentifier, content: content, trigger: nil)
+
+            UNUserNotificationCenter.current().add(request)
+        }
+    }
+
+    func standardUserDriverDidReceiveUserAttention(forUpdate _: SUAppcastItem) {
+        NSApp.dockTile.badgeLabel = ""
+
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [updateNotificationIdentifier])
     }
 }
 
@@ -88,14 +121,11 @@ struct HDrezkaApp: App {
     @State private var downloader: Downloader = .shared
     @Environment(\.openWindow) private var openWindow
 
-    @State private var updaterController: SPUStandardUpdaterController
     @State private var modelContainer: ModelContainer
 
     @Default(.theme) private var theme
 
     init() {
-        updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
-
         do {
             let schema = Schema([PlayerPosition.self, SelectPosition.self])
             let modelContainer = try ModelContainer(for: schema)
@@ -160,7 +190,7 @@ struct HDrezkaApp: App {
         .commands(content: removed)
 
         Settings {
-            SettingsView(updater: updaterController.updater)
+            SettingsView(updater: delegate.updaterController.updater)
                 .environment(downloader)
                 .preferredColorScheme(theme.scheme)
         }
@@ -194,7 +224,7 @@ struct HDrezkaApp: App {
             }
             .keyboardShortcut(",", modifiers: .command)
 
-            UpdateButton(updater: updaterController.updater)
+            UpdateButton(updater: delegate.updaterController.updater)
 
             Button {
                 openWindow(id: "licenses")
