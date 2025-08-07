@@ -3,8 +3,6 @@ import Foundation
 // MARK: RPC
 
 struct Aria2Request<E: Encodable>: Encodable {
-    let id: String = UUID().uuidString
-    let jsonrpc: String = "2.0"
     let method: Aria2Method
     let params: E?
 
@@ -12,18 +10,31 @@ struct Aria2Request<E: Encodable>: Encodable {
         self.method = method
         self.params = params
     }
+
+    enum CodingKeys: String, CodingKey {
+        case id, jsonrpc, method, params
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(UUID().uuidString, forKey: .id)
+        try container.encode("2.0", forKey: .jsonrpc)
+        try container.encode(method, forKey: .method)
+
+        if let params {
+            try container.encode(params, forKey: .params)
+        }
+    }
 }
 
 struct Aria2Response<D: Decodable>: Decodable {
-    let id: String
-    let jsonrpc: String
     let result: D?
     let error: Aria2Error?
 }
 
-struct Aria2Error: Decodable, Error {
+struct Aria2Error: Decodable {
     let code: Aria2ErrorCode
-    let message: String
 }
 
 enum Aria2ErrorCode: Int, Codable {
