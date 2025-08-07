@@ -560,25 +560,25 @@ class Downloader {
         .store(in: &subscriptions)
     }
 
-    func pauseAll() {
-        callUseCase(
-            data: Aria2Request(
-                method: .pauseAll,
-                params: EmptyTokenParams(
-                    token: Const.token,
-                ),
-            ),
-        )
-        .receive(on: DispatchQueue.main)
-        .sink { _ in } receiveValue: { (response: Aria2Response<String>) in
-            if response.result == "OK" {
-                for index in self.downloads.indices {
-                    self.downloads[index].pause()
-                }
-            }
-        }
-        .store(in: &subscriptions)
-    }
+//    func pauseAll() {
+//        callUseCase(
+//            data: Aria2Request(
+//                method: .pauseAll,
+//                params: EmptyTokenParams(
+//                    token: Const.token,
+//                ),
+//            ),
+//        )
+//        .receive(on: DispatchQueue.main)
+//        .sink { _ in } receiveValue: { (response: Aria2Response<String>) in
+//            if response.result == "OK" {
+//                for index in self.downloads.indices {
+//                    self.downloads[index].pause()
+//                }
+//            }
+//        }
+//        .store(in: &subscriptions)
+//    }
 
     func unpause(_ gid: String) {
         callUseCase(
@@ -603,23 +603,23 @@ class Downloader {
         .store(in: &subscriptions)
     }
 
-    func unpauseAll() {
-        callUseCase(
-            data: Aria2Request(
-                method: .unpauseAll,
-                params: EmptyTokenParams(
-                    token: Const.token,
-                ),
-            ),
-        )
-        .receive(on: DispatchQueue.main)
-        .sink { _ in } receiveValue: { (response: Aria2Response<String>) in
-            if response.result == "OK" {
-                for index in self.downloads.indices {
-                    self.downloads[index].unpause()
-                }
-            }
-        }
-        .store(in: &subscriptions)
-    }
+//    func unpauseAll() {
+//        callUseCase(
+//            data: Aria2Request(
+//                method: .unpauseAll,
+//                params: EmptyTokenParams(
+//                    token: Const.token,
+//                ),
+//            ),
+//        )
+//        .receive(on: DispatchQueue.main)
+//        .sink { _ in } receiveValue: { (response: Aria2Response<String>) in
+//            if response.result == "OK" {
+//                for index in self.downloads.indices {
+//                    self.downloads[index].unpause()
+//                }
+//            }
+//        }
+//        .store(in: &subscriptions)
+//    }
 }
