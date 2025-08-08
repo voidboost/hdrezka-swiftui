@@ -53,6 +53,7 @@ class Downloader {
                     "--stop-with-process=\(ProcessInfo.processInfo.processIdentifier)",
                     "--quiet=true",
                     "--allow-overwrite=true",
+                    "--user-agent=\(Const.userAgent)",
                 ],
                 terminationHandler: { process in
                     if process.terminationReason != .exit || process.terminationStatus != 0 {
