@@ -16,10 +16,12 @@ func decrypt(encrypted: String) -> String {
                 cache[input] = input
                 return input
             } else {
-                let result = indexes.map { index in
-                    let (before, after) = String(input[input.index(input.startIndex, offsetBy: index + 5)...]).divideAtFirstOccurrenceOfSymbols()
-                    return decryptRecursive(input: "\(String(input[..<input.index(input.startIndex, offsetBy: index)]))\(before.clear(trash: trash))\(after)")
-                }.min { $0.count < $1.count } ?? input
+                let result = indexes
+                    .map { index in
+                        let (before, after) = String(input[(input.index(input.startIndex, offsetBy: index + 5, limitedBy: input.endIndex) ?? input.endIndex)...]).divideAtFirstOccurrenceOfSymbols()
+                        return decryptRecursive(input: "\(String(input[..<(input.index(input.startIndex, offsetBy: index, limitedBy: input.endIndex) ?? input.endIndex)]))\(before.clear(trash: trash))\(after)")
+                    }
+                    .min { $0.count < $1.count } ?? input
 
                 cache[input] = result
                 return result
@@ -50,19 +52,18 @@ extension String {
         var searchStartIndex = startIndex
 
         while searchStartIndex < endIndex,
-              let range = range(of: substr, range: searchStartIndex ..< endIndex),
-              !range.isEmpty
+              let range = range(of: substr, range: searchStartIndex ..< endIndex)
         {
             let index = distance(from: startIndex, to: range.lowerBound)
             indices.append(index)
-            searchStartIndex = self.index(range.lowerBound, offsetBy: 1, limitedBy: endIndex) ?? endIndex
+            searchStartIndex = self.index(after: range.lowerBound)
         }
 
         return indices
     }
 
     fileprivate func divideAtFirstOccurrenceOfSymbols() -> (String, String) {
-        if let first = firstIndex(where: { $0 == "/" || $0 == "=" }), let next = index(first, offsetBy: 1, limitedBy: endIndex) {
+        if let next = index(after: { $0 == "/" || $0 == "=" }) {
             (String(self[..<next]), String(self[next...]))
         } else {
             (self, "")

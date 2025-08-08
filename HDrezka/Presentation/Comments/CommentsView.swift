@@ -493,7 +493,9 @@ struct CommentsView: View {
                             feedback.insert(contentsOf: "[/b]", at: range.upperBound)
                             feedback.insert(contentsOf: "[b]", at: range.lowerBound)
 
-                            selection = TextSelection(range: feedback.index(range.lowerBound, offsetBy: 3) ..< feedback.index(range.upperBound, offsetBy: 3))
+                            let lower = feedback.index(range.lowerBound, offsetBy: 3, limitedBy: feedback.endIndex) ?? feedback.endIndex
+                            let upper = feedback.index(range.upperBound, offsetBy: 3, limitedBy: feedback.endIndex) ?? feedback.endIndex
+                            selection = TextSelection(range: lower ..< upper)
                         case let .multiSelection(rangeSet):
                             let sortedRanges = rangeSet.ranges.sorted(by: { $0.lowerBound > $1.lowerBound })
 
@@ -503,14 +505,17 @@ struct CommentsView: View {
                             }
 
                             let updatedRanges = sortedRanges.indexed().map { index, range in
-                                feedback.index(range.lowerBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1)) ..< feedback.index(range.upperBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1))
+                                let lower = feedback.index(range.lowerBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
+                                let upper = feedback.index(range.upperBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
+
+                                return lower ..< upper
                             }
 
                             selection = TextSelection(ranges: .init(updatedRanges))
                         default:
                             feedback.append("[b][/b]")
 
-                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -4))
+                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -4, limitedBy: feedback.startIndex) ?? feedback.endIndex)
                         }
                     } label: {
                         Image(systemName: "bold")
@@ -530,7 +535,9 @@ struct CommentsView: View {
                             feedback.insert(contentsOf: "[/i]", at: range.upperBound)
                             feedback.insert(contentsOf: "[i]", at: range.lowerBound)
 
-                            selection = TextSelection(range: feedback.index(range.lowerBound, offsetBy: 3) ..< feedback.index(range.upperBound, offsetBy: 3))
+                            let lower = feedback.index(range.lowerBound, offsetBy: 3, limitedBy: feedback.endIndex) ?? feedback.endIndex
+                            let upper = feedback.index(range.upperBound, offsetBy: 3, limitedBy: feedback.endIndex) ?? feedback.endIndex
+                            selection = TextSelection(range: lower ..< upper)
                         case let .multiSelection(rangeSet):
                             let sortedRanges = rangeSet.ranges.sorted(by: { $0.lowerBound > $1.lowerBound })
 
@@ -540,14 +547,17 @@ struct CommentsView: View {
                             }
 
                             let updatedRanges = sortedRanges.indexed().map { index, range in
-                                feedback.index(range.lowerBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1)) ..< feedback.index(range.upperBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1))
+                                let lower = feedback.index(range.lowerBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
+                                let upper = feedback.index(range.upperBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
+
+                                return lower ..< upper
                             }
 
                             selection = TextSelection(ranges: .init(updatedRanges))
                         default:
                             feedback.append("[i][/i]")
 
-                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -4))
+                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -4, limitedBy: feedback.startIndex) ?? feedback.endIndex)
                         }
                     } label: {
                         Image(systemName: "italic")
@@ -567,7 +577,9 @@ struct CommentsView: View {
                             feedback.insert(contentsOf: "[/u]", at: range.upperBound)
                             feedback.insert(contentsOf: "[u]", at: range.lowerBound)
 
-                            selection = TextSelection(range: feedback.index(range.lowerBound, offsetBy: 3) ..< feedback.index(range.upperBound, offsetBy: 3))
+                            let lower = feedback.index(range.lowerBound, offsetBy: 3, limitedBy: feedback.endIndex) ?? feedback.endIndex
+                            let upper = feedback.index(range.upperBound, offsetBy: 3, limitedBy: feedback.endIndex) ?? feedback.endIndex
+                            selection = TextSelection(range: lower ..< upper)
                         case let .multiSelection(rangeSet):
                             let sortedRanges = rangeSet.ranges.sorted(by: { $0.lowerBound > $1.lowerBound })
 
@@ -577,14 +589,17 @@ struct CommentsView: View {
                             }
 
                             let updatedRanges = sortedRanges.indexed().map { index, range in
-                                feedback.index(range.lowerBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1)) ..< feedback.index(range.upperBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1))
+                                let lower = feedback.index(range.lowerBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
+                                let upper = feedback.index(range.upperBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
+
+                                return lower ..< upper
                             }
 
                             selection = TextSelection(ranges: .init(updatedRanges))
                         default:
                             feedback.append("[u][/u]")
 
-                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -4))
+                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -4, limitedBy: feedback.startIndex) ?? feedback.endIndex)
                         }
                     } label: {
                         Image(systemName: "underline")
@@ -604,7 +619,9 @@ struct CommentsView: View {
                             feedback.insert(contentsOf: "[/s]", at: range.upperBound)
                             feedback.insert(contentsOf: "[s]", at: range.lowerBound)
 
-                            selection = TextSelection(range: feedback.index(range.lowerBound, offsetBy: 3) ..< feedback.index(range.upperBound, offsetBy: 3))
+                            let lower = feedback.index(range.lowerBound, offsetBy: 3, limitedBy: feedback.endIndex) ?? feedback.endIndex
+                            let upper = feedback.index(range.upperBound, offsetBy: 3, limitedBy: feedback.endIndex) ?? feedback.endIndex
+                            selection = TextSelection(range: lower ..< upper)
                         case let .multiSelection(rangeSet):
                             let sortedRanges = rangeSet.ranges.sorted(by: { $0.lowerBound > $1.lowerBound })
 
@@ -614,14 +631,17 @@ struct CommentsView: View {
                             }
 
                             let updatedRanges = sortedRanges.indexed().map { index, range in
-                                feedback.index(range.lowerBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1)) ..< feedback.index(range.upperBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1))
+                                let lower = feedback.index(range.lowerBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
+                                let upper = feedback.index(range.upperBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
+
+                                return lower ..< upper
                             }
 
                             selection = TextSelection(ranges: .init(updatedRanges))
                         default:
                             feedback.append("[s][/s]")
 
-                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -4))
+                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -4, limitedBy: feedback.startIndex) ?? feedback.endIndex)
                         }
                     } label: {
                         Image(systemName: "strikethrough")
@@ -641,7 +661,9 @@ struct CommentsView: View {
                             feedback.insert(contentsOf: "[/spoiler]", at: range.upperBound)
                             feedback.insert(contentsOf: "[spoiler]", at: range.lowerBound)
 
-                            selection = TextSelection(range: feedback.index(range.lowerBound, offsetBy: 9) ..< feedback.index(range.upperBound, offsetBy: 9))
+                            let lower = feedback.index(range.lowerBound, offsetBy: 9, limitedBy: feedback.endIndex) ?? feedback.endIndex
+                            let upper = feedback.index(range.upperBound, offsetBy: 9, limitedBy: feedback.endIndex) ?? feedback.endIndex
+                            selection = TextSelection(range: lower ..< upper)
                         case let .multiSelection(rangeSet):
                             let sortedRanges = rangeSet.ranges.sorted(by: { $0.lowerBound > $1.lowerBound })
 
@@ -651,14 +673,17 @@ struct CommentsView: View {
                             }
 
                             let updatedRanges = sortedRanges.indexed().map { index, range in
-                                feedback.index(range.lowerBound, offsetBy: 9 + 19 * (sortedRanges.count - index - 1)) ..< feedback.index(range.upperBound, offsetBy: 9 + 19 * (sortedRanges.count - index - 1))
+                                let lower = feedback.index(range.lowerBound, offsetBy: 9 + 19 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
+                                let upper = feedback.index(range.upperBound, offsetBy: 9 + 19 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
+
+                                return lower ..< upper
                             }
 
                             selection = TextSelection(ranges: .init(updatedRanges))
                         default:
                             feedback.append("[spoiler][/spoiler]")
 
-                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -10))
+                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -10, limitedBy: feedback.startIndex) ?? feedback.endIndex)
                         }
                     } label: {
                         Text("Spoiler!".uppercased())
