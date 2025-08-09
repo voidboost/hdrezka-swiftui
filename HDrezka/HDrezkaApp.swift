@@ -46,9 +46,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
             }
         }
 
-        if Downloader.shared.isRunning {
-            Downloader.shared.terminate()
-        }
+        Downloader.shared.terminate()
     }
 
     func application(_: NSApplication, willEncodeRestorableState _: NSCoder) {}
