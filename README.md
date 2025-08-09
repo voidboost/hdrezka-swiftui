@@ -20,7 +20,7 @@
 <p>И многое другое!</p>
 <h2>Релизы</h2>
 <ul>
-    <li><a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.13.dmg">Скачать последнюю версию (macOS 15 Sequoia или новее)</a></li>
+    <li><a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.14.dmg">Скачать последнюю версию (macOS 15 Sequoia или новее)</a></li>
     <li><a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.10.dmg">Скачать последнюю версию (macOS 13 Ventura или новее)</a></li>
 </ul>
 <h2>Спонсорство и поддержка</h2>

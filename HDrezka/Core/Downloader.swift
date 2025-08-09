@@ -71,14 +71,9 @@ class Downloader {
         do {
             try process.run()
 
-            process.publisher(for: \.isRunning)
-                .receive(on: DispatchQueue.main)
-                .sink { isRunning in
-                    withAnimation(.easeInOut) {
-                        self.isRunning = isRunning
-                    }
-                }
-                .store(in: &subscriptions)
+            withAnimation(.easeInOut) {
+                self.isRunning = true
+            }
         } catch {
             fatalError("Failed to start aria2 process: \(error)")
         }
