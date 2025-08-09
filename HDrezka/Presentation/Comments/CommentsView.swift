@@ -487,215 +487,15 @@ struct CommentsView: View {
         var body: some View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .center, spacing: 8) {
-                    Button {
-                        switch selection?.indices {
-                        case let .selection(range):
-                            feedback.insert(contentsOf: "[/b]", at: range.upperBound)
-                            feedback.insert(contentsOf: "[b]", at: range.lowerBound)
+                    FormatButton(feedback: $feedback, selection: $selection, prefix: "[b]", suffix: "[/b]", icon: "bold")
 
-                            let lower = feedback.index(range.lowerBound, offsetBy: 3, limitedBy: feedback.endIndex) ?? feedback.endIndex
-                            let upper = feedback.index(range.upperBound, offsetBy: 3, limitedBy: feedback.endIndex) ?? feedback.endIndex
-                            selection = TextSelection(range: lower ..< upper)
-                        case let .multiSelection(rangeSet):
-                            let sortedRanges = rangeSet.ranges.sorted(by: { $0.lowerBound > $1.lowerBound })
+                    FormatButton(feedback: $feedback, selection: $selection, prefix: "[i]", suffix: "[/i]", icon: "italic")
 
-                            for range in sortedRanges {
-                                feedback.insert(contentsOf: "[/b]", at: range.upperBound)
-                                feedback.insert(contentsOf: "[b]", at: range.lowerBound)
-                            }
+                    FormatButton(feedback: $feedback, selection: $selection, prefix: "[u]", suffix: "[/u]", icon: "underline")
 
-                            let updatedRanges = sortedRanges.indexed().map { index, range in
-                                let lower = feedback.index(range.lowerBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
-                                let upper = feedback.index(range.upperBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
+                    FormatButton(feedback: $feedback, selection: $selection, prefix: "[s]", suffix: "[/s]", icon: "strikethrough")
 
-                                return lower ..< upper
-                            }
-
-                            selection = TextSelection(ranges: .init(updatedRanges))
-                        default:
-                            feedback.append("[b][/b]")
-
-                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -4, limitedBy: feedback.startIndex) ?? feedback.endIndex)
-                        }
-                    } label: {
-                        Image(systemName: "bold")
-                            .font(.system(size: 17))
-                            .frame(height: 28)
-                            .padding(.horizontal, 16)
-                            .background(.tertiary.opacity(0.05))
-                            .clipShape(.capsule)
-                            .contentShape(.capsule)
-                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
-                    }
-                    .buttonStyle(.plain)
-
-                    Button {
-                        switch selection?.indices {
-                        case let .selection(range):
-                            feedback.insert(contentsOf: "[/i]", at: range.upperBound)
-                            feedback.insert(contentsOf: "[i]", at: range.lowerBound)
-
-                            let lower = feedback.index(range.lowerBound, offsetBy: 3, limitedBy: feedback.endIndex) ?? feedback.endIndex
-                            let upper = feedback.index(range.upperBound, offsetBy: 3, limitedBy: feedback.endIndex) ?? feedback.endIndex
-                            selection = TextSelection(range: lower ..< upper)
-                        case let .multiSelection(rangeSet):
-                            let sortedRanges = rangeSet.ranges.sorted(by: { $0.lowerBound > $1.lowerBound })
-
-                            for range in sortedRanges {
-                                feedback.insert(contentsOf: "[/i]", at: range.upperBound)
-                                feedback.insert(contentsOf: "[i]", at: range.lowerBound)
-                            }
-
-                            let updatedRanges = sortedRanges.indexed().map { index, range in
-                                let lower = feedback.index(range.lowerBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
-                                let upper = feedback.index(range.upperBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
-
-                                return lower ..< upper
-                            }
-
-                            selection = TextSelection(ranges: .init(updatedRanges))
-                        default:
-                            feedback.append("[i][/i]")
-
-                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -4, limitedBy: feedback.startIndex) ?? feedback.endIndex)
-                        }
-                    } label: {
-                        Image(systemName: "italic")
-                            .font(.system(size: 17))
-                            .frame(height: 28)
-                            .padding(.horizontal, 16)
-                            .background(.tertiary.opacity(0.05))
-                            .clipShape(.capsule)
-                            .contentShape(.capsule)
-                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
-                    }
-                    .buttonStyle(.plain)
-
-                    Button {
-                        switch selection?.indices {
-                        case let .selection(range):
-                            feedback.insert(contentsOf: "[/u]", at: range.upperBound)
-                            feedback.insert(contentsOf: "[u]", at: range.lowerBound)
-
-                            let lower = feedback.index(range.lowerBound, offsetBy: 3, limitedBy: feedback.endIndex) ?? feedback.endIndex
-                            let upper = feedback.index(range.upperBound, offsetBy: 3, limitedBy: feedback.endIndex) ?? feedback.endIndex
-                            selection = TextSelection(range: lower ..< upper)
-                        case let .multiSelection(rangeSet):
-                            let sortedRanges = rangeSet.ranges.sorted(by: { $0.lowerBound > $1.lowerBound })
-
-                            for range in sortedRanges {
-                                feedback.insert(contentsOf: "[/u]", at: range.upperBound)
-                                feedback.insert(contentsOf: "[u]", at: range.lowerBound)
-                            }
-
-                            let updatedRanges = sortedRanges.indexed().map { index, range in
-                                let lower = feedback.index(range.lowerBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
-                                let upper = feedback.index(range.upperBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
-
-                                return lower ..< upper
-                            }
-
-                            selection = TextSelection(ranges: .init(updatedRanges))
-                        default:
-                            feedback.append("[u][/u]")
-
-                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -4, limitedBy: feedback.startIndex) ?? feedback.endIndex)
-                        }
-                    } label: {
-                        Image(systemName: "underline")
-                            .font(.system(size: 17))
-                            .frame(height: 28)
-                            .padding(.horizontal, 16)
-                            .background(.tertiary.opacity(0.05))
-                            .clipShape(.capsule)
-                            .contentShape(.capsule)
-                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
-                    }
-                    .buttonStyle(.plain)
-
-                    Button {
-                        switch selection?.indices {
-                        case let .selection(range):
-                            feedback.insert(contentsOf: "[/s]", at: range.upperBound)
-                            feedback.insert(contentsOf: "[s]", at: range.lowerBound)
-
-                            let lower = feedback.index(range.lowerBound, offsetBy: 3, limitedBy: feedback.endIndex) ?? feedback.endIndex
-                            let upper = feedback.index(range.upperBound, offsetBy: 3, limitedBy: feedback.endIndex) ?? feedback.endIndex
-                            selection = TextSelection(range: lower ..< upper)
-                        case let .multiSelection(rangeSet):
-                            let sortedRanges = rangeSet.ranges.sorted(by: { $0.lowerBound > $1.lowerBound })
-
-                            for range in sortedRanges {
-                                feedback.insert(contentsOf: "[/s]", at: range.upperBound)
-                                feedback.insert(contentsOf: "[s]", at: range.lowerBound)
-                            }
-
-                            let updatedRanges = sortedRanges.indexed().map { index, range in
-                                let lower = feedback.index(range.lowerBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
-                                let upper = feedback.index(range.upperBound, offsetBy: 3 + 7 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
-
-                                return lower ..< upper
-                            }
-
-                            selection = TextSelection(ranges: .init(updatedRanges))
-                        default:
-                            feedback.append("[s][/s]")
-
-                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -4, limitedBy: feedback.startIndex) ?? feedback.endIndex)
-                        }
-                    } label: {
-                        Image(systemName: "strikethrough")
-                            .font(.system(size: 17))
-                            .frame(height: 28)
-                            .padding(.horizontal, 16)
-                            .background(.tertiary.opacity(0.05))
-                            .clipShape(.capsule)
-                            .contentShape(.capsule)
-                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
-                    }
-                    .buttonStyle(.plain)
-
-                    Button {
-                        switch selection?.indices {
-                        case let .selection(range):
-                            feedback.insert(contentsOf: "[/spoiler]", at: range.upperBound)
-                            feedback.insert(contentsOf: "[spoiler]", at: range.lowerBound)
-
-                            let lower = feedback.index(range.lowerBound, offsetBy: 9, limitedBy: feedback.endIndex) ?? feedback.endIndex
-                            let upper = feedback.index(range.upperBound, offsetBy: 9, limitedBy: feedback.endIndex) ?? feedback.endIndex
-                            selection = TextSelection(range: lower ..< upper)
-                        case let .multiSelection(rangeSet):
-                            let sortedRanges = rangeSet.ranges.sorted(by: { $0.lowerBound > $1.lowerBound })
-
-                            for range in sortedRanges {
-                                feedback.insert(contentsOf: "[/spoiler]", at: range.upperBound)
-                                feedback.insert(contentsOf: "[spoiler]", at: range.lowerBound)
-                            }
-
-                            let updatedRanges = sortedRanges.indexed().map { index, range in
-                                let lower = feedback.index(range.lowerBound, offsetBy: 9 + 19 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
-                                let upper = feedback.index(range.upperBound, offsetBy: 9 + 19 * (sortedRanges.count - index - 1), limitedBy: feedback.endIndex) ?? feedback.endIndex
-
-                                return lower ..< upper
-                            }
-
-                            selection = TextSelection(ranges: .init(updatedRanges))
-                        default:
-                            feedback.append("[spoiler][/spoiler]")
-
-                            selection = TextSelection(insertionPoint: feedback.index(feedback.endIndex, offsetBy: -10, limitedBy: feedback.startIndex) ?? feedback.endIndex)
-                        }
-                    } label: {
-                        Text("Spoiler!".uppercased())
-                            .font(.system(size: 15, weight: .bold, design: .rounded))
-                            .frame(height: 28)
-                            .padding(.horizontal, 16)
-                            .background(.tertiary.opacity(0.05))
-                            .clipShape(.capsule)
-                            .contentShape(.capsule)
-                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
-                    }
-                    .buttonStyle(.plain)
+                    FormatButton(feedback: $feedback, selection: $selection, prefix: "[spoiler]", suffix: "[/spoiler]")
 
                     Spacer(minLength: 0)
 
@@ -734,7 +534,7 @@ struct CommentsView: View {
 
                 TextField("key.comments", text: $feedback, selection: $selection, prompt: Text(String(localized: "key.comments.placeholder").lowercased()))
                     .textFieldStyle(.plain)
-                    .textSelectionAffinity(.downstream)
+                    .textSelectionAffinity(.automatic)
             }
             .padding(12)
             .clipShape(.rect(cornerRadius: 6))
@@ -743,6 +543,115 @@ struct CommentsView: View {
                 if !allowedComments, !feedback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     appState.commentsRulesPresented = true
                 }
+            }
+        }
+
+        private struct FormatButton: View {
+            @Binding private var feedback: String
+            @Binding private var selection: TextSelection?
+            private let prefix: String
+            private let suffix: String
+            private let icon: String?
+
+            init(
+                feedback: Binding<String>,
+                selection: Binding<TextSelection?>,
+                prefix: String,
+                suffix: String,
+                icon: String? = nil,
+            ) {
+                _feedback = feedback
+                _selection = selection
+                self.prefix = prefix
+                self.suffix = suffix
+                self.icon = icon
+            }
+
+            var body: some View {
+                Button {
+                    switch selection?.indices {
+                    case let .selection(range):
+                        let lowerOffset = range.lowerBound.utf16Offset(in: feedback)
+                        let upperOffset = range.upperBound.utf16Offset(in: feedback)
+
+                        if let lowerIndex = feedback.utf16.index(feedback.utf16.startIndex, offsetBy: lowerOffset).samePosition(in: feedback),
+                           let upperIndex = feedback.utf16.index(feedback.utf16.startIndex, offsetBy: upperOffset).samePosition(in: feedback)
+                        {
+                            feedback.insert(contentsOf: suffix, at: upperIndex)
+                            feedback.insert(contentsOf: prefix, at: lowerIndex)
+                        }
+
+                        let offset = prefix.utf16.count
+                        let newLowerOffset = lowerOffset + offset
+                        let newUpperOffset = upperOffset + offset
+
+                        if let lowerIndex = feedback.utf16.index(feedback.utf16.startIndex, offsetBy: newLowerOffset).samePosition(in: feedback),
+                           let upperIndex = feedback.utf16.index(feedback.utf16.startIndex, offsetBy: newUpperOffset).samePosition(in: feedback)
+                        {
+                            selection = TextSelection(range: lowerIndex ..< upperIndex)
+                        } else {
+                            selection = nil
+                        }
+                    case let .multiSelection(rangeSet):
+                        let sortedRanges = rangeSet.ranges
+                            .map { $0.lowerBound.utf16Offset(in: feedback) ..< $0.upperBound.utf16Offset(in: feedback) }
+                            .sorted(by: { $0.lowerBound > $1.lowerBound })
+
+                        for range in sortedRanges {
+                            if let lowerIndex = feedback.utf16.index(feedback.utf16.startIndex, offsetBy: range.lowerBound).samePosition(in: feedback),
+                               let upperIndex = feedback.utf16.index(feedback.utf16.startIndex, offsetBy: range.upperBound).samePosition(in: feedback)
+                            {
+                                feedback.insert(contentsOf: suffix, at: upperIndex)
+                                feedback.insert(contentsOf: prefix, at: lowerIndex)
+                            }
+                        }
+
+                        let updatedRanges = sortedRanges.indexed().compactMap { index, range in
+                            let offset = prefix.utf16.count + (prefix.utf16.count + suffix.utf16.count) * (sortedRanges.count - index - 1)
+                            let newLowerOffset = range.lowerBound + offset
+                            let newUpperOffset = range.upperBound + offset
+
+                            if let lowerIndex = feedback.utf16.index(feedback.utf16.startIndex, offsetBy: newLowerOffset).samePosition(in: feedback),
+                               let upperIndex = feedback.utf16.index(feedback.utf16.startIndex, offsetBy: newUpperOffset).samePosition(in: feedback)
+                            {
+                                return lowerIndex ..< upperIndex
+                            } else {
+                                return nil
+                            }
+                        }
+
+                        selection = TextSelection(ranges: .init(updatedRanges))
+                    default:
+                        feedback.append(prefix + suffix)
+
+                        let offset = -suffix.utf16.count
+
+                        if let index = feedback.utf16.index(feedback.utf16.endIndex, offsetBy: offset).samePosition(in: feedback) {
+                            selection = TextSelection(insertionPoint: index)
+                        }
+                    }
+                } label: {
+                    if let icon {
+                        Image(systemName: icon)
+                            .font(.system(size: 17))
+                            .frame(height: 28)
+                            .padding(.horizontal, 16)
+                            .background(.tertiary.opacity(0.05))
+                            .clipShape(.capsule)
+                            .contentShape(.capsule)
+                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
+                    } else {
+                        Text("Spoiler!".uppercased())
+                            .font(.system(size: 15, weight: .bold, design: .rounded))
+                            .frame(height: 28)
+                            .padding(.horizontal, 16)
+                            .background(.tertiary.opacity(0.05))
+                            .clipShape(.capsule)
+                            .contentShape(.capsule)
+                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
+                    }
+                }
+                .buttonStyle(.plain)
             }
         }
     }
