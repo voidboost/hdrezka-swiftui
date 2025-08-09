@@ -800,6 +800,11 @@ struct DownloadSheetView: View {
                     .store(in: &subscriptions)
             }
         }
+        .onChange(of: downloader.isRunning) {
+            if !downloader.isRunning {
+                dismiss()
+            }
+        }
     }
 
     private struct CustomLabelStyle: LabelStyle {

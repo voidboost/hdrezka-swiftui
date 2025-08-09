@@ -2,6 +2,7 @@ import Combine
 import Defaults
 import FactoryKit
 import SwiftData
+import SwiftUI
 import UserNotifications
 
 @Observable
@@ -19,7 +20,9 @@ class Downloader {
 
     @ObservationIgnored private let fileManager = FileManager.default
 
-    @ObservationIgnored private let timerPublisher = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
+    @ObservationIgnored private let process: Process
+
+    var isRunning: Bool = false
 
     var downloads: [Download] = []
 
@@ -42,34 +45,45 @@ class Downloader {
             fatalError("aria2c binary not found in bundle")
         }
 
+        process = Process()
+        process.executableURL = aria2URL
+        process.arguments = [
+            "--enable-rpc=true",
+            "--rpc-listen-port=6800",
+            "--rpc-secret=\(Const.token)",
+            "--max-concurrent-downloads=\(Defaults[.maxConcurrentDownloads])",
+            "--stop-with-process=\(ProcessInfo.processInfo.processIdentifier)",
+            "--quiet=true",
+            "--allow-overwrite=true",
+            "--user-agent=\(Const.userAgent)",
+        ]
+
+        process.terminationHandler = { _ in
+            DispatchQueue.main.async {
+                self.subscriptions.flush()
+
+                withAnimation(.easeInOut) {
+                    self.isRunning = false
+                }
+            }
+        }
+
         do {
-            try Process.run(
-                aria2URL,
-                arguments: [
-                    "--enable-rpc=true",
-                    "--rpc-listen-port=6800",
-                    "--rpc-secret=\(Const.token)",
-                    "--max-concurrent-downloads=\(Defaults[.maxConcurrentDownloads])",
-                    "--stop-with-process=\(ProcessInfo.processInfo.processIdentifier)",
-                    "--quiet=true",
-                    "--allow-overwrite=true",
-                    "--user-agent=\(Const.userAgent)",
-                ],
-                terminationHandler: { process in
-                    if process.terminationReason != .exit || process.terminationStatus != 0 {
-                        do {
-                            try process.run()
-                        } catch {
-                            fatalError("Failed to restart aria2 process: \(error)")
-                        }
+            try process.run()
+
+            process.publisher(for: \.isRunning)
+                .receive(on: DispatchQueue.main)
+                .sink { isRunning in
+                    withAnimation(.easeInOut) {
+                        self.isRunning = isRunning
                     }
-                },
-            )
+                }
+                .store(in: &subscriptions)
         } catch {
             fatalError("Failed to start aria2 process: \(error)")
         }
 
-        timerPublisher
+        Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
             .flatMap { _ in
                 self.callUseCase(data:
                     Aria2Request(
@@ -623,4 +637,8 @@ class Downloader {
 //        }
 //        .store(in: &subscriptions)
 //    }
+
+    func terminate() {
+        process.terminate()
+    }
 }
