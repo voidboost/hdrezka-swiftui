@@ -45,6 +45,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                 notificationCenter.removeDeliveredNotifications(withIdentifiers: notifications.filter { $0.request.content.categoryIdentifier == "cancel" }.map(\.request.identifier))
             }
         }
+
+        if Downloader.shared.isRunning {
+            Downloader.shared.terminate()
+        }
     }
 
     func application(_: NSApplication, willEncodeRestorableState _: NSCoder) {}

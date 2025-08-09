@@ -141,6 +141,7 @@ struct DetailsView: View {
         @Binding private var isSchedulePresented: Bool
 
         @Environment(AppState.self) private var appState
+        @Environment(Downloader.self) private var downloader
 
         init(details: MovieDetailed, trailer: YouTubePlayer?, isSchedulePresented: Binding<Bool>) {
             self.details = details
@@ -226,23 +227,25 @@ struct DetailsView: View {
                                         WatchSheetView(id: details.movieId)
                                     }
 
-                                    Button {
-                                        isDownloadPresented = true
-                                    } label: {
-                                        Label("key.download", systemImage: "arrow.down.circle")
-                                            .font(.system(size: 13))
-                                            .foregroundStyle(Color.accentColor)
-                                            .padding(.horizontal, 14)
-                                            .padding(.vertical, 7)
-                                            .lineLimit(1)
-                                    }
-                                    .buttonStyle(.plain)
-                                    .background(.tertiary.opacity(0.05))
-                                    .clipShape(.capsule)
-                                    .contentShape(.capsule)
-                                    .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
-                                    .sheet(isPresented: $isDownloadPresented) {
-                                        DownloadSheetView(id: details.movieId)
+                                    if downloader.isRunning {
+                                        Button {
+                                            isDownloadPresented = true
+                                        } label: {
+                                            Label("key.download", systemImage: "arrow.down.circle")
+                                                .font(.system(size: 13))
+                                                .foregroundStyle(Color.accentColor)
+                                                .padding(.horizontal, 14)
+                                                .padding(.vertical, 7)
+                                                .lineLimit(1)
+                                        }
+                                        .buttonStyle(.plain)
+                                        .background(.tertiary.opacity(0.05))
+                                        .clipShape(.capsule)
+                                        .contentShape(.capsule)
+                                        .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
+                                        .sheet(isPresented: $isDownloadPresented) {
+                                            DownloadSheetView(id: details.movieId)
+                                        }
                                     }
 
                                     if !ExternalPlayers.allCases.compactMap({ NSWorkspace.shared.urlForApplication(withBundleIdentifier: $0.bundleIdentifier) }).isEmpty || !ExternalPlayers.allCases.compactMap({ NSWorkspace.shared.urlForApplication(toOpen: $0.url) }).isEmpty {
