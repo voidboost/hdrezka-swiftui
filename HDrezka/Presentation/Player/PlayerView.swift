@@ -15,6 +15,9 @@ struct PlayerView: View {
     @Default(.isLoggedIn) private var isLoggedIn
     @Default(.playerFullscreen) private var playerFullscreen
     @Default(.spatialAudio) private var spatialAudio
+    @Default(.rate) private var rate
+    @Default(.volume) private var volume
+    @Default(.isMuted) private var isMuted
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
@@ -55,15 +58,12 @@ struct PlayerView: View {
     @State private var timer: Int?
     @State private var timerWork: DispatchWorkItem?
     @State private var nextTimer: CGFloat?
-    @State private var rate: Float = 1.0
     @State private var currentTime: Double = 0.0
     @State private var duration: Double = .greatestFiniteMagnitude
-    @State private var volume: Float = 1.0
     @State private var error: Error?
     @State private var subtitles: String?
     @State private var isPlaying: Bool = true
     @State private var isLoading: Bool = true
-    @State private var isMuted: Bool = false
     @State private var isMaskShow: Bool = true
     @State private var delayHide: DispatchWorkItem?
     @State private var subtitlesOptions: [AVMediaSelectionOption] = []
@@ -93,7 +93,7 @@ struct PlayerView: View {
             if let error {
                 ErrorStateView(error) {
                     resetPlayer {
-                        setupPlayer(isMuted: isMuted, subtitles: subtitles, volume: volume)
+                        setupPlayer(subtitles: subtitles)
                     }
                 }
                 .padding(.vertical, 52)
@@ -375,7 +375,7 @@ struct PlayerView: View {
                                                     let currentSeek = player.currentTime()
 
                                                     resetPlayer {
-                                                        setupPlayer(seek: currentSeek, isPlaying: isPlaying, isMuted: isMuted, subtitles: subtitles, volume: volume)
+                                                        setupPlayer(seek: currentSeek, isPlaying: isPlaying, subtitles: subtitles)
                                                     }
                                                 }) {
                                                     ForEach(movie.getAvailableQualities(), id: \.self) { value in
@@ -652,7 +652,7 @@ struct PlayerView: View {
         )
     }
 
-    private func setupPlayer(seek: CMTime? = nil, isPlaying playing: Bool = true, isMuted muted: Bool = false, subtitles: String? = nil, volume vol: Float = 1.0) {
+    private func setupPlayer(seek: CMTime? = nil, isPlaying playing: Bool = true, subtitles: String? = nil) {
         guard let url = movie.getClosestTo(quality: quality)?.hls else { return }
 
         let player = CustomAVPlayer(m3u8: url, subtitles: movie.subtitles)
@@ -1068,8 +1068,8 @@ struct PlayerView: View {
             remoteCommandCenter.bookmarkCommand.isEnabled = false
             remoteCommandCenter.disableLanguageOptionCommand.isEnabled = false
 
-            player.volume = vol
-            player.isMuted = muted
+            player.volume = volume
+            player.isMuted = isMuted
 
             withAnimation(.easeInOut) {
                 playerLayer.player = player
@@ -1272,7 +1272,7 @@ struct PlayerView: View {
                             self.movie = movie
                             self.episode = prevEpisode
 
-                            setupPlayer(isMuted: isMuted, subtitles: subtitles, volume: volume)
+                            setupPlayer(subtitles: subtitles)
                         }
                     }
                     .store(in: &subscriptions)
@@ -1326,7 +1326,7 @@ struct PlayerView: View {
                             self.season = prevSeason
                             self.episode = prevEpisode
 
-                            setupPlayer(isMuted: isMuted, subtitles: subtitles, volume: volume)
+                            setupPlayer(subtitles: subtitles)
                         }
                     }
                     .store(in: &subscriptions)
@@ -1383,7 +1383,7 @@ struct PlayerView: View {
                             self.movie = movie
                             self.episode = nextEpisode
 
-                            setupPlayer(isMuted: isMuted, subtitles: subtitles, volume: volume)
+                            setupPlayer(subtitles: subtitles)
                         }
                     }
                     .store(in: &subscriptions)
@@ -1437,7 +1437,7 @@ struct PlayerView: View {
                             self.season = nextSeason
                             self.episode = nextEpisode
 
-                            setupPlayer(isMuted: isMuted, subtitles: subtitles, volume: volume)
+                            setupPlayer(subtitles: subtitles)
                         }
                     }
                     .store(in: &subscriptions)
