@@ -287,6 +287,7 @@ struct BookmarksView: View {
                 .labelsHidden()
                 .pickerStyle(.menu)
                 .buttonStyle(.accessoryBar)
+                .controlSize(.large)
                 .background(.tertiary.opacity(0.05))
                 .clipShape(.rect(cornerRadius: 6))
                 .contentShape(.rect(cornerRadius: 6))
