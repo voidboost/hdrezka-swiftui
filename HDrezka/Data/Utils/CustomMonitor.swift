@@ -121,7 +121,7 @@ private enum DebugDescription {
             return "[Body]: \(data.count) bytes"
         }
 
-        guard let body = String(data: data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines).indentingNewlines(),
+        guard let body = String(data: data, encoding: .utf8)?.trim().indentingNewlines(),
               !body.isEmpty
         else {
             return """

@@ -306,8 +306,8 @@ struct ContentView: View {
                 }
                 .store(in: &subscriptions)
         }
-        .onChange(of: query.trimmingCharacters(in: .whitespacesAndNewlines)) {
-            let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        .onChange(of: query.trim()) {
+            let trimmed = query.trim()
 
             guard !trimmed.isEmpty else { return }
 

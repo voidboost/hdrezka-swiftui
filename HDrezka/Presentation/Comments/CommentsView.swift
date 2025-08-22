@@ -528,8 +528,8 @@ struct CommentsView: View {
                             .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
-                    .disabled(feedback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || (!isLoggedIn && name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) || !allowedComments)
-                    .animation(.easeInOut, value: feedback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || (!isLoggedIn && name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) || !allowedComments)
+                    .disabled(feedback.trim().isEmpty || (!isLoggedIn && name.trim().isEmpty) || !allowedComments)
+                    .animation(.easeInOut, value: feedback.trim().isEmpty || (!isLoggedIn && name.trim().isEmpty) || !allowedComments)
                 }
 
                 TextField("key.comments", text: $feedback, selection: $selection, prompt: Text(String(localized: "key.comments.placeholder").lowercased()))
@@ -540,7 +540,7 @@ struct CommentsView: View {
             .clipShape(.rect(cornerRadius: 6))
             .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
             .onChange(of: feedback) {
-                if !allowedComments, !feedback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                if !allowedComments, !feedback.trim().isEmpty {
                     appState.commentsRulesPresented = true
                 }
             }

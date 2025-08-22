@@ -8,7 +8,7 @@ struct AccountRepositoryImpl: AccountRepository {
     @Injected(\.session) private var session
 
     func signIn(login: String, password: String) -> AnyPublisher<Bool, Error> {
-        session.request(AccountService.signIn(login: login, password: password))
+        session.request(AccountService.signIn(login: login.trim(), password: password.trim()))
             .validate(statusCode: 200 ..< 400)
             .publishData()
             .value()
@@ -26,7 +26,7 @@ struct AccountRepositoryImpl: AccountRepository {
     }
 
     func signUp(email: String, login: String, password: String) -> AnyPublisher<Bool, Error> {
-        session.request(AccountService.signUp(email: email, login: login, password: password))
+        session.request(AccountService.signUp(email: email.trim(), login: login.trim(), password: password.trim()))
             .validate(statusCode: 200 ..< 400)
             .publishString()
             .value()
@@ -36,7 +36,7 @@ struct AccountRepositoryImpl: AccountRepository {
     }
 
     func restore(login: String) -> AnyPublisher<String?, Error> {
-        session.request(AccountService.restore(login: login))
+        session.request(AccountService.restore(login: login.trim()))
             .validate(statusCode: 200 ..< 400)
             .publishString()
             .value()
@@ -53,7 +53,7 @@ struct AccountRepositoryImpl: AccountRepository {
     }
 
     func checkEmail(email: String) -> AnyPublisher<Bool, Error> {
-        session.request(AccountService.checkEmail(email: email))
+        session.request(AccountService.checkEmail(email: email.trim()))
             .validate(statusCode: 200 ..< 400)
             .publishString()
             .value()
@@ -63,7 +63,7 @@ struct AccountRepositoryImpl: AccountRepository {
     }
 
     func checkUsername(username: String) -> AnyPublisher<Bool, Error> {
-        session.request(AccountService.checkUsername(username: username))
+        session.request(AccountService.checkUsername(username: username.trim()))
             .validate(statusCode: 200 ..< 400)
             .publishString()
             .value()

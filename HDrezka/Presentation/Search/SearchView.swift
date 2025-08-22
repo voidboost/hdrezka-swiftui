@@ -22,7 +22,7 @@ struct SearchView: View {
         Group {
             if let error = viewModel.state.error {
                 ErrorStateView(error, viewModel.title) {
-                    viewModel.load(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
+                    viewModel.load(query: searchText.trim())
                 }
                 .padding(.vertical, 52)
                 .padding(.horizontal, 36)
@@ -68,7 +68,7 @@ struct SearchView: View {
                         }
                         .onScrollTargetVisibilityChange(idType: MovieSimple.ID.self) { onScreenCards in
                             if let last = movies.last, onScreenCards.contains(where: { $0 == last.id }), viewModel.paginationState == .idle {
-                                viewModel.loadMore(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
+                                viewModel.loadMore(query: searchText.trim())
                             }
                         }
 
@@ -86,7 +86,7 @@ struct SearchView: View {
         .navigationBar(title: viewModel.title, showBar: showBar, navbar: {
             if let movies = viewModel.state.data, !movies.isEmpty {
                 Button {
-                    viewModel.load(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
+                    viewModel.load(query: searchText.trim())
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
@@ -99,12 +99,12 @@ struct SearchView: View {
             case .data:
                 break
             default:
-                viewModel.load(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
+                viewModel.load(query: searchText.trim())
             }
         }
         .background(.background)
-        .onChange(of: searchText.trimmingCharacters(in: .whitespacesAndNewlines)) {
-            viewModel.load(query: searchText.trimmingCharacters(in: .whitespacesAndNewlines))
+        .onChange(of: searchText.trim()) {
+            viewModel.load(query: searchText.trim())
         }
     }
 }

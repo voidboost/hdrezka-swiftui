@@ -87,13 +87,13 @@ struct CommentReportSheet: View {
                             Text("key.report")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background((report != nil && report != .other) || (report == .other && !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) ? Color.accentColor : Color.secondary)
+                                .background((report != nil && report != .other) || (report == .other && !message.trim().isEmpty) ? Color.accentColor : Color.secondary)
                                 .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
-                        .disabled(report == nil || (report == .other && message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty))
-                        .animation(.easeInOut, value: (report != nil && report != .other) || (report == .other && !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty))
+                        .disabled(report == nil || (report == .other && message.trim().isEmpty))
+                        .animation(.easeInOut, value: (report != nil && report != .other) || (report == .other && !message.trim().isEmpty))
 
                         Button {
                             dismiss()

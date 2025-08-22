@@ -47,7 +47,7 @@ struct CreateBookmarkSheetView: View {
                                     .multilineTextAlignment(.trailing)
                                     .focused($focusedField, equals: .name)
                                     .onSubmit {
-                                        if !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                        if !name.trim().isEmpty {
                                             load()
                                         }
                                     }
@@ -68,13 +68,13 @@ struct CreateBookmarkSheetView: View {
                             Text("key.create")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background(!name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? Color.accentColor : Color.secondary)
+                                .background(!name.trim().isEmpty ? Color.accentColor : Color.secondary)
                                 .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
-                        .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                        .animation(.easeInOut, value: !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .disabled(name.trim().isEmpty)
+                        .animation(.easeInOut, value: !name.trim().isEmpty)
 
                         Button {
                             dismiss()
@@ -185,7 +185,7 @@ struct CreateBookmarkSheetView: View {
             state = .loading
         }
 
-        createBookmarksCategoryUseCase(name: name.trimmingCharacters(in: .whitespacesAndNewlines))
+        createBookmarksCategoryUseCase(name: name.trim())
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 guard case .failure = completion else { return }
