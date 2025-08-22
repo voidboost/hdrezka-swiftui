@@ -54,7 +54,7 @@ struct RenameBookmarkSheetView: View {
                                     .multilineTextAlignment(.trailing)
                                     .focused($focusedField, equals: .name)
                                     .onSubmit {
-                                        if !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, name.trimmingCharacters(in: .whitespacesAndNewlines) != bookmark.name {
+                                        if !name.trim().isEmpty, name.trim() != bookmark.name {
                                             load()
                                         }
                                     }
@@ -75,13 +75,13 @@ struct RenameBookmarkSheetView: View {
                             Text("key.rename")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background(!name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && name.trimmingCharacters(in: .whitespacesAndNewlines) != bookmark.name ? Color.accentColor : Color.secondary)
+                                .background(!name.trim().isEmpty && name.trim() != bookmark.name ? Color.accentColor : Color.secondary)
                                 .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
-                        .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || name.trimmingCharacters(in: .whitespacesAndNewlines) == bookmark.name)
-                        .animation(.easeInOut, value: !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && name.trimmingCharacters(in: .whitespacesAndNewlines) != bookmark.name)
+                        .disabled(name.trim().isEmpty || name.trim() == bookmark.name)
+                        .animation(.easeInOut, value: !name.trim().isEmpty && name.trim() != bookmark.name)
 
                         Button {
                             dismiss()
@@ -192,7 +192,7 @@ struct RenameBookmarkSheetView: View {
             state = .loading
         }
 
-        changeBookmarksCategoryNameUseCase(id: bookmark.bookmarkId, newName: name.trimmingCharacters(in: .whitespacesAndNewlines))
+        changeBookmarksCategoryNameUseCase(id: bookmark.bookmarkId, newName: name.trim())
             .receive(on: DispatchQueue.main)
             .sink { completion in
                 guard case .failure = completion else { return }

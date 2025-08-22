@@ -797,7 +797,7 @@ private extension String {
         let streams = decrypt(encrypted: url)
 
         let videoMap = try streams.components(separatedBy: ",").filter { !$0.isEmpty }.reduce(into: OrderedDictionary<String, URL?>()) { videoMap, stream in
-            let video = stream.replacingOccurrences(of: "[", with: "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let video = stream.replacingOccurrences(of: "[", with: "").trim()
             let name = try SwiftSoup.parse(video.components(separatedBy: "]").filter { !$0.isEmpty }.first.orThrow()).text()
             let videos = video[(video.lastIndex(of: "]") ?? video.startIndex)...].dropFirst().components(separatedBy: " or ").filter { !$0.isEmpty }
             let link = videos.first?.components(separatedBy: ":hls:manifest.m3u8").filter { !$0.isEmpty }.first
