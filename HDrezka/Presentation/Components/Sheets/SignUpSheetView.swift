@@ -360,9 +360,7 @@ struct SignUpSheetView: View {
                                                         .onEnded { _ in
                                                             withAnimation(.easeInOut(duration: 0.15)) {
                                                                 showPassword = false
-                                                            }
-
-                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                                            } completion: {
                                                                 focusedField = .password1
                                                             }
                                                         },
@@ -456,9 +454,7 @@ struct SignUpSheetView: View {
                                                         .onEnded { _ in
                                                             withAnimation(.easeInOut(duration: 0.15)) {
                                                                 showConfirmPassword = false
-                                                            }
-
-                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                                            } completion: {
                                                                 focusedField = .password2
                                                             }
                                                         },
