@@ -290,7 +290,7 @@ struct CommentsView: View {
                                 }
 
                                 if let delayShow {
-                                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5, execute: delayShow)
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: delayShow)
                                 }
                             }
                         }

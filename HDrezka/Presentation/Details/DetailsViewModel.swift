@@ -34,9 +34,7 @@ class DetailsViewModel {
             } receiveValue: { detail in
                 withAnimation(.easeInOut) {
                     self.state = .data(detail)
-                }
-
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                } completion: {
                     if let movieId = detail.movieId.id {
                         self.getMovieTrailerIdUseCase(movieId: movieId)
                             .receive(on: DispatchQueue.main)

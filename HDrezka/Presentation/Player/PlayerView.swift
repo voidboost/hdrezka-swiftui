@@ -716,9 +716,7 @@ struct PlayerView: View {
 
                                 withAnimation(.easeInOut(duration: 0.15)) {
                                     subtitlesOptions = mediaSelectionGroup.options.filter { $0.extendedLanguageTag != nil }
-                                }
-
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                } completion: {
                                     self.subtitles = subtitles
                                 }
                             }
@@ -1113,12 +1111,8 @@ struct PlayerView: View {
             nextTimer = nil
             subtitlesOptions = []
             isLoading = true
-        }
-
-        if let completion {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                completion()
-            }
+        } completion: {
+            completion?()
         }
 
         duration = .greatestFiniteMagnitude
@@ -1178,7 +1172,7 @@ struct PlayerView: View {
         }
 
         if let timerWork {
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + .seconds(timer), execute: timerWork)
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(timer), execute: timerWork)
         }
     }
 
@@ -1197,7 +1191,7 @@ struct PlayerView: View {
             }
 
             if let delayHide {
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 3, execute: delayHide)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: delayHide)
             }
         }
     }
@@ -1234,10 +1228,8 @@ struct PlayerView: View {
                     .sink { completion in
                         guard case let .failure(error) = completion else { return }
 
-                        resetPlayer {
-                            withAnimation(.easeInOut) {
-                                self.error = error
-                            }
+                        withAnimation(.easeInOut) {
+                            self.error = error
                         }
                     } receiveValue: { movie in
                         if movie.needPremium {
@@ -1288,10 +1280,8 @@ struct PlayerView: View {
                     .sink { completion in
                         guard case let .failure(error) = completion else { return }
 
-                        resetPlayer {
-                            withAnimation(.easeInOut) {
-                                self.error = error
-                            }
+                        withAnimation(.easeInOut) {
+                            self.error = error
                         }
                     } receiveValue: { movie in
                         if movie.needPremium {
@@ -1346,10 +1336,8 @@ struct PlayerView: View {
                     .sink { completion in
                         guard case let .failure(error) = completion else { return }
 
-                        resetPlayer {
-                            withAnimation(.easeInOut) {
-                                self.error = error
-                            }
+                        withAnimation(.easeInOut) {
+                            self.error = error
                         }
                     } receiveValue: { movie in
                         if movie.needPremium {
@@ -1399,10 +1387,8 @@ struct PlayerView: View {
                     .sink { completion in
                         guard case let .failure(error) = completion else { return }
 
-                        resetPlayer {
-                            withAnimation(.easeInOut) {
-                                self.error = error
-                            }
+                        withAnimation(.easeInOut) {
+                            self.error = error
                         }
                     } receiveValue: { movie in
                         if movie.needPremium {
