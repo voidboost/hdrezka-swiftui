@@ -41,9 +41,17 @@ class Downloader {
 
         UNUserNotificationCenter.current().setNotificationCategories([openCategory, cancelCategory, retryCategory, needPremiumCategory])
 
-        guard let aria2URL = Bundle.main.url(forResource: "aria2c", withExtension: nil) else {
-            fatalError("aria2c binary not found in bundle")
-        }
+        #if arch(arm64)
+            guard let aria2URL = Bundle.main.url(forResource: "aria2c-arm64", withExtension: nil) else {
+                fatalError("aria2c binary not found in bundle")
+            }
+        #elseif arch(x86_64)
+            guard let aria2URL = Bundle.main.url(forResource: "aria2c-x86_64", withExtension: nil) else {
+                fatalError("aria2c binary not found in bundle")
+            }
+        #else
+            fatalError("Failed to start aria2 process: unknown architecture")
+        #endif
 
         process = Process()
         process.executableURL = aria2URL
