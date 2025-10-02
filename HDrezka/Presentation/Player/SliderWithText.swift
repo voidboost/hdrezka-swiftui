@@ -85,7 +85,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                     .animation(.easeInOut, value: isActive)
                     .clipShape(.capsule)
                     .contentShape(.capsule)
-                    .gesture(
+                    .highPriorityGesture(
                         DragGesture(minimumDistance: 0, coordinateSpace: .local)
                             .updating($isActive) { _, state, _ in
                                 state = true
