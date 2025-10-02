@@ -129,7 +129,7 @@ struct PlayerView: View {
                                         } else {
                                             player.playImmediately(atRate: rate)
                                         }
-                                    })
+                                    }),
                     )
 
                 VStack(alignment: .center) {
@@ -694,7 +694,7 @@ struct PlayerView: View {
                         acting: voiceActing.translatorId,
                         season: season?.seasonId,
                         episode: episode?.episodeId,
-                        position: currentTime
+                        position: currentTime,
                     )
 
                     modelContext.insert(position)
@@ -1138,7 +1138,7 @@ struct PlayerView: View {
                         acting: voiceActing.translatorId,
                         season: season?.seasonId,
                         episode: episode?.episodeId,
-                        subtitles: language
+                        subtitles: language,
                     )
 
                     modelContext.insert(position)
@@ -1253,7 +1253,7 @@ struct PlayerView: View {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: season.seasonId,
-                                    episode: prevEpisode.episodeId
+                                    episode: prevEpisode.episodeId,
                                 )
 
                                 modelContext.insert(position)
@@ -1304,7 +1304,7 @@ struct PlayerView: View {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: prevSeason.seasonId,
-                                    episode: prevEpisode.episodeId
+                                    episode: prevEpisode.episodeId,
                                 )
 
                                 modelContext.insert(position)
@@ -1360,7 +1360,7 @@ struct PlayerView: View {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: season.seasonId,
-                                    episode: nextEpisode.episodeId
+                                    episode: nextEpisode.episodeId,
                                 )
 
                                 modelContext.insert(position)
@@ -1411,7 +1411,7 @@ struct PlayerView: View {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: nextSeason.seasonId,
-                                    episode: nextEpisode.episodeId
+                                    episode: nextEpisode.episodeId,
                                 )
 
                                 modelContext.insert(position)
