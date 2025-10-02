@@ -69,7 +69,6 @@ struct PlayerView: View {
     @State private var subtitlesOptions: [AVMediaSelectionOption] = []
     @State private var thumbnails: WebVTT?
     @State private var window: NSWindow?
-    @State private var isGestureEnabled: Bool = true
 
     init(data: PlayerData) {
         poster = data.details.poster
@@ -160,9 +159,6 @@ struct PlayerView: View {
                                     }
                                 }
                                 .frame(width: 120, height: 10)
-                                .onHover { hovering in
-                                    isGestureEnabled = !hovering
-                                }
                                 .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
 
                                 VStack(alignment: .center) {
@@ -442,9 +438,6 @@ struct PlayerView: View {
                                 }
                             }, inRange: 0 ... duration, buffers: loadedTimeRanges, activeFillColor: .primary, fillColor: .primary.opacity(0.7), emptyColor: .primary.opacity(0.3), height: 8, thumbnails: thumbnails) { _ in }
                                 .frame(height: 25)
-                                .onHover { hovering in
-                                    isGestureEnabled = !hovering
-                                }
                                 .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                         }
                     }
