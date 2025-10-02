@@ -101,6 +101,36 @@ struct PlayerView: View {
             } else if let player = playerLayer.player {
                 CustomAVPlayerView(playerLayer: playerLayer)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .contentShape(.rect)
+                    .gesture(
+                        TapGesture(count: 2)
+                            .onEnded {
+                                guard player.status == .readyToPlay,
+                                      let window,
+                                      !isPictureInPictureActive || (isPictureInPictureActive && window.styleMask.contains(.fullScreen))
+                                else {
+                                    return
+                                }
+
+                                window.toggleFullScreen(nil)
+                            }
+                            .exclusively(before:
+                                TapGesture(count: 1)
+                                    .onEnded {
+                                        guard player.status == .readyToPlay,
+                                              !isPictureInPictureActive,
+                                              !isLoading
+                                        else {
+                                            return
+                                        }
+
+                                        if isPlaying {
+                                            player.pause()
+                                        } else {
+                                            player.playImmediately(atRate: rate)
+                                        }
+                                    })
+                    )
 
                 VStack(alignment: .center) {
                     VStack {
@@ -616,40 +646,8 @@ struct PlayerView: View {
                 break
             }
         }
-        .gesture(
-            WindowDragGesture()
-                .exclusively(before:
-                    TapGesture(count: 2)
-                        .onEnded {
-                            guard let player = playerLayer.player,
-                                  player.status == .readyToPlay,
-                                  let window,
-                                  !isPictureInPictureActive || (isPictureInPictureActive && window.styleMask.contains(.fullScreen))
-                            else {
-                                return
-                            }
-
-                            window.toggleFullScreen(nil)
-                        }
-                        .exclusively(before:
-                            TapGesture(count: 1)
-                                .onEnded {
-                                    guard let player = playerLayer.player,
-                                          player.status == .readyToPlay,
-                                          !isPictureInPictureActive,
-                                          !isLoading
-                                    else {
-                                        return
-                                    }
-
-                                    if isPlaying {
-                                        player.pause()
-                                    } else {
-                                        player.playImmediately(atRate: rate)
-                                    }
-                                })),
-            isEnabled: isGestureEnabled,
-        )
+        .gesture(WindowDragGesture())
+        .allowsWindowActivationEvents()
     }
 
     private func setupPlayer(seek: CMTime? = nil, isPlaying playing: Bool = true, subtitles: String? = nil) {
@@ -696,7 +694,7 @@ struct PlayerView: View {
                         acting: voiceActing.translatorId,
                         season: season?.seasonId,
                         episode: episode?.episodeId,
-                        position: currentTime,
+                        position: currentTime
                     )
 
                     modelContext.insert(position)
@@ -1140,7 +1138,7 @@ struct PlayerView: View {
                         acting: voiceActing.translatorId,
                         season: season?.seasonId,
                         episode: episode?.episodeId,
-                        subtitles: language,
+                        subtitles: language
                     )
 
                     modelContext.insert(position)
@@ -1255,7 +1253,7 @@ struct PlayerView: View {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: season.seasonId,
-                                    episode: prevEpisode.episodeId,
+                                    episode: prevEpisode.episodeId
                                 )
 
                                 modelContext.insert(position)
@@ -1306,7 +1304,7 @@ struct PlayerView: View {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: prevSeason.seasonId,
-                                    episode: prevEpisode.episodeId,
+                                    episode: prevEpisode.episodeId
                                 )
 
                                 modelContext.insert(position)
@@ -1362,7 +1360,7 @@ struct PlayerView: View {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: season.seasonId,
-                                    episode: nextEpisode.episodeId,
+                                    episode: nextEpisode.episodeId
                                 )
 
                                 modelContext.insert(position)
@@ -1413,7 +1411,7 @@ struct PlayerView: View {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: nextSeason.seasonId,
-                                    episode: nextEpisode.episodeId,
+                                    episode: nextEpisode.episodeId
                                 )
 
                                 modelContext.insert(position)
