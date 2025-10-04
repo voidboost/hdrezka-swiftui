@@ -116,8 +116,7 @@ struct CommentsRulesSheet: View {
             .scrollIndicators(.never)
             .frame(maxWidth: .infinity)
             .frame(height: 200)
-            .background(.quinary)
-            .clipShape(.rect(cornerRadius: 6))
+            .background(.quinary, in: .rect(cornerRadius: 6))
             .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
 
             VStack(alignment: .center, spacing: 10) {
@@ -139,9 +138,8 @@ struct CommentsRulesSheet: View {
                     Text("key.accept")
                         .frame(width: 250, height: 30)
                         .foregroundStyle(.white)
-                        .background(Color.accentColor)
-                        .clipShape(.rect(cornerRadius: 6))
                         .contentShape(.rect(cornerRadius: 6))
+                        .background(Color.accentColor, in: .rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
 
@@ -150,9 +148,8 @@ struct CommentsRulesSheet: View {
                 } label: {
                     Text("key.cancel")
                         .frame(width: 250, height: 30)
-                        .background(.quinary.opacity(0.5))
-                        .clipShape(.rect(cornerRadius: 6))
                         .contentShape(.rect(cornerRadius: 6))
+                        .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
             }

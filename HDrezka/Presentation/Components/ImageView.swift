@@ -63,8 +63,7 @@ struct ImageView: View {
                     }
                 }
                 .scaledToFill()
-                .frame(maxWidth: .infinity)
-                .clipShape(.rect)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
 
                 VStack {}
                     .frame(maxWidth: .infinity, maxHeight: .infinity)

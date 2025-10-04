@@ -266,8 +266,7 @@ struct DownloadSheetView: View {
                         }
                         .padding(.horizontal, 15)
                         .padding(.vertical, 5)
-                        .background(.quinary)
-                        .clipShape(.rect(cornerRadius: 6))
+                        .background(.quinary, in: .rect(cornerRadius: 6))
                         .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
 
@@ -345,8 +344,7 @@ struct DownloadSheetView: View {
                         }
                         .padding(.horizontal, 15)
                         .padding(.vertical, 5)
-                        .background(.quinary)
-                        .clipShape(.rect(cornerRadius: 6))
+                        .background(.quinary, in: .rect(cornerRadius: 6))
                         .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
 
@@ -408,8 +406,7 @@ struct DownloadSheetView: View {
                         }
                         .padding(.horizontal, 15)
                         .padding(.vertical, 5)
-                        .background(.quinary)
-                        .clipShape(.rect(cornerRadius: 6))
+                        .background(.quinary, in: .rect(cornerRadius: 6))
                         .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
                 }
@@ -426,9 +423,8 @@ struct DownloadSheetView: View {
                     Text("key.download")
                         .frame(width: 250, height: 30)
                         .foregroundStyle(.white)
-                        .background(selectedQuality != nil ? Color.accentColor : Color.secondary)
-                        .clipShape(.rect(cornerRadius: 6))
                         .contentShape(.rect(cornerRadius: 6))
+                        .background(selectedQuality != nil ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
                 .disabled(selectedQuality == nil
@@ -483,9 +479,8 @@ struct DownloadSheetView: View {
                         Text(ExternalDownloaders.folx.localizedKey)
                             .frame(width: 250, height: 30)
                             .foregroundStyle(.white)
-                            .background(selectedQuality != nil ? Color.accentColor : Color.secondary)
-                            .clipShape(.rect(cornerRadius: 6))
                             .contentShape(.rect(cornerRadius: 6))
+                            .background(selectedQuality != nil ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
                     }
                     .buttonStyle(.plain)
                     .disabled(selectedQuality == nil)
@@ -536,9 +531,8 @@ struct DownloadSheetView: View {
                         Text(ExternalDownloaders.motrix.localizedKey)
                             .frame(width: 250, height: 30)
                             .foregroundStyle(.white)
-                            .background(selectedQuality != nil ? Color.accentColor : Color.secondary)
-                            .clipShape(.rect(cornerRadius: 6))
                             .contentShape(.rect(cornerRadius: 6))
+                            .background(selectedQuality != nil ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
                     }
                     .buttonStyle(.plain)
                     .disabled(selectedQuality == nil)
@@ -553,9 +547,8 @@ struct DownloadSheetView: View {
                         Text("key.download.season")
                             .frame(width: 250, height: 30)
                             .foregroundStyle(.white)
-                            .background(selectedQuality != nil ? Color.accentColor : Color.secondary)
-                            .clipShape(.rect(cornerRadius: 6))
                             .contentShape(.rect(cornerRadius: 6))
+                            .background(selectedQuality != nil ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
                     }
                     .buttonStyle(.plain)
                     .disabled(selectedQuality == nil
@@ -569,9 +562,8 @@ struct DownloadSheetView: View {
                 } label: {
                     Text("key.cancel")
                         .frame(width: 250, height: 30)
-                        .background(.quinary.opacity(0.5))
-                        .clipShape(.rect(cornerRadius: 6))
                         .contentShape(.rect(cornerRadius: 6))
+                        .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
             }

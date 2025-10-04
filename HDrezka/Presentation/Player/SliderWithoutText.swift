@@ -47,8 +47,8 @@ struct SliderWithoutText<T: BinaryFloatingPoint>: View {
                 }
                 .frame(height: isActive ? height * 1.25 : height, alignment: .center)
                 .animation(.easeInOut, value: isActive)
-                .clipShape(.capsule)
                 .contentShape(.capsule)
+                .clipShape(.capsule)
                 .highPriorityGesture(
                     DragGesture(minimumDistance: 0, coordinateSpace: .local)
                         .updating($isActive) { _, state, _ in

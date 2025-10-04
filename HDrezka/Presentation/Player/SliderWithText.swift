@@ -83,8 +83,8 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                     }
                     .frame(height: isActive ? height * 1.25 : height, alignment: .center)
                     .animation(.easeInOut, value: isActive)
-                    .clipShape(.capsule)
                     .contentShape(.capsule)
+                    .clipShape(.capsule)
                     .highPriorityGesture(
                         DragGesture(minimumDistance: 0, coordinateSpace: .local)
                             .updating($isActive) { _, state, _ in
@@ -131,8 +131,8 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                 }
                                 .scaledToFill()
                                 .frame(width: frame.width, height: frame.height)
-                                .background(.ultraThinMaterial)
                                 .clipShape(.rect(cornerRadius: 6))
+                                .background(.ultraThinMaterial, in: .rect(cornerRadius: 6))
                                 .overlay(.ultraThinMaterial, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                                 .overlay {
                                     VStack {

@@ -87,7 +87,6 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
                     Spacer()
                 }
             }
-            .clipShape(.rect)
     }
 
     private func backButtonAction() {
@@ -124,9 +123,8 @@ struct NavbarButtonStyle: ButtonStyle {
         .frame(width: width, height: height)
         .padding(.horizontal, hPadding ?? 0)
         .padding(.vertical, vPadding ?? 0)
-        .background(isHovered ? .secondary.opacity(configuration.isPressed ? 0.3 : 0.1) : Color.clear)
-        .clipShape(.rect(cornerRadius: 6))
         .contentShape(.rect(cornerRadius: 6))
+        .background(isHovered ? .secondary.opacity(configuration.isPressed ? 0.3 : 0.1) : Color.clear, in: .rect(cornerRadius: 6))
         .animation(.easeInOut(duration: 0.15), value: isHovered)
         .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
         .onHover { isHovered = $0 }

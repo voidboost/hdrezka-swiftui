@@ -87,9 +87,8 @@ struct CommentReportSheet: View {
                             Text("key.report")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background((report != nil && report != .other) || (report == .other && !message.trim().isEmpty) ? Color.accentColor : Color.secondary)
-                                .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
+                                .background((report != nil && report != .other) || (report == .other && !message.trim().isEmpty) ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                         .disabled(report == nil || (report == .other && message.trim().isEmpty))
@@ -100,9 +99,8 @@ struct CommentReportSheet: View {
                         } label: {
                             Text("key.cancel")
                                 .frame(width: 250, height: 30)
-                                .background(.quinary.opacity(0.5))
-                                .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
+                                .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6)).background(Color.accentColor, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                     }
@@ -167,9 +165,8 @@ struct CommentReportSheet: View {
                             Text("key.retry")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background(Color.accentColor)
-                                .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
+                                .background(Color.accentColor, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
 
@@ -178,9 +175,8 @@ struct CommentReportSheet: View {
                         } label: {
                             Text("key.cancel")
                                 .frame(width: 250, height: 30)
-                                .background(.quinary.opacity(0.5))
-                                .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
+                                .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6)).background(Color.accentColor, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                     }
@@ -230,8 +226,8 @@ struct CommentReportSheet: View {
                 }
             }
             .padding(10)
-            .clipShape(.rect(cornerRadius: 6))
             .contentShape(.rect(cornerRadius: 6))
+            .clipShape(.rect(cornerRadius: 6))
             .overlay(isSelected ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
             .onTapGesture { isSelected = true }
             .animation(.easeInOut, value: isSelected)

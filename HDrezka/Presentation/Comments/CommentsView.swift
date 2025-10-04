@@ -170,9 +170,8 @@ struct CommentsView: View {
                 } label: {
                     Text("key.done")
                         .frame(width: 250, height: 30)
-                        .background(.quinary.opacity(0.5))
-                        .clipShape(.rect(cornerRadius: 6))
                         .contentShape(.rect(cornerRadius: 6))
+                        .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
             }
@@ -346,9 +345,8 @@ struct CommentsView: View {
                             .font(.system(size: 13, weight: .semibold))
                             .frame(height: 28)
                             .padding(.horizontal, 16)
-                            .background(.tertiary.opacity(0.05))
-                            .clipShape(.capsule)
                             .contentShape(.capsule)
+                            .background(.tertiary.opacity(0.05), in: .capsule)
                             .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                         }
                         .buttonStyle(.plain)
@@ -362,9 +360,8 @@ struct CommentsView: View {
                                     .font(.system(size: 17))
                                     .frame(height: 28)
                                     .padding(.horizontal, 16)
-                                    .background(.tertiary.opacity(0.05))
-                                    .clipShape(.capsule)
                                     .contentShape(.capsule)
+                                    .background(.tertiary.opacity(0.05), in: .capsule)
                                     .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                             }
                             .buttonStyle(.plain)
@@ -381,9 +378,8 @@ struct CommentsView: View {
                                     .font(.system(size: 17))
                                     .frame(height: 28)
                                     .padding(.horizontal, 16)
-                                    .background(.tertiary.opacity(0.05))
-                                    .clipShape(.capsule)
                                     .contentShape(.capsule)
+                                    .background(.tertiary.opacity(0.05), in: .capsule)
                                     .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                             }
                             .buttonStyle(.plain)
@@ -439,9 +435,9 @@ struct CommentsView: View {
 //                                            .position(x: rect.x + rect.width * 0.5, y: rect.y + rect.height * 0.5)
 
                                 SpoilerView()
-                                    .background(.background)
-                                    .clipShape(.rect)
                                     .contentShape(.rect)
+                                    .background(.background, in: .rect)
+                                    .clipShape(.rect)
                                     .onTapGesture {
                                         withAnimation(.easeInOut) {
                                             comment.removeSpoiler(spoiler.id)
@@ -522,9 +518,8 @@ struct CommentsView: View {
                             .font(.system(size: 15, weight: .bold))
                             .frame(height: 28)
                             .padding(.horizontal, 16)
-                            .background(.tertiary.opacity(0.05))
-                            .clipShape(.capsule)
                             .contentShape(.capsule)
+                            .background(.tertiary.opacity(0.05), in: .capsule)
                             .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
@@ -537,7 +532,6 @@ struct CommentsView: View {
                     .textSelectionAffinity(.automatic)
             }
             .padding(12)
-            .clipShape(.rect(cornerRadius: 6))
             .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
             .onChange(of: feedback) {
                 if !allowedComments, !feedback.trim().isEmpty {
@@ -636,18 +630,16 @@ struct CommentsView: View {
                             .font(.system(size: 17))
                             .frame(height: 28)
                             .padding(.horizontal, 16)
-                            .background(.tertiary.opacity(0.05))
-                            .clipShape(.capsule)
                             .contentShape(.capsule)
+                            .background(.tertiary.opacity(0.05), in: .capsule)
                             .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                     } else {
                         Text("Spoiler!".uppercased())
                             .font(.system(size: 15, weight: .bold, design: .rounded))
                             .frame(height: 28)
                             .padding(.horizontal, 16)
-                            .background(.tertiary.opacity(0.05))
-                            .clipShape(.capsule)
                             .contentShape(.capsule)
+                            .background(.tertiary.opacity(0.05), in: .capsule)
                             .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                     }
                 }

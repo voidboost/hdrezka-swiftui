@@ -63,8 +63,7 @@ struct RenameBookmarkSheetView: View {
                         }
                         .padding(.horizontal, 15)
                         .padding(.vertical, 5)
-                        .background(.quinary)
-                        .clipShape(.rect(cornerRadius: 6))
+                        .background(.quinary, in: .rect(cornerRadius: 6))
                         .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
 
@@ -75,9 +74,8 @@ struct RenameBookmarkSheetView: View {
                             Text("key.rename")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background(!name.trim().isEmpty && name.trim() != bookmark.name ? Color.accentColor : Color.secondary)
-                                .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
+                                .background(!name.trim().isEmpty && name.trim() != bookmark.name ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                         .disabled(name.trim().isEmpty || name.trim() == bookmark.name)
@@ -88,9 +86,8 @@ struct RenameBookmarkSheetView: View {
                         } label: {
                             Text("key.cancel")
                                 .frame(width: 250, height: 30)
-                                .background(.quinary.opacity(0.5))
-                                .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
+                                .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6)).background(Color.accentColor, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                     }
@@ -126,9 +123,8 @@ struct RenameBookmarkSheetView: View {
                         } label: {
                             Text("key.cancel")
                                 .frame(width: 250, height: 30)
-                                .background(.quinary.opacity(0.5))
-                                .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
+                                .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6)).background(Color.accentColor, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                     }
@@ -160,9 +156,8 @@ struct RenameBookmarkSheetView: View {
                             Text("key.retry")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background(Color.accentColor)
-                                .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
+                                .background(Color.accentColor, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
 
@@ -171,9 +166,8 @@ struct RenameBookmarkSheetView: View {
                         } label: {
                             Text("key.cancel")
                                 .frame(width: 250, height: 30)
-                                .background(.quinary.opacity(0.5))
-                                .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
+                                .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6)).background(Color.accentColor, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                     }

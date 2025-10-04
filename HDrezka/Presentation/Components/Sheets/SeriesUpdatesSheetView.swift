@@ -80,9 +80,8 @@ struct SeriesUpdatesSheetView: View {
             } label: {
                 Text("key.done")
                     .frame(width: 250, height: 30)
-                    .background(.quinary.opacity(0.5))
-                    .clipShape(.rect(cornerRadius: 6))
                     .contentShape(.rect(cornerRadius: 6))
+                    .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
             }
             .buttonStyle(.plain)
         }
@@ -184,8 +183,7 @@ struct SeriesUpdatesSheetView: View {
                                                     view
                                                         .padding(.vertical, 2)
                                                         .padding(.horizontal, 6)
-                                                        .background(Const.premiumGradient)
-                                                        .clipShape(.capsule)
+                                                        .background(Const.premiumGradient, in: .capsule)
                                                 } else {
                                                     view
                                                 }
@@ -239,8 +237,7 @@ struct SeriesUpdatesSheetView: View {
                                                     view
                                                         .padding(.vertical, 2)
                                                         .padding(.horizontal, 6)
-                                                        .background(Const.premiumGradient)
-                                                        .clipShape(.capsule)
+                                                        .background(Const.premiumGradient, in: .capsule)
                                                 } else {
                                                     view
                                                 }
@@ -259,8 +256,7 @@ struct SeriesUpdatesSheetView: View {
                         }
                     }
                     .padding(.horizontal, 10)
-                    .background(.quinary)
-                    .clipShape(.rect(cornerRadius: 6))
+                    .background(.quinary, in: .rect(cornerRadius: 6))
                     .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
             }
