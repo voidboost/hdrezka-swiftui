@@ -491,9 +491,8 @@ struct PlayerView: View {
                                 .padding(.vertical, 16)
                                 .padding(.leading, 16)
                                 .padding(.trailing, 36)
-                                .background(.ultraThinMaterial)
-                                .clipShape(.rect(topLeadingRadius: 6, bottomLeadingRadius: 6))
                                 .contentShape(.rect(topLeadingRadius: 6, bottomLeadingRadius: 6))
+                                .background(.ultraThinMaterial, in: .rect(topLeadingRadius: 6, bottomLeadingRadius: 6))
                             }
                             .buttonStyle(.plain)
                         }

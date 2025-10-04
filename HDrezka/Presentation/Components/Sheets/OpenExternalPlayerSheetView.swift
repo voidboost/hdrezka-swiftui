@@ -265,8 +265,7 @@ struct OpenExternalPlayerSheetView: View {
                         }
                         .padding(.horizontal, 15)
                         .padding(.vertical, 5)
-                        .background(.quinary)
-                        .clipShape(.rect(cornerRadius: 6))
+                        .background(.quinary, in: .rect(cornerRadius: 6))
                         .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
 
@@ -344,8 +343,7 @@ struct OpenExternalPlayerSheetView: View {
                         }
                         .padding(.horizontal, 15)
                         .padding(.vertical, 5)
-                        .background(.quinary)
-                        .clipShape(.rect(cornerRadius: 6))
+                        .background(.quinary, in: .rect(cornerRadius: 6))
                         .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
 
@@ -407,8 +405,7 @@ struct OpenExternalPlayerSheetView: View {
                         }
                         .padding(.horizontal, 15)
                         .padding(.vertical, 5)
-                        .background(.quinary)
-                        .clipShape(.rect(cornerRadius: 6))
+                        .background(.quinary, in: .rect(cornerRadius: 6))
                         .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
                 }
@@ -465,9 +462,8 @@ struct OpenExternalPlayerSheetView: View {
                             Text(ExternalPlayers.iina.localizedKey)
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background(selectedQuality != nil ? Color.accentColor : Color.secondary)
-                                .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
+                                .background(selectedQuality != nil ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                         .disabled(selectedQuality == nil)
@@ -518,9 +514,8 @@ struct OpenExternalPlayerSheetView: View {
                             Text(ExternalPlayers.infuse.localizedKey)
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background(selectedQuality != nil ? Color.accentColor : Color.secondary)
-                                .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
+                                .background(selectedQuality != nil ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                         .disabled(selectedQuality == nil)
@@ -583,9 +578,8 @@ struct OpenExternalPlayerSheetView: View {
                             Text(ExternalPlayers.mpv.localizedKey)
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background(selectedQuality != nil ? Color.accentColor : Color.secondary)
-                                .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
+                                .background(selectedQuality != nil ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                         .disabled(selectedQuality == nil)
@@ -648,9 +642,8 @@ struct OpenExternalPlayerSheetView: View {
                             Text(ExternalPlayers.vlc.localizedKey)
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
-                                .background(selectedQuality != nil ? Color.accentColor : Color.secondary)
-                                .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
+                                .background(selectedQuality != nil ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                         .disabled(selectedQuality == nil)
@@ -659,9 +652,8 @@ struct OpenExternalPlayerSheetView: View {
                     Text("key.open.empty")
                         .frame(width: 250, height: 30)
                         .foregroundStyle(.white)
-                        .background(Color.accentColor)
-                        .clipShape(.rect(cornerRadius: 6))
                         .contentShape(.rect(cornerRadius: 6))
+                        .background(Color.accentColor, in: .rect(cornerRadius: 6))
                 }
 
                 Button {
@@ -669,9 +661,8 @@ struct OpenExternalPlayerSheetView: View {
                 } label: {
                     Text("key.cancel")
                         .frame(width: 250, height: 30)
-                        .background(.quinary.opacity(0.5))
-                        .clipShape(.rect(cornerRadius: 6))
                         .contentShape(.rect(cornerRadius: 6))
+                        .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
             }

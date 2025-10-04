@@ -92,8 +92,7 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal, 15)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(.quinary)
-                .clipShape(.rect(cornerRadius: 6))
+                .background(.quinary, in: .rect(cornerRadius: 6))
                 .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
 
                 if mirrorValid == true, let mirror, var urlComponents = URLComponents(url: mirror, resolvingAgainstBaseURL: false) {
@@ -122,7 +121,6 @@ struct SettingsView: View {
                             .foregroundStyle(Color.accentColor)
                             .bold()
                             .imageFill(1)
-                            .clipShape(.rect(cornerRadius: 6))
                             .contentShape(.rect(cornerRadius: 6))
                             .overlay(Color.accentColor, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
@@ -147,9 +145,8 @@ struct SettingsView: View {
                     .pickerStyle(.menu)
                     .buttonStyle(.accessoryBar)
                     .controlSize(.large)
-                    .background(.tertiary.opacity(0.05))
-                    .clipShape(.rect(cornerRadius: 6))
                     .contentShape(.rect(cornerRadius: 6))
+                    .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
                     .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
                 .frame(height: 40)
@@ -197,9 +194,8 @@ struct SettingsView: View {
                     .pickerStyle(.menu)
                     .buttonStyle(.accessoryBar)
                     .controlSize(.large)
-                    .background(.tertiary.opacity(0.05))
-                    .clipShape(.rect(cornerRadius: 6))
                     .contentShape(.rect(cornerRadius: 6))
+                    .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
                     .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
                 .frame(height: 40)
@@ -221,9 +217,8 @@ struct SettingsView: View {
                     .pickerStyle(.menu)
                     .buttonStyle(.accessoryBar)
                     .controlSize(.large)
-                    .background(.tertiary.opacity(0.05))
-                    .clipShape(.rect(cornerRadius: 6))
                     .contentShape(.rect(cornerRadius: 6))
+                    .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
                     .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
                 .frame(height: 40)
@@ -273,7 +268,6 @@ struct SettingsView: View {
                             .bold()
                             .imageFill(1)
                             .frame(height: 30)
-                            .clipShape(.rect(cornerRadius: 6))
                             .contentShape(.rect(cornerRadius: 6))
                             .overlay(Color.accentColor, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
@@ -302,7 +296,6 @@ struct SettingsView: View {
                                 .bold()
                                 .imageFill(1)
                                 .frame(height: 30)
-                                .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
                                 .overlay(Color.accentColor, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                         }
@@ -313,8 +306,7 @@ struct SettingsView: View {
                 }
             }
             .padding(.horizontal, 15)
-            .background(.quinary)
-            .clipShape(.rect(cornerRadius: 6))
+            .background(.quinary, in: .rect(cornerRadius: 6))
             .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
 
             VStack(spacing: 0) {
@@ -366,9 +358,8 @@ struct SettingsView: View {
                     .pickerStyle(.menu)
                     .buttonStyle(.accessoryBar)
                     .controlSize(.large)
-                    .background(.tertiary.opacity(0.05))
-                    .clipShape(.rect(cornerRadius: 6))
                     .contentShape(.rect(cornerRadius: 6))
+                    .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
                     .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
                 .frame(height: 40)
@@ -378,8 +369,7 @@ struct SettingsView: View {
                 }
             }
             .padding(.horizontal, 15)
-            .background(.quinary)
-            .clipShape(.rect(cornerRadius: 6))
+            .background(.quinary, in: .rect(cornerRadius: 6))
             .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
         }
         .padding(25)

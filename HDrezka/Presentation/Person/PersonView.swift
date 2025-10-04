@@ -106,8 +106,8 @@ struct PersonView: View {
                     }
                     .imageFill(2 / 3)
                     .frame(width: 250)
-                    .clipShape(.rect(cornerRadius: 6))
                     .contentShape(.rect(cornerRadius: 6))
+                    .clipShape(.rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
 
@@ -183,8 +183,7 @@ struct PersonView: View {
                             }
                         }
                         .padding(.horizontal, 10)
-                        .background(.quinary)
-                        .clipShape(.rect(cornerRadius: 6))
+                        .background(.quinary, in: .rect(cornerRadius: 6))
                         .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
                 }

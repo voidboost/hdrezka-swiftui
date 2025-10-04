@@ -188,8 +188,8 @@ struct DetailsView: View {
                             }
                             .imageFill(2 / 3)
                             .frame(width: 300)
-                            .clipShape(.rect(cornerRadius: 6))
                             .contentShape(.rect(cornerRadius: 6))
+                            .clipShape(.rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
 
@@ -218,11 +218,10 @@ struct DetailsView: View {
                                             .padding(.horizontal, 14)
                                             .padding(.vertical, 7)
                                             .lineLimit(1)
+                                            .contentShape(.capsule)
+                                            .background(Color.accentColor, in: .capsule)
                                     }
                                     .buttonStyle(.plain)
-                                    .background(Color.accentColor)
-                                    .clipShape(.capsule)
-                                    .contentShape(.capsule)
                                     .sheet(isPresented: $isPlayPresented) {
                                         WatchSheetView(id: details.movieId)
                                     }
@@ -237,12 +236,11 @@ struct DetailsView: View {
                                                 .padding(.horizontal, 14)
                                                 .padding(.vertical, 7)
                                                 .lineLimit(1)
+                                                .contentShape(.capsule)
+                                                .background(.tertiary.opacity(0.05), in: .capsule)
+                                                .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                                         }
                                         .buttonStyle(.plain)
-                                        .background(.tertiary.opacity(0.05))
-                                        .clipShape(.capsule)
-                                        .contentShape(.capsule)
-                                        .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                                         .sheet(isPresented: $isDownloadPresented) {
                                             DownloadSheetView(id: details.movieId)
                                         }
@@ -258,12 +256,11 @@ struct DetailsView: View {
                                                 .padding(.horizontal, 14)
                                                 .padding(.vertical, 7)
                                                 .lineLimit(1)
+                                                .contentShape(.capsule)
+                                                .background(.tertiary.opacity(0.05), in: .capsule)
+                                                .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                                         }
                                         .buttonStyle(.plain)
-                                        .background(.tertiary.opacity(0.05))
-                                        .clipShape(.capsule)
-                                        .contentShape(.capsule)
-                                        .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                                         .sheet(isPresented: $isOpenExternalPlayerPresented) {
                                             OpenExternalPlayerSheetView(id: details.movieId)
                                         }
@@ -275,10 +272,9 @@ struct DetailsView: View {
                                             .foregroundStyle(.white)
                                             .padding(.horizontal, 14)
                                             .padding(.vertical, 7)
+                                            .background(Color.accentColor, in: .capsule)
                                     }
                                     .buttonStyle(.plain)
-                                    .background(Color.accentColor)
-                                    .clipShape(.capsule)
                                     .disabled(true)
                                 } else {
                                     Button {} label: {
@@ -287,10 +283,9 @@ struct DetailsView: View {
                                             .foregroundStyle(.white)
                                             .padding(.horizontal, 14)
                                             .padding(.vertical, 7)
+                                            .background(Color.accentColor, in: .capsule)
                                     }
                                     .buttonStyle(.plain)
-                                    .background(Color.accentColor)
-                                    .clipShape(.capsule)
                                     .disabled(true)
                                 }
                             }
@@ -393,8 +388,7 @@ struct DetailsView: View {
                                     }
                                 }
                                 .padding(.horizontal, 10)
-                                .background(.quinary)
-                                .clipShape(.rect(cornerRadius: 6))
+                                .background(.quinary, in: .rect(cornerRadius: 6))
                                 .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                             }
                         }
@@ -531,8 +525,8 @@ struct DetailsView: View {
                     }
                     .aspectRatio(16 / 9, contentMode: .fit)
                     .frame(maxWidth: .infinity)
-                    .clipShape(.rect(cornerRadius: 6))
                     .contentShape(.rect(cornerRadius: 6))
+                    .clipShape(.rect(cornerRadius: 6))
                     .onScrollVisibilityChange { isVisible in
                         if !isVisible, trailer.isPlaying {
                             Task {
@@ -572,8 +566,7 @@ struct DetailsView: View {
                                                             .foregroundStyle(.white)
                                                     }
                                                     .frame(width: 19, height: 19)
-                                                    .background(LinearGradient(colors: [.secondary.opacity(colorScheme == .dark ? 1 : 0.5), .secondary.opacity(colorScheme == .dark ? 0.5 : 1)], startPoint: .top, endPoint: .bottom))
-                                                    .clipShape(.rect(cornerRadius: 6))
+                                                    .background(LinearGradient(colors: [.secondary.opacity(colorScheme == .dark ? 1 : 0.5), .secondary.opacity(colorScheme == .dark ? 0.5 : 1)], startPoint: .top, endPoint: .bottom), in: .rect(cornerRadius: 6))
                                                 }
                                                 .frame(width: 24, height: 24)
 
@@ -611,8 +604,7 @@ struct DetailsView: View {
                                                         .foregroundStyle(.white)
                                                 }
                                                 .frame(width: 19, height: 19)
-                                                .background(LinearGradient(colors: [Color.accentColor.opacity(colorScheme == .dark ? 1 : 0.5), Color.accentColor.opacity(colorScheme == .dark ? 0.5 : 1)], startPoint: .top, endPoint: .bottom))
-                                                .clipShape(.rect(cornerRadius: 6))
+                                                .background(LinearGradient(colors: [Color.accentColor.opacity(colorScheme == .dark ? 1 : 0.5), Color.accentColor.opacity(colorScheme == .dark ? 0.5 : 1)], startPoint: .top, endPoint: .bottom), in: .rect(cornerRadius: 6))
                                             }
                                             .frame(width: 24, height: 24)
 
@@ -664,8 +656,7 @@ struct DetailsView: View {
                                 }
                             }
                             .padding(.horizontal, 10)
-                            .background(.quinary)
-                            .clipShape(.rect(cornerRadius: 6))
+                            .background(.quinary, in: .rect(cornerRadius: 6))
                             .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                         }
                     }
@@ -733,8 +724,7 @@ struct DetailsView: View {
                                     }
                                 }
                                 .padding(.horizontal, 10)
-                                .background(.quinary)
-                                .clipShape(.rect(cornerRadius: 6))
+                                .background(.quinary, in: .rect(cornerRadius: 6))
                                 .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                             }
                         }

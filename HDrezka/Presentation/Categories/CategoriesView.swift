@@ -146,9 +146,8 @@ struct CategoriesView: View {
                                 .frame(height: 28)
                                 .frame(maxWidth: .infinity)
                                 .padding(.horizontal, 16)
-                                .background(.tertiary.opacity(0.05))
-                                .clipShape(.rect(cornerRadius: 6))
                                 .contentShape(.rect(cornerRadius: 6))
+                                .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
                                 .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                         }
                         .buttonStyle(.plain)
@@ -169,9 +168,8 @@ struct CategoriesView: View {
                     .buttonStyle(.accessoryBar)
                     .controlSize(.large)
                     .frame(height: 28)
-                    .background(.tertiary.opacity(0.05))
-                    .clipShape(.rect(cornerRadius: 6))
                     .contentShape(.rect(cornerRadius: 6))
+                    .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
                     .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
 
                     Picker("key.categories", selection: $bestYear) {
@@ -185,9 +183,8 @@ struct CategoriesView: View {
                     .buttonStyle(.accessoryBar)
                     .controlSize(.large)
                     .frame(height: 28)
-                    .background(.tertiary.opacity(0.05))
-                    .clipShape(.rect(cornerRadius: 6))
                     .contentShape(.rect(cornerRadius: 6))
+                    .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
                     .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
 
                     Button {
@@ -197,17 +194,15 @@ struct CategoriesView: View {
                             .font(.system(size: 13))
                             .frame(height: 28)
                             .padding(.horizontal, 16)
-                            .background(.tertiary.opacity(0.05))
-                            .clipShape(.rect(cornerRadius: 6))
                             .contentShape(.rect(cornerRadius: 6))
+                            .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
                             .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
                     .buttonStyle(.plain)
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 16)
-                .background(.tertiary.opacity(0.05))
-                .clipShape(.rect(cornerRadius: 6))
+                .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
                 .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
             }
         }

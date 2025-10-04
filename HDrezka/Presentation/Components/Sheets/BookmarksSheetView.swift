@@ -160,8 +160,7 @@ struct BookmarksSheetView: View {
                         .scrollIndicators(.never)
                         .frame(maxWidth: .infinity)
                         .frame(height: scrollViewContentSize.height > 140 ? 140 : scrollViewContentSize.height)
-                        .background(.quinary)
-                        .clipShape(.rect(cornerRadius: 6))
+                        .background(.quinary, in: .rect(cornerRadius: 6))
                         .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
                 } else {
@@ -176,9 +175,8 @@ struct BookmarksSheetView: View {
                 } label: {
                     Text("key.create")
                         .frame(width: 250, height: 30)
-                        .background(.quinary.opacity(0.5))
-                        .clipShape(.rect(cornerRadius: 6))
                         .contentShape(.rect(cornerRadius: 6))
+                        .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
 
@@ -187,9 +185,8 @@ struct BookmarksSheetView: View {
                 } label: {
                     Text("key.done")
                         .frame(width: 250, height: 30)
-                        .background(.quinary.opacity(0.5))
-                        .clipShape(.rect(cornerRadius: 6))
                         .contentShape(.rect(cornerRadius: 6))
+                        .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
             }
