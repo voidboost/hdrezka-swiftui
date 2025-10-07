@@ -18,69 +18,66 @@ struct DetailsView: View {
     @State private var isCreateBookmarkPresented = false
     @State private var isSchedulePresented = false
 
-    @State private var showBar: Bool = false
-
     @Default(.isLoggedIn) private var isLoggedIn
     @Default(.mirror) private var mirror
 
     @Environment(AppState.self) private var appState
 
     var body: some View {
-        Group {
-            if let error = viewModel.state.error {
-                ErrorStateView(error, title) {
-                    viewModel.load()
-                }
-                .padding(.vertical, 52)
-                .padding(.horizontal, 36)
-            } else if let details = viewModel.state.data {
-                ScrollView(.vertical) {
-                    LazyVStack(alignment: .leading, spacing: 18) {
-                        DetailsViewComponent(details: details, trailer: viewModel.trailer, isSchedulePresented: $isSchedulePresented)
+        GeometryReader { geometry in
+            ScrollView(.vertical) {
+                LazyVStack(alignment: .leading, spacing: 18) {
+                    if let details = viewModel.state.data {
+                        DetailsViewComponent(details: details, trailer: viewModel.trailer, topSafeAreaInset: geometry.safeAreaInsets.top, isSchedulePresented: $isSchedulePresented)
                             .environment(viewModel)
                     }
                 }
-                .scrollIndicators(.never)
-                .onScrollGeometryChange(for: Bool.self) { geometry in
-                    geometry.contentOffset.y >= 52
-                } action: { _, showBar in
-                    withAnimation(.easeInOut(duration: 0.15)) {
-                        self.showBar = showBar
+            }
+            .scrollIndicators(.visible, axes: .vertical)
+            .ignoresSafeArea(edges: .top)
+            .contentMargins(.top, geometry.safeAreaInsets.top, for: .scrollIndicators)
+            .overlay {
+                if let error = viewModel.state.error {
+                    ErrorStateView(error) {
+                        viewModel.load()
                     }
-                }
-            } else {
-                LoadingStateView(title)
-                    .padding(.vertical, 52)
+                    .padding(.vertical, 18)
                     .padding(.horizontal, 36)
+                } else if viewModel.state == .loading {
+                    LoadingStateView()
+                        .padding(.vertical, 18)
+                        .padding(.horizontal, 36)
+                }
             }
         }
-        .navigationBar(title: viewModel.state.data?.nameRussian ?? title ?? "", showBar: showBar, navbar: {
-            if case .data = viewModel.state {
+        .transition(.opacity)
+        .navigationTitle(viewModel.state.data?.nameRussian ?? title ?? "")
+        .toolbar {
+            ToolbarItem(placement: .navigation) {
                 Button {
                     viewModel.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
-                .buttonStyle(NavbarButtonStyle(width: 30, height: 22))
                 .keyboardShortcut("r", modifiers: .command)
+                .disabled(viewModel.state.data == nil)
             }
-        }, toolbar: {
-            if let details = viewModel.state.data {
+
+            ToolbarItemGroup(placement: .primaryAction) {
                 Button {
-                    appState.path.append(.comments(details))
+                    if let details = viewModel.state.data {
+                        appState.append(.comments(details))
+                    }
                 } label: {
                     HStack(alignment: .center, spacing: 4) {
                         Image(systemName: "bubble.left.and.bubble.right")
 
-                        if details.commentsCount > 0 {
+                        if let details = viewModel.state.data, details.commentsCount > 0 {
                             Text(verbatim: "(\(details.commentsCount))")
                         }
                     }
                 }
-                .buttonStyle(NavbarButtonStyle(height: 22, hPadding: 8))
-
-                Divider()
-                    .padding(.vertical, 18)
+                .disabled(viewModel.state.data == nil)
 
                 if isLoggedIn {
                     Button {
@@ -88,18 +85,15 @@ struct DetailsView: View {
                     } label: {
                         Image(systemName: "bookmark")
                     }
-                    .buttonStyle(NavbarButtonStyle(width: 30, height: 22))
-
-                    Divider()
-                        .padding(.vertical, 18)
+                    .disabled(viewModel.state.data == nil)
                 }
 
                 ShareLink(item: (mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: viewModel.id, directoryHint: .notDirectory)) {
                     Image(systemName: "square.and.arrow.up")
                 }
-                .buttonStyle(NavbarButtonStyle(width: 30, height: 22))
+                .disabled(viewModel.state.data == nil)
             }
-        })
+        }
         .task(id: isLoggedIn) {
             switch viewModel.state {
             case .data:
@@ -138,14 +132,16 @@ struct DetailsView: View {
     private struct DetailsViewComponent: View {
         private let details: MovieDetailed
         private let trailer: YouTubePlayer?
+        private let topSafeAreaInset: CGFloat
         @Binding private var isSchedulePresented: Bool
 
         @Environment(AppState.self) private var appState
         @Environment(Downloader.self) private var downloader
 
-        init(details: MovieDetailed, trailer: YouTubePlayer?, isSchedulePresented: Binding<Bool>) {
+        init(details: MovieDetailed, trailer: YouTubePlayer?, topSafeAreaInset: CGFloat, isSchedulePresented: Binding<Bool>) {
             self.details = details
             self.trailer = trailer
+            self.topSafeAreaInset = topSafeAreaInset
             _isSchedulePresented = isSchedulePresented
         }
 
@@ -156,7 +152,6 @@ struct DetailsView: View {
         @State private var franchiseExpanded: Bool = false
 
         @State private var blurHeght: CGFloat = .zero
-        @State private var showImage: Bool = false
 
         @Environment(\.colorScheme) private var colorScheme
         @Environment(\.openWindow) private var openWindow
@@ -398,8 +393,8 @@ struct DetailsView: View {
                 }
                 .onGeometryChange(for: CGFloat.self) { geometry in
                     geometry.size.height
-                } action: { height in
-                    blurHeght = height
+                } action: {
+                    blurHeght = $0
                 }
 
                 if details.imdbRating != nil
@@ -445,10 +440,10 @@ struct DetailsView: View {
             }
             .padding(.horizontal, 36)
             .padding(.top, 18)
-            .padding(.top, 52)
+            .padding(.top, topSafeAreaInset)
             .background {
-                ZStack(alignment: .topLeading) {
-                    if showImage {
+                if #available(macOS 26, *) {
+                    ZStack(alignment: .topLeading) {
                         AsyncImage(url: URL(string: details.poster), transaction: .init(animation: .easeInOut)) { phase in
                             if let image = phase.image {
                                 image.resizable()
@@ -460,46 +455,53 @@ struct DetailsView: View {
                         .frame(maxWidth: .infinity)
                         .frame(height: blurHeght)
                         .clipShape(.rect)
+
+                        VStack {}
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(.ultraThickMaterial)
+
+                        VStack {}
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(.background)
+                            .mask {
+                                LinearGradient(stops: [
+                                    .init(color: .black.opacity(0.3), location: 0.9),
+                                    .init(color: .black, location: 1.0),
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom)
+                            }
                     }
-
-                    VStack {}
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(.ultraThickMaterial)
-//                        .viewModifier { view in
-//                            if let cat = movie.cat {
-//                                view.overlay {
-//                                    HStack {
-//                                        Divider()
-//                                            .background(cat.color.opacity(0.5))
-//
-//                                        Spacer()
-//
-//                                        Divider()
-//                                            .background(cat.color.opacity(0.5))
-//                                    }
-//                                }
-//                            } else {
-//                                view
-//                            }
-//                        }
-
-                    VStack {}
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(.background)
-                        .mask {
-                            LinearGradient(stops: [
-                                .init(color: .black.opacity(0.3), location: 0.9),
-                                .init(color: .black, location: 1.0),
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom)
+                    .backgroundExtensionEffect()
+                } else {
+                    ZStack(alignment: .topLeading) {
+                        AsyncImage(url: URL(string: details.poster), transaction: .init(animation: .easeInOut)) { phase in
+                            if let image = phase.image {
+                                image.resizable()
+                            } else {
+                                Color.gray
+                            }
                         }
-                }
-                .task {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                        withAnimation(.easeInOut) {
-                            showImage = true
-                        }
+                        .scaledToFill()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: blurHeght)
+                        .clipShape(.rect)
+
+                        VStack {}
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(.ultraThickMaterial)
+
+                        VStack {}
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(.background)
+                            .mask {
+                                LinearGradient(stops: [
+                                    .init(color: .black.opacity(0.3), location: 0.9),
+                                    .init(color: .black, location: 1.0),
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom)
+                            }
                     }
                 }
             }
@@ -556,7 +558,7 @@ struct DetailsView: View {
                                 ForEach(franchise.prefix(franchiseExpanded ? franchise.count : 5)) { fr in
                                     if !fr.current {
                                         Button {
-                                            appState.path.append(.details(MovieSimple(movieId: fr.franchiseId, name: fr.name)))
+                                            appState.append(.details(MovieSimple(movieId: fr.franchiseId, name: fr.name)))
                                         } label: {
                                             HStack(alignment: .center, spacing: 4) {
                                                 ZStack(alignment: .center) {
@@ -646,9 +648,8 @@ struct DetailsView: View {
                                         } label: {
                                             Text(franchiseExpanded ? String(localized: "key.hide").lowercased() : String(localized: "key.view_more").lowercased())
                                                 .font(.system(size: 13))
-                                                .highlightOnHover()
                                         }
-                                        .buttonStyle(.plain)
+                                        .buttonStyle(.accessoryBar)
 
                                         Spacer()
                                     }
@@ -714,9 +715,8 @@ struct DetailsView: View {
                                             } label: {
                                                 Text(String(localized: "key.view_more").lowercased())
                                                     .font(.system(size: 13))
-                                                    .highlightOnHover()
                                             }
-                                            .buttonStyle(.plain)
+                                            .buttonStyle(.accessoryBar)
 
                                             Spacer()
                                         }
@@ -752,7 +752,6 @@ struct DetailsView: View {
                 .scrollIndicators(.never)
             }
             .padding(.bottom, 18)
-            .padding(.bottom, 52)
         }
     }
 
@@ -806,7 +805,7 @@ struct DetailsView: View {
                     HStack(alignment: .center, spacing: 0) {
                         ForEach(data.prefix(2)) { item in
                             Button {
-                                appState.path.append(.fromNamed(item))
+                                appState.append(.fromNamed(item))
                             } label: {
                                 if let person = item as? PersonSimple, !person.photo.isEmpty {
                                     PersonTextWithPhoto(person: person)
@@ -862,7 +861,7 @@ struct DetailsView: View {
                                         Button {
                                             isPresented = false
 
-                                            appState.path.append(.fromNamed(item))
+                                            appState.append(.fromNamed(item))
                                         } label: {
                                             if let person = item as? PersonSimple, !person.photo.isEmpty {
                                                 HStack(alignment: .center, spacing: 8) {

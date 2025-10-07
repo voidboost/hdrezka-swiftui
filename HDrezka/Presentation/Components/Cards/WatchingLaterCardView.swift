@@ -14,7 +14,7 @@ struct WatchingLaterCardView: View {
 
     var body: some View {
         Button {
-            appState.path.append(.details(MovieSimple(movieId: movie.watchLaterId, name: movie.name, poster: movie.cover)))
+            appState.append(.details(MovieSimple(movieId: movie.watchLaterId, name: movie.name, poster: movie.cover)))
         } label: {
             VStack(alignment: .leading, spacing: 6) {
                 AsyncImage(url: URL(string: movie.cover), transaction: .init(animation: .easeInOut)) { phase in

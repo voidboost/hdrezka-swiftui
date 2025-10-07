@@ -11,7 +11,7 @@ struct CollectionCardView: View {
 
     var body: some View {
         Button {
-            appState.path.append(.collection(collection))
+            appState.append(.collection(collection))
         } label: {
             VStack {
                 if let poster = collection.poster {

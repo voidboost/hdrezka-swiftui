@@ -14,119 +14,75 @@ struct CommentsView: View {
         viewModel = CommentsViewModel(id: details.movieId, adb: details.adb, type: details.type)
     }
 
-    @State private var showBar: Bool = false
-
     @Default(.isLoggedIn) private var isLoggedIn
 
     var body: some View {
-        Group {
+        ScrollView(.vertical) {
+            LazyVStack(alignment: .leading, spacing: 16) {
+                if let comments = viewModel.state.data, !comments.isEmpty {
+                    if viewModel.reply == nil {
+                        CommentTextArea()
+                    }
+
+                    ForEach(comments) { comment in
+                        CommentsViewComponent(comment: comment)
+                    }
+
+                    if viewModel.paginationState == .loading {
+                        LoadingPaginationStateView()
+                    }
+                }
+            }
+            .scrollTargetLayout()
+            .padding(.vertical, 18)
+            .padding(.horizontal, 36)
+        }
+        .scrollIndicators(.visible, axes: .vertical)
+        .onScrollTargetVisibilityChange(idType: Comment.ID.self) { onScreenComments in
+            if let comments = viewModel.state.data,
+               !comments.isEmpty,
+               let last = comments.last,
+               onScreenComments.contains(where: { $0 == last.id }),
+               viewModel.paginationState == .idle
+            {
+                viewModel.loadMore()
+            }
+        }
+        .environment(viewModel)
+        .overlay {
             if let error = viewModel.state.error {
-                ErrorStateView(error, title) {
+                ErrorStateView(error) {
                     viewModel.load()
                 }
-                .padding(.vertical, 52)
+                .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if let comments = viewModel.state.data {
-                if comments.isEmpty {
-                    ScrollView(.vertical) {
-                        VStack(spacing: 18) {
-                            VStack(alignment: .leading) {
-                                Spacer()
-
-                                Text(title)
-                                    .font(.largeTitle.weight(.semibold))
-                                    .lineLimit(1)
-
-                                Spacer()
-
-                                Divider()
-                            }
-                            .frame(height: 52)
-
-                            CommentTextArea()
-                        }
-                        .padding(.vertical, 52)
+            } else if let comments = viewModel.state.data, comments.isEmpty {
+                ScrollView(.vertical) {
+                    CommentTextArea()
+                        .padding(.vertical, 18)
                         .padding(.horizontal, 36)
-                    }
-                    .scrollIndicators(.never)
-                    .onScrollGeometryChange(for: Bool.self) { geometry in
-                        geometry.contentOffset.y >= 52
-                    } action: { _, showBar in
-                        withAnimation(.easeInOut(duration: 0.15)) {
-                            self.showBar = showBar
-                        }
-                    }
-                    .environment(viewModel)
-                } else {
-                    VStack {
-                        ScrollView(.vertical) {
-                            VStack(spacing: 18) {
-                                VStack(alignment: .leading) {
-                                    Spacer()
-
-                                    Text(title)
-                                        .font(.largeTitle.weight(.semibold))
-                                        .lineLimit(1)
-
-                                    Spacer()
-
-                                    Divider()
-                                }
-                                .frame(height: 52)
-
-                                VStack(spacing: 16) {
-                                    if viewModel.reply == nil {
-                                        CommentTextArea()
-                                    }
-
-                                    LazyVStack(alignment: .leading, spacing: 16) {
-                                        ForEach(comments) { comment in
-                                            CommentsViewComponent(comment: comment)
-                                        }
-                                    }
-                                    .scrollTargetLayout()
-                                }
-                            }
-                            .padding(.vertical, 52)
-                            .padding(.horizontal, 36)
-                        }
-                        .scrollIndicators(.never)
-                        .onScrollGeometryChange(for: Bool.self) { geometry in
-                            geometry.contentOffset.y >= 52
-                        } action: { _, showBar in
-                            withAnimation(.easeInOut(duration: 0.15)) {
-                                self.showBar = showBar
-                            }
-                        }
-                        .onScrollTargetVisibilityChange(idType: Comment.ID.self) { onScreenComments in
-                            if let last = comments.last, onScreenComments.contains(where: { $0 == last.id }), viewModel.paginationState == .idle {
-                                viewModel.loadMore()
-                            }
-                        }
-                        .environment(viewModel)
-
-                        if viewModel.paginationState == .loading {
-                            LoadingPaginationStateView()
-                        }
-                    }
                 }
-            } else {
-                LoadingStateView(title)
-                    .padding(.vertical, 52)
+                .scrollIndicators(.visible, axes: .vertical)
+                .environment(viewModel)
+            } else if viewModel.state == .loading {
+                LoadingStateView()
+                    .padding(.vertical, 18)
                     .padding(.horizontal, 36)
             }
         }
-        .navigationBar(title: title, showBar: showBar, navbar: {
-            if let comments = viewModel.state.data, !comments.isEmpty {
+        .transition(.opacity)
+        .navigationTitle(title)
+        .toolbar {
+            ToolbarItem(placement: .navigation) {
                 Button {
                     viewModel.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
-                .buttonStyle(NavbarButtonStyle(width: 30, height: 22))
                 .keyboardShortcut("r", modifiers: .command)
+                .disabled(viewModel.state.data?.isEmpty != false)
             }
-        })
+        }
         .task(id: isLoggedIn) {
             switch viewModel.state {
             case .data:
@@ -459,7 +415,7 @@ struct CommentsView: View {
 
                         return .handled
                     } else if !url.path().isEmpty, String(url.path().dropFirst()).id != nil {
-                        appState.path.append(.details(.init(movieId: String(url.path().dropFirst()))))
+                        appState.append(.details(.init(movieId: String(url.path().dropFirst()))))
 
                         return .handled
                     }

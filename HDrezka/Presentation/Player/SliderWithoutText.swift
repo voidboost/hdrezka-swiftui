@@ -32,7 +32,7 @@ struct SliderWithoutText<T: BinaryFloatingPoint>: View {
     }
 
     var body: some View {
-        GeometryReader { bounds in
+        GeometryReader { geometry in
             ZStack(alignment: .center) {
                 ZStack(alignment: .center) {
                     emptyColor
@@ -40,7 +40,7 @@ struct SliderWithoutText<T: BinaryFloatingPoint>: View {
                         .mask {
                             HStack {
                                 Color.black
-                                    .frame(width: max(bounds.size.width * CGFloat(localRealProgress + localTempProgress), 0), alignment: .leading)
+                                    .frame(width: max(geometry.size.width * CGFloat(localRealProgress + localTempProgress), 0), alignment: .leading)
                                 Spacer(minLength: 0)
                             }
                         }
@@ -55,7 +55,7 @@ struct SliderWithoutText<T: BinaryFloatingPoint>: View {
                             state = true
                         }
                         .onChanged { gesture in
-                            localRealProgress = max(min(T(gesture.location.x / bounds.size.width), 1), 0)
+                            localRealProgress = max(min(T(gesture.location.x / geometry.size.width), 1), 0)
                             value = max(min(getPrgValue(), inRange.upperBound), inRange.lowerBound)
                         }.onEnded { _ in
                             localRealProgress = max(min(localRealProgress + localTempProgress, 1), 0)
@@ -63,7 +63,7 @@ struct SliderWithoutText<T: BinaryFloatingPoint>: View {
                         },
                 )
             }
-            .frame(width: bounds.size.width, height: bounds.size.height)
+            .frame(width: geometry.size.width, height: geometry.size.height)
             .onChange(of: isActive) {
                 value = max(min(getPrgValue(), inRange.upperBound), inRange.lowerBound)
                 onEditingChanged(isActive)

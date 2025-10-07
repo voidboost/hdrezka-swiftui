@@ -21,15 +21,15 @@ struct SearchView: View {
     var body: some View {
         Group {
             if let error = viewModel.state.error {
-                ErrorStateView(error, viewModel.title) {
+                ErrorStateView(error) {
                     viewModel.load(query: searchText.trim())
                 }
-                .padding(.vertical, 52)
+                .padding(.vertical, 18)
                 .padding(.horizontal, 36)
             } else if let movies = viewModel.state.data {
                 if movies.isEmpty {
-                    EmptyStateView(String(localized: "key.nothing_found"), viewModel.title, String(localized: "key.search.empty"))
-                        .padding(.vertical, 52)
+                    EmptyStateView(String(localized: "key.nothing_found"), String(localized: "key.search.empty"))
+                        .padding(.vertical, 18)
                         .padding(.horizontal, 36)
                 } else {
                     VStack {
@@ -55,7 +55,7 @@ struct SearchView: View {
                                 }
                                 .scrollTargetLayout()
                             }
-                            .padding(.vertical, 52)
+                            .padding(.vertical, 18)
                             .padding(.horizontal, 36)
                         }
                         .scrollIndicators(.never)
@@ -78,8 +78,8 @@ struct SearchView: View {
                     }
                 }
             } else {
-                LoadingStateView(viewModel.title)
-                    .padding(.vertical, 52)
+                LoadingStateView()
+                    .padding(.vertical, 18)
                     .padding(.horizontal, 36)
             }
         }

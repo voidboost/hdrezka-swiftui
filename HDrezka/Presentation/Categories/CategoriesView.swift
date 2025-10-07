@@ -7,82 +7,59 @@ struct CategoriesView: View {
 
     @State private var viewModel = CategoriesViewModel()
 
-    @State private var showBar: Bool = false
-
     @Default(.isLoggedIn) private var isLoggedIn
 
     var body: some View {
-        Group {
-            if let error = viewModel.state.error {
-                ErrorStateView(error, title) {
-                    viewModel.load()
-                }
-                .padding(.vertical, 52)
-                .padding(.horizontal, 36)
-            } else if let types = viewModel.state.data {
-                if types.isEmpty {
-                    EmptyStateView(String(localized: "key.categories.empty"), title) {
-                        viewModel.load()
-                    }
-                    .padding(.vertical, 52)
-                    .padding(.horizontal, 36)
-                } else {
-                    ScrollView(.vertical) {
-                        VStack(spacing: 18) {
-                            VStack(alignment: .leading) {
-                                Spacer()
+        ScrollView(.vertical) {
+            LazyVStack(alignment: .leading, spacing: 18) {
+                if let types = viewModel.state.data, !types.isEmpty {
+                    ForEach(types) { type in
+                        if let typeView = TypeView(type: type) {
+                            typeView
 
-                                Text(title)
-                                    .font(.largeTitle.weight(.semibold))
-                                    .lineLimit(1)
-
-                                Spacer()
-
+                            if type != types.last {
                                 Divider()
                             }
-                            .frame(height: 52)
-
-                            LazyVStack(alignment: .leading, spacing: 18) {
-                                ForEach(types) { type in
-                                    if let typeView = TypeView(type: type) {
-                                        typeView
-
-                                        if type != types.last {
-                                            Divider()
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        .padding(.vertical, 52)
-                        .padding(.horizontal, 36)
-                    }
-                    .scrollIndicators(.never)
-                    .onScrollGeometryChange(for: Bool.self) { geometry in
-                        geometry.contentOffset.y >= 52
-                    } action: { _, showBar in
-                        withAnimation(.easeInOut(duration: 0.15)) {
-                            self.showBar = showBar
                         }
                     }
                 }
-            } else {
-                LoadingStateView(title)
-                    .padding(.vertical, 52)
+            }
+            .padding(.vertical, 18)
+            .padding(.horizontal, 36)
+        }
+        .scrollIndicators(.visible, axes: .vertical)
+        .overlay {
+            if let error = viewModel.state.error {
+                ErrorStateView(error) {
+                    viewModel.load()
+                }
+                .padding(.vertical, 18)
+                .padding(.horizontal, 36)
+            } else if let types = viewModel.state.data, types.isEmpty {
+                EmptyStateView(String(localized: "key.categories.empty")) {
+                    viewModel.load()
+                }
+                .padding(.vertical, 18)
+                .padding(.horizontal, 36)
+            } else if viewModel.state == .loading {
+                LoadingStateView()
+                    .padding(.vertical, 18)
                     .padding(.horizontal, 36)
             }
         }
-        .navigationBar(title: title, showBar: showBar, navbar: {
-            if let types = viewModel.state.data, !types.isEmpty {
+        .transition(.opacity)
+        .navigationTitle(title)
+        .toolbar {
+            ToolbarItem(placement: .navigation) {
                 Button {
                     viewModel.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
-                .buttonStyle(NavbarButtonStyle(width: 30, height: 22))
                 .keyboardShortcut("r", modifiers: .command)
+                .disabled(viewModel.state.data?.isEmpty != false)
             }
-        })
+        }
         .task(id: isLoggedIn) {
             switch viewModel.state {
             case .data:
@@ -120,7 +97,7 @@ struct CategoriesView: View {
                     Spacer()
 
                     Button {
-                        appState.path.append(.genre(.init(name: type.name, genreId: type.typeId)))
+                        appState.append(.genre(.init(name: type.name, genreId: type.typeId)))
                     } label: {
                         HStack(alignment: .center) {
                             Text("key.see_all")
@@ -131,15 +108,14 @@ struct CategoriesView: View {
                                 .font(.system(size: 12))
                                 .foregroundStyle(Color.accentColor)
                         }
-                        .highlightOnHover()
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.accessoryBar)
                 }
 
                 HFlow(horizontalAlignment: .leading, verticalAlignment: .center, horizontalSpacing: 6, verticalSpacing: 6, distributeItemsEvenly: true) {
                     ForEach(type.genres) { genre in
                         Button {
-                            appState.path.append(.genre(genre))
+                            appState.append(.genre(genre))
                         } label: {
                             Text(genre.name)
                                 .font(.system(size: 13))
@@ -165,12 +141,6 @@ struct CategoriesView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .frame(height: 28)
-                    .contentShape(.rect(cornerRadius: 6))
-                    .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
-                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
 
                     Picker("key.categories", selection: $bestYear) {
                         ForEach(type.best.years) { year in
@@ -180,25 +150,13 @@ struct CategoriesView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .frame(height: 28)
-                    .contentShape(.rect(cornerRadius: 6))
-                    .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
-                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
 
                     Button {
-                        appState.path.append(.list(.init(name: type.name, listId: bestGenre.genreId + (bestYear.year != 0 ? "\(bestYear.year)/" : ""))))
+                        appState.append(.list(.init(name: type.name, listId: bestGenre.genreId + (bestYear.year != 0 ? "\(bestYear.year)/" : ""))))
                     } label: {
                         Text("key.go")
-                            .font(.system(size: 13))
-                            .frame(height: 28)
-                            .padding(.horizontal, 16)
-                            .contentShape(.rect(cornerRadius: 6))
-                            .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
-                            .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.accessoryBar)
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 16)

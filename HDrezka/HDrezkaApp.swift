@@ -153,7 +153,6 @@ struct HDrezkaApp: App {
         .modelContainer(modelContainer)
         .windowResizability(.contentMinSize)
         .defaultPosition(.center)
-        .windowStyle(.hiddenTitleBar)
         .restorationBehavior(.disabled)
         .commands(content: customCommands)
         .commands(content: removed)

@@ -95,7 +95,7 @@ struct PlayerView: View {
                         setupPlayer(subtitles: subtitles)
                     }
                 }
-                .padding(.vertical, 52)
+                .padding(.vertical, 18)
                 .padding(.horizontal, 36)
             } else if let player = playerLayer.player {
                 CustomAVPlayerView(playerLayer: playerLayer)

@@ -15,7 +15,7 @@ struct CardView: View {
 
     var body: some View {
         Button {
-            appState.path.append(.details(movie))
+            appState.append(.details(movie))
         } label: {
             VStack(alignment: .leading, spacing: 6) {
                 if let poster = movie.poster {

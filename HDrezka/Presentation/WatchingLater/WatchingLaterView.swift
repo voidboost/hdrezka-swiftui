@@ -13,8 +13,6 @@ struct WatchingLaterView: View {
         GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading),
     ]
 
-    @State private var showBar: Bool = false
-
     @Default(.isLoggedIn) private var isLoggedIn
 
     @Environment(\.modelContext) private var modelContext
@@ -22,88 +20,67 @@ struct WatchingLaterView: View {
     @Query private var playerPositions: [PlayerPosition]
 
     var body: some View {
-        Group {
-            if let error = viewModel.state.error {
-                ErrorStateView(error, title) {
-                    viewModel.load()
-                }
-                .padding(.vertical, 52)
-                .padding(.horizontal, 36)
-            } else if let movies = viewModel.state.data {
-                if movies.isEmpty {
-                    EmptyStateView(String(localized: "key.watching_later.empty"), title, String(localized: "key.watching_later.empty.description")) {
-                        viewModel.load()
-                    }
-                    .padding(.vertical, 52)
-                    .padding(.horizontal, 36)
-                } else {
-                    ScrollView(.vertical) {
-                        VStack(spacing: 18) {
-                            VStack(alignment: .leading) {
-                                Spacer()
+        ScrollView(.vertical) {
+            LazyVGrid(columns: columns, alignment: .leading, spacing: 18) {
+                if let movies = viewModel.state.data, !movies.isEmpty {
+                    ForEach(movies) { movie in
+                        WatchingLaterCardView(movie: movie)
+                            .contextMenu {
+                                Button {
+                                    viewModel.switchWatchedItem(movie: movie)
+                                } label: {
+                                    Text(movie.watched ? String(localized: "key.mark.unwatched") : String(localized: "key.mark.watched"))
+                                }
 
-                                Text(title)
-                                    .font(.largeTitle.weight(.semibold))
-                                    .lineLimit(1)
+                                Button {
+                                    viewModel.removeWatchingItem(movie: movie)
 
-                                Spacer()
-
-                                Divider()
-                            }
-                            .frame(height: 52)
-
-                            LazyVGrid(columns: columns, alignment: .leading, spacing: 18) {
-                                ForEach(movies) { movie in
-                                    WatchingLaterCardView(movie: movie)
-                                        .contextMenu {
-                                            Button {
-                                                viewModel.switchWatchedItem(movie: movie)
-                                            } label: {
-                                                Text(movie.watched ? String(localized: "key.mark.unwatched") : String(localized: "key.mark.watched"))
-                                            }
-
-                                            Button {
-                                                viewModel.removeWatchingItem(movie: movie)
-
-                                                playerPositions
-                                                    .filter { $0.id == movie.watchLaterId.id }
-                                                    .forEach { modelContext.delete($0) }
-                                            } label: {
-                                                Text("key.delete")
-                                            }
-                                        }
+                                    playerPositions
+                                        .filter { $0.id == movie.watchLaterId.id }
+                                        .forEach { modelContext.delete($0) }
+                                } label: {
+                                    Text("key.delete")
                                 }
                             }
-                        }
-                        .padding(.vertical, 52)
-                        .padding(.horizontal, 36)
-                    }
-                    .scrollIndicators(.never)
-                    .onScrollGeometryChange(for: Bool.self) { geometry in
-                        geometry.contentOffset.y >= 52
-                    } action: { _, showBar in
-                        withAnimation(.easeInOut(duration: 0.15)) {
-                            self.showBar = showBar
-                        }
                     }
                 }
-            } else {
-                LoadingStateView(title)
-                    .padding(.vertical, 52)
+            }
+            .padding(.vertical, 18)
+            .padding(.horizontal, 36)
+        }
+        .scrollIndicators(.visible, axes: .vertical)
+        .overlay {
+            if let error = viewModel.state.error {
+                ErrorStateView(error) {
+                    viewModel.load()
+                }
+                .padding(.vertical, 18)
+                .padding(.horizontal, 36)
+            } else if let movies = viewModel.state.data, movies.isEmpty {
+                EmptyStateView(String(localized: "key.watching_later.empty"), String(localized: "key.watching_later.empty.description")) {
+                    viewModel.load()
+                }
+                .padding(.vertical, 18)
+                .padding(.horizontal, 36)
+            } else if viewModel.state == .loading {
+                LoadingStateView()
+                    .padding(.vertical, 18)
                     .padding(.horizontal, 36)
             }
         }
-        .navigationBar(title: title, showBar: showBar, navbar: {
-            if let movies = viewModel.state.data, !movies.isEmpty {
+        .transition(.opacity)
+        .navigationTitle(title)
+        .toolbar {
+            ToolbarItem(placement: .navigation) {
                 Button {
                     viewModel.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
-                .buttonStyle(NavbarButtonStyle(width: 30, height: 22))
                 .keyboardShortcut("r", modifiers: .command)
+                .disabled(viewModel.state.data?.isEmpty != false)
             }
-        })
+        }
         .task(id: isLoggedIn) {
             switch viewModel.state {
             case .data:
