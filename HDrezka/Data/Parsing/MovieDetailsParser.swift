@@ -220,12 +220,11 @@ private extension Elements {
     }
 
     func getDetailsImdbLink() throws -> String? {
-        guard let base64 = try last()?.select(".b-post__info_rates.imdb a").first()?.attr("href").reversed().drop(while: { $0 == "/" }).reversed()
-        else {
+        guard let base64 = try last()?.select(".b-post__info_rates.imdb a").first()?.attr("href").substringBeforeLast("/").substringAfterLast("/") else {
             return nil
         }
 
-        return try String(String(base64).suffix(from: String(base64).range(of: "/help/", options: .backwards).orThrow().upperBound)).base64Decoded.removingPercentEncoding
+        return base64.base64Decoded.removingPercentEncoding
     }
 
     func getDetailsImdbRating() throws -> Float? {
@@ -237,12 +236,11 @@ private extension Elements {
     }
 
     func getDetailsKpLink() throws -> String? {
-        guard let base64 = try last()?.select(".b-post__info_rates.kp a").first()?.attr("href").reversed().drop(while: { $0 == "/" }).reversed()
-        else {
+        guard let base64 = try last()?.select(".b-post__info_rates.kp a").first()?.attr("href").substringBeforeLast("/").substringAfterLast("/") else {
             return nil
         }
 
-        return try String(String(base64).suffix(from: String(base64).range(of: "/help/", options: .backwards).orThrow().upperBound)).base64Decoded.removingPercentEncoding
+        return base64.base64Decoded.removingPercentEncoding
     }
 
     func getDetailsKpRating() throws -> Float? {
@@ -254,12 +252,11 @@ private extension Elements {
     }
 
     func getDetailsWaLink() throws -> String? {
-        guard let base64 = try last()?.select(".b-post__info_rates.wa a").first()?.attr("href").reversed().drop(while: { $0 == "/" }).reversed()
-        else {
+        guard let base64 = try last()?.select(".b-post__info_rates.wa a").first()?.attr("href").substringBeforeLast("/").substringAfterLast("/") else {
             return nil
         }
 
-        return try String(String(base64).suffix(from: String(base64).range(of: "/help/", options: .backwards).orThrow().upperBound)).base64Decoded.removingPercentEncoding
+        return base64.base64Decoded.removingPercentEncoding
     }
 
     func getDetailsWaRating() throws -> Float? {
@@ -556,7 +553,7 @@ private extension Document {
 
     func getBookmarks() throws -> [Bookmark] {
         try select("#user-favorites-list .hd-label-row").map {
-            let name = try $0.select("label").text().components(separatedBy: "(").filter { !$0.isEmpty }.dropLast().joined(separator: "(")
+            let name = try $0.select("label").text().substringBeforeLast("(").trim()
             let id = try Int($0.select("input").attr("value")).orThrow()
             let count = try Int($0.select("small b").text()).orThrow()
             let isChecked = try $0.select("input").hasAttr("checked")
@@ -797,12 +794,11 @@ private extension String {
         let streams = decrypt(encrypted: url)
 
         let videoMap = try streams.components(separatedBy: ",").filter { !$0.isEmpty }.reduce(into: OrderedDictionary<String, URL?>()) { videoMap, stream in
-            let video = stream.replacingOccurrences(of: "[", with: "").trim()
-            let name = try SwiftSoup.parse(video.components(separatedBy: "]").filter { !$0.isEmpty }.first.orThrow()).text()
-            let videos = video[(video.lastIndex(of: "]") ?? video.startIndex)...].dropFirst().components(separatedBy: " or ").filter { !$0.isEmpty }
-            let link = videos.first?.components(separatedBy: ":hls:manifest.m3u8").filter { !$0.isEmpty }.first
+            let name = try SwiftSoup.parse(stream.substringAfter("[").substringBefore("]")).text()
+            let videos = stream.substringAfter("]").components(separatedBy: " or ").filter { !$0.isEmpty }
+            let link = videos.first?.substringBeforeLast(".mp4", includeSeparator: true)
 
-            let url: URL? = if let link, link != "null" {
+            let url: URL? = if let link, !link.isEmpty, link != "null" {
                 URL(string: link)
             } else {
                 nil

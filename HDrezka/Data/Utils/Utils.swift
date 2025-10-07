@@ -115,6 +115,54 @@ extension String {
             self
         }
     }
+
+    func substringBefore(_ separator: String, includeSeparator: Bool = false) -> String {
+        if let range = range(of: separator) {
+            if includeSeparator {
+                String(self[..<range.upperBound])
+            } else {
+                String(self[..<range.lowerBound])
+            }
+        } else {
+            self
+        }
+    }
+
+    func substringBeforeLast(_ separator: String, includeSeparator: Bool = false) -> String {
+        if let range = range(of: separator, options: .backwards) {
+            if includeSeparator {
+                String(self[..<range.upperBound])
+            } else {
+                String(self[..<range.lowerBound])
+            }
+        } else {
+            self
+        }
+    }
+
+    func substringAfter(_ separator: String, includeSeparator: Bool = false) -> String {
+        if let range = range(of: separator) {
+            if includeSeparator {
+                String(self[range.lowerBound...])
+            } else {
+                String(self[range.upperBound...])
+            }
+        } else {
+            self
+        }
+    }
+
+    func substringAfterLast(_ separator: String, includeSeparator: Bool = false) -> String {
+        if let range = range(of: separator, options: .backwards) {
+            if includeSeparator {
+                String(self[range.lowerBound...])
+            } else {
+                String(self[range.upperBound...])
+            }
+        } else {
+            self
+        }
+    }
 }
 
 extension Optional {
