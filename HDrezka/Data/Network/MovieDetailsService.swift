@@ -45,7 +45,7 @@ extension MovieDetailsService: URLRequestConvertible {
                 "ajax/get_cdn_series/"
             }
         case let .getMovieThumbnails(path):
-            String(path.reversed().drop(while: { $0 != "/" }).reversed().dropFirst())
+            path.substringBeforeLast("/", includeSeparator: true).substringAfter("/")
         case .getComments:
             "ajax/get_comments/"
         case .toggleCommentLike:
