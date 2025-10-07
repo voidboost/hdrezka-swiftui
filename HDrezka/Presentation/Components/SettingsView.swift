@@ -88,7 +88,7 @@ struct SettingsView: View {
                     } label: {
                         Image(systemName: "gobackward")
                     }
-                    .buttonStyle(NavbarButtonStyle(width: 22, height: 22))
+                    .buttonStyle(.accessoryBar)
                 }
                 .padding(.horizontal, 15)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
