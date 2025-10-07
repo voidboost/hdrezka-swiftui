@@ -101,7 +101,6 @@ struct ListView: View {
                             }
                         }
                         .pickerStyle(.menu)
-                        .controlSize(.large)
                         .disabled(viewModel.state == .loading)
                     }
 
@@ -112,7 +111,6 @@ struct ListView: View {
                             }
                         }
                         .pickerStyle(.menu)
-                        .controlSize(.large)
                         .disabled(viewModel.state == .loading)
                     }
 
@@ -123,7 +121,6 @@ struct ListView: View {
                             }
                         }
                         .pickerStyle(.menu)
-                        .controlSize(.large)
                         .disabled(viewModel.state == .loading)
                     }
                 }

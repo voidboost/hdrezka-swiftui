@@ -6,7 +6,7 @@ import SwiftUI
 class SearchViewModel {
     @ObservationIgnored @LazyInjected(\.searchUseCase) private var searchUseCase
 
-    private(set) var state: DataState<[MovieSimple]> = .loading
+    private(set) var state: DataState<[MovieSimple]> = .data([])
     private(set) var paginationState: DataPaginationState = .idle
 
     private(set) var title: String = .init(localized: "key.search")
@@ -16,6 +16,8 @@ class SearchViewModel {
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
     @ObservationIgnored private var page = 1
+
+    var query: String = ""
 
     private func getData(query: String, isInitial: Bool = true) {
         searchUseCase(query: query, page: page)
@@ -49,37 +51,61 @@ class SearchViewModel {
             .store(in: &subscriptions)
     }
 
-    func load(query: String) {
+    func load(force: Bool = false) {
         searchWork?.cancel()
 
-        searchWork = DispatchWorkItem {
-            self.paginationState = .idle
-            self.page = 1
-            self.subscriptions.flush()
+        if force {
+            paginationState = .idle
+            page = 1
+            subscriptions.flush()
 
-            if !query.isEmpty {
-                self.state = .loading
-                self.title = .init(localized: "key.search.result-\(query)")
+            if !query.trim().isEmpty {
+                withAnimation(.easeInOut) {
+                    state = .loading
+                    title = .init(localized: "key.search.result-\(query.trim())")
+                }
 
-                self.getData(query: query)
+                getData(query: query.trim())
             } else {
-                self.title = .init(localized: "key.search")
-                self.state = .data([])
+                withAnimation(.easeInOut) {
+                    title = .init(localized: "key.search")
+                    state = .data([])
+                }
             }
-        }
+        } else {
+            searchWork = DispatchWorkItem {
+                self.paginationState = .idle
+                self.page = 1
+                self.subscriptions.flush()
 
-        if let searchWork {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: searchWork)
+                if !self.query.trim().isEmpty {
+                    withAnimation(.easeInOut) {
+                        self.state = .loading
+                        self.title = .init(localized: "key.search.result-\(self.query.trim())")
+                    }
+
+                    self.getData(query: self.query.trim())
+                } else {
+                    withAnimation(.easeInOut) {
+                        self.title = .init(localized: "key.search")
+                        self.state = .data([])
+                    }
+                }
+            }
+
+            if let searchWork {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: searchWork)
+            }
         }
     }
 
-    func loadMore(query: String) {
+    func loadMore() {
         guard paginationState == .idle, !query.isEmpty else { return }
 
         withAnimation(.easeInOut) {
-            paginationState = .loading
+            self.paginationState = .loading
         }
 
-        getData(query: query, isInitial: false)
+        getData(query: query.trim(), isInitial: false)
     }
 }
