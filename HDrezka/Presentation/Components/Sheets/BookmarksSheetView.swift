@@ -56,9 +56,8 @@ struct BookmarksSheetView: View {
                         } label: {
                             Text("key.retry")
                                 .foregroundStyle(Color.accentColor)
-                                .highlightOnHover()
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.accessoryBar)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if var bookmarks = state.data {
@@ -71,9 +70,8 @@ struct BookmarksSheetView: View {
                             } label: {
                                 Text("key.retry")
                                     .foregroundStyle(Color.accentColor)
-                                    .highlightOnHover()
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(.accessoryBar)
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else {
@@ -134,9 +132,8 @@ struct BookmarksSheetView: View {
                                                     .multilineTextAlignment(.center)
                                                     .contentTransition(.numericText(value: Double(bookmark.count)))
                                             }
-                                            .highlightOnHover()
                                         }
-                                        .buttonStyle(.plain)
+                                        .buttonStyle(.accessoryBar)
                                         .changeEffect(
                                             .rise(origin: UnitPoint(x: 0.5, y: 0.25), layer: .named("rise")) {
                                                 Text(verbatim: bookmarks[index].firstState != true ? "+1" : "-1")

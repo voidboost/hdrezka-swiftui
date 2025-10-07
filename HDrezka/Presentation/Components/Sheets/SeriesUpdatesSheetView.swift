@@ -33,9 +33,8 @@ struct SeriesUpdatesSheetView: View {
                         } label: {
                             Text("key.retry")
                                 .foregroundStyle(Color.accentColor)
-                                .highlightOnHover()
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.accessoryBar)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let seriesUpdates = state.data {
@@ -48,9 +47,8 @@ struct SeriesUpdatesSheetView: View {
                             } label: {
                                 Text("key.retry")
                                     .foregroundStyle(Color.accentColor)
-                                    .highlightOnHover()
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(.accessoryBar)
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else {
@@ -151,7 +149,7 @@ struct SeriesUpdatesSheetView: View {
                             Button {
                                 dismiss()
 
-                                appState.path.append(.details(MovieSimple(movieId: item.seriesId, name: item.seriesName)))
+                                appState.append(.details(MovieSimple(movieId: item.seriesId, name: item.seriesName)))
                             } label: {
                                 HStack(alignment: .center) {
                                     Text(verbatim: "\(item.seriesName) \(item.season)")
@@ -168,9 +166,8 @@ struct SeriesUpdatesSheetView: View {
                                             HStack(spacing: 3) {
                                                 if item.isChosenVoiceActingPremium {
                                                     Image("Premium")
-                                                        .renderingMode(.template)
                                                         .font(.system(size: 11))
-                                                        .foregroundColor(.white.opacity(0.8))
+                                                        .foregroundStyle(.white.opacity(0.8))
                                                 }
 
                                                 Text(item.chosenVoiceActing)
@@ -205,7 +202,7 @@ struct SeriesUpdatesSheetView: View {
                             Button {
                                 dismiss()
 
-                                appState.path.append(.details(MovieSimple(movieId: item.seriesId, name: item.seriesName)))
+                                appState.append(.details(MovieSimple(movieId: item.seriesId, name: item.seriesName)))
                             } label: {
                                 HStack(alignment: .center) {
                                     Text(verbatim: "\(item.seriesName) \(item.season)")
@@ -222,9 +219,8 @@ struct SeriesUpdatesSheetView: View {
                                             HStack(spacing: 3) {
                                                 if item.isChosenVoiceActingPremium {
                                                     Image("Premium")
-                                                        .renderingMode(.template)
                                                         .font(.system(size: 11))
-                                                        .foregroundColor(.white.opacity(0.8))
+                                                        .foregroundStyle(.white.opacity(0.8))
                                                 }
 
                                                 Text(item.chosenVoiceActing)

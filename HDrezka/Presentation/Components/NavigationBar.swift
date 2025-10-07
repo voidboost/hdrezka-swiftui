@@ -42,15 +42,6 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
                     ZStack(alignment: .bottom) {
                         HStack(alignment: .center, spacing: 8) {
                             HStack(alignment: .center, spacing: 5) {
-                                if !appState.path.isEmpty {
-                                    Button {
-                                        backButtonAction()
-                                    } label: {
-                                        Image(systemName: "chevron.left")
-                                    }
-                                    .buttonStyle(NavbarButtonStyle(width: 22, height: 22))
-                                }
-
                                 if let navbar {
                                     navbar
                                 }
@@ -87,16 +78,6 @@ struct NavigationBar<Navbar: View, Toolbar: View>: ViewModifier {
                     Spacer()
                 }
             }
-    }
-
-    private func backButtonAction() {
-        if !appState.path.isEmpty {
-            appState.path.removeLast()
-
-            while !isLoggedIn, appState.path.last == .watchingLater || appState.path.last == .bookmarks {
-                appState.path.removeLast()
-            }
-        }
     }
 }
 

@@ -200,6 +200,7 @@
       }
     },
     "key.account" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -6428,6 +6429,7 @@
       }
     },
     "key.sign_out" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

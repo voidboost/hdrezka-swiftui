@@ -30,145 +30,105 @@ struct ListView: View {
 
     private let columns = [GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading)]
 
-    @State private var showBar: Bool = false
-
     @Default(.isLoggedIn) private var isLoggedIn
 
     var body: some View {
-        Group {
+        ScrollView(.vertical) {
+            LazyVGrid(columns: columns, alignment: .leading, spacing: 18) {
+                if let movies = viewModel.state.data, !movies.isEmpty {
+                    ForEach(movies) { movie in
+                        CardView(movie: movie)
+                    }
+                }
+            }
+            .scrollTargetLayout()
+            .padding(.vertical, 18)
+            .padding(.horizontal, 36)
+
+//            if viewModel.paginationState == .loading {
+//                LoadingPaginationStateView()
+//            }
+        }
+        .scrollIndicators(.visible, axes: .vertical)
+        .onScrollTargetVisibilityChange(idType: MovieSimple.ID.self) { onScreenCards in
+            if let movies = viewModel.state.data,
+               !movies.isEmpty,
+               let last = movies.last,
+               onScreenCards.contains(where: { $0 == last.id }),
+               viewModel.paginationState == .idle
+            {
+                viewModel.loadMore()
+            }
+        }
+        .overlay {
             if let error = viewModel.state.error {
-                ErrorStateView(error, viewModel.title) {
+                ErrorStateView(error) {
                     viewModel.load()
                 }
-                .padding(.vertical, 52)
+                .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if let movies = viewModel.state.data {
-                if movies.isEmpty {
-                    EmptyStateView(String(localized: "key.nothing_found"), viewModel.title, String(localized: "key.filter.empty")) {
-                        viewModel.load()
-                    }
-                    .padding(.vertical, 52)
-                    .padding(.horizontal, 36)
-                } else {
-                    VStack {
-                        ScrollView(.vertical) {
-                            VStack(spacing: 18) {
-                                VStack(alignment: .leading) {
-                                    Spacer()
-
-                                    Text(viewModel.title)
-                                        .font(.largeTitle.weight(.semibold))
-                                        .lineLimit(1)
-
-                                    Spacer()
-
-                                    Divider()
-                                }
-                                .frame(height: 52)
-
-                                LazyVGrid(columns: columns, alignment: .leading, spacing: 18) {
-                                    ForEach(movies) { movie in
-                                        CardView(movie: movie)
-                                    }
-                                }
-                                .scrollTargetLayout()
-                            }
-                            .padding(.vertical, 52)
-                            .padding(.horizontal, 36)
-                        }
-                        .scrollIndicators(.never)
-                        .onScrollGeometryChange(for: Bool.self) { geometry in
-                            geometry.contentOffset.y >= 52
-                        } action: { _, showBar in
-                            withAnimation(.easeInOut(duration: 0.15)) {
-                                self.showBar = showBar
-                            }
-                        }
-                        .onScrollTargetVisibilityChange(idType: MovieSimple.ID.self) { onScreenCards in
-                            if let last = movies.last, onScreenCards.contains(where: { $0 == last.id }), viewModel.paginationState == .idle {
-                                viewModel.loadMore()
-                            }
-                        }
-
-                        if viewModel.paginationState == .loading {
-                            LoadingPaginationStateView()
-                        }
-                    }
+            } else if let movies = viewModel.state.data, movies.isEmpty {
+                EmptyStateView(String(localized: "key.nothing_found"), String(localized: "key.filter.empty")) {
+                    viewModel.load()
                 }
-            } else {
-                LoadingStateView(viewModel.title)
-                    .padding(.vertical, 52)
+                .padding(.vertical, 18)
+                .padding(.horizontal, 36)
+            } else if viewModel.state == .loading {
+                LoadingStateView()
+                    .padding(.vertical, 18)
                     .padding(.horizontal, 36)
             }
         }
-        .navigationBar(title: viewModel.title, showBar: showBar, navbar: {
-            if let movies = viewModel.state.data, !movies.isEmpty {
+        .transition(.opacity)
+        .navigationTitle(viewModel.title)
+        .toolbar {
+            ToolbarItem(placement: .navigation) {
                 Button {
                     viewModel.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
-                .buttonStyle(NavbarButtonStyle(width: 30, height: 22))
                 .keyboardShortcut("r", modifiers: .command)
+                .disabled(viewModel.state.data?.isEmpty != false)
             }
-        }, toolbar: {
-            if viewModel.state != .loading, !viewModel.isCustomMovies, !viewModel.isList {
-                Image(systemName: "line.3.horizontal.decrease.circle")
 
-                if viewModel.isGenre || viewModel.isCollection || viewModel.isCountry {
-                    Picker("key.filter.select", selection: $viewModel.filter) {
-                        ForEach(Filters.allCases) { filter in
-                            Text(filter.rawValue).tag(filter)
+            if !viewModel.isCustomMovies, !viewModel.isList {
+                ToolbarItemGroup(placement: .primaryAction) {
+                    if viewModel.isGenre || viewModel.isCollection || viewModel.isCountry {
+                        Picker("key.filter.select", selection: $viewModel.filter) {
+                            ForEach(Filters.allCases) { filter in
+                                Text(filter.rawValue).tag(filter)
+                            }
                         }
+                        .pickerStyle(.menu)
+                        .controlSize(.large)
+                        .disabled(viewModel.state == .loading)
                     }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .contentShape(.rect(cornerRadius: 6))
-                    .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
-                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
-                }
 
-                if viewModel.isCategory(.newest) {
-                    Picker("key.filter.select", selection: $viewModel.newFilter) {
-                        ForEach(NewFilters.allCases) { filter in
-                            Text(filter.rawValue).tag(filter)
+                    if viewModel.isCategory(.newest) {
+                        Picker("key.filter.select", selection: $viewModel.newFilter) {
+                            ForEach(NewFilters.allCases) { filter in
+                                Text(filter.rawValue).tag(filter)
+                            }
                         }
+                        .pickerStyle(.menu)
+                        .controlSize(.large)
+                        .disabled(viewModel.state == .loading)
                     }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .contentShape(.rect(cornerRadius: 6))
-                    .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
-                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
 
-                    Divider()
-                        .padding(.vertical, 18)
-                }
-
-                if viewModel.isCountry {
-                    Divider()
-                        .padding(.vertical, 18)
-                }
-
-                if viewModel.isCategory || viewModel.isCountry {
-                    Picker("key.genre.select", selection: $viewModel.filterGenre) {
-                        ForEach(Genres.allCases.filter { $0 != .show || !viewModel.isCategory(.hot) }) { genre in
-                            Text(genre.rawValue).tag(genre)
+                    if viewModel.isCategory || viewModel.isCountry {
+                        Picker("key.genre.select", selection: $viewModel.filterGenre) {
+                            ForEach(Genres.allCases.filter { $0 != .show || !viewModel.isCategory(.hot) }) { genre in
+                                Text(genre.rawValue).tag(genre)
+                            }
                         }
+                        .pickerStyle(.menu)
+                        .controlSize(.large)
+                        .disabled(viewModel.state == .loading)
                     }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .contentShape(.rect(cornerRadius: 6))
-                    .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
-                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
             }
-        })
+        }
         .task(id: isLoggedIn) {
             switch viewModel.state {
             case .data:

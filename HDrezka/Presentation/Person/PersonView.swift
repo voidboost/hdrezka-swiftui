@@ -11,59 +11,52 @@ struct PersonView: View {
         viewModel = PersonViewModel(id: person.personId)
     }
 
-    @State private var showBar: Bool = false
-
     @Default(.mirror) private var mirror
     @Default(.isLoggedIn) private var isLoggedIn
 
     var body: some View {
-        Group {
+        ScrollView(.vertical) {
+            LazyVStack(alignment: .leading, spacing: 18) {
+                if let details = viewModel.state.data {
+                    PersonViewComponent(details: details)
+                }
+            }
+            .padding(.vertical, 18)
+        }
+        .scrollIndicators(.visible, axes: .vertical)
+        .overlay {
             if let error = viewModel.state.error {
-                ErrorStateView(error, title) {
+                ErrorStateView(error) {
                     viewModel.load()
                 }
-                .padding(.vertical, 52)
+                .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if let details = viewModel.state.data {
-                ScrollView(.vertical) {
-                    LazyVStack(alignment: .leading, spacing: 18) {
-                        PersonViewComponent(details: details)
-                    }
-                    .padding(.vertical, 52)
+            } else if viewModel.state == .loading {
+                LoadingStateView()
                     .padding(.vertical, 18)
-                }
-                .scrollIndicators(.never)
-                .onScrollGeometryChange(for: Bool.self) { geometry in
-                    geometry.contentOffset.y >= 52
-                } action: { _, showBar in
-                    withAnimation(.easeInOut(duration: 0.15)) {
-                        self.showBar = showBar
-                    }
-                }
-            } else {
-                LoadingStateView(title)
-                    .padding(.vertical, 52)
                     .padding(.horizontal, 36)
             }
         }
-        .navigationBar(title: title, showBar: showBar, navbar: {
-            if case .data = viewModel.state {
+        .transition(.opacity)
+        .navigationTitle(title)
+        .toolbar {
+            ToolbarItem(placement: .navigation) {
                 Button {
                     viewModel.load()
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
-                .buttonStyle(NavbarButtonStyle(width: 30, height: 22))
                 .keyboardShortcut("r", modifiers: .command)
+                .disabled(viewModel.state.data == nil)
             }
-        }, toolbar: {
-            if case .data = viewModel.state {
+
+            ToolbarItem(placement: .primaryAction) {
                 ShareLink(item: (mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: viewModel.id, directoryHint: .notDirectory)) {
                     Image(systemName: "square.and.arrow.up")
                 }
-                .buttonStyle(NavbarButtonStyle(width: 30, height: 22))
+                .disabled(viewModel.state.data == nil)
             }
-        })
+        }
         .task(id: isLoggedIn) {
             switch viewModel.state {
             case .data:
@@ -300,7 +293,7 @@ struct PersonView: View {
 
                     if movies.count > 10 {
                         Button {
-                            appState.path.append(.customList(movies, title))
+                            appState.append(.customList(movies, title))
                         } label: {
                             HStack(alignment: .center) {
                                 Text("key.see_all")
@@ -311,9 +304,8 @@ struct PersonView: View {
                                     .font(.system(size: 12))
                                     .foregroundStyle(Color.accentColor)
                             }
-                            .highlightOnHover()
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.accessoryBar)
                     }
                 }
                 .padding(.horizontal, 36)

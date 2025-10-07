@@ -119,7 +119,6 @@ struct WatchSheetView: View {
                                                         } label: {
                                                             HStack(spacing: 2) {
                                                                 Image("Premium")
-                                                                    .renderingMode(.template)
 
                                                                 Text(acting.name)
                                                             }

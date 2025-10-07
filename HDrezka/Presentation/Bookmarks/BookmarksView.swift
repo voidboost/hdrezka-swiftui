@@ -16,7 +16,75 @@ struct BookmarksView: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
-            Group {
+            List(selection: $viewModel.selectedBookmark) {
+                if let bookmarks = viewModel.bookmarksState.data, !bookmarks.isEmpty {
+                    ForEach(bookmarks) { bookmark in
+                        Text(bookmark.name)
+                            .font(.system(size: 15))
+                            .lineLimit(1)
+                            .badge(
+                                Text(verbatim: "\(bookmark.count)")
+                                    .monospacedDigit()
+                            )
+                            .contentTransition(.numericText(value: Double(bookmark.count)))
+                            .tag(bookmark.bookmarkId)
+                            .padding(7)
+                            .listRowInsets(.init())
+                            .contextMenu {
+                                Button {
+                                    viewModel.renameBookmark = bookmark
+                                } label: {
+                                    Text("key.rename")
+                                }
+
+                                Button {
+                                    viewModel.deleteBookmarksCategory(bookmark: bookmark)
+                                } label: {
+                                    Text("key.delete")
+                                }
+                            }
+                            .viewModifier { view in
+                                if viewModel.selectedBookmark != bookmark.bookmarkId {
+                                    view.dropDestination(for: MovieSimple.self) { movies, _ in
+                                        if !movies.isEmpty, !movies.compactMap(\.movieId.id).isEmpty {
+                                            viewModel.moveBetweenBookmarks(movies: movies, bookmark: bookmark)
+
+                                            return true
+                                        }
+
+                                        return false
+                                    }
+                                } else {
+                                    view
+                                }
+                            }
+                            .swipeActions(edge: .trailing) {
+                                Button {
+                                    viewModel.deleteBookmarksCategory(bookmark: bookmark)
+                                } label: {
+                                    Image(systemName: "trash")
+                                        .font(.system(size: 15))
+                                }
+                                .tint(.accentColor)
+
+                                Button {
+                                    viewModel.renameBookmark = bookmark
+                                } label: {
+                                    Image(systemName: "pencil")
+                                        .font(.system(size: 15))
+                                }
+                                .tint(.secondary)
+                            }
+                    }
+                    .onMove { fromOffsets, toOffset in
+                        viewModel.reorderBookmarksCategories(fromOffsets: fromOffsets, toOffset: toOffset)
+                    }
+                }
+            }
+            .scrollContentBackground(.hidden)
+            .environment(\.defaultMinListRowHeight, 0)
+            .scrollIndicators(.visible, axes: .vertical)
+            .overlay {
                 if let error = viewModel.bookmarksState.error {
                     VStack(alignment: .center, spacing: 8) {
                         Text(error.localizedDescription)
@@ -30,151 +98,108 @@ struct BookmarksView: View {
                             Text("key.retry")
                                 .font(.system(size: 13))
                                 .foregroundStyle(Color.accentColor)
-                                .highlightOnHover()
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.accessoryBar)
                         .keyboardShortcut("r", modifiers: .command)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(.top, 52)
                     .padding(18)
-                } else if let bookmarks = viewModel.bookmarksState.data {
-                    if bookmarks.isEmpty {
-                        VStack(alignment: .center, spacing: 8) {
-                            Text("key.bookmark.empty")
-                                .font(.system(size: 17, weight: .medium))
-                                .lineLimit(nil)
-                                .multilineTextAlignment(.center)
+                } else if let bookmarks = viewModel.bookmarksState.data, bookmarks.isEmpty {
+                    VStack(alignment: .center, spacing: 8) {
+                        Text("key.bookmark.empty")
+                            .font(.system(size: 17, weight: .medium))
+                            .lineLimit(nil)
+                            .multilineTextAlignment(.center)
 
-                            Button {
-                                viewModel.isCreateBookmarkPresented = true
-                            } label: {
-                                Text("key.create")
-                                    .font(.system(size: 13))
-                                    .foregroundStyle(Color.accentColor)
-                                    .highlightOnHover()
-                            }
-                            .buttonStyle(.plain)
-                            .keyboardShortcut("n", modifiers: .command)
-
-                            Button {
-                                viewModel.getBookmarks(reset: true)
-                            } label: {
-                                Text("key.retry")
-                                    .font(.system(size: 13))
-                                    .foregroundStyle(Color.accentColor)
-                                    .highlightOnHover()
-                            }
-                            .buttonStyle(.plain)
-                            .keyboardShortcut("r", modifiers: .command)
+                        Button {
+                            viewModel.isCreateBookmarkPresented = true
+                        } label: {
+                            Text("key.create")
+                                .font(.system(size: 13))
+                                .foregroundStyle(Color.accentColor)
                         }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .padding(.top, 52)
-                        .padding(18)
-                    } else {
-                        List(selection: $viewModel.selectedBookmark) {
-                            ForEach(bookmarks) { bookmark in
-                                Text(bookmark.name)
-                                    .font(.system(size: 15))
-                                    .lineLimit(1)
-                                    .badge(
-                                        Text(verbatim: "\(bookmark.count)")
-                                            .monospacedDigit(),
-                                    )
-                                    .contentTransition(.numericText(value: Double(bookmark.count)))
-                                    .tag(bookmark.bookmarkId)
-                                    .padding(7)
-                                    .listRowInsets(.init())
-                                    .contextMenu {
-                                        Button {
-                                            viewModel.renameBookmark = bookmark
-                                        } label: {
-                                            Text("key.rename")
-                                        }
+                        .buttonStyle(.accessoryBar)
+                        .keyboardShortcut("n", modifiers: .command)
 
-                                        Button {
-                                            viewModel.deleteBookmarksCategory(bookmark: bookmark)
-                                        } label: {
-                                            Text("key.delete")
-                                        }
-                                    }
-                                    .viewModifier { view in
-                                        if viewModel.selectedBookmark != bookmark.bookmarkId {
-                                            view.dropDestination(for: MovieSimple.self) { movies, _ in
-                                                if !movies.isEmpty, !movies.compactMap(\.movieId.id).isEmpty {
-                                                    viewModel.moveBetweenBookmarks(movies: movies, bookmark: bookmark)
-
-                                                    return true
-                                                }
-
-                                                return false
-                                            }
-                                        } else {
-                                            view
-                                        }
-                                    }
-                                    .swipeActions(edge: .trailing) {
-                                        Button {
-                                            viewModel.deleteBookmarksCategory(bookmark: bookmark)
-                                        } label: {
-                                            Image(systemName: "trash")
-                                                .font(.system(size: 15))
-                                        }
-                                        .tint(.accentColor)
-
-                                        Button {
-                                            viewModel.renameBookmark = bookmark
-                                        } label: {
-                                            Image(systemName: "pencil")
-                                                .font(.system(size: 15))
-                                        }
-                                        .tint(.secondary)
-                                    }
-                            }
-                            .onMove { fromOffsets, toOffset in
-                                viewModel.reorderBookmarksCategories(fromOffsets: fromOffsets, toOffset: toOffset)
-                            }
+                        Button {
+                            viewModel.getBookmarks(reset: true)
+                        } label: {
+                            Text("key.retry")
+                                .font(.system(size: 13))
+                                .foregroundStyle(Color.accentColor)
                         }
-                        .scrollContentBackground(.hidden)
-                        .environment(\.defaultMinListRowHeight, 0)
-                        .padding(.top, 52)
-                        .scrollIndicators(.never)
+                        .buttonStyle(.accessoryBar)
+                        .keyboardShortcut("r", modifiers: .command)
                     }
-                } else {
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(18)
+                } else if viewModel.bookmarksState == .loading {
                     ProgressView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .padding(.top, 52)
                         .padding(18)
                 }
             }
             .frame(width: 200)
 
             Divider()
-                .padding(.top, 52)
 
-            if let error = viewModel.bookmarkState.error {
-                VStack(alignment: .center, spacing: 8) {
-                    Text(error.localizedDescription)
-                        .font(.system(size: 20, weight: .medium))
-                        .lineLimit(nil)
-                        .multilineTextAlignment(.center)
-
-                    Button {
-                        viewModel.load()
-                    } label: {
-                        Text("key.retry")
-                            .font(.system(size: 15))
-                            .foregroundStyle(Color.accentColor)
-                            .highlightOnHover()
+            ScrollView(.vertical) {
+                LazyVGrid(columns: columns, alignment: .leading, spacing: 18) {
+                    if let movies = viewModel.bookmarkState.data, !movies.isEmpty {
+                        ForEach(movies) { movie in
+                            CardView(movie: movie, draggable: true)
+                                .contextMenu {
+                                    Button {
+                                        if let movieId = movie.movieId.id {
+                                            viewModel.removeFromBookmarks(movies: [movieId])
+                                        }
+                                    } label: {
+                                        Text("key.delete")
+                                    }
+                                    .disabled(movie.movieId.id == nil)
+                                }
+                        }
                     }
-                    .buttonStyle(.plain)
-                    .keyboardShortcut("r", modifiers: .command)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(.top, 52)
                 .padding(18)
-            } else if let movies = viewModel.bookmarkState.data {
-                if movies.isEmpty {
+                .scrollTargetLayout()
+
+//                if viewModel.paginationState == .loading {
+//                    LoadingPaginationStateView()
+//                }
+            }
+            .scrollIndicators(.visible, axes: .vertical)
+            .onScrollTargetVisibilityChange(idType: MovieSimple.ID.self) { onScreenCards in
+                if let movies = viewModel.bookmarkState.data,
+                   !movies.isEmpty,
+                   let last = movies.last,
+                   onScreenCards.contains(where: { $0 == last.id }),
+                   viewModel.paginationState == .idle
+                {
+                    viewModel.loadMore()
+                }
+            }
+            .overlay {
+                if let error = viewModel.bookmarkState.error {
+                    VStack(alignment: .center, spacing: 8) {
+                        Text(error.localizedDescription)
+                            .font(.system(size: 20, weight: .medium))
+                            .lineLimit(nil)
+                            .multilineTextAlignment(.center)
+
+                        Button {
+                            viewModel.load()
+                        } label: {
+                            Text("key.retry")
+                                .font(.system(size: 15))
+                                .foregroundStyle(Color.accentColor)
+                        }
+                        .buttonStyle(.accessoryBar)
+                        .keyboardShortcut("r", modifiers: .command)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(18)
+                } else if let movies = viewModel.bookmarkState.data, movies.isEmpty {
                     VStack(alignment: .center, spacing: 8) {
                         Text(viewModel.selectedBookmark == -1 ? String(localized: "key.bookmarks.select") : String(localized: "key.bookmarks.empty"))
                             .font(.system(size: 20, weight: .medium))
@@ -188,110 +213,61 @@ struct BookmarksView: View {
                                 Text("key.retry")
                                     .font(.system(size: 15))
                                     .foregroundStyle(Color.accentColor)
-                                    .highlightOnHover()
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(.accessoryBar)
                             .keyboardShortcut("r", modifiers: .command)
                         }
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(.top, 52)
                     .padding(18)
-                } else {
-                    VStack {
-                        ScrollView(.vertical) {
-                            LazyVGrid(columns: columns, alignment: .leading, spacing: 18) {
-                                ForEach(movies) { movie in
-                                    CardView(movie: movie, draggable: true)
-                                        .contextMenu {
-                                            Button {
-                                                if let movieId = movie.movieId.id {
-                                                    viewModel.removeFromBookmarks(movies: [movieId])
-                                                }
-                                            } label: {
-                                                Text("key.delete")
-                                            }
-                                            .disabled(movie.movieId.id == nil)
-                                        }
-                                }
-                            }
-                            .padding(.top, 52)
-                            .padding(18)
-                            .scrollTargetLayout()
-                        }
-                        .scrollIndicators(.never)
-                        .onScrollTargetVisibilityChange(idType: MovieSimple.ID.self) { onScreenCards in
-                            if let last = movies.last, onScreenCards.contains(where: { $0 == last.id }), viewModel.paginationState == .idle {
-                                viewModel.loadMore()
-                            }
-                        }
-
-                        if viewModel.paginationState == .loading {
-                            LoadingPaginationStateView()
-                        }
-                    }
+                } else if viewModel.bookmarkState == .loading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .padding(18)
                 }
-            } else {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(.top, 52)
-                    .padding(18)
             }
         }
-        .navigationBar(title: title, showBar: true, navbar: {
-            if let bookmarks = viewModel.bookmarksState.data, !bookmarks.isEmpty {
-                if !(viewModel.bookmarkState.data?.isEmpty ?? true) || viewModel.selectedBookmark == -1 {
-                    Button {
-                        viewModel.getBookmarks(reset: true)
-                    } label: {
-                        Image(systemName: "arrow.trianglehead.clockwise")
-                    }
-                    .buttonStyle(NavbarButtonStyle(width: 30, height: 22))
-                    .keyboardShortcut("r", modifiers: .command)
+        .transition(.opacity)
+        .navigationTitle(title)
+        .toolbar {
+            ToolbarItemGroup(placement: .navigation) {
+                Button {
+                    viewModel.getBookmarks(reset: true)
+                } label: {
+                    Image(systemName: "arrow.trianglehead.clockwise")
                 }
+                .keyboardShortcut("r", modifiers: .command)
+                .disabled(viewModel.bookmarksState.data?.isEmpty != false || (viewModel.bookmarkState.data?.isEmpty != false && viewModel.selectedBookmark != -1))
 
                 Button {
                     viewModel.isCreateBookmarkPresented = true
                 } label: {
                     Image(systemName: "plus")
                 }
-                .buttonStyle(NavbarButtonStyle(width: 22, height: 22))
                 .keyboardShortcut("n", modifiers: .command)
+                .disabled(viewModel.bookmarksState.data?.isEmpty != false)
             }
-        }, toolbar: {
-            if viewModel.bookmarkState != .loading, viewModel.selectedBookmark != -1 {
-                Image(systemName: "line.3.horizontal.decrease.circle")
 
+            ToolbarItemGroup(placement: .primaryAction) {
                 Picker("key.filter.select", selection: $viewModel.filter) {
                     ForEach(BookmarkFilters.allCases) { filter in
                         Text(filter.rawValue).tag(filter)
                     }
                 }
-                .labelsHidden()
                 .pickerStyle(.menu)
-                .buttonStyle(.accessoryBar)
                 .controlSize(.large)
-                .contentShape(.rect(cornerRadius: 6))
-                .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
-                .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
-
-                Divider()
-                    .padding(.vertical, 18)
+                .disabled(viewModel.bookmarkState == .loading || viewModel.selectedBookmark == -1)
 
                 Picker("key.genre.select", selection: $viewModel.genre) {
                     ForEach(Genres.allCases) { genre in
                         Text(genre.rawValue).tag(genre)
                     }
                 }
-                .labelsHidden()
                 .pickerStyle(.menu)
-                .buttonStyle(.accessoryBar)
                 .controlSize(.large)
-                .contentShape(.rect(cornerRadius: 6))
-                .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
-                .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                .disabled(viewModel.bookmarkState == .loading || viewModel.selectedBookmark == -1)
             }
-        })
+        }
         .onChange(of: viewModel.selectedBookmark) {
             if viewModel.selectedBookmark != -1 {
                 viewModel.load()
