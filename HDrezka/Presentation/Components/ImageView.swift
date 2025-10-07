@@ -31,7 +31,7 @@ struct ImageView: View {
                     ShareLink(item: url) {
                         Image(systemName: "square.and.arrow.up")
                     }
-                    .buttonStyle(NavbarButtonStyle(width: 30, height: 22))
+                    .buttonStyle(.accessoryBar)
                 }
                 .padding(10)
             }
