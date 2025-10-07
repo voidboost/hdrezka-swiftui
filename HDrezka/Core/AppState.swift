@@ -27,7 +27,7 @@ class AppState {
 
 enum Tabs: Hashable, Identifiable, CaseIterable {
     case home
-//    case search
+    case search
     case categories
     case collections
     case watchingLater
@@ -37,8 +37,8 @@ enum Tabs: Hashable, Identifiable, CaseIterable {
         switch self {
         case .home:
             "key.home"
-//        case .search:
-//            "key.search"
+        case .search:
+            "key.search"
         case .categories:
             "key.categories"
         case .collections:
@@ -54,8 +54,8 @@ enum Tabs: Hashable, Identifiable, CaseIterable {
         switch self {
         case .home:
             "house"
-//        case .search:
-//            "magnifyingglass"
+        case .search:
+            "magnifyingglass"
         case .categories:
             "square.grid.2x2"
         case .collections:
@@ -76,10 +76,20 @@ enum Tabs: Hashable, Identifiable, CaseIterable {
         }
     }
 
+    var role: TabRole? {
+        switch self {
+        case .search:
+            .search
+        default:
+            nil
+        }
+    }
+
     @ViewBuilder
     func content() -> some View {
         switch self {
         case .home: HomeTabView()
+        case .search: SearchTabView()
         case .categories: CategoriesTabView()
         case .collections: CollectionsTabView()
         case .watchingLater: WatchingLaterTabView()

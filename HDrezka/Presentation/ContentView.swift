@@ -17,8 +17,6 @@ struct ContentView: View {
 
     @Environment(AppState.self) private var appState
 
-    @State private var query = ""
-
     @State private var showDays = false
 
     @State private var subscriptions: Set<AnyCancellable> = []
@@ -29,7 +27,7 @@ struct ContentView: View {
         TabView(selection: $appState.selectedTab) {
             TabSection {
                 ForEach(Tabs.allCases.filter { !$0.needAccount }) { tab in
-                    Tab(value: tab) {
+                    Tab(value: tab, role: tab.role) {
                         tab.content()
                     } label: {
                         Label {
@@ -46,7 +44,7 @@ struct ContentView: View {
             if isLoggedIn {
                 TabSection {
                     ForEach(Tabs.allCases.filter(\.needAccount)) { tab in
-                        Tab(value: tab) {
+                        Tab(value: tab, role: tab.role) {
                             tab.content()
                         } label: {
                             Label {

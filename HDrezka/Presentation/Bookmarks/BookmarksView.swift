@@ -22,10 +22,7 @@ struct BookmarksView: View {
                         Text(bookmark.name)
                             .font(.system(size: 15))
                             .lineLimit(1)
-                            .badge(
-                                Text(verbatim: "\(bookmark.count)")
-                                    .monospacedDigit()
-                            )
+                            .badge(Text(verbatim: "\(bookmark.count)").monospacedDigit())
                             .contentTransition(.numericText(value: Double(bookmark.count)))
                             .tag(bookmark.bookmarkId)
                             .padding(7)
@@ -255,7 +252,6 @@ struct BookmarksView: View {
                     }
                 }
                 .pickerStyle(.menu)
-                .controlSize(.large)
                 .disabled(viewModel.bookmarkState == .loading || viewModel.selectedBookmark == -1)
 
                 Picker("key.genre.select", selection: $viewModel.genre) {
@@ -264,7 +260,6 @@ struct BookmarksView: View {
                     }
                 }
                 .pickerStyle(.menu)
-                .controlSize(.large)
                 .disabled(viewModel.bookmarkState == .loading || viewModel.selectedBookmark == -1)
             }
         }
