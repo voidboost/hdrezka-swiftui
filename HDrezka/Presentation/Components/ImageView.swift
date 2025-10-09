@@ -30,6 +30,7 @@ struct ImageView: View {
 
                     ShareLink(item: url) {
                         Image(systemName: "square.and.arrow.up")
+                            .foregroundStyle(.primary)
                     }
                     .buttonStyle(.accessoryBar)
                 }
