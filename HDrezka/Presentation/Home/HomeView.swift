@@ -8,8 +8,6 @@ struct HomeView: View {
 
     @Default(.isLoggedIn) private var isLoggedIn
 
-    @Environment(AppState.self) private var appState
-
     var body: some View {
         ScrollView(.vertical) {
             LazyVStack(alignment: .leading, spacing: 18) {
@@ -32,9 +30,7 @@ struct HomeView: View {
 
                                 Spacer()
 
-                                Button {
-                                    appState.append(.category(category.category))
-                                } label: {
+                                NavigationLink(value: Destinations.category(category.category)) {
                                     HStack(alignment: .center) {
                                         Text("key.see_all")
                                             .font(.system(size: 12))

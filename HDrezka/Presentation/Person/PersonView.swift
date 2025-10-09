@@ -277,8 +277,6 @@ struct PersonView: View {
         private let title: String
         private let movies: [MovieSimple]
 
-        @Environment(AppState.self) private var appState
-
         init(_ title: String, _ movies: [MovieSimple]) {
             self.title = title
             self.movies = movies
@@ -292,9 +290,7 @@ struct PersonView: View {
                     Spacer()
 
                     if movies.count > 10 {
-                        Button {
-                            appState.append(.customList(movies, title))
-                        } label: {
+                        NavigationLink(value: Destinations.customList(movies, title)) {
                             HStack(alignment: .center) {
                                 Text("key.see_all")
                                     .font(.system(size: 12))

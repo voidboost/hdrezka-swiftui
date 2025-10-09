@@ -3,16 +3,12 @@ import SwiftUI
 struct CollectionCardView: View {
     private let collection: MoviesCollection
 
-    @Environment(AppState.self) private var appState
-
     init(collection: MoviesCollection) {
         self.collection = collection
     }
 
     var body: some View {
-        Button {
-            appState.append(.collection(collection))
-        } label: {
+        NavigationLink(value: Destinations.collection(collection)) {
             VStack {
                 if let poster = collection.poster {
                     AsyncImage(url: URL(string: poster), transaction: .init(animation: .easeInOut)) { phase in

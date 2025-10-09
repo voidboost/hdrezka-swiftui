@@ -362,7 +362,6 @@ struct CommentsView: View {
     private struct CommentText: View {
         @State private var comment: Comment
 
-        @Environment(AppState.self) private var appState
         @Environment(CommentsViewModel.self) private var viewModel
 
         init(comment: Comment) {
@@ -415,7 +414,7 @@ struct CommentsView: View {
 
                         return .handled
                     } else if !url.path().isEmpty, String(url.path().dropFirst()).id != nil {
-                        appState.append(.details(.init(movieId: String(url.path().dropFirst()))))
+//                        appState.append(.details(.init(movieId: String(url.path().dropFirst()))))
 
                         return .handled
                     }

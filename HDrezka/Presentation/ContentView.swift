@@ -101,10 +101,6 @@ struct ContentView: View {
         .onChange(of: isLoggedIn) {
             if !isLoggedIn, appState.selectedTab.needAccount {
                 appState.selectedTab = .home
-
-                for tab in Tabs.allCases.filter(\.needAccount) {
-                    appState.paths[tab] = nil
-                }
             }
         }
         .sheet(isPresented: $appState.isSignInPresented) {

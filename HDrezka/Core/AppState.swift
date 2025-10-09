@@ -14,11 +14,6 @@ class AppState {
     var isPremiumPresented = false
 
     var selectedTab: Tabs = .home
-    var paths: [Tabs: [Destinations]] = [:]
-
-    func append(_ destination: Destinations) {
-        paths[selectedTab, default: []].append(destination)
-    }
 
     var window: NSWindow?
 }
@@ -85,13 +80,15 @@ enum Tabs: Hashable, Identifiable, CaseIterable {
 
     @ViewBuilder
     func content() -> some View {
-        switch self {
-        case .home: HomeTabView()
-        case .search: SearchTabView()
-        case .categories: CategoriesTabView()
-        case .collections: CollectionsTabView()
-        case .watchingLater: WatchingLaterTabView()
-        case .bookmarks: BookmarksTabView()
+        NavigationStack {
+            switch self {
+            case .home: HomeView().destinations()
+            case .search: SearchView().destinations()
+            case .categories: CategoriesView().destinations()
+            case .collections: CollectionsView().destinations()
+            case .watchingLater: WatchingLaterView().destinations()
+            case .bookmarks: BookmarksView().destinations()
+            }
         }
     }
 

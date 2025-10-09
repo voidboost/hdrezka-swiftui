@@ -83,8 +83,6 @@ struct CategoriesView: View {
             bestYear = year
         }
 
-        @Environment(AppState.self) private var appState
-
         @State private var bestGenre: MovieGenre
         @State private var bestYear: MovieYear
 
@@ -96,9 +94,7 @@ struct CategoriesView: View {
 
                     Spacer()
 
-                    Button {
-                        appState.append(.genre(.init(name: type.name, genreId: type.typeId)))
-                    } label: {
+                    NavigationLink(value: Destinations.genre(.init(name: type.name, genreId: type.typeId))) {
                         HStack(alignment: .center) {
                             Text("key.see_all")
                                 .font(.system(size: 12))
@@ -114,9 +110,7 @@ struct CategoriesView: View {
 
                 HFlow(horizontalAlignment: .leading, verticalAlignment: .center, horizontalSpacing: 6, verticalSpacing: 6, distributeItemsEvenly: true) {
                     ForEach(type.genres) { genre in
-                        Button {
-                            appState.append(.genre(genre))
-                        } label: {
+                        NavigationLink(value: Destinations.genre(genre)) {
                             Text(genre.name)
                                 .font(.system(size: 13))
                                 .frame(height: 28)
@@ -151,9 +145,7 @@ struct CategoriesView: View {
                     .labelsHidden()
                     .pickerStyle(.menu)
 
-                    Button {
-                        appState.append(.list(.init(name: type.name, listId: bestGenre.genreId + (bestYear.year != 0 ? "\(bestYear.year)/" : ""))))
-                    } label: {
+                    NavigationLink(value: Destinations.list(.init(name: type.name, listId: bestGenre.genreId + (bestYear.year != 0 ? "\(bestYear.year)/" : "")))) {
                         Text("key.go")
                     }
                     .buttonStyle(.accessoryBar)
