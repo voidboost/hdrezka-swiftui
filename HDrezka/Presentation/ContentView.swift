@@ -89,6 +89,38 @@ struct ContentView: View {
                 }
             }
         }
+        .tabViewSidebarBottomBar {
+            Button {
+                if isLoggedIn {
+                    appState.isSignOutPresented = true
+                } else {
+                    appState.isSignInPresented = true
+                }
+            } label: {
+                HStack {
+                    Label {
+                        if isLoggedIn {
+                            Text("key.sign_out")
+                        } else {
+                            Text("key.sign_in")
+                        }
+                    } icon: {
+                        if isLoggedIn {
+                            Image(systemName: "arrow.left")
+                        } else {
+                            Image(systemName: "arrow.right")
+                        }
+                    }
+                    .labelStyle(.titleAndIcon)
+                    .foregroundStyle(.primary)
+
+                    Spacer(minLength: 0)
+                }
+                .padding(.vertical, 3)
+            }
+            .buttonStyle(.accessoryBar)
+            .padding(.vertical, 5)
+        }
         .frame(minWidth: 1100, minHeight: 600)
         .task {
             getVersionUseCase()
@@ -131,48 +163,4 @@ struct ContentView: View {
             CommentsRulesSheet()
         }
     }
-}
-
-struct SidebarButtonStyle: ButtonStyle {
-    @State private var isHovered = false
-
-    func makeBody(configuration: Self.Configuration) -> some View {
-        HStack(alignment: .center) {
-            configuration.label
-
-            Spacer()
-        }
-        .padding(7)
-        .frame(maxWidth: .infinity)
-        .contentShape(.rect(cornerRadius: 6))
-        .background(isHovered ? .secondary.opacity(configuration.isPressed ? 0.3 : 0.1) : Color.clear, in: .rect(cornerRadius: 6))
-        .animation(.easeInOut(duration: 0.15), value: isHovered)
-        .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
-        .onHover { over in
-            isHovered = over
-        }
-    }
-}
-
-struct SidebarLabelStyle: LabelStyle {
-    func makeBody(configuration: Self.Configuration) -> some View {
-        HStack(alignment: .center, spacing: 7) {
-            configuration.icon
-                .frame(width: 20)
-                .foregroundStyle(Color.accentColor)
-            configuration.title
-        }
-    }
-}
-
-struct BlurredView: NSViewRepresentable {
-    func makeNSView(context _: Context) -> some NSVisualEffectView {
-        let view = NSVisualEffectView()
-        view.material = .sidebar
-        view.blendingMode = .behindWindow
-
-        return view
-    }
-
-    func updateNSView(_: NSViewType, context _: Context) {}
 }
