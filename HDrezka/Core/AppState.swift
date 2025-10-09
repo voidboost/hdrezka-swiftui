@@ -20,8 +20,6 @@ class AppState {
         paths[selectedTab, default: []].append(destination)
     }
 
-    var path: [Destinations] = []
-
     var window: NSWindow?
 }
 

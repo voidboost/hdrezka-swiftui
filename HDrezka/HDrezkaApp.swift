@@ -28,9 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
-        AppState.shared.path.removeAll()
-
-        return Downloader.shared.downloads.isEmpty
+        Downloader.shared.downloads.isEmpty
     }
 
     func applicationWillTerminate(_: Notification) {
