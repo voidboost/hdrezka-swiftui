@@ -154,6 +154,7 @@ struct CategoriesView: View {
 
                     NavigationLink(value: Destinations.list(.init(name: type.name, listId: bestGenre.genreId + (bestYear.year != 0 ? "\(bestYear.year)/" : "")))) {
                         Text("key.go")
+                            .foregroundStyle(.primary)
                     }
                     .buttonStyle(.accessoryBar)
                 }

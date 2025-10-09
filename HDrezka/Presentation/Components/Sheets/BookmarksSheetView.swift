@@ -125,12 +125,14 @@ struct BookmarksSheetView: View {
                                             HStack(alignment: .center) {
                                                 Image(systemName: isChecked ? "bookmark.fill" : "bookmark")
                                                     .contentTransition(.symbolEffect(.replace))
+                                                    .foregroundStyle(.primary)
 
                                                 Text(verbatim: "\(bookmark.name) (\(bookmark.count))")
                                                     .monospacedDigit()
                                                     .lineLimit(nil)
                                                     .multilineTextAlignment(.center)
                                                     .contentTransition(.numericText(value: Double(bookmark.count)))
+                                                    .foregroundStyle(.primary)
                                             }
                                         }
                                         .buttonStyle(.accessoryBar)
