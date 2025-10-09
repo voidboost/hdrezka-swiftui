@@ -265,6 +265,7 @@ struct BookmarksView: View {
                         Text(filter.rawValue).tag(filter)
                     }
                 }
+                .labelsHidden()
                 .pickerStyle(.menu)
                 .disabled(viewModel.bookmarkState == .loading || viewModel.selectedBookmark == -1)
 
@@ -273,6 +274,7 @@ struct BookmarksView: View {
                         Text(genre.rawValue).tag(genre)
                     }
                 }
+                .labelsHidden()
                 .pickerStyle(.menu)
                 .disabled(viewModel.bookmarkState == .loading || viewModel.selectedBookmark == -1)
             }

@@ -107,6 +107,7 @@ struct ListView: View {
                                 Text(filter.rawValue).tag(filter)
                             }
                         }
+                        .labelsHidden()
                         .pickerStyle(.menu)
                         .disabled(viewModel.state == .loading)
                     }
@@ -117,6 +118,7 @@ struct ListView: View {
                                 Text(filter.rawValue).tag(filter)
                             }
                         }
+                        .labelsHidden()
                         .pickerStyle(.menu)
                         .disabled(viewModel.state == .loading)
                     }
@@ -127,6 +129,7 @@ struct ListView: View {
                                 Text(genre.rawValue).tag(genre)
                             }
                         }
+                        .labelsHidden()
                         .pickerStyle(.menu)
                         .disabled(viewModel.state == .loading)
                     }

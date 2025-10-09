@@ -143,11 +143,6 @@ struct SettingsView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .contentShape(.rect(cornerRadius: 6))
-                    .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
-                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
                 .frame(height: 40)
 
@@ -192,11 +187,6 @@ struct SettingsView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .contentShape(.rect(cornerRadius: 6))
-                    .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
-                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
                 .frame(height: 40)
 
@@ -215,11 +205,6 @@ struct SettingsView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .contentShape(.rect(cornerRadius: 6))
-                    .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
-                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
                 .frame(height: 40)
 
@@ -356,11 +341,6 @@ struct SettingsView: View {
                     }
                     .labelsHidden()
                     .pickerStyle(.menu)
-                    .buttonStyle(.accessoryBar)
-                    .controlSize(.large)
-                    .contentShape(.rect(cornerRadius: 6))
-                    .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
-                    .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
                 .frame(height: 40)
                 .disabled(!automaticallyChecksForUpdates)
