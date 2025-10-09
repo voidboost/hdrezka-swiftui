@@ -21,8 +21,6 @@ struct DetailsView: View {
     @Default(.isLoggedIn) private var isLoggedIn
     @Default(.mirror) private var mirror
 
-    @Environment(AppState.self) private var appState
-
     var body: some View {
         GeometryReader { geometry in
             ScrollView(.vertical) {
@@ -64,20 +62,17 @@ struct DetailsView: View {
             }
 
             ToolbarItemGroup(placement: .primaryAction) {
-                Button {
-                    if let details = viewModel.state.data {
-                        appState.append(.comments(details))
-                    }
-                } label: {
-                    HStack(alignment: .center, spacing: 4) {
-                        Image(systemName: "bubble.left.and.bubble.right")
+                if let details = viewModel.state.data {
+                    NavigationLink(value: Destinations.comments(details)) {
+                        HStack(alignment: .center, spacing: 4) {
+                            Image(systemName: "bubble.left.and.bubble.right")
 
-                        if let details = viewModel.state.data, details.commentsCount > 0 {
-                            Text(verbatim: "(\(details.commentsCount))")
+                            if let details = viewModel.state.data, details.commentsCount > 0 {
+                                Text(verbatim: "(\(details.commentsCount))")
+                            }
                         }
                     }
                 }
-                .disabled(viewModel.state.data == nil)
 
                 if isLoggedIn {
                     Button {
@@ -135,7 +130,6 @@ struct DetailsView: View {
         private let topSafeAreaInset: CGFloat
         @Binding private var isSchedulePresented: Bool
 
-        @Environment(AppState.self) private var appState
         @Environment(Downloader.self) private var downloader
 
         init(details: MovieDetailed, trailer: YouTubePlayer?, topSafeAreaInset: CGFloat, isSchedulePresented: Binding<Bool>) {
@@ -557,9 +551,7 @@ struct DetailsView: View {
                             LazyVStack(alignment: .leading, spacing: 0) {
                                 ForEach(franchise.prefix(franchiseExpanded ? franchise.count : 5)) { fr in
                                     if !fr.current {
-                                        Button {
-                                            appState.append(.details(MovieSimple(movieId: fr.franchiseId, name: fr.name)))
-                                        } label: {
+                                        NavigationLink(value: Destinations.details(MovieSimple(movieId: fr.franchiseId, name: fr.name))) {
                                             HStack(alignment: .center, spacing: 4) {
                                                 ZStack(alignment: .center) {
                                                     ZStack(alignment: .center) {
@@ -786,8 +778,6 @@ struct DetailsView: View {
 
         @State private var isPresented: Bool = false
 
-        @Environment(AppState.self) private var appState
-
         init(_ title: String, _ description: String, _ data: [T]) {
             self.title = title
             self.description = description
@@ -804,9 +794,7 @@ struct DetailsView: View {
                 HStack(alignment: .center, spacing: 4) {
                     HStack(alignment: .center, spacing: 0) {
                         ForEach(data.prefix(2)) { item in
-                            Button {
-                                appState.append(.fromNamed(item))
-                            } label: {
+                            NavigationLink(value: Destinations.fromNamed(item)) {
                                 if let person = item as? PersonSimple, !person.photo.isEmpty {
                                     PersonTextWithPhoto(person: person)
                                         .contentShape(.rect)
@@ -861,7 +849,7 @@ struct DetailsView: View {
                                         Button {
                                             isPresented = false
 
-                                            appState.append(.fromNamed(item))
+//                                            appState.append(.fromNamed(item))
                                         } label: {
                                             if let person = item as? PersonSimple, !person.photo.isEmpty {
                                                 HStack(alignment: .center, spacing: 8) {

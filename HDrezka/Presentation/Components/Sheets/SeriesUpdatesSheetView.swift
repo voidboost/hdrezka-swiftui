@@ -122,8 +122,6 @@ struct SeriesUpdatesSheetView: View {
 
         @State private var isExpanded: Bool
 
-        @Environment(AppState.self) private var appState
-
         init(group: SeriesUpdateGroup, dismiss: @escaping () -> Void, isExpanded: Bool) {
             self.group = group
             self.dismiss = dismiss
@@ -149,7 +147,7 @@ struct SeriesUpdatesSheetView: View {
                             Button {
                                 dismiss()
 
-                                appState.append(.details(MovieSimple(movieId: item.seriesId, name: item.seriesName)))
+//                                appState.append(.details(MovieSimple(movieId: item.seriesId, name: item.seriesName)))
                             } label: {
                                 HStack(alignment: .center) {
                                     Text(verbatim: "\(item.seriesName) \(item.season)")
@@ -202,7 +200,7 @@ struct SeriesUpdatesSheetView: View {
                             Button {
                                 dismiss()
 
-                                appState.append(.details(MovieSimple(movieId: item.seriesId, name: item.seriesName)))
+//                                appState.append(.details(MovieSimple(movieId: item.seriesId, name: item.seriesName)))
                             } label: {
                                 HStack(alignment: .center) {
                                     Text(verbatim: "\(item.seriesName) \(item.season)")

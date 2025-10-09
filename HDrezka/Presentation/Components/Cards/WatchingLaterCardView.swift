@@ -3,8 +3,6 @@ import SwiftUI
 struct WatchingLaterCardView: View {
     private let movie: MovieWatchLater
 
-    @Environment(AppState.self) private var appState
-
     init(movie: MovieWatchLater) {
         self.movie = movie
     }
@@ -13,9 +11,7 @@ struct WatchingLaterCardView: View {
     @State private var outerHeight: CGFloat = 1
 
     var body: some View {
-        Button {
-            appState.append(.details(MovieSimple(movieId: movie.watchLaterId, name: movie.name, poster: movie.cover)))
-        } label: {
+        NavigationLink(value: Destinations.details(MovieSimple(movieId: movie.watchLaterId, name: movie.name, poster: movie.cover))) {
             VStack(alignment: .leading, spacing: 6) {
                 AsyncImage(url: URL(string: movie.cover), transaction: .init(animation: .easeInOut)) { phase in
                     if let image = phase.image {

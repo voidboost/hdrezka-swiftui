@@ -5,8 +5,6 @@ struct CardView: View {
     private let draggable: Bool
     private let reservesSpace: Bool
 
-    @Environment(AppState.self) private var appState
-
     init(movie: MovieSimple, draggable: Bool = false, reservesSpace: Bool = false) {
         self.movie = movie
         self.draggable = draggable
@@ -14,9 +12,7 @@ struct CardView: View {
     }
 
     var body: some View {
-        Button {
-            appState.append(.details(movie))
-        } label: {
+        NavigationLink(value: Destinations.details(movie)) {
             VStack(alignment: .leading, spacing: 6) {
                 if let poster = movie.poster {
                     AsyncImage(url: URL(string: poster), transaction: .init(animation: .easeInOut)) { phase in
