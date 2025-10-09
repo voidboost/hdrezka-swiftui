@@ -29,6 +29,7 @@ struct ErrorPaginationStateView: View {
 
             Spacer()
         }
-        .padding(10)
+        .padding(.vertical, 18)
+        .padding(.horizontal, 36)
     }
 }

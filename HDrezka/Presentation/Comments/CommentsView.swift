@@ -18,24 +18,26 @@ struct CommentsView: View {
 
     var body: some View {
         ScrollView(.vertical) {
+            if viewModel.state.data?.isEmpty == false, viewModel.reply == nil {
+                CommentTextArea()
+                    .padding(.top, 18)
+                    .padding(.horizontal, 36)
+            }
+
             LazyVStack(alignment: .leading, spacing: 16) {
                 if let comments = viewModel.state.data, !comments.isEmpty {
-                    if viewModel.reply == nil {
-                        CommentTextArea()
-                    }
-
                     ForEach(comments) { comment in
                         CommentsViewComponent(comment: comment)
-                    }
-
-                    if viewModel.paginationState == .loading {
-                        LoadingPaginationStateView()
                     }
                 }
             }
             .scrollTargetLayout()
             .padding(.vertical, 18)
             .padding(.horizontal, 36)
+
+            if viewModel.paginationState == .loading {
+                LoadingPaginationStateView()
+            }
         }
         .scrollIndicators(.visible, axes: .vertical)
         .onScrollTargetVisibilityChange(idType: Comment.ID.self) { onScreenComments in
@@ -46,6 +48,13 @@ struct CommentsView: View {
                viewModel.paginationState == .idle
             {
                 viewModel.loadMore()
+            }
+        }
+        .viewModifier { view in
+            if #available(macOS 26, *) {
+                view.scrollEdgeEffectStyle(.soft, for: .all)
+            } else {
+                view
             }
         }
         .environment(viewModel)
@@ -63,6 +72,13 @@ struct CommentsView: View {
                         .padding(.horizontal, 36)
                 }
                 .scrollIndicators(.visible, axes: .vertical)
+                .viewModifier { view in
+                    if #available(macOS 26, *) {
+                        view.scrollEdgeEffectStyle(.soft, for: .all)
+                    } else {
+                        view
+                    }
+                }
                 .environment(viewModel)
             } else if viewModel.state == .loading {
                 LoadingStateView()
@@ -364,6 +380,8 @@ struct CommentsView: View {
 
         @Environment(CommentsViewModel.self) private var viewModel
 
+        @State private var movieDestination: MovieSimple?
+
         init(comment: Comment) {
             self.comment = comment
         }
@@ -414,13 +432,16 @@ struct CommentsView: View {
 
                         return .handled
                     } else if !url.path().isEmpty, String(url.path().dropFirst()).id != nil {
-//                        appState.append(.details(.init(movieId: String(url.path().dropFirst()))))
+                        movieDestination = .init(movieId: String(url.path().dropFirst()))
 
                         return .handled
                     }
 
                     return .systemAction
                 })
+                .navigationDestination(item: $movieDestination) {
+                    DetailsView(movie: $0)
+                }
         }
     }
 

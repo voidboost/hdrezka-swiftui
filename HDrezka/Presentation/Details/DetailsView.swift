@@ -32,6 +32,13 @@ struct DetailsView: View {
                 }
             }
             .scrollIndicators(.visible, axes: .vertical)
+            .viewModifier { view in
+                if #available(macOS 26, *) {
+                    view.scrollEdgeEffectStyle(.soft, for: .all)
+                } else {
+                    view
+                }
+            }
             .ignoresSafeArea(edges: .top)
             .contentMargins(.top, geometry.safeAreaInsets.top, for: .scrollIndicators)
             .overlay {
@@ -436,66 +443,40 @@ struct DetailsView: View {
             .padding(.top, 18)
             .padding(.top, topSafeAreaInset)
             .background {
-                if #available(macOS 26, *) {
-                    ZStack(alignment: .topLeading) {
-                        AsyncImage(url: URL(string: details.poster), transaction: .init(animation: .easeInOut)) { phase in
-                            if let image = phase.image {
-                                image.resizable()
-                            } else {
-                                Color.gray
-                            }
+                ZStack(alignment: .topLeading) {
+                    AsyncImage(url: URL(string: details.poster), transaction: .init(animation: .easeInOut)) { phase in
+                        if let image = phase.image {
+                            image.resizable()
+                        } else {
+                            Color.gray
                         }
-                        .scaledToFill()
-                        .frame(maxWidth: .infinity)
-                        .frame(height: blurHeght)
-                        .clipShape(.rect)
-
-                        VStack {}
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(.ultraThickMaterial)
-
-                        VStack {}
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(.background)
-                            .mask {
-                                LinearGradient(stops: [
-                                    .init(color: .black.opacity(0.3), location: 0.9),
-                                    .init(color: .black, location: 1.0),
-                                ],
-                                startPoint: .top,
-                                endPoint: .bottom)
-                            }
                     }
-                    .backgroundExtensionEffect()
-                } else {
-                    ZStack(alignment: .topLeading) {
-                        AsyncImage(url: URL(string: details.poster), transaction: .init(animation: .easeInOut)) { phase in
-                            if let image = phase.image {
-                                image.resizable()
-                            } else {
-                                Color.gray
-                            }
+                    .scaledToFill()
+                    .frame(maxWidth: .infinity)
+                    .frame(height: blurHeght)
+                    .clipShape(.rect)
+
+                    VStack {}
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(.ultraThickMaterial)
+
+                    VStack {}
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(.background)
+                        .mask {
+                            LinearGradient(stops: [
+                                .init(color: .black.opacity(0.3), location: 0.9),
+                                .init(color: .black, location: 1.0),
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom)
                         }
-                        .scaledToFill()
-                        .frame(maxWidth: .infinity)
-                        .frame(height: blurHeght)
-                        .clipShape(.rect)
-
-                        VStack {}
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(.ultraThickMaterial)
-
-                        VStack {}
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(.background)
-                            .mask {
-                                LinearGradient(stops: [
-                                    .init(color: .black.opacity(0.3), location: 0.9),
-                                    .init(color: .black, location: 1.0),
-                                ],
-                                startPoint: .top,
-                                endPoint: .bottom)
-                            }
+                }
+                .viewModifier { view in
+                    if #available(macOS 26, *) {
+                        view.backgroundExtensionEffect()
+                    } else {
+                        view
                     }
                 }
             }
@@ -778,6 +759,12 @@ struct DetailsView: View {
 
         @State private var isPresented: Bool = false
 
+        @State private var countryDestination: MovieCountry?
+        @State private var genreDestination: MovieGenre?
+        @State private var personDestination: PersonSimple?
+        @State private var listDestination: MovieList?
+        @State private var collectionDestination: MoviesCollection?
+
         init(_ title: String, _ description: String, _ data: [T]) {
             self.title = title
             self.description = description
@@ -847,9 +834,20 @@ struct DetailsView: View {
                                 VStack(alignment: .center, spacing: 0) {
                                     ForEach(data) { item in
                                         Button {
-                                            isPresented = false
-
-//                                            appState.append(.fromNamed(item))
+                                            switch Destinations.fromNamed(item) {
+                                            case let .country(country):
+                                                countryDestination = country
+                                            case let .genre(genre):
+                                                genreDestination = genre
+                                            case let .person(person):
+                                                personDestination = person
+                                            case let .list(list):
+                                                listDestination = list
+                                            case let .collection(collection):
+                                                collectionDestination = collection
+                                            default:
+                                                fatalError("Need \"named\" implementation")
+                                            }
                                         } label: {
                                             if let person = item as? PersonSimple, !person.photo.isEmpty {
                                                 HStack(alignment: .center, spacing: 8) {
@@ -905,6 +903,21 @@ struct DetailsView: View {
                 }
             }
             .padding(.vertical, 8)
+            .navigationDestination(item: $countryDestination) {
+                ListView(country: $0)
+            }
+            .navigationDestination(item: $genreDestination) {
+                ListView(genre: $0)
+            }
+            .navigationDestination(item: $personDestination) {
+                PersonView(person: $0)
+            }
+            .navigationDestination(item: $listDestination) {
+                ListView(list: $0)
+            }
+            .navigationDestination(item: $collectionDestination) {
+                ListView(collection: $0)
+            }
         }
     }
 

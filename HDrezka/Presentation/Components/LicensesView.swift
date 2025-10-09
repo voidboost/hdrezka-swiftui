@@ -19,7 +19,14 @@ struct LicensesView: View {
             .padding(25)
             .background(.background)
         }
-        .scrollIndicators(.never)
+        .scrollIndicators(.visible, axes: .vertical)
+        .viewModifier { view in
+            if #available(macOS 26, *) {
+                view.scrollEdgeEffectStyle(.soft, for: .all)
+            } else {
+                view
+            }
+        }
         .navigationTitle("key.licenses")
         .frame(width: 700, height: 400)
     }

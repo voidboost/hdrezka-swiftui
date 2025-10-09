@@ -17,7 +17,7 @@ class BookmarksViewModel {
 
     private(set) var bookmarksState: DataState<[Bookmark]> = .loading
     private(set) var bookmarkState: DataState<[MovieSimple]> = .data([])
-    private(set) var paginationState: DataPaginationState = .loading
+    private(set) var paginationState: DataPaginationState = .idle
 
     var selectedBookmark: Int = -1
 
@@ -38,7 +38,7 @@ class BookmarksViewModel {
         bookmarksState = .loading
 
         bookmarkState = .data([])
-        paginationState = .loading
+        paginationState = .idle
         page = 1
 
         getBookmarksUseCase()

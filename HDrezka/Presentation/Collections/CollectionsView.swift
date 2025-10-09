@@ -25,9 +25,9 @@ struct CollectionsView: View {
             .padding(.vertical, 18)
             .padding(.horizontal, 36)
 
-//            if viewModel.paginationState == .loading {
-//                LoadingPaginationStateView()
-//            }
+            if viewModel.paginationState == .loading {
+                LoadingPaginationStateView()
+            }
         }
         .scrollIndicators(.visible, axes: .vertical)
         .onScrollTargetVisibilityChange(idType: MoviesCollection.ID.self) { onScreenCards in
@@ -38,6 +38,13 @@ struct CollectionsView: View {
                viewModel.paginationState == .idle
             {
                 viewModel.loadMore()
+            }
+        }
+        .viewModifier { view in
+            if #available(macOS 26, *) {
+                view.scrollEdgeEffectStyle(.soft, for: .all)
+            } else {
+                view
             }
         }
         .overlay {

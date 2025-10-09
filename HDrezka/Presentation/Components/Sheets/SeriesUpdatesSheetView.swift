@@ -9,6 +9,12 @@ struct SeriesUpdatesSheetView: View {
 
     @State private var state: DataState<[SeriesUpdateGroup]> = .loading
 
+    @Binding private var movieDestination: MovieSimple?
+
+    init(movieDestination: Binding<MovieSimple?>) {
+        _movieDestination = movieDestination
+    }
+
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -55,7 +61,7 @@ struct SeriesUpdatesSheetView: View {
                         ScrollView(.vertical) {
                             LazyVStack(alignment: .leading, spacing: 10) {
                                 ForEach(seriesUpdates) { group in
-                                    CustomSection(group: group, dismiss: { dismiss() }, isExpanded: seriesUpdates.firstIndex(of: group) == 0)
+                                    CustomSection(group: group, dismiss: { dismiss() }, isExpanded: seriesUpdates.firstIndex(of: group) == 0, movieDestination: $movieDestination)
 
                                     if group != seriesUpdates.last {
                                         Divider()
@@ -122,10 +128,13 @@ struct SeriesUpdatesSheetView: View {
 
         @State private var isExpanded: Bool
 
-        init(group: SeriesUpdateGroup, dismiss: @escaping () -> Void, isExpanded: Bool) {
+        @Binding private var movieDestination: MovieSimple?
+
+        init(group: SeriesUpdateGroup, dismiss: @escaping () -> Void, isExpanded: Bool, movieDestination: Binding<MovieSimple?>) {
             self.group = group
             self.dismiss = dismiss
             self.isExpanded = isExpanded
+            _movieDestination = movieDestination
         }
 
         var body: some View {
@@ -147,7 +156,7 @@ struct SeriesUpdatesSheetView: View {
                             Button {
                                 dismiss()
 
-//                                appState.append(.details(MovieSimple(movieId: item.seriesId, name: item.seriesName)))
+                                movieDestination = .init(movieId: item.seriesId, name: item.seriesName)
                             } label: {
                                 HStack(alignment: .center) {
                                     Text(verbatim: "\(item.seriesName) \(item.season)")
@@ -200,7 +209,7 @@ struct SeriesUpdatesSheetView: View {
                             Button {
                                 dismiss()
 
-//                                appState.append(.details(MovieSimple(movieId: item.seriesId, name: item.seriesName)))
+                                movieDestination = .init(movieId: item.seriesId, name: item.seriesName)
                             } label: {
                                 HStack(alignment: .center) {
                                     Text(verbatim: "\(item.seriesName) \(item.season)")
