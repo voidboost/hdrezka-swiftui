@@ -67,6 +67,7 @@ struct CollectionsView: View {
             }
         }
         .transition(.opacity)
+        .navigationTitle(title)
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button {
