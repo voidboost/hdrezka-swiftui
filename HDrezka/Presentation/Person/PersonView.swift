@@ -24,6 +24,13 @@ struct PersonView: View {
             .padding(.vertical, 18)
         }
         .scrollIndicators(.visible, axes: .vertical)
+        .viewModifier { view in
+            if #available(macOS 26, *) {
+                view.scrollEdgeEffectStyle(.soft, for: .all)
+            } else {
+                view
+            }
+        }
         .overlay {
             if let error = viewModel.state.error {
                 ErrorStateView(error) {

@@ -1,7 +1,5 @@
 import Foundation
 
-// MARK: RPC
-
 struct Aria2Request<E: Encodable>: Encodable {
     let method: Aria2Method
     let params: E?
@@ -144,8 +142,6 @@ enum Aria2ErrorCode: Int, Codable {
     }
 }
 
-// MARK: Params
-
 protocol TokenParams: Encodable {
     var token: String { get }
     func encodeAdditional(to container: inout UnkeyedEncodingContainer) throws
@@ -243,8 +239,6 @@ struct OptionsParams<E: Encodable>: TokenParams {
     }
 }
 
-// MARK: Results
-
 struct GlobalStatusResult: Decodable {
     let numActive: Int
     let numWaiting: Int
@@ -321,8 +315,6 @@ struct StatusResult: Codable, Hashable {
 enum Status: String, Decodable {
     case active, waiting, paused, error, complete, removed
 }
-
-// MARK: Methods
 
 enum Aria2Method: String, Encodable, Sendable {
     case addUri = "aria2.addUri"

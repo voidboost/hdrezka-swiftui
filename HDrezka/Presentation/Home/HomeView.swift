@@ -8,6 +8,8 @@ struct HomeView: View {
 
     @Default(.isLoggedIn) private var isLoggedIn
 
+    @State private var movieDestination: MovieSimple?
+
     var body: some View {
         ScrollView(.vertical) {
             LazyVStack(alignment: .leading, spacing: 18) {
@@ -50,18 +52,18 @@ struct HomeView: View {
                             Divider().padding(.horizontal, 36)
                         }
                     }
-
-                    if let error = viewModel.paginationState.error {
-                        ErrorPaginationStateView(error) {
-                            viewModel.loadMore(reset: true)
-                        }
-                    } else if viewModel.paginationState == .loading {
-                        LoadingPaginationStateView()
-                    }
                 }
             }
             .scrollTargetLayout()
             .padding(.vertical, 18)
+
+            if let error = viewModel.paginationState.error {
+                ErrorPaginationStateView(error) {
+                    viewModel.loadMore(reset: true)
+                }
+            } else if viewModel.paginationState == .loading {
+                LoadingPaginationStateView()
+            }
         }
         .scrollIndicators(.visible, axes: .vertical)
         .onScrollTargetVisibilityChange(idType: Category.ID.self) { onScreenCategories in
@@ -72,6 +74,13 @@ struct HomeView: View {
                viewModel.paginationState == .idle
             {
                 viewModel.loadMore()
+            }
+        }
+        .viewModifier { view in
+            if #available(macOS 26, *) {
+                view.scrollEdgeEffectStyle(.soft, for: .all)
+            } else {
+                view
             }
         }
         .overlay {
@@ -125,7 +134,10 @@ struct HomeView: View {
         }
         .background(.background)
         .sheet(isPresented: $viewModel.isSeriesUpdatesPresented) {
-            SeriesUpdatesSheetView()
+            SeriesUpdatesSheetView(movieDestination: $movieDestination)
+        }
+        .navigationDestination(item: $movieDestination) {
+            DetailsView(movie: $0)
         }
     }
 }

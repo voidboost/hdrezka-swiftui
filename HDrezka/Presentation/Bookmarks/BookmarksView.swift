@@ -81,6 +81,13 @@ struct BookmarksView: View {
             .scrollContentBackground(.hidden)
             .environment(\.defaultMinListRowHeight, 0)
             .scrollIndicators(.visible, axes: .vertical)
+            .viewModifier { view in
+                if #available(macOS 26, *) {
+                    view.scrollEdgeEffectStyle(.hard, for: .all)
+                } else {
+                    view
+                }
+            }
             .overlay {
                 if let error = viewModel.bookmarksState.error {
                     VStack(alignment: .center, spacing: 8) {
@@ -161,9 +168,9 @@ struct BookmarksView: View {
                 .padding(18)
                 .scrollTargetLayout()
 
-//                if viewModel.paginationState == .loading {
-//                    LoadingPaginationStateView()
-//                }
+                if viewModel.paginationState == .loading {
+                    LoadingPaginationStateView()
+                }
             }
             .scrollIndicators(.visible, axes: .vertical)
             .onScrollTargetVisibilityChange(idType: MovieSimple.ID.self) { onScreenCards in
@@ -174,6 +181,13 @@ struct BookmarksView: View {
                    viewModel.paginationState == .idle
                 {
                     viewModel.loadMore()
+                }
+            }
+            .viewModifier { view in
+                if #available(macOS 26, *) {
+                    view.scrollEdgeEffectStyle(.hard, for: .all)
+                } else {
+                    view
                 }
             }
             .overlay {
