@@ -21,38 +21,54 @@ struct DetailsView: View {
     @Default(.isLoggedIn) private var isLoggedIn
     @Default(.mirror) private var mirror
 
+    @State private var topSafeAreaInset: CGFloat = .zero
+
+    @State private var countryDestination: MovieCountry?
+    @State private var genreDestination: MovieGenre?
+    @State private var personDestination: PersonSimple?
+    @State private var listDestination: MovieList?
+    @State private var collectionDestination: MoviesCollection?
+
     var body: some View {
-        GeometryReader { geometry in
-            ScrollView(.vertical) {
-                LazyVStack(alignment: .leading, spacing: 18) {
-                    if let details = viewModel.state.data {
-                        DetailsViewComponent(details: details, trailer: viewModel.trailer, topSafeAreaInset: geometry.safeAreaInsets.top, isSchedulePresented: $isSchedulePresented)
-                            .environment(viewModel)
-                    }
+        ScrollView(.vertical) {
+            LazyVStack(alignment: .leading, spacing: 18) {
+                if let details = viewModel.state.data {
+                    DetailsViewComponent(
+                        details: details,
+                        trailer: viewModel.trailer,
+                        topSafeAreaInset: topSafeAreaInset,
+                        isSchedulePresented: $isSchedulePresented,
+                        countryDestination: $countryDestination,
+                        genreDestination: $genreDestination,
+                        personDestination: $personDestination,
+                        listDestination: $listDestination,
+                        collectionDestination: $collectionDestination,
+                    )
+                    .environment(viewModel)
                 }
             }
-            .scrollIndicators(.visible, axes: .vertical)
-            .viewModifier { view in
-                if #available(macOS 26, *) {
-                    view.scrollEdgeEffectStyle(.soft, for: .all)
-                } else {
-                    view
-                }
+        }
+        .scrollIndicators(.visible, axes: .vertical)
+        .viewModifier { view in
+            if #available(macOS 26, *) {
+                view.scrollEdgeEffectStyle(.soft, for: .all)
+            } else {
+                view
             }
-            .ignoresSafeArea(edges: .top)
-            .contentMargins(.top, geometry.safeAreaInsets.top, for: .scrollIndicators)
-            .overlay {
-                if let error = viewModel.state.error {
-                    ErrorStateView(error) {
-                        viewModel.load()
-                    }
+        }
+        .ignoresSafeArea(edges: .top)
+        .contentMargins(.top, topSafeAreaInset, for: .scrollIndicators)
+        .overlay {
+            if let error = viewModel.state.error {
+                ErrorStateView(error) {
+                    viewModel.load()
+                }
+                .padding(.vertical, 18)
+                .padding(.horizontal, 36)
+            } else if viewModel.state == .loading {
+                LoadingStateView()
                     .padding(.vertical, 18)
                     .padding(.horizontal, 36)
-                } else if viewModel.state == .loading {
-                    LoadingStateView()
-                        .padding(.vertical, 18)
-                        .padding(.horizontal, 36)
-                }
             }
         }
         .transition(.opacity)
@@ -96,6 +112,11 @@ struct DetailsView: View {
                 .disabled(viewModel.state.data == nil)
             }
         }
+        .onGeometryChange(for: CGFloat.self) { geometry in
+            geometry.safeAreaInsets.top
+        } action: { inset in
+            topSafeAreaInset = inset
+        }
         .task(id: isLoggedIn) {
             switch viewModel.state {
             case .data:
@@ -129,6 +150,21 @@ struct DetailsView: View {
             isBookmarksPresented = !isCreateBookmarkPresented
         }
         .background(.background)
+        .navigationDestination(item: $countryDestination) {
+            ListView(country: $0)
+        }
+        .navigationDestination(item: $genreDestination) {
+            ListView(genre: $0)
+        }
+        .navigationDestination(item: $personDestination) {
+            PersonView(person: $0)
+        }
+        .navigationDestination(item: $listDestination) {
+            ListView(list: $0)
+        }
+        .navigationDestination(item: $collectionDestination) {
+            ListView(collection: $0)
+        }
     }
 
     private struct DetailsViewComponent: View {
@@ -139,11 +175,31 @@ struct DetailsView: View {
 
         @Environment(Downloader.self) private var downloader
 
-        init(details: MovieDetailed, trailer: YouTubePlayer?, topSafeAreaInset: CGFloat, isSchedulePresented: Binding<Bool>) {
+        @Binding private var countryDestination: MovieCountry?
+        @Binding private var genreDestination: MovieGenre?
+        @Binding private var personDestination: PersonSimple?
+        @Binding private var listDestination: MovieList?
+        @Binding private var collectionDestination: MoviesCollection?
+
+        init(details: MovieDetailed,
+             trailer: YouTubePlayer?,
+             topSafeAreaInset: CGFloat,
+             isSchedulePresented: Binding<Bool>,
+             countryDestination: Binding<MovieCountry?>,
+             genreDestination: Binding<MovieGenre?>,
+             personDestination: Binding<PersonSimple?>,
+             listDestination: Binding<MovieList?>,
+             collectionDestination: Binding<MoviesCollection?>)
+        {
             self.details = details
             self.trailer = trailer
             self.topSafeAreaInset = topSafeAreaInset
             _isSchedulePresented = isSchedulePresented
+            _countryDestination = countryDestination
+            _genreDestination = genreDestination
+            _personDestination = personDestination
+            _listDestination = listDestination
+            _collectionDestination = collectionDestination
         }
 
         @State private var isPlayPresented: Bool = false
@@ -332,7 +388,16 @@ struct DetailsView: View {
                                             Divider()
                                         }
 
-                                        InfoRowWithButtons(String(localized: "key.info.country"), String(localized: "key.info.country.description"), countries)
+                                        InfoRowWithButtons(
+                                            String(localized: "key.info.country"),
+                                            String(localized: "key.info.country.description"),
+                                            countries,
+                                            countryDestination: $countryDestination,
+                                            genreDestination: $genreDestination,
+                                            personDestination: $personDestination,
+                                            listDestination: $listDestination,
+                                            collectionDestination: $collectionDestination,
+                                        )
                                     }
 
                                     if let genres = details.genres, !genres.isEmpty {
@@ -340,7 +405,16 @@ struct DetailsView: View {
                                             Divider()
                                         }
 
-                                        InfoRowWithButtons(String(localized: "key.info.genres"), String(localized: "key.info.genres.description"), genres)
+                                        InfoRowWithButtons(
+                                            String(localized: "key.info.genres"),
+                                            String(localized: "key.info.genres.description"),
+                                            genres,
+                                            countryDestination: $countryDestination,
+                                            genreDestination: $genreDestination,
+                                            personDestination: $personDestination,
+                                            listDestination: $listDestination,
+                                            collectionDestination: $collectionDestination,
+                                        )
                                     }
 
                                     if let producer = details.producer, !producer.isEmpty {
@@ -348,7 +422,16 @@ struct DetailsView: View {
                                             Divider()
                                         }
 
-                                        InfoRowWithButtons(String(localized: "key.info.producer"), String(localized: "key.info.producer.description"), producer)
+                                        InfoRowWithButtons(
+                                            String(localized: "key.info.producer"),
+                                            String(localized: "key.info.producer.description"),
+                                            producer,
+                                            countryDestination: $countryDestination,
+                                            genreDestination: $genreDestination,
+                                            personDestination: $personDestination,
+                                            listDestination: $listDestination,
+                                            collectionDestination: $collectionDestination,
+                                        )
                                     }
 
                                     if let actors = details.actors, !actors.isEmpty {
@@ -356,7 +439,16 @@ struct DetailsView: View {
                                             Divider()
                                         }
 
-                                        InfoRowWithButtons(String(localized: "key.info.actors"), String(localized: "key.info.actors.description"), actors)
+                                        InfoRowWithButtons(
+                                            String(localized: "key.info.actors"),
+                                            String(localized: "key.info.actors.description"),
+                                            actors,
+                                            countryDestination: $countryDestination,
+                                            genreDestination: $genreDestination,
+                                            personDestination: $personDestination,
+                                            listDestination: $listDestination,
+                                            collectionDestination: $collectionDestination,
+                                        )
                                     }
 
                                     if let lists = details.lists, !lists.isEmpty {
@@ -364,7 +456,16 @@ struct DetailsView: View {
                                             Divider()
                                         }
 
-                                        InfoRowWithButtons(String(localized: "key.info.lists"), String(localized: "key.info.lists.description"), lists)
+                                        InfoRowWithButtons(
+                                            String(localized: "key.info.lists"),
+                                            String(localized: "key.info.lists.description"),
+                                            lists,
+                                            countryDestination: $countryDestination,
+                                            genreDestination: $genreDestination,
+                                            personDestination: $personDestination,
+                                            listDestination: $listDestination,
+                                            collectionDestination: $collectionDestination,
+                                        )
                                     }
 
                                     if let collections = details.collections, !collections.isEmpty {
@@ -372,7 +473,16 @@ struct DetailsView: View {
                                             Divider()
                                         }
 
-                                        InfoRowWithButtons(String(localized: "key.info.collections"), String(localized: "key.info.collections.description"), collections)
+                                        InfoRowWithButtons(
+                                            String(localized: "key.info.collections"),
+                                            String(localized: "key.info.collections.description"),
+                                            collections,
+                                            countryDestination: $countryDestination,
+                                            genreDestination: $genreDestination,
+                                            personDestination: $personDestination,
+                                            listDestination: $listDestination,
+                                            collectionDestination: $collectionDestination,
+                                        )
                                     }
 
                                     if let rating = details.rating {
@@ -394,8 +504,8 @@ struct DetailsView: View {
                 }
                 .onGeometryChange(for: CGFloat.self) { geometry in
                     geometry.size.height
-                } action: {
-                    blurHeght = $0
+                } action: { height in
+                    blurHeght = height
                 }
 
                 if details.imdbRating != nil
@@ -761,16 +871,29 @@ struct DetailsView: View {
 
         @State private var isPresented: Bool = false
 
-        @State private var countryDestination: MovieCountry?
-        @State private var genreDestination: MovieGenre?
-        @State private var personDestination: PersonSimple?
-        @State private var listDestination: MovieList?
-        @State private var collectionDestination: MoviesCollection?
+        @Binding private var countryDestination: MovieCountry?
+        @Binding private var genreDestination: MovieGenre?
+        @Binding private var personDestination: PersonSimple?
+        @Binding private var listDestination: MovieList?
+        @Binding private var collectionDestination: MoviesCollection?
 
-        init(_ title: String, _ description: String, _ data: [T]) {
+        init(_ title: String,
+             _ description: String,
+             _ data: [T],
+             countryDestination: Binding<MovieCountry?>,
+             genreDestination: Binding<MovieGenre?>,
+             personDestination: Binding<PersonSimple?>,
+             listDestination: Binding<MovieList?>,
+             collectionDestination: Binding<MoviesCollection?>)
+        {
             self.title = title
             self.description = description
             self.data = data
+            _countryDestination = countryDestination
+            _genreDestination = genreDestination
+            _personDestination = personDestination
+            _listDestination = listDestination
+            _collectionDestination = collectionDestination
         }
 
         var body: some View {
@@ -905,21 +1028,6 @@ struct DetailsView: View {
                 }
             }
             .padding(.vertical, 8)
-            .navigationDestination(item: $countryDestination) {
-                ListView(country: $0)
-            }
-            .navigationDestination(item: $genreDestination) {
-                ListView(genre: $0)
-            }
-            .navigationDestination(item: $personDestination) {
-                PersonView(person: $0)
-            }
-            .navigationDestination(item: $listDestination) {
-                ListView(list: $0)
-            }
-            .navigationDestination(item: $collectionDestination) {
-                ListView(collection: $0)
-            }
         }
     }
 
