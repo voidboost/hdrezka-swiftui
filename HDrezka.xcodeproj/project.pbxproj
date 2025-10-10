@@ -19,7 +19,7 @@
 		DEB035B52C89E1DB004ABFA1 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B42C89E1DB004ABFA1 /* FirebaseAnalytics */; };
 		DEB035B72C89E1DB004ABFA1 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B62C89E1DB004ABFA1 /* FirebaseCrashlytics */; };
 		DEB035BA2C89E57A004ABFA1 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B92C89E57A004ABFA1 /* Defaults */; };
-		DEE64D0B2C8869D0002C2F2F /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = DEE64D0A2C8869D0002C2F2F /* Sparkle */; };
+		DEE64D0B2C8869D0002C2F2F /* Sparkle in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = DEE64D0A2C8869D0002C2F2F /* Sparkle */; };
 		DEF920382DD5CAF20087C32C /* FactoryKit in Frameworks */ = {isa = PBXBuildFile; productRef = DEF920372DD5CAF20087C32C /* FactoryKit */; };
 /* End PBXBuildFile section */
 
@@ -31,9 +31,209 @@
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
 		DE2A628C2CC443F500301282 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Resources/Info.plist,
-			);
+			platformFiltersByRelativePath = {
+				iOS/Core/AppState.swift = (
+					ios,
+				);
+				iOS/Core/Const.swift = (
+					ios,
+				);
+				iOS/Core/Container.swift = (
+					ios,
+				);
+				iOS/Core/Defaults.swift = (
+					ios,
+				);
+				iOS/HDrezkaApp.swift = (
+					ios,
+				);
+				iOS/Resources/Assets.xcassets = (
+					ios,
+				);
+				iOS/Resources/Info.plist = (
+					ios,
+				);
+				macOS/Core/AppState.swift = (
+					macos,
+				);
+				macOS/Core/Const.swift = (
+					macos,
+				);
+				macOS/Core/Container.swift = (
+					macos,
+				);
+				macOS/Core/Defaults.swift = (
+					macos,
+				);
+				macOS/Core/Downloader.swift = (
+					macos,
+				);
+				macOS/Data/Network/Aria2Service.swift = (
+					macos,
+				);
+				macOS/Data/Repositories/Aria2RepositoryImpl.swift = (
+					macos,
+				);
+				macOS/Domain/Entities/Aria2.swift = (
+					macos,
+				);
+				macOS/Domain/Repositories/Aria2Repository.swift = (
+					macos,
+				);
+				macOS/Domain/UseCases/Aria2/CallUseCase.swift = (
+					macos,
+				);
+				macOS/Domain/UseCases/Aria2/MulticallUseCase.swift = (
+					macos,
+				);
+				macOS/HDrezkaApp.swift = (
+					macos,
+				);
+				macOS/Presentations/BookmarksView.swift = (
+					macos,
+				);
+				macOS/Presentations/CategoriesView.swift = (
+					macos,
+				);
+				macOS/Presentations/CollectionsView.swift = (
+					macos,
+				);
+				macOS/Presentations/CommentsView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Cards/CardView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Cards/CollectionCardView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Cards/WatchingLaterCardView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/DownloadsView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/EmptyStateView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/ErrorPaginationStateView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/ErrorStateView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/ImageView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/LicensesView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/LoadingPaginationStateView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/LoadingStateView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Player/CustomAVPlayer.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Player/PlayerView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Player/SliderWithText.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Player/SliderWithoutText.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/SettingsView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Sheets/BookmarksSheetView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Sheets/CommentReportSheet.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Sheets/CommentsRulesSheet.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Sheets/CreateBookmarkSheetView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Sheets/DownloadSheetView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Sheets/OpenExternalPlayerSheetView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Sheets/RenameBookmarkSheetView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Sheets/RestoreSheetView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Sheets/ScheduleSheetView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Sheets/SeriesUpdatesSheetView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Sheets/SignInSheetView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Sheets/SignUpSheetView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/Sheets/WatchSheetView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/SpoilerView.swift = (
+					macos,
+				);
+				macOS/Presentations/Components/UpdateButton.swift = (
+					macos,
+				);
+				macOS/Presentations/ContentView.swift = (
+					macos,
+				);
+				macOS/Presentations/DetailsView.swift = (
+					macos,
+				);
+				macOS/Presentations/HomeView.swift = (
+					macos,
+				);
+				macOS/Presentations/ListView.swift = (
+					macos,
+				);
+				macOS/Presentations/PersonView.swift = (
+					macos,
+				);
+				macOS/Presentations/SearchView.swift = (
+					macos,
+				);
+				macOS/Presentations/WatchingLaterView.swift = (
+					macos,
+				);
+				macOS/Resources/Assets.xcassets = (
+					macos,
+				);
+				macOS/Resources/Info.plist = (
+					macos,
+				);
+				"macOS/Resources/aria2c-arm64" = (
+					macos,
+				);
+				"macOS/Resources/aria2c-x86_64" = (
+					macos,
+				);
+				macOS/Utils/NSImage.swift = (
+					macos,
+				);
+				macOS/Utils/WindowAccessor.swift = (
+					macos,
+				);
+			};
 			target = 04B3CA732BA06C9C0039F76E /* HDrezka */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -377,6 +577,9 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_USE_OPTIMIZATION_PROFILE = YES;
 				CODE_SIGN_ENTITLEMENTS = HDrezka/Resources/HDrezka.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" = HDrezka/iOS/Resources/HDrezka.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = HDrezka/macOS/Resources/HDrezka.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -391,11 +594,13 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = HDrezka/Resources/Info.plist;
+				INFOPLIST_FILE = "";
+				"INFOPLIST_FILE[sdk=iphoneos*]" = HDrezka/iOS/Resources/Info.plist;
+				"INFOPLIST_FILE[sdk=macosx*]" = HDrezka/macOS/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = HDrezka;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -405,10 +610,11 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = io.silentsea.hdrezka;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -421,7 +627,10 @@
 				ASSETCATALOG_COMPILER_OPTIMIZATION = time;
 				CLANG_USE_OPTIMIZATION_PROFILE = YES;
 				CODE_SIGN_ENTITLEMENTS = HDrezka/Resources/HDrezka.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=iphoneos*]" = HDrezka/iOS/Resources/HDrezka.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = HDrezka/macOS/Resources/HDrezka.entitlements;
 				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -436,11 +645,13 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_OPTIMIZATION_LEVEL = fast;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = HDrezka/Resources/Info.plist;
+				INFOPLIST_FILE = "";
+				"INFOPLIST_FILE[sdk=iphoneos*]" = HDrezka/iOS/Resources/Info.plist;
+				"INFOPLIST_FILE[sdk=macosx*]" = HDrezka/macOS/Resources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = HDrezka;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -450,10 +661,11 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = io.silentsea.hdrezka;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
