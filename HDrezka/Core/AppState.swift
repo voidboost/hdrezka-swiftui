@@ -82,12 +82,30 @@ enum Tabs: Hashable, Identifiable, CaseIterable {
     func content() -> some View {
         NavigationStack {
             switch self {
-            case .home: HomeView().destinations()
-            case .search: SearchView().destinations()
-            case .categories: CategoriesView().destinations()
-            case .collections: CollectionsView().destinations()
-            case .watchingLater: WatchingLaterView().destinations()
-            case .bookmarks: BookmarksView().destinations()
+            case .home:
+                HomeView()
+                    .id("home")
+                    .destinations()
+            case .search:
+                SearchView()
+                    .id("search")
+                    .destinations()
+            case .categories:
+                CategoriesView()
+                    .id("categories")
+                    .destinations()
+            case .collections:
+                CollectionsView()
+                    .id("collections")
+                    .destinations()
+            case .watchingLater:
+                WatchingLaterView()
+                    .id("watching_later")
+                    .destinations()
+            case .bookmarks:
+                BookmarksView()
+                    .id("bookmarks")
+                    .destinations()
             }
         }
     }
@@ -130,15 +148,33 @@ extension View {
     func destinations() -> some View {
         navigationDestination(for: Destinations.self) { destination in
             switch destination {
-            case let .details(movie): DetailsView(movie: movie)
-            case let .country(country): ListView(country: country)
-            case let .category(category): ListView(category: category)
-            case let .genre(genre): ListView(genre: genre)
-            case let .collection(collection): ListView(collection: collection)
-            case let .customList(movies, title): ListView(movies: movies, title: title)
-            case let .list(list): ListView(list: list)
-            case let .person(person): PersonView(person: person)
-            case let .comments(details): CommentsView(details: details)
+            case let .details(movie):
+                DetailsView(movie: movie)
+                    .id(movie.movieId)
+            case let .country(country):
+                ListView(country: country)
+                    .id(country.countryId)
+            case let .category(category):
+                ListView(category: category)
+                    .id(category)
+            case let .genre(genre):
+                ListView(genre: genre)
+                    .id(genre.genreId)
+            case let .collection(collection):
+                ListView(collection: collection)
+                    .id(collection.collectionId)
+            case let .customList(movies, title):
+                ListView(movies: movies, title: title)
+                    .id(title)
+            case let .list(list):
+                ListView(list: list)
+                    .id(list.listId)
+            case let .person(person):
+                PersonView(person: person)
+                    .id(person.personId)
+            case let .comments(details):
+                CommentsView(details: details)
+                    .id(details.movieId)
             }
         }
     }

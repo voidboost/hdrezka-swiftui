@@ -16,6 +16,8 @@ struct CommentsView: View {
 
     @Default(.isLoggedIn) private var isLoggedIn
 
+    @State private var movieDestination: MovieSimple?
+
     var body: some View {
         ScrollView(.vertical) {
             if viewModel.state.data?.isEmpty == false, viewModel.reply == nil {
@@ -27,7 +29,7 @@ struct CommentsView: View {
             LazyVStack(alignment: .leading, spacing: 16) {
                 if let comments = viewModel.state.data, !comments.isEmpty {
                     ForEach(comments) { comment in
-                        CommentsViewComponent(comment: comment)
+                        CommentsViewComponent(comment: comment, movieDestination: $movieDestination)
                     }
                 }
             }
@@ -129,7 +131,7 @@ struct CommentsView: View {
             VStack(alignment: .center, spacing: 25) {
                 if let comment = viewModel.comment {
                     ScrollView(.vertical) {
-                        CommentsViewComponent(comment: comment)
+                        CommentsViewComponent(comment: comment, movieDestination: $movieDestination)
                     }
                     .scrollIndicators(.never)
                     .environment(viewModel)
@@ -174,13 +176,19 @@ struct CommentsView: View {
             Text("key.comment.delete")
         }
         .background(.background)
+        .navigationDestination(item: $movieDestination) {
+            DetailsView(movie: $0)
+        }
     }
 
     private struct CommentsViewComponent: View {
         private let comment: Comment
 
-        init(comment: Comment) {
+        @Binding private var movieDestination: MovieSimple?
+
+        init(comment: Comment, movieDestination: Binding<MovieSimple?>) {
             self.comment = comment
+            _movieDestination = movieDestination
         }
 
         @State private var delayShow: DispatchWorkItem?
@@ -215,7 +223,7 @@ struct CommentsView: View {
                             .foregroundColor(.secondary)
                     }
 
-                    CommentText(comment: comment)
+                    CommentText(comment: comment, movieDestination: $movieDestination)
 
                     HStack(alignment: .center, spacing: 8) {
                         @Bindable var viewModel = viewModel
@@ -366,7 +374,7 @@ struct CommentsView: View {
                 if !comment.replies.isEmpty {
                     LazyVStack(alignment: .leading, spacing: 16) {
                         ForEach(comment.replies) { reply in
-                            CommentsViewComponent(comment: reply)
+                            CommentsViewComponent(comment: reply, movieDestination: $movieDestination)
                         }
                     }
                     .padding(.leading, 16)
@@ -380,10 +388,11 @@ struct CommentsView: View {
 
         @Environment(CommentsViewModel.self) private var viewModel
 
-        @State private var movieDestination: MovieSimple?
+        @Binding private var movieDestination: MovieSimple?
 
-        init(comment: Comment) {
+        init(comment: Comment, movieDestination: Binding<MovieSimple?>) {
             self.comment = comment
+            _movieDestination = movieDestination
         }
 
         var body: some View {
@@ -439,9 +448,6 @@ struct CommentsView: View {
 
                     return .systemAction
                 })
-                .navigationDestination(item: $movieDestination) {
-                    DetailsView(movie: $0)
-                }
         }
     }
 
