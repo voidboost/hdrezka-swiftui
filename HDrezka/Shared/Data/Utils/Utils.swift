@@ -184,50 +184,101 @@ extension Optional {
 class AttributedTextStyle {
     private(set) var attributes: [NSAttributedString.Key: Any] = [:]
 
-    func font(
-        bold: Bool = false,
-        italic: Bool = false,
-        underline: Bool = false,
-        strikethrough: Bool = false,
-        link: String? = nil,
-    ) {
-        var font = NSFont.systemFont(ofSize: 13)
-        let fontManager = NSFontManager.shared
+    #if os(macOS)
 
-        if bold {
-            font = fontManager.convert(font, toHaveTrait: .boldFontMask)
+        func font(
+            bold: Bool = false,
+            italic: Bool = false,
+            underline: Bool = false,
+            strikethrough: Bool = false,
+            link: String? = nil,
+        ) {
+            var font = NSFont.systemFont(ofSize: 13)
+            let fontManager = NSFontManager.shared
+
+            if bold {
+                font = fontManager.convert(font, toHaveTrait: .boldFontMask)
+            }
+
+            if italic {
+                font = fontManager.convert(font, toHaveTrait: .italicFontMask)
+            }
+
+            self.font(font, underline, strikethrough, link)
         }
 
-        if italic {
-            font = fontManager.convert(font, toHaveTrait: .italicFontMask)
+        func font(_ font: NSFont, _ underline: Bool, _ strikethrough: Bool, _ link: String?) {
+            attributes[.font] = font
+            attributes[.foregroundColor] = NSColor.labelColor
+
+            if underline {
+                attributes[.underlineStyle] = NSUnderlineStyle.single.rawValue
+            }
+
+            if strikethrough {
+                attributes[.strikethroughStyle] = NSUnderlineStyle.single.rawValue
+            }
+
+            if let link {
+                attributes[.link] = link
+                attributes[.foregroundColor] = NSColor(Color.accentColor)
+            }
+
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.alignment = .left
+            paragraphStyle.lineBreakMode = .byWordWrapping
+
+            attributes[.paragraphStyle] = paragraphStyle
         }
 
-        self.font(font, underline, strikethrough, link)
-    }
+    #elseif os(iOS)
 
-    func font(_ font: NSFont, _ underline: Bool, _ strikethrough: Bool, _ link: String?) {
-        attributes[.font] = font
-        attributes[.foregroundColor] = NSColor.labelColor
+        func font(
+            bold: Bool = false,
+            italic: Bool = false,
+            underline: Bool = false,
+            strikethrough: Bool = false,
+            link: String? = nil,
+        ) {
+            var fontDescriptor = UIFont.systemFont(ofSize: 13).fontDescriptor
 
-        if underline {
-            attributes[.underlineStyle] = 1
+            if bold {
+                fontDescriptor = fontDescriptor.withSymbolicTraits(.traitBold) ?? fontDescriptor
+            }
+
+            if italic {
+                fontDescriptor = fontDescriptor.withSymbolicTraits(.traitItalic) ?? fontDescriptor
+            }
+
+            let font = UIFont(descriptor: fontDescriptor, size: 13)
+            self.font(font, underline, strikethrough, link)
         }
 
-        if strikethrough {
-            attributes[.strikethroughStyle] = 1
+        func font(_ font: UIFont, _ underline: Bool, _ strikethrough: Bool, _ link: String?) {
+            attributes[.font] = font
+            attributes[.foregroundColor] = UIColor.label
+
+            if underline {
+                attributes[.underlineStyle] = NSUnderlineStyle.single.rawValue
+            }
+
+            if strikethrough {
+                attributes[.strikethroughStyle] = NSUnderlineStyle.single.rawValue
+            }
+
+            if let link {
+                attributes[.link] = link
+                attributes[.foregroundColor] = UIColor(Color.accentColor)
+            }
+
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.alignment = .left
+            paragraphStyle.lineBreakMode = .byWordWrapping
+
+            attributes[.paragraphStyle] = paragraphStyle
         }
 
-        if let link {
-            attributes[.link] = link
-            attributes[.foregroundColor] = NSColor(Color.accentColor)
-        }
-
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .left
-        paragraphStyle.lineBreakMode = .byWordWrapping
-
-        attributes[.paragraphStyle] = paragraphStyle
-    }
+    #endif
 }
 
 extension NSMutableAttributedString {

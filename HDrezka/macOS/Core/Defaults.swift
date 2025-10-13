@@ -1,5 +1,6 @@
+import AVFoundation
 import Defaults
-import Foundation
+import SwiftUI
 
 extension Defaults.Keys {
     static let mirror = Key<URL>("mirror", default: Const.mirror)

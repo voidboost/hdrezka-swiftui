@@ -56,7 +56,11 @@ class DetailsViewModel {
                                         ),
                                         configuration: .init(
                                             openURLAction: .init { url, _ in
-                                                NSWorkspace.shared.open(url)
+                                                #if os(macOS)
+                                                    NSWorkspace.shared.open(url)
+                                                #elseif os(iOS)
+                                                    UIApplication.shared.open(url)
+                                                #endif
                                             },
                                         ),
                                         isLoggingEnabled: isLoggingEnabled,

@@ -103,6 +103,5 @@ struct HDrezkaApp: App {
                 .preferredColorScheme(theme.scheme)
         }
         .modelContainer(modelContainer)
-        .restorationBehavior(.disabled)
     }
 }
