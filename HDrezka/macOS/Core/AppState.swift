@@ -20,9 +20,9 @@ class AppState {
 
 enum Tabs: Hashable, Identifiable, CaseIterable {
     case home
-    case search
     case categories
     case collections
+    case search
     case watchingLater
     case bookmarks
 

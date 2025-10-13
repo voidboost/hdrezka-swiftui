@@ -25,22 +25,19 @@ class Const {
         let appName = Bundle.main.infoDictionary?["CFBundleName"] as? String ?? "HDrezka"
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
         let appBundle = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
-        let osName = "macOS"
+        let osName = "iOS"
         let osVersion = ProcessInfo.processInfo.operatingSystemVersion
 
-        var size = 0
-        sysctlbyname("hw.model", nil, &size, nil, 0)
-        var model = [CChar](repeating: 0, count: Int(size))
-        sysctlbyname("hw.model", &model, &size, nil, 0)
-        let deviceModel = String(cString: model)
-
-        let service = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
-        if service != 0 {
-            defer { IOObjectRelease(service) }
-
-            if let uuid = IORegistryEntryCreateCFProperty(service, kIOPlatformUUIDKey as CFString, kCFAllocatorDefault, 0).takeRetainedValue() as? String, !uuid.isEmpty {
-                return "\(appName)/\(appVersion)(\(appBundle)) (\(deviceModel); \(osName) \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion); \(uuid))"
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let deviceModel = withUnsafePointer(to: &systemInfo.machine) {
+            $0.withMemoryRebound(to: CChar.self, capacity: 1) {
+                String(cString: $0)
             }
+        }
+
+        if let uuid = UIDevice.current.identifierForVendor?.uuidString {
+            return "\(appName)/\(appVersion)(\(appBundle)) (\(deviceModel); \(osName) \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion); \(uuid))"
         }
 
         return "\(appName)/\(appVersion)(\(appBundle)) (\(deviceModel); \(osName) \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion))"

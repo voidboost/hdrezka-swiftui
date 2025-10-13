@@ -83,31 +83,3 @@ class HomeViewModel {
         getData(category: page, isInitial: false)
     }
 }
-
-struct Category: Identifiable, Hashable {
-    let category: Categories
-    let title: String
-    let movies: [MovieSimple]
-    let id: UUID
-
-    init(category: Categories, title: String, movies: [MovieSimple], id: UUID = .init()) {
-        self.category = category
-        self.title = title
-        self.movies = movies
-        self.id = id
-    }
-}
-
-enum Categories: LocalizedStringKey, CaseIterable, Hashable {
-    case hot = "key.filters.hot"
-//    case featured = "key.filters.featured"
-    case watchingNow = "key.filters.watching_now"
-    case newest = "key.filters.newest"
-    case latest = "key.filters.latest"
-    case popular = "key.filters.popular"
-    case soon = "key.filters.soon"
-
-    var localized: String {
-        rawValue.toString() ?? ""
-    }
-}

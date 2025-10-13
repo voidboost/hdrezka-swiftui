@@ -18,11 +18,9 @@ class AppState {
 
 enum Tabs: Hashable, Identifiable, CaseIterable {
     case home
-    case search
     case categories
-    case collections
-    case watchingLater
-    case bookmarks
+    case search
+    case profile
 
     var label: LocalizedStringKey {
         switch self {
@@ -32,12 +30,8 @@ enum Tabs: Hashable, Identifiable, CaseIterable {
             "key.search"
         case .categories:
             "key.categories"
-        case .collections:
-            "key.collections"
-        case .watchingLater:
-            "key.watching_later"
-        case .bookmarks:
-            "key.bookmarks"
+        case .profile:
+            "key.profile"
         }
     }
 
@@ -49,21 +43,8 @@ enum Tabs: Hashable, Identifiable, CaseIterable {
             "magnifyingglass"
         case .categories:
             "square.grid.2x2"
-        case .collections:
-            "film.stack"
-        case .watchingLater:
-            "clock.arrow.circlepath"
-        case .bookmarks:
-            "bookmark"
-        }
-    }
-
-    var needAccount: Bool {
-        switch self {
-        case .watchingLater, .bookmarks:
-            true
-        default:
-            false
+        case .profile:
+            "person.crop.circle"
         }
     }
 
@@ -79,32 +60,26 @@ enum Tabs: Hashable, Identifiable, CaseIterable {
     @ViewBuilder
     func content() -> some View {
         NavigationStack {
-            switch self {
-            case .home:
-                HomeView()
-                    .id("home")
-                    .destinations()
-            case .search:
-                SearchView()
-                    .id("search")
-                    .destinations()
-            case .categories:
-                CategoriesView()
-                    .id("categories")
-                    .destinations()
-            case .collections:
-                CollectionsView()
-                    .id("collections")
-                    .destinations()
-            case .watchingLater:
-                WatchingLaterView()
-                    .id("watching_later")
-                    .destinations()
-            case .bookmarks:
-                BookmarksView()
-                    .id("bookmarks")
-                    .destinations()
-            }
+            HomeView()
+                .id("home")
+//            switch self {
+//            case .home:
+//                HomeView()
+//                    .id("home")
+//                    .destinations()
+//            case .search:
+//                SearchView()
+//                    .id("search")
+//                    .destinations()
+//            case .categories:
+//                CategoriesView()
+//                    .id("categories")
+//                    .destinations()
+//            case .profile:
+//                ProfileView()
+//                    .id("profile")
+//                    .destinations()
+//            }
         }
     }
 
@@ -112,6 +87,9 @@ enum Tabs: Hashable, Identifiable, CaseIterable {
 }
 
 enum Destinations: Hashable, Identifiable {
+    case collections
+    case watchingLater
+    case bookmarks
     case details(MovieSimple)
     case country(MovieCountry)
     case category(Categories)
@@ -141,39 +119,48 @@ enum Destinations: Hashable, Identifiable {
     var id: Self { self }
 }
 
-extension View {
-    @ViewBuilder
-    func destinations() -> some View {
-        navigationDestination(for: Destinations.self) { destination in
-            switch destination {
-            case let .details(movie):
-                DetailsView(movie: movie)
-                    .id(movie.movieId)
-            case let .country(country):
-                ListView(country: country)
-                    .id(country.countryId)
-            case let .category(category):
-                ListView(category: category)
-                    .id(category)
-            case let .genre(genre):
-                ListView(genre: genre)
-                    .id(genre.genreId)
-            case let .collection(collection):
-                ListView(collection: collection)
-                    .id(collection.collectionId)
-            case let .customList(movies, title):
-                ListView(movies: movies, title: title)
-                    .id(title)
-            case let .list(list):
-                ListView(list: list)
-                    .id(list.listId)
-            case let .person(person):
-                PersonView(person: person)
-                    .id(person.personId)
-            case let .comments(details):
-                CommentsView(details: details)
-                    .id(details.movieId)
-            }
-        }
-    }
-}
+// extension View {
+//    @ViewBuilder
+//    func destinations() -> some View {
+//        navigationDestination(for: Destinations.self) { destination in
+//            switch destination {
+//            case .collections:
+//                CollectionsView()
+//                    .id("collections")
+//            case .watchingLater:
+//                WatchingLaterView()
+//                    .id("watching_later")
+//            case .bookmarks:
+//                BookmarksView()
+//                    .id("bookmarks")
+//            case let .details(movie):
+//                DetailsView(movie: movie)
+//                    .id(movie.movieId)
+//            case let .country(country):
+//                ListView(country: country)
+//                    .id(country.countryId)
+//            case let .category(category):
+//                ListView(category: category)
+//                    .id(category)
+//            case let .genre(genre):
+//                ListView(genre: genre)
+//                    .id(genre.genreId)
+//            case let .collection(collection):
+//                ListView(collection: collection)
+//                    .id(collection.collectionId)
+//            case let .customList(movies, title):
+//                ListView(movies: movies, title: title)
+//                    .id(title)
+//            case let .list(list):
+//                ListView(list: list)
+//                    .id(list.listId)
+//            case let .person(person):
+//                PersonView(person: person)
+//                    .id(person.personId)
+//            case let .comments(details):
+//                CommentsView(details: details)
+//                    .id(details.movieId)
+//            }
+//        }
+//    }
+// }
