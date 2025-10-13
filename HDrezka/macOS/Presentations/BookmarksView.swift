@@ -20,7 +20,7 @@ struct BookmarksView: View {
                 if let bookmarks = viewModel.bookmarksState.data, !bookmarks.isEmpty {
                     ForEach(bookmarks) { bookmark in
                         Text(bookmark.name)
-                            .font(.system(size: 15))
+                            .font(.title3)
                             .lineLimit(1)
                             .badge(Text(verbatim: "\(bookmark.count)").monospacedDigit())
                             .contentTransition(.numericText(value: Double(bookmark.count)))
@@ -60,7 +60,7 @@ struct BookmarksView: View {
                                     viewModel.deleteBookmarksCategory(bookmark: bookmark)
                                 } label: {
                                     Image(systemName: "trash")
-                                        .font(.system(size: 15))
+                                        .font(.title3)
                                 }
                                 .tint(.accentColor)
 
@@ -68,7 +68,7 @@ struct BookmarksView: View {
                                     viewModel.renameBookmark = bookmark
                                 } label: {
                                     Image(systemName: "pencil")
-                                        .font(.system(size: 15))
+                                        .font(.title3)
                                 }
                                 .tint(.secondary)
                             }
@@ -92,7 +92,7 @@ struct BookmarksView: View {
                 if let error = viewModel.bookmarksState.error {
                     VStack(alignment: .center, spacing: 8) {
                         Text(error.localizedDescription)
-                            .font(.system(size: 17, weight: .medium))
+                            .font(.system(.title2, weight: .medium))
                             .lineLimit(nil)
                             .multilineTextAlignment(.center)
 
@@ -100,7 +100,7 @@ struct BookmarksView: View {
                             viewModel.getBookmarks(reset: true)
                         } label: {
                             Text("key.retry")
-                                .font(.system(size: 13))
+                                .font(.body)
                                 .foregroundStyle(Color.accentColor)
                         }
                         .buttonStyle(.accessoryBar)
@@ -111,7 +111,7 @@ struct BookmarksView: View {
                 } else if let bookmarks = viewModel.bookmarksState.data, bookmarks.isEmpty {
                     VStack(alignment: .center, spacing: 8) {
                         Text("key.bookmark.empty")
-                            .font(.system(size: 17, weight: .medium))
+                            .font(.system(.title2, weight: .medium))
                             .lineLimit(nil)
                             .multilineTextAlignment(.center)
 
@@ -119,7 +119,7 @@ struct BookmarksView: View {
                             viewModel.isCreateBookmarkPresented = true
                         } label: {
                             Text("key.create")
-                                .font(.system(size: 13))
+                                .font(.body)
                                 .foregroundStyle(Color.accentColor)
                         }
                         .buttonStyle(.accessoryBar)
@@ -129,7 +129,7 @@ struct BookmarksView: View {
                             viewModel.getBookmarks(reset: true)
                         } label: {
                             Text("key.retry")
-                                .font(.system(size: 13))
+                                .font(.body)
                                 .foregroundStyle(Color.accentColor)
                         }
                         .buttonStyle(.accessoryBar)
@@ -194,7 +194,7 @@ struct BookmarksView: View {
                 if let error = viewModel.bookmarkState.error {
                     VStack(alignment: .center, spacing: 8) {
                         Text(error.localizedDescription)
-                            .font(.system(size: 20, weight: .medium))
+                            .font(.system(.title, weight: .medium))
                             .lineLimit(nil)
                             .multilineTextAlignment(.center)
 
@@ -202,7 +202,7 @@ struct BookmarksView: View {
                             viewModel.load()
                         } label: {
                             Text("key.retry")
-                                .font(.system(size: 15))
+                                .font(.title3)
                                 .foregroundStyle(Color.accentColor)
                         }
                         .buttonStyle(.accessoryBar)
@@ -213,7 +213,7 @@ struct BookmarksView: View {
                 } else if let movies = viewModel.bookmarkState.data, movies.isEmpty {
                     VStack(alignment: .center, spacing: 8) {
                         Text(viewModel.selectedBookmark == -1 ? String(localized: "key.bookmarks.select") : String(localized: "key.bookmarks.empty"))
-                            .font(.system(size: 20, weight: .medium))
+                            .font(.system(.title, weight: .medium))
                             .lineLimit(nil)
                             .multilineTextAlignment(.center)
 
@@ -222,7 +222,7 @@ struct BookmarksView: View {
                                 viewModel.load()
                             } label: {
                                 Text("key.retry")
-                                    .font(.system(size: 15))
+                                    .font(.title3)
                                     .foregroundStyle(Color.accentColor)
                             }
                             .buttonStyle(.accessoryBar)

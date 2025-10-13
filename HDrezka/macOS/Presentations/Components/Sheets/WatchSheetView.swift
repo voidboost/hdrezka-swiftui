@@ -50,7 +50,7 @@ struct WatchSheetView: View {
         VStack(alignment: .center, spacing: 25) {
             VStack(alignment: .center, spacing: 5) {
                 Image(systemName: "videoprojector")
-                    .font(.system(size: 48))
+                    .font(.largeTitle)
                     .foregroundStyle(Color.accentColor)
 
                 Text("key.before_starting")
@@ -77,7 +77,7 @@ struct WatchSheetView: View {
                                             } label: {
                                                 Image(systemName: "questionmark.circle")
                                                     .foregroundStyle(Color.accentColor)
-                                                    .font(.system(size: 11))
+                                                    .font(.subheadline)
                                             }
                                             .buttonStyle(.plain)
                                             .popover(isPresented: $showRating, arrowEdge: .trailing) {
@@ -277,7 +277,7 @@ struct WatchSheetView: View {
                                     ShareLink(item: link) {
                                         Image(systemName: "square.and.arrow.up")
                                             .foregroundStyle(.secondary)
-                                            .font(.system(size: 11))
+                                            .font(.subheadline)
                                     }
                                     .buttonStyle(.plain)
                                 }

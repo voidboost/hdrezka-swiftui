@@ -91,16 +91,16 @@ struct WatchingLaterCardView: View {
 
                 VStack(alignment: .leading) {
                     Text(movie.name)
-                        .font(.system(size: 15).weight(.semibold))
+                        .font(.title3.weight(.semibold))
                         .lineLimit(2)
 
                     Text(movie.details.trimmingCharacters(in: CharacterSet(charactersIn: "()")))
-                        .font(.system(size: 12))
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
 
                     Text(movie.date.replacingOccurrences(of: "-", with: ".").firstLetterUppercased())
-                        .font(.system(size: 12))
+                        .font(.subheadline)
                         .foregroundStyle(Color.accentColor)
                 }
             }

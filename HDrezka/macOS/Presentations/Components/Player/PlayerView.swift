@@ -139,7 +139,7 @@ struct PlayerView: View {
                                     pipController.startPictureInPicture()
                                 } label: {
                                     Image(systemName: "pip.enter")
-                                        .font(.system(size: 17))
+                                        .font(.title2)
                                 }
                                 .buttonStyle(.plain)
                                 .disabled(isPictureInPictureActive || !isPictureInPicturePossible)
@@ -170,7 +170,7 @@ struct PlayerView: View {
                                         }
                                     } label: {
                                         Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(volume))
-                                            .font(.system(size: 17))
+                                            .font(.title2)
                                             .contentTransition(.symbolEffect(.replace))
                                     }
                                     .buttonStyle(.plain)
@@ -194,7 +194,7 @@ struct PlayerView: View {
                                     prevTrack(seasons, season, episode)
                                 } label: {
                                     Image(systemName: "backward.fill")
-                                        .font(.system(size: 18))
+                                        .font(.title2)
                                 }
                                 .buttonStyle(.plain)
                                 .disabled(seasons.element(before: season) == nil && season.episodes.element(before: episode) == nil)
@@ -219,7 +219,7 @@ struct PlayerView: View {
                                     }
                                 } label: {
                                     Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                                        .font(.system(size: 43))
+                                        .font(.largeTitle)
                                         .contentTransition(.symbolEffect(.replace))
                                 }
                                 .buttonStyle(.plain)
@@ -234,7 +234,7 @@ struct PlayerView: View {
                                     nextTrack(seasons, season, episode)
                                 } label: {
                                     Image(systemName: "forward.fill")
-                                        .font(.system(size: 18))
+                                        .font(.title2)
                                 }
                                 .buttonStyle(.plain)
                                 .disabled(seasons.element(after: season) == nil && season.episodes.element(after: episode) == nil)
@@ -298,7 +298,7 @@ struct PlayerView: View {
                                         } label: {
                                             Label("key.subtitles", systemImage: "captions.bubble")
                                                 .labelStyle(.iconOnly)
-                                                .font(.system(size: 17))
+                                                .font(.title2)
                                         }
                                         .buttonStyle(.plain)
                                         .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
@@ -340,7 +340,7 @@ struct PlayerView: View {
                                         } label: {
                                             Label("key.timer", systemImage: "timer")
                                                 .labelStyle(.titleOnly)
-                                                .font(.system(size: 17))
+                                                .font(.title2)
                                         }
                                         .buttonStyle(.plain)
 
@@ -362,7 +362,7 @@ struct PlayerView: View {
                                         } label: {
                                             Label("key.video_gravity", systemImage: "arrow.up.left.and.arrow.down.right")
                                                 .labelStyle(.titleOnly)
-                                                .font(.system(size: 17))
+                                                .font(.title2)
                                         }
                                         .buttonStyle(.plain)
 
@@ -387,7 +387,7 @@ struct PlayerView: View {
                                         } label: {
                                             Label("key.speed", systemImage: "gauge.with.dots.needle.33percent")
                                                 .labelStyle(.titleOnly)
-                                                .font(.system(size: 17))
+                                                .font(.title2)
                                         }
                                         .buttonStyle(.plain)
 
@@ -414,14 +414,14 @@ struct PlayerView: View {
                                             } label: {
                                                 Label("key.quality", systemImage: "gearshape")
                                                     .labelStyle(.titleOnly)
-                                                    .font(.system(size: 17))
+                                                    .font(.title2)
                                             }
                                             .buttonStyle(.plain)
                                         }
                                     } label: {
                                         Label("key.settings", systemImage: "ellipsis.circle")
                                             .labelStyle(.iconOnly)
-                                            .font(.system(size: 17))
+                                            .font(.title2)
                                     }
                                     .buttonStyle(.plain)
                                     .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
@@ -461,7 +461,7 @@ struct PlayerView: View {
                                                     .offset(y: -14.0 / 4)
                                             } else {
                                                 Image(systemName: "chart.bar.xaxis")
-                                                    .font(.system(size: 15))
+                                                    .font(.title3)
                                             }
 
                                             Text("key.next")

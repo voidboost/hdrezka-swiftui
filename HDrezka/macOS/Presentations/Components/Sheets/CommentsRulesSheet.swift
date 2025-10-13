@@ -11,7 +11,7 @@ struct CommentsRulesSheet: View {
         VStack(alignment: .center, spacing: 25) {
             VStack(alignment: .center, spacing: 5) {
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 48))
+                    .font(.largeTitle)
                     .foregroundStyle(Color.accentColor)
 
                 Text("key.rules")
@@ -30,7 +30,7 @@ struct CommentsRulesSheet: View {
                     HStack(alignment: .top, spacing: 5) {
                         Image(systemName: "seal.fill")
                             .padding(.top, 3)
-                            .font(.system(size: 9))
+                            .font(.caption)
                             .foregroundStyle(Color.accentColor)
 
                         Text(String(localized: "key.rules.inciting").lowercased())
@@ -39,7 +39,7 @@ struct CommentsRulesSheet: View {
                     HStack(alignment: .top, spacing: 5) {
                         Image(systemName: "seal.fill")
                             .padding(.top, 3)
-                            .font(.system(size: 9))
+                            .font(.caption)
                             .foregroundStyle(Color.accentColor)
 
                         Text(String(localized: "key.rules.insulting").lowercased())
@@ -48,7 +48,7 @@ struct CommentsRulesSheet: View {
                     HStack(alignment: .top, spacing: 5) {
                         Image(systemName: "seal.fill")
                             .padding(.top, 3)
-                            .font(.system(size: 9))
+                            .font(.caption)
                             .foregroundStyle(Color.accentColor)
 
                         Text(String(localized: "key.rules.obscene").lowercased())
@@ -57,7 +57,7 @@ struct CommentsRulesSheet: View {
                     HStack(alignment: .top, spacing: 5) {
                         Image(systemName: "seal.fill")
                             .padding(.top, 3)
-                            .font(.system(size: 9))
+                            .font(.caption)
                             .foregroundStyle(Color.accentColor)
 
                         Text(String(localized: "key.rules.spoiler").lowercased())
@@ -66,7 +66,7 @@ struct CommentsRulesSheet: View {
                     HStack(alignment: .top, spacing: 5) {
                         Image(systemName: "seal.fill")
                             .padding(.top, 3)
-                            .font(.system(size: 9))
+                            .font(.caption)
                             .foregroundStyle(Color.accentColor)
 
                         Text(String(localized: "key.rules.leave").lowercased())
@@ -75,7 +75,7 @@ struct CommentsRulesSheet: View {
                     HStack(alignment: .top, spacing: 5) {
                         Image(systemName: "seal.fill")
                             .padding(.top, 3)
-                            .font(.system(size: 9))
+                            .font(.caption)
                             .foregroundStyle(Color.accentColor)
 
                         Text(String(localized: "key.rules.questions").lowercased())
@@ -84,7 +84,7 @@ struct CommentsRulesSheet: View {
                     HStack(alignment: .top, spacing: 5) {
                         Image(systemName: "seal.fill")
                             .padding(.top, 3)
-                            .font(.system(size: 9))
+                            .font(.caption)
                             .foregroundStyle(Color.accentColor)
 
                         Text(String(localized: "key.rules.resources").lowercased())
@@ -93,7 +93,7 @@ struct CommentsRulesSheet: View {
                     HStack(alignment: .top, spacing: 5) {
                         Image(systemName: "seal.fill")
                             .padding(.top, 3)
-                            .font(.system(size: 9))
+                            .font(.caption)
                             .foregroundStyle(Color.accentColor)
 
                         Text(String(localized: "key.rules.mention").lowercased())
@@ -102,14 +102,14 @@ struct CommentsRulesSheet: View {
                     HStack(alignment: .top, spacing: 5) {
                         Image(systemName: "seal.fill")
                             .padding(.top, 3)
-                            .font(.system(size: 9))
+                            .font(.caption)
                             .foregroundStyle(Color.accentColor)
 
                         Text(String(localized: "key.rules.problems").lowercased())
                     }
                 }
                 .multilineTextAlignment(.leading)
-                .font(.system(size: 13))
+                .font(.body)
                 .padding(10)
                 .frame(maxWidth: .infinity)
             }

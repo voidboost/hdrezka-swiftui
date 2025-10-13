@@ -32,7 +32,7 @@ struct CollectionCardView: View {
 
                                         Text(verbatim: "\(count)")
                                             .lineLimit(1)
-                                            .font(.system(size: 10))
+                                            .font(.caption)
                                             .padding(.vertical, 3)
                                             .padding(.horizontal, 6)
                                             .background(.ultraThickMaterial)
@@ -44,7 +44,7 @@ struct CollectionCardView: View {
                             }
 
                             Text(collection.name)
-                                .font(.system(size: 15).weight(.semibold))
+                                .font(.title3.weight(.semibold))
                                 .lineLimit(2)
                                 .multilineTextAlignment(.center)
                                 .padding(9)

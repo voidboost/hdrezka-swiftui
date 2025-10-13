@@ -13,7 +13,7 @@ struct ScheduleSheetView: View {
         VStack(alignment: .center, spacing: 25) {
             VStack(spacing: 5) {
                 Image(systemName: "list.and.film")
-                    .font(.system(size: 48))
+                    .font(.largeTitle)
                     .foregroundStyle(Color.accentColor)
 
                 Text("key.schedule")
@@ -64,7 +64,7 @@ struct ScheduleSheetView: View {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     Label(group.name, systemImage: isExpanded ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 15).bold())
+                        .font(.title3.bold())
 
                     Spacer()
                 }
@@ -75,12 +75,12 @@ struct ScheduleSheetView: View {
                             HStack(alignment: .center) {
                                 VStack(alignment: .leading) {
                                     Text(item.russianEpisodeName)
-                                        .font(.system(size: 13))
+                                        .font(.body)
                                         .lineLimit(1)
 
                                     if let originalEpisodeName = item.originalEpisodeName {
                                         Text(originalEpisodeName)
-                                            .font(.system(size: 13))
+                                            .font(.body)
                                             .lineLimit(1)
                                             .foregroundStyle(.secondary)
                                     }
@@ -89,9 +89,9 @@ struct ScheduleSheetView: View {
                                 Spacer()
 
                                 VStack(alignment: .trailing) {
-                                    Text(item.releaseDate).font(.system(size: 13)).foregroundStyle(.secondary)
+                                    Text(item.releaseDate).font(.body).foregroundStyle(.secondary)
 
-                                    Text(item.title).font(.system(size: 11)).foregroundStyle(.secondary)
+                                    Text(item.title).font(.subheadline).foregroundStyle(.secondary)
                                 }
                             }
                             .padding(.vertical, 8)

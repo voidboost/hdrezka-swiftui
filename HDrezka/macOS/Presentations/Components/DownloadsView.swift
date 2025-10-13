@@ -24,7 +24,7 @@ struct DownloadsView: View {
                                     }
                                 } label: {
                                     Image(systemName: status.status == .paused ? "play.circle.fill" : "pause.circle.fill")
-                                        .font(.system(size: 15))
+                                        .font(.title3)
                                         .contentTransition(.symbolEffect(.replace))
                                 }
                                 .buttonStyle(.plain)
@@ -35,7 +35,7 @@ struct DownloadsView: View {
                             } label: {
                                 Image(systemName: "xmark.circle.fill")
                                     .foregroundStyle(Color.accentColor)
-                                    .font(.system(size: 15))
+                                    .font(.title3)
                             }
                             .buttonStyle(.plain)
                         }

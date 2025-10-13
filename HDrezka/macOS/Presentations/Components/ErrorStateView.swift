@@ -12,7 +12,7 @@ struct ErrorStateView: View {
     var body: some View {
         VStack(alignment: .center, spacing: 8) {
             Text(error.localizedDescription)
-                .font(.system(size: 20, weight: .medium))
+                .font(.system(.title, weight: .medium))
                 .lineLimit(nil)
                 .multilineTextAlignment(.center)
 
@@ -20,7 +20,7 @@ struct ErrorStateView: View {
                 retryAction()
             } label: {
                 Text("key.retry")
-                    .font(.system(size: 15))
+                    .font(.title3)
                     .foregroundStyle(Color.accentColor)
             }
             .buttonStyle(.accessoryBar)
