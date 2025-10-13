@@ -25,7 +25,7 @@ struct CreateBookmarkSheetView: View {
                 VStack(alignment: .center, spacing: 25) {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "bookmark.circle")
-                            .font(.system(size: 48))
+                            .font(.largeTitle)
                             .foregroundStyle(Color.accentColor)
 
                         Text("key.create.label")
@@ -92,7 +92,7 @@ struct CreateBookmarkSheetView: View {
                 VStack(alignment: .center, spacing: 25) {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "bookmark.circle")
-                            .font(.system(size: 48))
+                            .font(.largeTitle)
                             .foregroundStyle(Color.accentColor)
 
                         Text("key.create.enter")
@@ -126,7 +126,7 @@ struct CreateBookmarkSheetView: View {
                 VStack(alignment: .center, spacing: 25) {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "bookmark.circle")
-                            .font(.system(size: 48))
+                            .font(.largeTitle)
                             .foregroundStyle(Color.accentColor)
 
                         Text("key.ops")

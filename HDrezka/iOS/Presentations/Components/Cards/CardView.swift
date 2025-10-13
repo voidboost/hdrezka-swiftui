@@ -34,7 +34,7 @@ struct CardView: View {
                                         let icon = Text(Image(systemName: cat.icon))
 
                                         Text("key.cat-\(cat.title)-\(rating)-\(icon)")
-                                            .font(.system(size: 10))
+                                            .font(.caption)
                                             .foregroundStyle(.white)
                                             .padding(.vertical, 3)
                                             .padding(.horizontal, 6)
@@ -44,7 +44,7 @@ struct CardView: View {
                                         let icon = Text(Image(systemName: cat.icon))
 
                                         Text("key.cat-\(cat.title)-\(icon)")
-                                            .font(.system(size: 10))
+                                            .font(.caption)
                                             .foregroundStyle(.white)
                                             .padding(.vertical, 3)
                                             .padding(.horizontal, 6)
@@ -60,7 +60,7 @@ struct CardView: View {
                                 HStack {
                                     Text(info.title)
                                         .lineLimit(1)
-                                        .font(.system(size: 10))
+                                        .font(.caption)
                                         .padding(.vertical, 3)
                                         .padding(.horizontal, 6)
                                         .background(.ultraThickMaterial)
@@ -79,23 +79,23 @@ struct CardView: View {
                         ZStack(alignment: .topLeading) {
                             VStack(alignment: .leading) {
                                 Text(name)
-                                    .font(.system(size: 15).weight(.semibold))
+                                    .font(.title3.weight(.semibold))
                                     .foregroundStyle(.clear)
                                     .lineLimit(2, reservesSpace: true)
 
                                 Text(details)
-                                    .font(.system(size: 12))
+                                    .font(.subheadline)
                                     .foregroundStyle(.clear)
                                     .lineLimit(2, reservesSpace: true)
                             }
 
                             VStack(alignment: .leading) {
                                 Text(name)
-                                    .font(.system(size: 15).weight(.semibold))
+                                    .font(.title3.weight(.semibold))
                                     .lineLimit(2)
 
                                 Text(details)
-                                    .font(.system(size: 12))
+                                    .font(.subheadline)
                                     .foregroundStyle(.secondary)
                                     .lineLimit(2)
                             }
@@ -103,11 +103,11 @@ struct CardView: View {
                     } else {
                         VStack(alignment: .leading) {
                             Text(name)
-                                .font(.system(size: 15).weight(.semibold))
+                                .font(.title3.weight(.semibold))
                                 .lineLimit(2)
 
                             Text(details)
-                                .font(.system(size: 12))
+                                .font(.subheadline)
                                 .foregroundStyle(.secondary)
                                 .lineLimit(2)
                         }

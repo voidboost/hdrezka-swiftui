@@ -28,18 +28,18 @@ struct HomeView: View {
                             .scrollIndicators(.never)
                         } header: {
                             HStack(alignment: .center, spacing: 9) {
-                                Text(category.title).font(.system(size: 22, weight: .semibold))
+                                Text(category.title).font(.system(.title, weight: .semibold))
 
                                 Spacer()
 
                                 NavigationLink(value: Destinations.category(category.category)) {
                                     HStack(alignment: .center) {
                                         Text("key.see_all")
-                                            .font(.system(size: 12))
+                                            .font(.subheadline)
                                             .foregroundStyle(Color.accentColor)
 
                                         Image(systemName: "chevron.right")
-                                            .font(.system(size: 12))
+                                            .font(.subheadline)
                                             .foregroundStyle(Color.accentColor)
                                     }
                                 }

@@ -14,13 +14,13 @@ struct EmptyStateView: View {
     var body: some View {
         VStack(alignment: .center, spacing: 8) {
             Text(description)
-                .font(.system(size: 20, weight: .medium))
+                .font(.system(.title, weight: .medium))
                 .lineLimit(nil)
                 .multilineTextAlignment(.center)
 
             if let subdescription {
                 Text(subdescription)
-                    .font(.system(size: 15))
+                    .font(.title3)
                     .foregroundStyle(.secondary)
                     .lineLimit(nil)
                     .multilineTextAlignment(.center)
@@ -31,7 +31,7 @@ struct EmptyStateView: View {
                     retryAction()
                 } label: {
                     Text("key.retry")
-                        .font(.system(size: 15))
+                        .font(.title3)
                         .foregroundStyle(Color.accentColor)
                 }
                 .buttonStyle(.bordered)

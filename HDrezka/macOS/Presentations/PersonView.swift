@@ -119,7 +119,7 @@ struct PersonView: View {
 
                         if let nameOriginal = details.nameOrig {
                             Text(nameOriginal)
-                                .font(.system(size: 15))
+                                .font(.title3)
                                 .foregroundStyle(.secondary)
                                 .textSelection(.enabled)
                         }
@@ -267,12 +267,12 @@ struct PersonView: View {
         var body: some View {
             HStack(alignment: .center) {
                 Text(title)
-                    .font(.system(size: 13))
+                    .font(.body)
 
                 Spacer()
 
                 Text(info)
-                    .font(.system(size: 13))
+                    .font(.body)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
@@ -292,7 +292,7 @@ struct PersonView: View {
         var body: some View {
             VStack(alignment: .leading, spacing: 18) {
                 HStack(alignment: .center, spacing: 9) {
-                    Text(title).font(.system(size: 22).bold())
+                    Text(title).font(.title.bold())
 
                     Spacer()
 
@@ -300,11 +300,11 @@ struct PersonView: View {
                         NavigationLink(value: Destinations.customList(movies, title)) {
                             HStack(alignment: .center) {
                                 Text("key.see_all")
-                                    .font(.system(size: 12))
+                                    .font(.subheadline)
                                     .foregroundStyle(Color.accentColor)
 
                                 Image(systemName: "chevron.right")
-                                    .font(.system(size: 12))
+                                    .font(.subheadline)
                                     .foregroundStyle(Color.accentColor)
                             }
                         }

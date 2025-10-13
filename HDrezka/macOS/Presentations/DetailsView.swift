@@ -253,7 +253,7 @@ struct DetailsView: View {
 
                                 if let nameOriginal = details.nameOriginal {
                                     Text(nameOriginal)
-                                        .font(.system(size: 15))
+                                        .font(.title3)
                                         .foregroundStyle(.secondary)
                                         .textSelection(.enabled)
                                 }
@@ -265,7 +265,7 @@ struct DetailsView: View {
                                         isPlayPresented = true
                                     } label: {
                                         Label("key.watch", systemImage: "play.fill")
-                                            .font(.system(size: 13))
+                                            .font(.body)
                                             .foregroundStyle(.white)
                                             .padding(.horizontal, 14)
                                             .padding(.vertical, 7)
@@ -283,7 +283,7 @@ struct DetailsView: View {
                                             isDownloadPresented = true
                                         } label: {
                                             Label("key.download", systemImage: "arrow.down.circle")
-                                                .font(.system(size: 13))
+                                                .font(.body)
                                                 .foregroundStyle(Color.accentColor)
                                                 .padding(.horizontal, 14)
                                                 .padding(.vertical, 7)
@@ -303,7 +303,7 @@ struct DetailsView: View {
                                             isOpenExternalPlayerPresented = true
                                         } label: {
                                             Label("key.open.external", systemImage: "arrow.up.forward.app")
-                                                .font(.system(size: 13))
+                                                .font(.body)
                                                 .foregroundStyle(Color.accentColor)
                                                 .padding(.horizontal, 14)
                                                 .padding(.vertical, 7)
@@ -320,7 +320,7 @@ struct DetailsView: View {
                                 } else if details.comingSoon {
                                     Button {} label: {
                                         Label("key.soon", systemImage: "clock")
-                                            .font(.system(size: 13))
+                                            .font(.body)
                                             .foregroundStyle(.white)
                                             .padding(.horizontal, 14)
                                             .padding(.vertical, 7)
@@ -331,7 +331,7 @@ struct DetailsView: View {
                                 } else {
                                     Button {} label: {
                                         Label("key.unavailable", systemImage: "network.slash")
-                                            .font(.system(size: 13))
+                                            .font(.body)
                                             .foregroundStyle(.white)
                                             .padding(.horizontal, 14)
                                             .padding(.vertical, 7)
@@ -538,11 +538,11 @@ struct DetailsView: View {
                         }
 
                         if let duration = details.duration, duration > 0 {
-                            InfoColumn(String(localized: "key.info.duration"), duration.description, Text(String(localized: "key.info.minutes-\(duration)").trimmingCharacters(in: .letters.inverted).lowercased()).font(.system(size: 13).weight(.medium)))
+                            InfoColumn(String(localized: "key.info.duration"), duration.description, Text(String(localized: "key.info.minutes-\(duration)").trimmingCharacters(in: .letters.inverted).lowercased()).font(.body.weight(.medium)))
                         }
 
                         if let ageRestriction = details.ageRestriction, !ageRestriction.isEmpty {
-                            InfoColumn(String(localized: "key.info.age"), ageRestriction, Text(String(localized: "key.info.years_old").lowercased()).font(.system(size: 13).weight(.medium)))
+                            InfoColumn(String(localized: "key.info.age"), ageRestriction, Text(String(localized: "key.info.years_old").lowercased()).font(.body.weight(.medium)))
                         }
                     }
 
@@ -593,7 +593,7 @@ struct DetailsView: View {
 
             HStack(alignment: .center, spacing: 18) {
                 Text(details.description)
-                    .font(.system(size: 15))
+                    .font(.title3)
                     .textSelection(.enabled)
 
                 if let trailer {
@@ -634,7 +634,7 @@ struct DetailsView: View {
                         VStack(alignment: .leading, spacing: 10) {
                             HStack {
                                 Text("key.franchise")
-                                    .font(.system(size: 17).bold())
+                                    .font(.title2.bold())
 
                                 Spacer()
                             }
@@ -647,7 +647,7 @@ struct DetailsView: View {
                                                 ZStack(alignment: .center) {
                                                     ZStack(alignment: .center) {
                                                         Text(verbatim: "\(fr.position)")
-                                                            .font(.system(size: 11))
+                                                            .font(.subheadline)
                                                             .foregroundStyle(.white)
                                                     }
                                                     .frame(width: 19, height: 19)
@@ -656,7 +656,7 @@ struct DetailsView: View {
                                                 .frame(width: 24, height: 24)
 
                                                 VStack(alignment: .leading) {
-                                                    Text(fr.name).font(.system(size: 13))
+                                                    Text(fr.name).font(.body)
                                                         .lineLimit(1)
 
                                                     if let rating = fr.rating {
@@ -665,16 +665,16 @@ struct DetailsView: View {
                                                         let star = Text(Image(systemName: "star.fill")).foregroundStyle(color)
 
                                                         Text("key.franchise.year-\(fr.year)-\(rating)-\(star)")
-                                                            .font(.system(size: 11))
+                                                            .font(.subheadline)
                                                             .foregroundStyle(.secondary)
                                                     } else {
-                                                        Text("key.franchise.year-\(fr.year)").font(.system(size: 11)).foregroundStyle(.secondary)
+                                                        Text("key.franchise.year-\(fr.year)").font(.subheadline).foregroundStyle(.secondary)
                                                     }
                                                 }
 
                                                 Spacer()
 
-                                                Image(systemName: "chevron.right").font(.system(size: 13))
+                                                Image(systemName: "chevron.right").font(.body)
                                             }
                                             .contentShape(.rect)
                                         }
@@ -685,7 +685,7 @@ struct DetailsView: View {
                                             ZStack(alignment: .center) {
                                                 ZStack(alignment: .center) {
                                                     Text(String(fr.position))
-                                                        .font(.system(size: 11))
+                                                        .font(.subheadline)
                                                         .foregroundStyle(.white)
                                                 }
                                                 .frame(width: 19, height: 19)
@@ -694,7 +694,7 @@ struct DetailsView: View {
                                             .frame(width: 24, height: 24)
 
                                             VStack(alignment: .leading) {
-                                                Text(fr.name).font(.system(size: 13))
+                                                Text(fr.name).font(.body)
                                                     .lineLimit(1)
 
                                                 if let rating = fr.rating {
@@ -703,10 +703,10 @@ struct DetailsView: View {
                                                     let star = Text(Image(systemName: "star.fill")).foregroundStyle(color)
 
                                                     Text("key.franchise.year-\(fr.year)-\(rating)-\(star)")
-                                                        .font(.system(size: 11))
+                                                        .font(.subheadline)
                                                         .foregroundStyle(.secondary)
                                                 } else {
-                                                    Text("key.franchise.year-\(fr.year)").font(.system(size: 11)).foregroundStyle(.secondary)
+                                                    Text("key.franchise.year-\(fr.year)").font(.subheadline).foregroundStyle(.secondary)
                                                 }
                                             }
 
@@ -730,7 +730,7 @@ struct DetailsView: View {
                                             }
                                         } label: {
                                             Text(franchiseExpanded ? String(localized: "key.hide").lowercased() : String(localized: "key.view_more").lowercased())
-                                                .font(.system(size: 13))
+                                                .font(.body)
                                                 .foregroundStyle(.primary)
                                         }
                                         .buttonStyle(.accessoryBar)
@@ -750,26 +750,26 @@ struct DetailsView: View {
                         VStack(alignment: .leading, spacing: 10) {
                             HStack {
                                 Text("key.schedule")
-                                    .font(.system(size: 17).bold())
+                                    .font(.title2.bold())
 
                                 Spacer()
                             }
 
                             VStack(alignment: .leading, spacing: 10) {
                                 Text(first.name)
-                                    .font(.system(size: 15).bold())
+                                    .font(.title3.bold())
 
                                 LazyVStack(alignment: .leading, spacing: 0) {
                                     ForEach(first.items.prefix(5)) { item in
                                         HStack(alignment: .center) {
                                             VStack(alignment: .leading) {
                                                 Text(item.russianEpisodeName)
-                                                    .font(.system(size: 13))
+                                                    .font(.body)
                                                     .lineLimit(1)
 
                                                 if let originalEpisodeName = item.originalEpisodeName {
                                                     Text(originalEpisodeName)
-                                                        .font(.system(size: 13))
+                                                        .font(.body)
                                                         .lineLimit(1)
                                                         .foregroundStyle(.secondary)
                                                 }
@@ -778,9 +778,9 @@ struct DetailsView: View {
                                             Spacer()
 
                                             VStack(alignment: .trailing) {
-                                                Text(item.releaseDate).font(.system(size: 13)).foregroundStyle(.secondary)
+                                                Text(item.releaseDate).font(.body).foregroundStyle(.secondary)
 
-                                                Text(item.title).font(.system(size: 11)).foregroundStyle(.secondary)
+                                                Text(item.title).font(.subheadline).foregroundStyle(.secondary)
                                             }
                                         }
                                         .padding(.vertical, 8)
@@ -798,7 +798,7 @@ struct DetailsView: View {
                                                 isSchedulePresented = true
                                             } label: {
                                                 Text(String(localized: "key.view_more").lowercased())
-                                                    .font(.system(size: 13))
+                                                    .font(.body)
                                                     .foregroundStyle(.primary)
                                             }
                                             .buttonStyle(.accessoryBar)
@@ -822,7 +822,7 @@ struct DetailsView: View {
                 .padding(.horizontal, 36)
 
             VStack(alignment: .leading, spacing: 18) {
-                Text("key.watch_also").font(.system(size: 22).bold())
+                Text("key.watch_also").font(.title.bold())
                     .padding(.horizontal, 36)
 
                 ScrollView(.horizontal) {
@@ -852,11 +852,11 @@ struct DetailsView: View {
         var body: some View {
             HStack(alignment: .center) {
                 Text(title)
-                    .font(.system(size: 13))
+                    .font(.body)
 
                 Spacer(minLength: 10)
 
-                Text(info).font(.system(size: 13)).foregroundStyle(.secondary)
+                Text(info).font(.body).foregroundStyle(.secondary)
                     .lineLimit(1)
                     .help(info)
             }
@@ -899,7 +899,7 @@ struct DetailsView: View {
         var body: some View {
             HStack(alignment: .center) {
                 Text(title)
-                    .font(.system(size: 13))
+                    .font(.body)
 
                 Spacer(minLength: 10)
 
@@ -915,13 +915,13 @@ struct DetailsView: View {
 
                                     Text("key.list-\(list.name)-\(place)")
                                         .foregroundStyle(.secondary)
-                                        .font(.system(size: 13))
+                                        .font(.body)
                                         .lineLimit(1)
                                         .truncationMode(.middle)
                                         .contentShape(.rect)
                                 } else {
                                     Text(item.name)
-                                        .font(.system(size: 13))
+                                        .font(.body)
                                         .foregroundStyle(.secondary)
                                         .lineLimit(1)
                                         .contentShape(.rect)
@@ -931,7 +931,7 @@ struct DetailsView: View {
 
                             if item != data.prefix(2).last {
                                 Text(verbatim: ", ")
-                                    .font(.system(size: 13))
+                                    .font(.body)
                                     .foregroundStyle(.secondary)
                             }
                         }
@@ -942,18 +942,18 @@ struct DetailsView: View {
                             isPresented = true
                         } label: {
                             Image(systemName: "info.circle")
-                                .font(.system(size: 13))
+                                .font(.body)
                                 .foregroundStyle(.secondary)
                         }
                         .buttonStyle(.plain)
                         .popover(isPresented: $isPresented, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
                             VStack(alignment: .center, spacing: 6) {
                                 Text(title)
-                                    .font(.system(size: 13).bold())
+                                    .font(.body.bold())
                                     .multilineTextAlignment(.center)
 
                                 Text(description)
-                                    .font(.system(size: 10))
+                                    .font(.caption)
                                     .multilineTextAlignment(.center)
 
                                 VStack(alignment: .center, spacing: 0) {
@@ -991,7 +991,7 @@ struct DetailsView: View {
                                                     .overlay(.tertiary.opacity(0.2), in: .circle.stroke(lineWidth: 1))
 
                                                     Text(person.name)
-                                                        .font(.system(size: 13))
+                                                        .font(.body)
                                                         .lineLimit(nil)
                                                         .multilineTextAlignment(.center)
                                                 }
@@ -1000,13 +1000,13 @@ struct DetailsView: View {
                                                 let place = Text("key.place-\(position)").foregroundStyle(.secondary)
 
                                                 Text("key.list-\(list.name)-\(place)")
-                                                    .font(.system(size: 13))
+                                                    .font(.body)
                                                     .lineLimit(nil)
                                                     .multilineTextAlignment(.center)
                                                     .contentShape(.rect)
                                             } else {
                                                 Text(item.name)
-                                                    .font(.system(size: 13))
+                                                    .font(.body)
                                                     .lineLimit(nil)
                                                     .multilineTextAlignment(.center)
                                                     .contentShape(.rect)
@@ -1059,7 +1059,7 @@ struct DetailsView: View {
                             viewModel.rate(rating: index + 1)
                         } label: {
                             Image(systemName: "star.fill")
-                                .font(.system(size: 13, design: .rounded))
+                                .font(.system(.body, design: .rounded))
                                 .aspectRatio(contentMode: .fit)
                         }
                         .buttonStyle(.plain)
@@ -1074,7 +1074,7 @@ struct DetailsView: View {
                         }
                     } else {
                         Image(systemName: "star.fill")
-                            .font(.system(size: 13, design: .rounded))
+                            .font(.system(.body, design: .rounded))
                             .aspectRatio(contentMode: .fit)
                     }
                 }
@@ -1084,7 +1084,7 @@ struct DetailsView: View {
         var body: some View {
             HStack(alignment: .center) {
                 Text(title)
-                    .font(.system(size: 13))
+                    .font(.body)
 
                 Spacer(minLength: 10)
 
@@ -1107,13 +1107,13 @@ struct DetailsView: View {
 
                     HStack(alignment: .firstTextBaseline, spacing: 2) {
                         Text(verbatim: "\(rating)")
-                            .font(.system(size: 13).monospacedDigit())
+                            .font(.body.monospacedDigit())
                             .foregroundStyle(.secondary)
                             .contentTransition(.numericText(value: Double(rating)))
 
                         if let votes, vote {
                             Text(verbatim: "(\(votes))")
-                                .font(.system(size: 9).monospacedDigit())
+                                .font(.caption.monospacedDigit())
                                 .foregroundStyle(.secondary)
                                 .contentTransition(.numericText())
                         }
@@ -1146,7 +1146,7 @@ struct DetailsView: View {
 
         var body: some View {
             Text(person.name)
-                .font(.system(size: 13))
+                .font(.body)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
                 .onHover {
@@ -1184,7 +1184,7 @@ struct DetailsView: View {
             HStack(spacing: 0) {
                 ForEach(0 ..< 5, id: \.self) { _ in
                     Image(systemName: "star.fill")
-                        .font(.system(size: 13, design: .rounded))
+                        .font(.system(.body, design: .rounded))
                         .aspectRatio(contentMode: .fit)
                 }
             }
@@ -1234,11 +1234,11 @@ struct DetailsView: View {
                 if let url {
                     Link(destination: url) {
                         VStack(alignment: .center, spacing: 2) {
-                            Text(title).font(.system(size: 13).weight(.medium))
+                            Text(title).font(.body.weight(.medium))
 
                             HStack(alignment: .firstTextBaseline, spacing: 2) {
                                 Text(value)
-                                    .font(.system(size: 24, design: .rounded).weight(.semibold))
+                                    .font(.system(.title, design: .rounded, weight: .semibold))
                                     .viewModifier { view in
                                         if let valueColor {
                                             view.foregroundStyle(valueColor)
@@ -1249,7 +1249,7 @@ struct DetailsView: View {
 
                                 if let hover, show {
                                     Text(verbatim: "(\(hover))")
-                                        .font(.system(size: 11))
+                                        .font(.subheadline)
                                         .foregroundStyle(.secondary)
                                 }
                             }
@@ -1272,11 +1272,11 @@ struct DetailsView: View {
                     .buttonStyle(.plain)
                 } else {
                     VStack(alignment: .center, spacing: 2) {
-                        Text(title).font(.system(size: 13).weight(.medium))
+                        Text(title).font(.body.weight(.medium))
 
                         HStack(alignment: .center, spacing: 2) {
                             Text(value)
-                                .font(.system(size: 24, design: .rounded).weight(.semibold))
+                                .font(.system(.title, design: .rounded, weight: .semibold))
                                 .viewModifier { view in
                                     if let valueColor {
                                         view.foregroundStyle(valueColor)
@@ -1287,7 +1287,7 @@ struct DetailsView: View {
 
                             if let hover, show {
                                 Text(verbatim: "(\(hover))")
-                                    .font(.system(size: 11))
+                                    .font(.subheadline)
                                     .foregroundStyle(.secondary)
                             }
                         }

@@ -141,7 +141,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                         HStack {
                                             Spacer()
                                             Text((T(Float(unitSeekImage)) * inRange.upperBound).asTimeString(style: .positional))
-                                                .font(.system(size: 9))
+                                                .font(.caption)
                                                 .foregroundStyle(.secondary)
                                             Spacer()
                                         }
@@ -160,7 +160,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                     Spacer(minLength: 0)
                     Text("-" + (inRange.upperBound - progressDuration).asTimeString(style: .positional))
                 }
-                .font(.system(size: 11).monospacedDigit())
+                .font(.subheadline.monospacedDigit())
                 .foregroundColor(isActive ? fillColor : emptyColor)
             }
         }

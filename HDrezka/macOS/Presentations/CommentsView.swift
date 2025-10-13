@@ -215,11 +215,11 @@ struct CommentsView: View {
                         .overlay(.tertiary.opacity(0.2), in: .circle.stroke(lineWidth: 1))
 
                         Text(comment.author)
-                            .font(.system(size: 13, weight: .bold))
+                            .font(.body.bold())
                             .textSelection(.enabled)
 
                         Text(comment.date)
-                            .font(.system(size: 12))
+                            .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
 
@@ -239,17 +239,17 @@ struct CommentsView: View {
                                 if comment.isLiked {
                                     Image(systemName: "hand.thumbsup.fill")
                                         .foregroundColor(.accentColor)
-                                        .font(.system(size: 17))
+                                        .font(.title2)
                                         .transition(.movingParts.pop(Color.accentColor))
                                 } else {
                                     Image(systemName: "hand.thumbsup")
                                         .foregroundColor(.accentColor)
-                                        .font(.system(size: 17))
+                                        .font(.title2)
                                 }
 
                                 if comment.likesCount > 0 {
                                     Text(verbatim: "\(comment.likesCount)")
-                                        .font(.system(size: 13, weight: .semibold).monospacedDigit())
+                                        .font(.system(.body, weight: .semibold).monospacedDigit())
                                         .contentTransition(.numericText(value: Double(comment.likesCount)))
                                 }
                             }
@@ -297,7 +297,7 @@ struct CommentsView: View {
 
                                                     Text(like.name)
                                                         .lineLimit(1)
-                                                        .font(.system(size: 13))
+                                                        .font(.body)
                                                 }
                                                 .frame(width: 60)
                                             }
@@ -322,7 +322,7 @@ struct CommentsView: View {
                                     Text("key.reply")
                                 }
                             }
-                            .font(.system(size: 13, weight: .semibold))
+                            .font(.system(.body, weight: .semibold))
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .contentShape(.capsule)
@@ -337,7 +337,7 @@ struct CommentsView: View {
                             } label: {
                                 Image(systemName: "exclamationmark.bubble.fill")
                                     .foregroundColor(.accentColor)
-                                    .font(.system(size: 17))
+                                    .font(.title2)
                                     .frame(height: 28)
                                     .padding(.horizontal, 16)
                                     .contentShape(.capsule)
@@ -355,7 +355,7 @@ struct CommentsView: View {
                             } label: {
                                 Image(systemName: "trash")
                                     .foregroundColor(.accentColor)
-                                    .font(.system(size: 17))
+                                    .font(.title2)
                                     .frame(height: 28)
                                     .padding(.horizontal, 16)
                                     .contentShape(.capsule)
@@ -480,7 +480,7 @@ struct CommentsView: View {
                     if !isLoggedIn {
                         TextField("key.name", text: $name, prompt: Text(String(localized: "key.name.full").lowercased()))
                             .textFieldStyle(.plain)
-                            .font(.system(size: 13))
+                            .font(.body)
                             .multilineTextAlignment(.trailing)
                             .lineLimit(1)
                             .onChange(of: name) {
@@ -497,7 +497,7 @@ struct CommentsView: View {
                         feedback = ""
                     } label: {
                         Text("key.send")
-                            .font(.system(size: 15, weight: .bold))
+                            .font(.system(.title3, weight: .bold))
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .contentShape(.capsule)
@@ -609,7 +609,7 @@ struct CommentsView: View {
                 } label: {
                     if let icon {
                         Image(systemName: icon)
-                            .font(.system(size: 17))
+                            .font(.title2)
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .contentShape(.capsule)
@@ -617,7 +617,7 @@ struct CommentsView: View {
                             .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                     } else {
                         Text("Spoiler!".uppercased())
-                            .font(.system(size: 15, weight: .bold, design: .rounded))
+                            .font(.system(.title3, design: .rounded, weight: .bold))
                             .frame(height: 28)
                             .padding(.horizontal, 16)
                             .contentShape(.capsule)

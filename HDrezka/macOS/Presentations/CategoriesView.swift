@@ -97,18 +97,18 @@ struct CategoriesView: View {
             VStack(alignment: .leading, spacing: 18) {
                 HStack(alignment: .center, spacing: 9) {
                     Text(type.name)
-                        .font(.system(size: 22, weight: .semibold))
+                        .font(.system(.title, weight: .semibold))
 
                     Spacer()
 
                     NavigationLink(value: Destinations.genre(.init(name: type.name, genreId: type.typeId))) {
                         HStack(alignment: .center) {
                             Text("key.see_all")
-                                .font(.system(size: 12))
+                                .font(.subheadline)
                                 .foregroundStyle(Color.accentColor)
 
                             Image(systemName: "chevron.right")
-                                .font(.system(size: 12))
+                                .font(.subheadline)
                                 .foregroundStyle(Color.accentColor)
                         }
                     }
@@ -119,7 +119,7 @@ struct CategoriesView: View {
                     ForEach(type.genres) { genre in
                         NavigationLink(value: Destinations.genre(genre)) {
                             Text(genre.name)
-                                .font(.system(size: 13))
+                                .font(.body)
                                 .frame(height: 28)
                                 .frame(maxWidth: .infinity)
                                 .padding(.horizontal, 16)

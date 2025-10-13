@@ -21,7 +21,7 @@ struct SeriesUpdatesSheetView: View {
         VStack(alignment: .center, spacing: 25) {
             VStack(spacing: 5) {
                 Image(systemName: "bell")
-                    .font(.system(size: 48))
+                    .font(.largeTitle)
                     .foregroundStyle(Color.accentColor)
 
                 Text("key.series_updates")
@@ -145,7 +145,7 @@ struct SeriesUpdatesSheetView: View {
                     }
                 } label: {
                     Label(group.date, systemImage: isExpanded ? "chevron.up" : "chevron.down")
-                        .font(.system(size: 15).bold())
+                        .font(.title3.bold())
                         .contentShape(.rect)
                 }
                 .buttonStyle(.plain)
@@ -160,25 +160,25 @@ struct SeriesUpdatesSheetView: View {
                             } label: {
                                 HStack(alignment: .center) {
                                     Text(verbatim: "\(item.seriesName) \(item.season)")
-                                        .font(.system(size: 13))
+                                        .font(.body)
                                         .lineLimit(nil)
 
                                     Spacer()
 
                                     VStack(alignment: .trailing, spacing: 2) {
-                                        Text(item.releasedEpisode).font(.system(size: 11)).foregroundStyle(.secondary)
+                                        Text(item.releasedEpisode).font(.subheadline).foregroundStyle(.secondary)
                                             .multilineTextAlignment(.trailing)
 
                                         if !item.chosenVoiceActing.isEmpty {
                                             HStack(spacing: 3) {
                                                 if item.isChosenVoiceActingPremium {
                                                     Image("Premium")
-                                                        .font(.system(size: 11))
+                                                        .font(.subheadline)
                                                         .foregroundStyle(.white.opacity(0.8))
                                                 }
 
                                                 Text(item.chosenVoiceActing)
-                                                    .font(.system(size: 11))
+                                                    .font(.subheadline)
                                                     .foregroundStyle(item.isChosenVoiceActingPremium ? .white.opacity(0.8) : .secondary)
                                                     .multilineTextAlignment(.trailing)
                                             }
@@ -213,25 +213,25 @@ struct SeriesUpdatesSheetView: View {
                             } label: {
                                 HStack(alignment: .center) {
                                     Text(verbatim: "\(item.seriesName) \(item.season)")
-                                        .font(.system(size: 13))
+                                        .font(.body)
                                         .lineLimit(nil)
 
                                     Spacer()
 
                                     VStack(alignment: .trailing, spacing: 2) {
-                                        Text(item.releasedEpisode).font(.system(size: 11)).foregroundStyle(.secondary)
+                                        Text(item.releasedEpisode).font(.subheadline).foregroundStyle(.secondary)
                                             .multilineTextAlignment(.trailing)
 
                                         if !item.chosenVoiceActing.isEmpty {
                                             HStack(spacing: 3) {
                                                 if item.isChosenVoiceActingPremium {
                                                     Image("Premium")
-                                                        .font(.system(size: 11))
+                                                        .font(.subheadline)
                                                         .foregroundStyle(.white.opacity(0.8))
                                                 }
 
                                                 Text(item.chosenVoiceActing)
-                                                    .font(.system(size: 11))
+                                                    .font(.subheadline)
                                                     .foregroundStyle(item.isChosenVoiceActingPremium ? .white.opacity(0.8) : .secondary)
                                                     .multilineTextAlignment(.trailing)
                                             }

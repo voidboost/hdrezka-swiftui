@@ -27,7 +27,7 @@ struct CommentReportSheet: View {
                 VStack(alignment: .center, spacing: 25) {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "exclamationmark.bubble.fill")
-                            .font(.system(size: 48))
+                            .font(.largeTitle)
                             .foregroundStyle(Color.accentColor)
 
                         Text("key.report.label")
@@ -109,7 +109,7 @@ struct CommentReportSheet: View {
                 VStack(alignment: .center, spacing: 25) {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "exclamationmark.bubble.fill")
-                            .font(.system(size: 48))
+                            .font(.largeTitle)
                             .foregroundStyle(Color.accentColor)
 
                         Text("key.report.enter")
@@ -142,7 +142,7 @@ struct CommentReportSheet: View {
                 VStack(alignment: .center, spacing: 25) {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "exclamationmark.bubble.fill")
-                            .font(.system(size: 48))
+                            .font(.largeTitle)
                             .foregroundStyle(Color.accentColor)
 
                         Text("key.ops")
@@ -212,7 +212,7 @@ struct CommentReportSheet: View {
             VStack(alignment: .leading, spacing: 5) {
                 HStack(alignment: .center, spacing: 0) {
                     Text(label)
-                        .font(.system(size: 15))
+                        .font(.title3)
                         .multilineTextAlignment(.leading)
 
                     Spacer(minLength: 0)
@@ -221,7 +221,7 @@ struct CommentReportSheet: View {
                 if isSelected, tag == .other {
                     TextField("key.message", text: $message, prompt: Text(String(localized: "key.message.more")))
                         .textFieldStyle(.plain)
-                        .font(.system(size: 13))
+                        .font(.body)
                         .focused($focused)
                 }
             }
