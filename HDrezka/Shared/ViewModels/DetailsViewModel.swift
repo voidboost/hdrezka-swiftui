@@ -18,7 +18,7 @@ class DetailsViewModel {
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
     private(set) var state: DataState<MovieDetailed> = .loading
-    private(set) var trailer: YouTubePlayer?
+    private(set) var trailerId: String?
 
     func load() {
         state = .loading
@@ -39,32 +39,8 @@ class DetailsViewModel {
                         self.getMovieTrailerIdUseCase(movieId: movieId)
                             .receive(on: DispatchQueue.main)
                             .sink { _ in } receiveValue: { trailerId in
-                                #if DEBUG
-                                    let isLoggingEnabled = true
-                                #else
-                                    let isLoggingEnabled = false
-                                #endif
-
                                 withAnimation(.easeInOut) {
-                                    self.trailer = YouTubePlayer(
-                                        source: .video(id: trailerId),
-                                        parameters: .init(
-                                            autoPlay: false,
-                                            loopEnabled: true,
-                                            showControls: true,
-                                            showFullscreenButton: true,
-                                        ),
-                                        configuration: .init(
-                                            openURLAction: .init { url, _ in
-                                                #if os(macOS)
-                                                    NSWorkspace.shared.open(url)
-                                                #elseif os(iOS)
-                                                    UIApplication.shared.open(url)
-                                                #endif
-                                            },
-                                        ),
-                                        isLoggingEnabled: isLoggingEnabled,
-                                    )
+                                    self.trailerId = trailerId
                                 }
                             }
                             .store(in: &self.subscriptions)

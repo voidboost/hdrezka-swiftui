@@ -58,11 +58,14 @@
 				iOS/Presentations/Components/Sheets/CommentReportSheet.swift = (ios, );
 				iOS/Presentations/Components/Sheets/CommentsRulesSheet.swift = (ios, );
 				iOS/Presentations/Components/Sheets/CreateBookmarkSheetView.swift = (ios, );
+				iOS/Presentations/Components/Sheets/OpenExternalPlayerSheetView.swift = (ios, );
+				iOS/Presentations/Components/Sheets/RenameBookmarkSheetView.swift = (ios, );
 				iOS/Presentations/Components/Sheets/RestoreSheetView.swift = (ios, );
 				iOS/Presentations/Components/Sheets/ScheduleSheetView.swift = (ios, );
 				iOS/Presentations/Components/Sheets/SeriesUpdatesSheetView.swift = (ios, );
 				iOS/Presentations/Components/Sheets/SignInSheetView.swift = (ios, );
 				iOS/Presentations/Components/Sheets/SignUpSheetView.swift = (ios, );
+				iOS/Presentations/Components/Sheets/WatchSheetView.swift = (ios, );
 				iOS/Presentations/Components/SpoilerView.swift = (ios, );
 				iOS/Presentations/ContentView.swift = (ios, );
 				iOS/Presentations/DetailsView.swift = (ios, );

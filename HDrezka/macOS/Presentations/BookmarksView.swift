@@ -259,23 +259,22 @@ struct BookmarksView: View {
                 .disabled(viewModel.bookmarksState.data?.isEmpty != false)
             }
 
-            ToolbarItemGroup(placement: .primaryAction) {
-                Picker("key.filter.select", selection: $viewModel.filter) {
-                    ForEach(BookmarkFilters.allCases) { filter in
-                        Text(filter.rawValue).tag(filter)
+            ToolbarItem(placement: .primaryAction) {
+                Menu {
+                    Picker("key.filter.select", selection: $viewModel.filter) {
+                        ForEach(BookmarkFilters.allCases) { filter in
+                            Text(filter.rawValue).tag(filter)
+                        }
                     }
-                }
-                .labelsHidden()
-                .pickerStyle(.menu)
-                .disabled(viewModel.bookmarkState == .loading || viewModel.selectedBookmark == nil)
 
-                Picker("key.genre.select", selection: $viewModel.genre) {
-                    ForEach(Genres.allCases) { genre in
-                        Text(genre.rawValue).tag(genre)
+                    Picker("key.genre.select", selection: $viewModel.genre) {
+                        ForEach(Genres.allCases) { genre in
+                            Text(genre.rawValue).tag(genre)
+                        }
                     }
+                } label: {
+                    Image(systemName: "line.3.horizontal.decrease")
                 }
-                .labelsHidden()
-                .pickerStyle(.menu)
                 .disabled(viewModel.bookmarkState == .loading || viewModel.selectedBookmark == nil)
             }
         }

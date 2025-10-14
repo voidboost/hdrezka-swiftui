@@ -100,39 +100,35 @@ struct ListView: View {
             }
 
             if !viewModel.isCustomMovies, !viewModel.isList {
-                ToolbarItemGroup(placement: .primaryAction) {
-                    if viewModel.isGenre || viewModel.isCollection || viewModel.isCountry {
-                        Picker("key.filter.select", selection: $viewModel.filter) {
-                            ForEach(Filters.allCases) { filter in
-                                Text(filter.rawValue).tag(filter)
+                ToolbarItem(placement: .primaryAction) {
+                    Menu {
+                        if viewModel.isGenre || viewModel.isCollection || viewModel.isCountry {
+                            Picker("key.filter.select", selection: $viewModel.filter) {
+                                ForEach(Filters.allCases) { filter in
+                                    Text(filter.rawValue).tag(filter)
+                                }
                             }
                         }
-                        .labelsHidden()
-                        .pickerStyle(.menu)
-                        .disabled(viewModel.state == .loading)
-                    }
 
-                    if viewModel.isCategory(.newest) {
-                        Picker("key.filter.select", selection: $viewModel.newFilter) {
-                            ForEach(NewFilters.allCases) { filter in
-                                Text(filter.rawValue).tag(filter)
+                        if viewModel.isCategory(.newest) {
+                            Picker("key.filter.select", selection: $viewModel.newFilter) {
+                                ForEach(NewFilters.allCases) { filter in
+                                    Text(filter.rawValue).tag(filter)
+                                }
                             }
                         }
-                        .labelsHidden()
-                        .pickerStyle(.menu)
-                        .disabled(viewModel.state == .loading)
-                    }
 
-                    if viewModel.isCategory || viewModel.isCountry {
-                        Picker("key.genre.select", selection: $viewModel.filterGenre) {
-                            ForEach(Genres.allCases.filter { $0 != .show || !viewModel.isCategory(.hot) }) { genre in
-                                Text(genre.rawValue).tag(genre)
+                        if viewModel.isCategory || viewModel.isCountry {
+                            Picker("key.genre.select", selection: $viewModel.filterGenre) {
+                                ForEach(Genres.allCases.filter { $0 != .show || !viewModel.isCategory(.hot) }) { genre in
+                                    Text(genre.rawValue).tag(genre)
+                                }
                             }
                         }
-                        .labelsHidden()
-                        .pickerStyle(.menu)
-                        .disabled(viewModel.state == .loading)
+                    } label: {
+                        Image(systemName: "line.3.horizontal.decrease")
                     }
+                    .disabled(viewModel.state == .loading)
                 }
             }
         }
