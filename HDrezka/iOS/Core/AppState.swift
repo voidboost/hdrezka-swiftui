@@ -124,15 +124,15 @@ extension View {
     func destinations() -> some View {
         navigationDestination(for: Destinations.self) { destination in
             switch destination {
-//            case .collections:
-//                CollectionsView()
-//                    .id("collections")
-//            case .watchingLater:
-//                WatchingLaterView()
-//                    .id("watching_later")
-//            case .bookmarks:
-//                BookmarksView()
-//                    .id("bookmarks")
+            case .collections:
+                CollectionsView()
+                    .id("collections")
+            case .watchingLater:
+                WatchingLaterView()
+                    .id("watching_later")
+            case .bookmarks:
+                BookmarksView()
+                    .id("bookmarks")
             case let .details(movie):
                 DetailsView(movie: movie)
                     .id(movie.movieId)
@@ -157,11 +157,9 @@ extension View {
             case let .person(person):
                 PersonView(person: person)
                     .id(person.personId)
-//            case let .comments(details):
-//                CommentsView(details: details)
-//                    .id(details.movieId)
-            default:
-                HomeView()
+            case let .comments(details):
+                CommentsView(details: details)
+                    .id(details.movieId)
             }
         }
     }

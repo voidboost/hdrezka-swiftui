@@ -82,7 +82,7 @@ struct BookmarksView: View {
             .environment(\.defaultMinListRowHeight, 0)
             .scrollIndicators(.visible, axes: .vertical)
             .viewModifier { view in
-                if #available(macOS 26, *) {
+                if #available(iOS 26, *) {
                     view.scrollEdgeEffectStyle(.hard, for: .all)
                 } else {
                     view
@@ -103,7 +103,7 @@ struct BookmarksView: View {
                                 .font(.body)
                                 .foregroundStyle(Color.accentColor)
                         }
-                        .buttonStyle(.accessoryBar)
+                        .buttonStyle(.bordered)
                         .keyboardShortcut("r", modifiers: .command)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -122,7 +122,7 @@ struct BookmarksView: View {
                                 .font(.body)
                                 .foregroundStyle(Color.accentColor)
                         }
-                        .buttonStyle(.accessoryBar)
+                        .buttonStyle(.bordered)
                         .keyboardShortcut("n", modifiers: .command)
 
                         Button {
@@ -132,7 +132,7 @@ struct BookmarksView: View {
                                 .font(.body)
                                 .foregroundStyle(Color.accentColor)
                         }
-                        .buttonStyle(.accessoryBar)
+                        .buttonStyle(.bordered)
                         .keyboardShortcut("r", modifiers: .command)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -144,6 +144,11 @@ struct BookmarksView: View {
                 }
             }
             .frame(width: 200)
+            .refreshable {
+                if viewModel.bookmarksState.data?.isEmpty == false, viewModel.bookmarkState.data?.isEmpty == false || viewModel.selectedBookmark == nil {
+                    viewModel.getBookmarks(reset: true)
+                }
+            }
 
             Divider()
 
@@ -184,7 +189,7 @@ struct BookmarksView: View {
                 }
             }
             .viewModifier { view in
-                if #available(macOS 26, *) {
+                if #available(iOS 26, *) {
                     view.scrollEdgeEffectStyle(.hard, for: .all)
                 } else {
                     view
@@ -205,7 +210,7 @@ struct BookmarksView: View {
                                 .font(.title3)
                                 .foregroundStyle(Color.accentColor)
                         }
-                        .buttonStyle(.accessoryBar)
+                        .buttonStyle(.bordered)
                         .keyboardShortcut("r", modifiers: .command)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -225,7 +230,7 @@ struct BookmarksView: View {
                                     .font(.title3)
                                     .foregroundStyle(Color.accentColor)
                             }
-                            .buttonStyle(.accessoryBar)
+                            .buttonStyle(.bordered)
                             .keyboardShortcut("r", modifiers: .command)
                         }
                     }
@@ -240,16 +245,9 @@ struct BookmarksView: View {
         }
         .transition(.opacity)
         .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItemGroup(placement: .navigation) {
-                Button {
-                    viewModel.getBookmarks(reset: true)
-                } label: {
-                    Image(systemName: "arrow.trianglehead.clockwise")
-                }
-                .keyboardShortcut("r", modifiers: .command)
-                .disabled(viewModel.bookmarksState.data?.isEmpty != false || (viewModel.bookmarkState.data?.isEmpty != false && viewModel.selectedBookmark != nil))
-
+            ToolbarItem(placement: .navigation) {
                 Button {
                     viewModel.isCreateBookmarkPresented = true
                 } label: {
@@ -259,23 +257,22 @@ struct BookmarksView: View {
                 .disabled(viewModel.bookmarksState.data?.isEmpty != false)
             }
 
-            ToolbarItemGroup(placement: .primaryAction) {
-                Picker("key.filter.select", selection: $viewModel.filter) {
-                    ForEach(BookmarkFilters.allCases) { filter in
-                        Text(filter.rawValue).tag(filter)
+            ToolbarItem(placement: .primaryAction) {
+                Menu {
+                    Picker("key.filter.select", selection: $viewModel.filter) {
+                        ForEach(BookmarkFilters.allCases) { filter in
+                            Text(filter.rawValue).tag(filter)
+                        }
                     }
-                }
-                .labelsHidden()
-                .pickerStyle(.menu)
-                .disabled(viewModel.bookmarkState == .loading || viewModel.selectedBookmark == nil)
 
-                Picker("key.genre.select", selection: $viewModel.genre) {
-                    ForEach(Genres.allCases) { genre in
-                        Text(genre.rawValue).tag(genre)
+                    Picker("key.genre.select", selection: $viewModel.genre) {
+                        ForEach(Genres.allCases) { genre in
+                            Text(genre.rawValue).tag(genre)
+                        }
                     }
+                } label: {
+                    Image(systemName: "line.3.horizontal.decrease")
                 }
-                .labelsHidden()
-                .pickerStyle(.menu)
                 .disabled(viewModel.bookmarkState == .loading || viewModel.selectedBookmark == nil)
             }
         }
@@ -315,12 +312,13 @@ struct BookmarksView: View {
                 Text(error.localizedDescription)
             }
         }
-        .dialogSeverity(.critical)
         .sheet(item: $viewModel.renameBookmark) { bookmark in
             RenameBookmarkSheetView(bookmark: bookmark)
+                .presentationSizing(.fitted)
         }
         .sheet(isPresented: $viewModel.isCreateBookmarkPresented) {
             CreateBookmarkSheetView()
+                .presentationSizing(.fitted)
         }
         .background(.background)
     }

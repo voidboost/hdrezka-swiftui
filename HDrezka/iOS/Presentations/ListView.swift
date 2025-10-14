@@ -88,9 +88,10 @@ struct ListView: View {
         }
         .transition(.opacity)
         .navigationTitle(viewModel.title)
+        .navigationBarTitleDisplayMode(.large)
         .toolbar {
             if !viewModel.isCustomMovies, !viewModel.isList {
-                ToolbarItemGroup(placement: .primaryAction) {
+                ToolbarItem(placement: .primaryAction) {
                     Menu {
                         if viewModel.isGenre || viewModel.isCollection || viewModel.isCountry {
                             Picker("key.filter.select", selection: $viewModel.filter) {

@@ -413,7 +413,7 @@ struct OpenExternalPlayerSheetView: View {
             }
 
             VStack(alignment: .center, spacing: 10) {
-                if !ExternalPlayers.allCases.contains(where: { UIApplication.shared.canOpenURL($0.url) }) {
+                if ExternalPlayers.allCases.contains(where: { UIApplication.shared.canOpenURL($0.url) }) {
                     if UIApplication.shared.canOpenURL(ExternalPlayers.infuse.url) {
                         Button {
                             if let selectedActing {

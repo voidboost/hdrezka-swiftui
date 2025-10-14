@@ -16,7 +16,7 @@ struct PersonView: View {
 
     var body: some View {
         ScrollView(.vertical) {
-            LazyVStack(alignment: .leading, spacing: 18) {
+            LazyVStack(alignment: .center, spacing: 18) {
                 if let details = viewModel.state.data {
                     PersonViewComponent(details: details)
                 }
@@ -46,6 +46,7 @@ struct PersonView: View {
         }
         .transition(.opacity)
         .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 ShareLink(item: (mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: viewModel.id, directoryHint: .notDirectory)) {
@@ -75,12 +76,121 @@ struct PersonView: View {
 
         @Environment(\.openWindow) private var openWindow
 
+        @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
         init(details: PersonDetailed) {
             self.details = details
         }
 
         var body: some View {
-            HStack(alignment: .bottom, spacing: 27) {
+            if horizontalSizeClass == .compact {
+                HStack(alignment: .bottom, spacing: 27) {
+                    Button {
+                        if let url = URL(string: details.hphoto) ?? URL(string: details.photo) {
+                            openWindow(id: "imageViewer", value: url)
+                        }
+                    } label: {
+                        AsyncImage(url: URL(string: details.hphoto), transaction: .init(animation: .easeInOut)) { phase in
+                            if let image = phase.image {
+                                image.resizable()
+                            } else {
+                                AsyncImage(url: URL(string: details.photo), transaction: .init(animation: .easeInOut)) { phase in
+                                    if let image = phase.image {
+                                        image.resizable()
+                                    } else {
+                                        Color.gray.shimmering()
+                                    }
+                                }
+                            }
+                        }
+                        .imageFill(2 / 3)
+                        .frame(width: 250)
+                        .contentShape(.rect(cornerRadius: 6))
+                        .clipShape(.rect(cornerRadius: 6))
+                    }
+                    .buttonStyle(.plain)
+
+                    VStack(alignment: .leading, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(details.nameRu)
+                                .font(.largeTitle.weight(.semibold))
+                                .textSelection(.enabled)
+                                .multilineTextAlignment(.leading)
+
+                            if let nameOriginal = details.nameOrig {
+                                Text(nameOriginal)
+                                    .font(.title3)
+                                    .foregroundStyle(.secondary)
+                                    .textSelection(.enabled)
+                                    .multilineTextAlignment(.leading)
+                            }
+                        }
+
+                        if details.career?.isEmpty == false
+                            ||
+                            details.birthDate?.isEmpty == false
+                            ||
+                            details.birthPlace?.isEmpty == false
+                            ||
+                            details.deathDate?.isEmpty == false
+                            ||
+                            details.deathPlace?.isEmpty == false
+                            ||
+                            details.height?.isEmpty == false
+                        {
+                            VStack(alignment: .leading, spacing: 0) {
+                                if let career = details.career, !career.isEmpty {
+                                    InfoRow(String(localized: "key.person.career"), career)
+                                }
+
+                                if let height = details.height, !height.isEmpty {
+                                    if details.career?.isEmpty == false {
+                                        Divider()
+                                    }
+
+                                    InfoRow(String(localized: "key.person.height"), height)
+                                }
+
+                                if let birthDate = details.birthDate, !birthDate.isEmpty {
+                                    if details.career?.isEmpty == false || details.height?.isEmpty == false {
+                                        Divider()
+                                    }
+
+                                    InfoRow(String(localized: "key.person.birth_date"), birthDate)
+                                }
+
+                                if let birthPlace = details.birthPlace, !birthPlace.isEmpty {
+                                    if details.career?.isEmpty == false || details.birthDate?.isEmpty == false || details.height?.isEmpty == false {
+                                        Divider()
+                                    }
+
+                                    InfoRow(String(localized: "key.person.birth_place"), birthPlace)
+                                }
+
+                                if let deathDate = details.deathDate, !deathDate.isEmpty {
+                                    if details.career?.isEmpty == false || details.birthDate?.isEmpty == false || details.birthPlace?.isEmpty == false || details.height?.isEmpty == false {
+                                        Divider()
+                                    }
+
+                                    InfoRow(String(localized: "key.person.death_date"), deathDate)
+                                }
+
+                                if let deathPlace = details.deathPlace, !deathPlace.isEmpty {
+                                    if details.career?.isEmpty == false || details.birthDate?.isEmpty == false || details.birthPlace?.isEmpty == false || details.deathDate?.isEmpty == false || details.height?.isEmpty == false {
+                                        Divider()
+                                    }
+
+                                    InfoRow(String(localized: "key.person.death_place"), deathPlace)
+                                }
+                            }
+                            .padding(.horizontal, 10)
+                            .background(.quinary, in: .rect(cornerRadius: 6))
+                            .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                        }
+                    }
+                }
+                .padding(.horizontal, 36)
+            } else {
                 Button {
                     if let url = URL(string: details.hphoto) ?? URL(string: details.photo) {
                         openWindow(id: "imageViewer", value: url)
@@ -105,18 +215,21 @@ struct PersonView: View {
                     .clipShape(.rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
+                .padding(.horizontal, 36)
 
-                VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .center, spacing: 16) {
+                    VStack(alignment: .center, spacing: 8) {
                         Text(details.nameRu)
                             .font(.largeTitle.weight(.semibold))
                             .textSelection(.enabled)
+                            .multilineTextAlignment(.center)
 
                         if let nameOriginal = details.nameOrig {
                             Text(nameOriginal)
                                 .font(.title3)
                                 .foregroundStyle(.secondary)
                                 .textSelection(.enabled)
+                                .multilineTextAlignment(.center)
                         }
                     }
 
@@ -182,8 +295,8 @@ struct PersonView: View {
                         .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
                 }
+                .padding(.horizontal, 36)
             }
-            .padding(.horizontal, 36)
 
             if let actorMovies = details.actorMovies, !actorMovies.isEmpty {
                 Divider()

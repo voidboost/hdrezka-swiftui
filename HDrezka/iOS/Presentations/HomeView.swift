@@ -104,6 +104,7 @@ struct HomeView: View {
         }
         .transition(.opacity)
         .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -130,9 +131,10 @@ struct HomeView: View {
         .background(.background)
         .sheet(isPresented: $viewModel.isSeriesUpdatesPresented) {
             SeriesUpdatesSheetView(movieDestination: $movieDestination)
+                .presentationSizing(.fitted)
         }
-//        .navigationDestination(item: $movieDestination) {
-//            DetailsView(movie: $0)
-//        }
+        .navigationDestination(item: $movieDestination) {
+            DetailsView(movie: $0)
+        }
     }
 }
