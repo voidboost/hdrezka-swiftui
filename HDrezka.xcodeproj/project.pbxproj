@@ -54,6 +54,11 @@
 				iOS/Presentations/Components/ErrorStateView.swift = (ios, );
 				iOS/Presentations/Components/LoadingPaginationStateView.swift = (ios, );
 				iOS/Presentations/Components/LoadingStateView.swift = (ios, );
+				iOS/Presentations/Components/OrientationView.swift = (ios, );
+				iOS/Presentations/Components/Player/CustomAVPlayer.swift = (ios, );
+				iOS/Presentations/Components/Player/PlayerView.swift = (ios, );
+				iOS/Presentations/Components/Player/SliderWithText.swift = (ios, );
+				iOS/Presentations/Components/Player/SliderWithoutText.swift = (ios, );
 				iOS/Presentations/Components/Sheets/BookmarksSheetView.swift = (ios, );
 				iOS/Presentations/Components/Sheets/CommentReportSheet.swift = (ios, );
 				iOS/Presentations/Components/Sheets/CommentsRulesSheet.swift = (ios, );
@@ -75,6 +80,7 @@
 				iOS/Presentations/SearchView.swift = (ios, );
 				iOS/Presentations/WatchingLaterView.swift = (ios, );
 				iOS/Resources/Assets.xcassets = (ios, );
+				iOS/Utils/UIImage.swift = (ios, );
 				macOS/Core/AppState.swift = (macos, );
 				macOS/Core/Const.swift = (macos, );
 				macOS/Core/Container.swift = (macos, );

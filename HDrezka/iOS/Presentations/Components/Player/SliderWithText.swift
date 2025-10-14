@@ -123,8 +123,8 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                         if showSeekImage || isActive, let cue = thumbnails?.cues.first(where: { TimeInterval(unitSeekImage) * TimeInterval(inRange.upperBound) > $0.timeStart && TimeInterval(unitSeekImage) * TimeInterval(inRange.upperBound) < $0.timeEnd }), let imageUrl = cue.imageUrl, let frame = cue.frame {
                             ZStack {
                                 AsyncImage(url: URL(string: imageUrl), transaction: .init(animation: .easeInOut)) { phase in
-                                    if let image = phase.image, let nsImage = ImageRenderer(content: image).cgImage?.crop(to: frame) {
-                                        Image(nsImage: nsImage).resizable()
+                                    if let image = phase.image, let uiImage = ImageRenderer(content: image).cgImage?.crop(to: frame) {
+                                        Image(uiImage: uiImage).resizable()
                                     } else {
                                         ProgressView().scaleEffect(0.75)
                                     }
@@ -208,9 +208,9 @@ extension BinaryFloatingPoint {
 }
 
 private extension CGImage {
-    func crop(to rect: CGRect) -> NSImage? {
+    func crop(to rect: CGRect) -> UIImage? {
         guard let cutImageRef = cropping(to: rect) else { return nil }
 
-        return NSImage(cgImage: cutImageRef, size: .init(width: CGFloat(cutImageRef.width), height: CGFloat(cutImageRef.height)))
+        return UIImage(cgImage: cutImageRef)
     }
 }
