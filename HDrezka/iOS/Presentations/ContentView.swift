@@ -36,7 +36,7 @@ struct ContentView: View {
             }
         }
         .tabViewStyle(.tabBarOnly)
-        .task {
+        .onAppear {
             getVersionUseCase()
                 .receive(on: DispatchQueue.main)
                 .sink { _ in } receiveValue: { version in

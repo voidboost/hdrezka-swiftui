@@ -92,7 +92,7 @@ struct RenameBookmarkSheetView: View {
                         .buttonStyle(.plain)
                     }
                 }
-                .task {
+                .onAppear {
                     focusedField = .name
                 }
             case .loading:

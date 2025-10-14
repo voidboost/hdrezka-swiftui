@@ -132,7 +132,7 @@ struct ListView: View {
                 }
             }
         }
-        .task(id: isLoggedIn) {
+        .onAppear {
             switch viewModel.state {
             case .data:
                 break

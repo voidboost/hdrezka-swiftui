@@ -98,7 +98,7 @@ struct RestoreSheetView: View {
                         .buttonStyle(.plain)
                     }
                 }
-                .task {
+                .onAppear {
                     focusedField = .login
                 }
             case .loading:

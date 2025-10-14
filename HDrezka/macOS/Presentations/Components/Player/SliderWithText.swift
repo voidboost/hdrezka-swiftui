@@ -169,7 +169,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
             value = max(min(getPrgValue(), inRange.upperBound), inRange.lowerBound)
             onEditingChanged(isActive)
         }
-        .task {
+        .onAppear {
             localRealProgress = getPrgPercentage(value)
             progressDuration = inRange.upperBound * localRealProgress
         }

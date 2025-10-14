@@ -78,7 +78,7 @@ struct WatchingLaterView: View {
         .transition(.opacity)
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.large)
-        .task(id: isLoggedIn) {
+        .onAppear {
             switch viewModel.state {
             case .data:
                 break

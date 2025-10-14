@@ -117,7 +117,7 @@ struct DetailsView: View {
         } action: { inset in
             topSafeAreaInset = inset
         }
-        .task(id: isLoggedIn) {
+        .onAppear {
             switch viewModel.state {
             case .data:
                 break

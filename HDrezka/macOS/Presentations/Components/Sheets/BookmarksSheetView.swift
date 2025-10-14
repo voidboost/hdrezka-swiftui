@@ -195,7 +195,7 @@ struct BookmarksSheetView: View {
         .padding(.bottom, 25)
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
-        .task {
+        .onAppear {
             load()
         }
         .alert("key.ops", isPresented: $isErrorPresented) {

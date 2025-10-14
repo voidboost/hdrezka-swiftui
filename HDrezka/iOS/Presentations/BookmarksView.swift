@@ -297,7 +297,7 @@ struct BookmarksView: View {
         .onChange(of: viewModel.genre) {
             viewModel.load()
         }
-        .task(id: isLoggedIn) {
+        .onAppear {
             switch viewModel.bookmarksState {
             case .data:
                 break

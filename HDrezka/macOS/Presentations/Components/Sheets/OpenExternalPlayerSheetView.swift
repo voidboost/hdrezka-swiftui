@@ -704,7 +704,7 @@ struct OpenExternalPlayerSheetView: View {
         .padding(.bottom, 25)
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
-        .task {
+        .onAppear {
             getMovieDetailsUseCase(movieId: id)
                 .receive(on: DispatchQueue.main)
                 .sink { completion in

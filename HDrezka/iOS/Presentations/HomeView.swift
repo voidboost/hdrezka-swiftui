@@ -115,7 +115,7 @@ struct HomeView: View {
                 .disabled(viewModel.state.data == nil)
             }
         }
-        .task(id: isLoggedIn) {
+        .onAppear {
             switch viewModel.state {
             case .data:
                 break

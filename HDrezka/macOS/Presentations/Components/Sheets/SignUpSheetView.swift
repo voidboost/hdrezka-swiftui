@@ -510,7 +510,7 @@ struct SignUpSheetView: View {
                             .buttonStyle(.plain)
                         }
                     }
-                    .task {
+                    .onAppear {
                         focusedField = .email
                     }
                 case .loading:

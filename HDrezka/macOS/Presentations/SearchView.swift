@@ -80,7 +80,7 @@ struct SearchView: View {
             }
         }
         .background(.background)
-        .task(id: isLoggedIn) {
+        .onAppear {
             switch viewModel.state {
             case .data:
                 break
