@@ -160,7 +160,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                     Spacer(minLength: 0)
                     Text("-" + (inRange.upperBound - progressDuration).asTimeString(style: .positional))
                 }
-                .font(.subheadline.monospacedDigit())
+                .font(.caption.monospacedDigit())
                 .foregroundColor(isActive ? fillColor : emptyColor)
             }
         }

@@ -13,8 +13,6 @@ struct WatchSheetView: View {
     @State private var subscriptions: Set<AnyCancellable> = []
 
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.openWindow) private var openWindow
-    @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.modelContext) private var modelContext
 
     @Environment(AppState.self) private var appState
@@ -26,6 +24,7 @@ struct WatchSheetView: View {
     @Default(.defaultQuality) private var defaultQuality
 
     private let id: String
+    @Binding private var playerData: PlayerData?
 
     @State private var details: MovieDetailed?
     @State private var seasons: [MovieSeason]?
@@ -42,8 +41,9 @@ struct WatchSheetView: View {
 
     @State private var showRating: Bool = false
 
-    init(id: String) {
+    init(id: String, playerData: Binding<PlayerData?>) {
         self.id = id
+        _playerData = playerData
     }
 
     var body: some View {
@@ -376,14 +376,9 @@ struct WatchSheetView: View {
                             modelContext.insert(position)
                         }
 
-                        dismissWindow(id: "player")
-
-                        openWindow(
-                            id: "player",
-                            value: PlayerData(details: details, selectedActing: selectedActing, seasons: seasons, selectedSeason: selectedSeason, selectedEpisode: selectedEpisode, selectedQuality: selectedQuality, movie: movie),
-                        )
-
                         dismiss()
+
+                        playerData = PlayerData(details: details, selectedActing: selectedActing, seasons: seasons, selectedSeason: selectedSeason, selectedEpisode: selectedEpisode, selectedQuality: selectedQuality, movie: movie)
                     }
                 } label: {
                     Text("key.watch")

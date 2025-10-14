@@ -203,6 +203,7 @@ struct DetailsView: View {
         @State private var isPlayPresented: Bool = false
         @State private var isDownloadPresented: Bool = false
         @State private var isOpenExternalPlayerPresented: Bool = false
+        @State private var playerData: PlayerData?
 
         @State private var franchiseExpanded: Bool = false
 
@@ -279,10 +280,6 @@ struct DetailsView: View {
                                                 .background(Color.accentColor, in: .capsule)
                                         }
                                         .buttonStyle(.plain)
-                                        .sheet(isPresented: $isPlayPresented) {
-                                            WatchSheetView(id: details.movieId)
-                                                .presentationSizing(.fitted)
-                                        }
 
                                         //                                    if downloader.isRunning {
                                         //                                        Button {
@@ -320,10 +317,6 @@ struct DetailsView: View {
                                                     .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                                             }
                                             .buttonStyle(.plain)
-                                            .sheet(isPresented: $isOpenExternalPlayerPresented) {
-                                                OpenExternalPlayerSheetView(id: details.movieId)
-                                                    .presentationSizing(.fitted)
-                                            }
                                         }
                                     } else if details.comingSoon {
                                         Button {} label: {
@@ -572,10 +565,6 @@ struct DetailsView: View {
                                                 .background(Color.accentColor, in: .capsule)
                                         }
                                         .buttonStyle(.plain)
-                                        .sheet(isPresented: $isPlayPresented) {
-                                            WatchSheetView(id: details.movieId)
-                                                .presentationSizing(.fitted)
-                                        }
 
                                         //                                    if downloader.isRunning {
                                         //                                        Button {
@@ -613,10 +602,6 @@ struct DetailsView: View {
                                                     .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                                             }
                                             .buttonStyle(.plain)
-                                            .sheet(isPresented: $isOpenExternalPlayerPresented) {
-                                                OpenExternalPlayerSheetView(id: details.movieId)
-                                                    .presentationSizing(.fitted)
-                                            }
                                         }
                                     } else if details.comingSoon {
                                         Button {} label: {
@@ -802,6 +787,17 @@ struct DetailsView: View {
                                 }
                             }
                         }
+                    }
+                    .sheet(isPresented: $isPlayPresented) {
+                        WatchSheetView(id: details.movieId, playerData: $playerData)
+                            .presentationSizing(.fitted)
+                    }
+                    .sheet(isPresented: $isOpenExternalPlayerPresented) {
+                        OpenExternalPlayerSheetView(id: details.movieId)
+                            .presentationSizing(.fitted)
+                    }
+                    .fullScreenCover(item: $playerData) { data in
+                        PlayerView(data: data)
                     }
 
                     Divider().opacity(0)
