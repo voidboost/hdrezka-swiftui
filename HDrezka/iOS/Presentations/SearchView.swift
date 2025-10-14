@@ -68,6 +68,7 @@ struct SearchView: View {
         .searchFocused($searchFocus)
         .transition(.opacity)
         .navigationTitle(viewModel.title)
+        .navigationBarTitleDisplayMode(.large)
         .background(.background)
         .task(id: isLoggedIn) {
             switch viewModel.state {

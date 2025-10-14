@@ -19,7 +19,7 @@ class BookmarksViewModel {
     private(set) var bookmarkState: DataState<[MovieSimple]> = .data([])
     private(set) var paginationState: DataPaginationState = .idle
 
-    var selectedBookmark: Int = -1
+    var selectedBookmark: Int?
 
     private(set) var error: Error?
     var isErrorPresented: Bool = false
@@ -32,7 +32,7 @@ class BookmarksViewModel {
 
     func getBookmarks(reset: Bool = false) {
         if reset {
-            selectedBookmark = -1
+            selectedBookmark = nil
         }
 
         bookmarksState = .loading
@@ -60,35 +60,37 @@ class BookmarksViewModel {
     @ObservationIgnored private var page = 1
 
     private func getBookmark(isInitial: Bool = true) {
-        getPublisher(id: selectedBookmark, filter: filter, genre: genre)
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
+        if let selectedBookmark {
+            getPublisher(id: selectedBookmark, filter: filter, genre: genre)
+                .receive(on: DispatchQueue.main)
+                .sink { completion in
+                    guard case let .failure(error) = completion else { return }
 
-                withAnimation(.easeInOut) {
-                    if isInitial {
-                        self.bookmarkState = .error(error)
-                    } else {
-                        self.paginationState = .error(error)
-                    }
-                }
-            } receiveValue: { result in
-                self.page += 1
-
-                withAnimation(.easeInOut) {
-                    if isInitial {
-                        self.bookmarkState = .data(result)
-                    } else {
-                        if !result.isEmpty {
-                            self.bookmarkState.append(result)
-                            self.paginationState = .idle
+                    withAnimation(.easeInOut) {
+                        if isInitial {
+                            self.bookmarkState = .error(error)
                         } else {
-                            self.paginationState = .error(HDrezkaError.unknown)
+                            self.paginationState = .error(error)
+                        }
+                    }
+                } receiveValue: { result in
+                    self.page += 1
+
+                    withAnimation(.easeInOut) {
+                        if isInitial {
+                            self.bookmarkState = .data(result)
+                        } else {
+                            if !result.isEmpty {
+                                self.bookmarkState.append(result)
+                                self.paginationState = .idle
+                            } else {
+                                self.paginationState = .error(HDrezkaError.unknown)
+                            }
                         }
                     }
                 }
-            }
-            .store(in: &subscriptions)
+                .store(in: &subscriptions)
+        }
     }
 
     private func getPublisher(id: Int, filter: BookmarkFilters, genre: Genres) -> AnyPublisher<[MovieSimple], Error> {
@@ -139,7 +141,7 @@ class BookmarksViewModel {
                     }
 
                     if self.selectedBookmark == bookmark.bookmarkId {
-                        self.selectedBookmark = -1
+                        self.selectedBookmark = nil
                         self.bookmarkState = .data([])
                     }
                 }
@@ -147,40 +149,42 @@ class BookmarksViewModel {
             .store(in: &subscriptions)
     }
 
-    func moveBetweenBookmarks(movies: [MovieSimple], bookmark: Bookmark) {
-        moveBetweenBookmarksUseCase(movies: movies.compactMap(\.movieId.id), fromBookmarkUserCategory: selectedBookmark, toBookmarkUserCategory: bookmark.bookmarkId)
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
+    func moveBetweenBookmarks(movies: [MovieSimple], toBookmark: Bookmark) {
+        if let fromBookmark = selectedBookmark {
+            moveBetweenBookmarksUseCase(movies: movies.compactMap(\.movieId.id), fromBookmarkUserCategory: fromBookmark, toBookmarkUserCategory: toBookmark.bookmarkId)
+                .receive(on: DispatchQueue.main)
+                .sink { completion in
+                    guard case let .failure(error) = completion else { return }
 
-                self.error = error
-                self.isErrorPresented = true
-            } receiveValue: { moved in
-                withAnimation(.easeInOut) {
-                    if var data = self.bookmarkState.data {
-                        data.removeAll(where: { movie in
-                            movies.contains(where: { movedMovie in
-                                movie.movieId == movedMovie.movieId
+                    self.error = error
+                    self.isErrorPresented = true
+                } receiveValue: { moved in
+                    withAnimation(.easeInOut) {
+                        if var data = self.bookmarkState.data {
+                            data.removeAll(where: { movie in
+                                movies.contains(where: { movedMovie in
+                                    movie.movieId == movedMovie.movieId
+                                })
                             })
-                        })
 
-                        self.bookmarkState = .data(data)
-                    }
-
-                    if var bookmarks = self.bookmarksState.data {
-                        if let from = bookmarks.firstIndex(where: { $0.bookmarkId == self.selectedBookmark }) {
-                            bookmarks[from] -= 1
+                            self.bookmarkState = .data(data)
                         }
 
-                        if let to = bookmarks.firstIndex(where: { $0.bookmarkId == bookmark.bookmarkId }) {
-                            bookmarks[to] += moved
-                        }
+                        if var bookmarks = self.bookmarksState.data {
+                            if let from = bookmarks.firstIndex(where: { $0.bookmarkId == self.selectedBookmark }) {
+                                bookmarks[from] -= 1
+                            }
 
-                        self.bookmarksState = .data(bookmarks)
+                            if let to = bookmarks.firstIndex(where: { $0.bookmarkId == toBookmark.bookmarkId }) {
+                                bookmarks[to] += moved
+                            }
+
+                            self.bookmarksState = .data(bookmarks)
+                        }
                     }
                 }
-            }
-            .store(in: &subscriptions)
+                .store(in: &subscriptions)
+        }
     }
 
     func reorderBookmarksCategories(fromOffsets: IndexSet, toOffset: Int) {
@@ -211,34 +215,36 @@ class BookmarksViewModel {
     }
 
     func removeFromBookmarks(movies ids: [String]) {
-        removeFromBookmarksUseCase(movies: ids, bookmarkUserCategory: selectedBookmark)
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
+        if let selectedBookmark {
+            removeFromBookmarksUseCase(movies: ids, bookmarkUserCategory: selectedBookmark)
+                .receive(on: DispatchQueue.main)
+                .sink { completion in
+                    guard case let .failure(error) = completion else { return }
 
-                self.error = error
-                self.isErrorPresented = true
-            } receiveValue: { delete in
-                if delete, var movies = self.bookmarkState.data {
-                    movies.removeAll(where: {
-                        if let movieId = $0.movieId.id {
-                            ids.contains(movieId)
-                        } else {
-                            false
-                        }
-                    })
+                    self.error = error
+                    self.isErrorPresented = true
+                } receiveValue: { delete in
+                    if delete, var movies = self.bookmarkState.data {
+                        movies.removeAll(where: {
+                            if let movieId = $0.movieId.id {
+                                ids.contains(movieId)
+                            } else {
+                                false
+                            }
+                        })
 
-                    withAnimation(.easeInOut) {
-                        self.bookmarkState = .data(movies)
+                        withAnimation(.easeInOut) {
+                            self.bookmarkState = .data(movies)
 
-                        if var bookmarks = self.bookmarksState.data, let index = bookmarks.firstIndex(where: { $0.bookmarkId == self.selectedBookmark }) {
-                            bookmarks[index] -= 1
+                            if var bookmarks = self.bookmarksState.data, let index = bookmarks.firstIndex(where: { $0.bookmarkId == self.selectedBookmark }) {
+                                bookmarks[index] -= 1
 
-                            self.bookmarksState = .data(bookmarks)
+                                self.bookmarksState = .data(bookmarks)
+                            }
                         }
                     }
                 }
-            }
-            .store(in: &subscriptions)
+                .store(in: &subscriptions)
+        }
     }
 }

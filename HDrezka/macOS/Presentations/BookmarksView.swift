@@ -44,7 +44,7 @@ struct BookmarksView: View {
                                 if viewModel.selectedBookmark != bookmark.bookmarkId {
                                     view.dropDestination(for: MovieSimple.self) { movies, _ in
                                         if !movies.isEmpty, !movies.compactMap(\.movieId.id).isEmpty {
-                                            viewModel.moveBetweenBookmarks(movies: movies, bookmark: bookmark)
+                                            viewModel.moveBetweenBookmarks(movies: movies, toBookmark: bookmark)
 
                                             return true
                                         }
@@ -212,12 +212,12 @@ struct BookmarksView: View {
                     .padding(18)
                 } else if let movies = viewModel.bookmarkState.data, movies.isEmpty {
                     VStack(alignment: .center, spacing: 8) {
-                        Text(viewModel.selectedBookmark == -1 ? String(localized: "key.bookmarks.select") : String(localized: "key.bookmarks.empty"))
+                        Text(viewModel.selectedBookmark == nil ? String(localized: "key.bookmarks.select") : String(localized: "key.bookmarks.empty"))
                             .font(.system(.title, weight: .medium))
                             .lineLimit(nil)
                             .multilineTextAlignment(.center)
 
-                        if viewModel.selectedBookmark != -1 {
+                        if viewModel.selectedBookmark != nil {
                             Button {
                                 viewModel.load()
                             } label: {
@@ -248,7 +248,7 @@ struct BookmarksView: View {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
                 .keyboardShortcut("r", modifiers: .command)
-                .disabled(viewModel.bookmarksState.data?.isEmpty != false || (viewModel.bookmarkState.data?.isEmpty != false && viewModel.selectedBookmark != -1))
+                .disabled(viewModel.bookmarksState.data?.isEmpty != false || (viewModel.bookmarkState.data?.isEmpty != false && viewModel.selectedBookmark != nil))
 
                 Button {
                     viewModel.isCreateBookmarkPresented = true
@@ -267,7 +267,7 @@ struct BookmarksView: View {
                 }
                 .labelsHidden()
                 .pickerStyle(.menu)
-                .disabled(viewModel.bookmarkState == .loading || viewModel.selectedBookmark == -1)
+                .disabled(viewModel.bookmarkState == .loading || viewModel.selectedBookmark == nil)
 
                 Picker("key.genre.select", selection: $viewModel.genre) {
                     ForEach(Genres.allCases) { genre in
@@ -276,11 +276,11 @@ struct BookmarksView: View {
                 }
                 .labelsHidden()
                 .pickerStyle(.menu)
-                .disabled(viewModel.bookmarkState == .loading || viewModel.selectedBookmark == -1)
+                .disabled(viewModel.bookmarkState == .loading || viewModel.selectedBookmark == nil)
             }
         }
         .onChange(of: viewModel.selectedBookmark) {
-            if viewModel.selectedBookmark != -1 {
+            if viewModel.selectedBookmark != nil {
                 viewModel.load()
             }
         }

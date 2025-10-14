@@ -123,13 +123,16 @@ struct DetailsView: View {
         }
         .sheet(isPresented: $isBookmarksPresented) {
             BookmarksSheetView(id: viewModel.id, isCreateBookmarkPresented: $isCreateBookmarkPresented)
+                .presentationSizing(.fitted)
         }
         .sheet(isPresented: $isCreateBookmarkPresented) {
             CreateBookmarkSheetView()
+                .presentationSizing(.fitted)
         }
         .sheet(isPresented: $isSchedulePresented) {
             if let details = viewModel.state.data, let schedule = details.schedule, !schedule.isEmpty {
                 ScheduleSheetView(schedule: schedule)
+                    .presentationSizing(.fitted)
             }
         }
         .alert("key.ops", isPresented: $viewModel.isErrorPresented) {
@@ -276,6 +279,7 @@ struct DetailsView: View {
                                         .buttonStyle(.plain)
                                         .sheet(isPresented: $isPlayPresented) {
                                             WatchSheetView(id: details.movieId)
+                                                .presentationSizing(.fitted)
                                         }
 
                                         //                                    if downloader.isRunning {
@@ -295,10 +299,11 @@ struct DetailsView: View {
                                         //                                        .buttonStyle(.plain)
                                         //                                        .sheet(isPresented: $isDownloadPresented) {
                                         //                                            DownloadSheetView(id: details.movieId)
+//                                        .presentationSizing(.fitted)
                                         //                                        }
                                         //                                    }
 
-                                        if !ExternalPlayers.allCases.contains(where: { UIApplication.shared.canOpenURL($0.url) }) {
+                                        if ExternalPlayers.allCases.contains(where: { UIApplication.shared.canOpenURL($0.url) }) {
                                             Button {
                                                 isOpenExternalPlayerPresented = true
                                             } label: {
@@ -315,6 +320,7 @@ struct DetailsView: View {
                                             .buttonStyle(.plain)
                                             .sheet(isPresented: $isOpenExternalPlayerPresented) {
                                                 OpenExternalPlayerSheetView(id: details.movieId)
+                                                    .presentationSizing(.fitted)
                                             }
                                         }
                                     } else if details.comingSoon {
@@ -560,6 +566,7 @@ struct DetailsView: View {
                                     .buttonStyle(.plain)
                                     .sheet(isPresented: $isPlayPresented) {
                                         WatchSheetView(id: details.movieId)
+                                            .presentationSizing(.fitted)
                                     }
 
                                     //                                    if downloader.isRunning {
@@ -579,10 +586,11 @@ struct DetailsView: View {
                                     //                                        .buttonStyle(.plain)
                                     //                                        .sheet(isPresented: $isDownloadPresented) {
                                     //                                            DownloadSheetView(id: details.movieId)
+//                                    .presentationSizing(.fitted)
                                     //                                        }
                                     //                                    }
 
-                                    if !ExternalPlayers.allCases.contains(where: { UIApplication.shared.canOpenURL($0.url) }) {
+                                    if ExternalPlayers.allCases.contains(where: { UIApplication.shared.canOpenURL($0.url) }) {
                                         Button {
                                             isOpenExternalPlayerPresented = true
                                         } label: {
@@ -599,6 +607,7 @@ struct DetailsView: View {
                                         .buttonStyle(.plain)
                                         .sheet(isPresented: $isOpenExternalPlayerPresented) {
                                             OpenExternalPlayerSheetView(id: details.movieId)
+                                                .presentationSizing(.fitted)
                                         }
                                     }
                                 } else if details.comingSoon {

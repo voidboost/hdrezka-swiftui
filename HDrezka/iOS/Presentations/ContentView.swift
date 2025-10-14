@@ -6,6 +6,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Injected(\.getVersionUseCase) private var getVersionUseCase
+    @Injected(\.logoutUseCase) private var logoutUseCase
 
     @Default(.mirror) private var mirror
     @Default(.lastHdrezkaAppVersion) private var lastHdrezkaAppVersion
@@ -43,32 +44,35 @@ struct ContentView: View {
                 }
                 .store(in: &subscriptions)
         }
-//        .sheet(isPresented: $appState.isSignInPresented) {
-//            SignInSheetView()
-//        }
-//        .sheet(isPresented: $appState.isSignUpPresented) {
-//            SignUpSheetView()
-//        }
-//        .sheet(isPresented: $appState.isRestorePresented) {
-//            RestoreSheetView()
-//        }
-//        .confirmationDialog("key.sign_out.label", isPresented: $appState.isSignOutPresented) {
-//            Button(role: .destructive) {
-//                logoutUseCase()
-//            } label: {
-//                Text("key.yes")
-//            }
-//        } message: {
-//            Text("key.sign_out.q")
-//        }
-//        .dialogSeverity(.critical)
-//        .confirmationDialog("key.premium_content", isPresented: $appState.isPremiumPresented) {
-//            Link("key.buy", destination: (mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
-//        } message: {
-//            Text("key.premium.description")
-//        }
-//        .sheet(isPresented: $appState.commentsRulesPresented) {
-//            CommentsRulesSheet()
-//        }
+        .sheet(isPresented: $appState.isSignInPresented) {
+            SignInSheetView()
+                .presentationSizing(.fitted)
+        }
+        .sheet(isPresented: $appState.isSignUpPresented) {
+            SignUpSheetView()
+                .presentationSizing(.fitted)
+        }
+        .sheet(isPresented: $appState.isRestorePresented) {
+            RestoreSheetView()
+                .presentationSizing(.fitted)
+        }
+        .confirmationDialog("key.sign_out.label", isPresented: $appState.isSignOutPresented) {
+            Button(role: .destructive) {
+                logoutUseCase()
+            } label: {
+                Text("key.yes")
+            }
+        } message: {
+            Text("key.sign_out.q")
+        }
+        .confirmationDialog("key.premium_content", isPresented: $appState.isPremiumPresented) {
+            Link("key.buy", destination: (mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
+        } message: {
+            Text("key.premium.description")
+        }
+        .sheet(isPresented: $appState.commentsRulesPresented) {
+            CommentsRulesSheet()
+                .presentationSizing(.fitted)
+        }
     }
 }
