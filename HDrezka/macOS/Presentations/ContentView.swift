@@ -122,7 +122,7 @@ struct ContentView: View {
             .padding(.vertical, 5)
         }
         .frame(minWidth: 1100, minHeight: 600)
-        .task {
+        .onAppear {
             getVersionUseCase()
                 .receive(on: DispatchQueue.main)
                 .sink { _ in } receiveValue: { version in

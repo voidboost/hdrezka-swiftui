@@ -175,7 +175,7 @@ struct SignInSheetView: View {
                         .buttonStyle(.plain)
                     }
                 }
-                .task {
+                .onAppear {
                     focusedField = .username
                 }
             case .loading:

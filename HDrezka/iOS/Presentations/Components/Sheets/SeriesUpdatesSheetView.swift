@@ -93,7 +93,7 @@ struct SeriesUpdatesSheetView: View {
         .padding(.top, 35)
         .padding(.bottom, 25)
         .frame(width: 520, height: 520)
-        .task {
+        .onAppear {
             load()
         }
     }

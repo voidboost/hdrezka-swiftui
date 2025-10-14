@@ -85,7 +85,7 @@ struct CreateBookmarkSheetView: View {
                         .buttonStyle(.plain)
                     }
                 }
-                .task {
+                .onAppear {
                     focusedField = .name
                 }
             case .loading:

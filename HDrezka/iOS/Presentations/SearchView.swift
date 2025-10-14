@@ -70,7 +70,7 @@ struct SearchView: View {
         .navigationTitle(viewModel.title)
         .navigationBarTitleDisplayMode(.large)
         .background(.background)
-        .task(id: isLoggedIn) {
+        .onAppear {
             switch viewModel.state {
             case .data:
                 break

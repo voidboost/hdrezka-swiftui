@@ -108,7 +108,7 @@ struct DetailsView: View {
         } action: { inset in
             topSafeAreaInset = inset
         }
-        .task(id: isLoggedIn) {
+        .onAppear {
             switch viewModel.state {
             case .data:
                 break
@@ -211,14 +211,13 @@ struct DetailsView: View {
         @Environment(\.colorScheme) private var colorScheme
         @Environment(\.openWindow) private var openWindow
         @Environment(\.dismissWindow) private var dismissWindow
-        @Environment(\.horizontalSizeClass) private var horizontalSizeClass
         @Environment(\.openURL) private var openURL
 
         var body: some View {
             VStack(spacing: 18) {
                 VStack(alignment: .center, spacing: 18) {
-                    if horizontalSizeClass == .regular {
-                        HStack(alignment: .bottom, spacing: 27) {
+                    OrientationView { orientation in
+                        VStack(alignment: .center, spacing: 18) {
                             Button {
                                 if let url = URL(string: details.hposter) ?? URL(string: details.poster) {
                                     dismissWindow(id: "imageViewer")
@@ -245,20 +244,23 @@ struct DetailsView: View {
                                 .clipShape(.rect(cornerRadius: 6))
                             }
                             .buttonStyle(.plain)
+                            .matchedGeometryEffect(id: "poster", in: orientation)
 
-                            VStack(alignment: .leading, spacing: 16) {
-                                VStack(alignment: .leading, spacing: 8) {
+                            VStack(alignment: .center, spacing: 16) {
+                                VStack(alignment: .center, spacing: 8) {
                                     Text(details.nameRussian)
                                         .font(.largeTitle.weight(.semibold))
                                         .textSelection(.enabled)
-                                        .multilineTextAlignment(.leading)
+                                        .multilineTextAlignment(.center)
+                                        .matchedGeometryEffect(id: "nameRussian", in: orientation)
 
                                     if let nameOriginal = details.nameOriginal {
                                         Text(nameOriginal)
                                             .font(.title3)
                                             .foregroundStyle(.secondary)
                                             .textSelection(.enabled)
-                                            .multilineTextAlignment(.leading)
+                                            .multilineTextAlignment(.center)
+                                            .matchedGeometryEffect(id: "nameOriginal", in: orientation)
                                     }
                                 }
 
@@ -299,7 +301,7 @@ struct DetailsView: View {
                                         //                                        .buttonStyle(.plain)
                                         //                                        .sheet(isPresented: $isDownloadPresented) {
                                         //                                            DownloadSheetView(id: details.movieId)
-//                                        .presentationSizing(.fitted)
+                                        //                                    .presentationSizing(.fitted)
                                         //                                        }
                                         //                                    }
 
@@ -347,6 +349,7 @@ struct DetailsView: View {
                                         .disabled(true)
                                     }
                                 }
+                                .matchedGeometryEffect(id: "buttons", in: orientation)
 
                                 if details.slogan?.isEmpty == false
                                     ||
@@ -502,293 +505,301 @@ struct DetailsView: View {
                                     .padding(.horizontal, 10)
                                     .background(.quinary, in: .rect(cornerRadius: 6))
                                     .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                                    .matchedGeometryEffect(id: "info", in: orientation)
                                 }
                             }
                         }
-                    } else {
-                        Button {
-                            if let url = URL(string: details.hposter) ?? URL(string: details.poster) {
-                                dismissWindow(id: "imageViewer")
+                    } landscape: { orientation in
+                        HStack(alignment: .bottom, spacing: 27) {
+                            Button {
+                                if let url = URL(string: details.hposter) ?? URL(string: details.poster) {
+                                    dismissWindow(id: "imageViewer")
 
-                                openWindow(id: "imageViewer", value: url)
-                            }
-                        } label: {
-                            AsyncImage(url: URL(string: details.hposter), transaction: .init(animation: .easeInOut)) { phase in
-                                if let image = phase.image {
-                                    image.resizable()
-                                } else {
-                                    AsyncImage(url: URL(string: details.poster), transaction: .init(animation: .easeInOut)) { phase in
-                                        if let image = phase.image {
-                                            image.resizable()
-                                        } else {
-                                            Color.gray.shimmering()
+                                    openWindow(id: "imageViewer", value: url)
+                                }
+                            } label: {
+                                AsyncImage(url: URL(string: details.hposter), transaction: .init(animation: .easeInOut)) { phase in
+                                    if let image = phase.image {
+                                        image.resizable()
+                                    } else {
+                                        AsyncImage(url: URL(string: details.poster), transaction: .init(animation: .easeInOut)) { phase in
+                                            if let image = phase.image {
+                                                image.resizable()
+                                            } else {
+                                                Color.gray.shimmering()
+                                            }
                                         }
                                     }
                                 }
+                                .imageFill(2 / 3)
+                                .frame(width: 300)
+                                .contentShape(.rect(cornerRadius: 6))
+                                .clipShape(.rect(cornerRadius: 6))
                             }
-                            .imageFill(2 / 3)
-                            .frame(width: 300)
-                            .contentShape(.rect(cornerRadius: 6))
-                            .clipShape(.rect(cornerRadius: 6))
-                        }
-                        .buttonStyle(.plain)
+                            .buttonStyle(.plain)
+                            .matchedGeometryEffect(id: "poster", in: orientation)
 
-                        VStack(alignment: .center, spacing: 16) {
-                            VStack(alignment: .center, spacing: 8) {
-                                Text(details.nameRussian)
-                                    .font(.largeTitle.weight(.semibold))
-                                    .textSelection(.enabled)
-                                    .multilineTextAlignment(.center)
-
-                                if let nameOriginal = details.nameOriginal {
-                                    Text(nameOriginal)
-                                        .font(.title3)
-                                        .foregroundStyle(.secondary)
+                            VStack(alignment: .leading, spacing: 16) {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text(details.nameRussian)
+                                        .font(.largeTitle.weight(.semibold))
                                         .textSelection(.enabled)
-                                        .multilineTextAlignment(.center)
+                                        .multilineTextAlignment(.leading)
+                                        .matchedGeometryEffect(id: "nameRussian", in: orientation)
+
+                                    if let nameOriginal = details.nameOriginal {
+                                        Text(nameOriginal)
+                                            .font(.title3)
+                                            .foregroundStyle(.secondary)
+                                            .textSelection(.enabled)
+                                            .multilineTextAlignment(.leading)
+                                            .matchedGeometryEffect(id: "nameOriginal", in: orientation)
+                                    }
                                 }
-                            }
 
-                            HStack(alignment: .center, spacing: 12) {
-                                if details.available {
-                                    Button {
-                                        isPlayPresented = true
-                                    } label: {
-                                        Label("key.watch", systemImage: "play.fill")
-                                            .font(.body)
-                                            .foregroundStyle(.white)
-                                            .padding(.horizontal, 14)
-                                            .padding(.vertical, 7)
-                                            .lineLimit(1)
-                                            .contentShape(.capsule)
-                                            .background(Color.accentColor, in: .capsule)
-                                    }
-                                    .buttonStyle(.plain)
-                                    .sheet(isPresented: $isPlayPresented) {
-                                        WatchSheetView(id: details.movieId)
-                                            .presentationSizing(.fitted)
-                                    }
-
-                                    //                                    if downloader.isRunning {
-                                    //                                        Button {
-                                    //                                            isDownloadPresented = true
-                                    //                                        } label: {
-                                    //                                            Label("key.download", systemImage: "arrow.down.circle")
-                                    //                                                .font(.body)
-                                    //                                                .foregroundStyle(Color.accentColor)
-                                    //                                                .padding(.horizontal, 14)
-                                    //                                                .padding(.vertical, 7)
-                                    //                                                .lineLimit(1)
-                                    //                                                .contentShape(.capsule)
-                                    //                                                .background(.tertiary.opacity(0.05), in: .capsule)
-                                    //                                                .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
-                                    //                                        }
-                                    //                                        .buttonStyle(.plain)
-                                    //                                        .sheet(isPresented: $isDownloadPresented) {
-                                    //                                            DownloadSheetView(id: details.movieId)
-//                                    .presentationSizing(.fitted)
-                                    //                                        }
-                                    //                                    }
-
-                                    if ExternalPlayers.allCases.contains(where: { UIApplication.shared.canOpenURL($0.url) }) {
+                                HStack(alignment: .center, spacing: 12) {
+                                    if details.available {
                                         Button {
-                                            isOpenExternalPlayerPresented = true
+                                            isPlayPresented = true
                                         } label: {
-                                            Label("key.open.external", systemImage: "arrow.up.forward.app")
+                                            Label("key.watch", systemImage: "play.fill")
                                                 .font(.body)
-                                                .foregroundStyle(Color.accentColor)
+                                                .foregroundStyle(.white)
                                                 .padding(.horizontal, 14)
                                                 .padding(.vertical, 7)
                                                 .lineLimit(1)
                                                 .contentShape(.capsule)
-                                                .background(.tertiary.opacity(0.05), in: .capsule)
-                                                .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
+                                                .background(Color.accentColor, in: .capsule)
                                         }
                                         .buttonStyle(.plain)
-                                        .sheet(isPresented: $isOpenExternalPlayerPresented) {
-                                            OpenExternalPlayerSheetView(id: details.movieId)
+                                        .sheet(isPresented: $isPlayPresented) {
+                                            WatchSheetView(id: details.movieId)
                                                 .presentationSizing(.fitted)
                                         }
-                                    }
-                                } else if details.comingSoon {
-                                    Button {} label: {
-                                        Label("key.soon", systemImage: "clock")
-                                            .font(.body)
-                                            .foregroundStyle(.white)
-                                            .padding(.horizontal, 14)
-                                            .padding(.vertical, 7)
-                                            .background(Color.accentColor, in: .capsule)
-                                    }
-                                    .buttonStyle(.plain)
-                                    .disabled(true)
-                                } else {
-                                    Button {} label: {
-                                        Label("key.unavailable", systemImage: "network.slash")
-                                            .font(.body)
-                                            .foregroundStyle(.white)
-                                            .padding(.horizontal, 14)
-                                            .padding(.vertical, 7)
-                                            .background(Color.accentColor, in: .capsule)
-                                    }
-                                    .buttonStyle(.plain)
-                                    .disabled(true)
-                                }
-                            }
 
-                            if details.slogan?.isEmpty == false
-                                ||
-                                details.releaseDate?.isEmpty == false
-                                ||
-                                details.year?.isEmpty == false
-                                ||
-                                details.countries?.isEmpty == false
-                                ||
-                                details.genres?.isEmpty == false
-                                ||
-                                details.producer?.isEmpty == false
-                                ||
-                                details.actors?.isEmpty == false
-                                ||
-                                details.lists?.isEmpty == false
-                                ||
-                                details.collections?.isEmpty == false
-                                ||
-                                details.rating != nil
-                            {
-                                VStack(alignment: .leading, spacing: 0) {
-                                    if let slogan = details.slogan, !slogan.isEmpty {
-                                        InfoRow(String(localized: "key.info.slogan"), slogan)
-                                    }
+                                        //                                    if downloader.isRunning {
+                                        //                                        Button {
+                                        //                                            isDownloadPresented = true
+                                        //                                        } label: {
+                                        //                                            Label("key.download", systemImage: "arrow.down.circle")
+                                        //                                                .font(.body)
+                                        //                                                .foregroundStyle(Color.accentColor)
+                                        //                                                .padding(.horizontal, 14)
+                                        //                                                .padding(.vertical, 7)
+                                        //                                                .lineLimit(1)
+                                        //                                                .contentShape(.capsule)
+                                        //                                                .background(.tertiary.opacity(0.05), in: .capsule)
+                                        //                                                .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
+                                        //                                        }
+                                        //                                        .buttonStyle(.plain)
+                                        //                                        .sheet(isPresented: $isDownloadPresented) {
+                                        //                                            DownloadSheetView(id: details.movieId)
+//                                        .presentationSizing(.fitted)
+                                        //                                        }
+                                        //                                    }
 
-                                    if let releaseDate = details.releaseDate, !releaseDate.isEmpty {
-                                        if details.slogan?.isEmpty == false {
-                                            Divider()
+                                        if ExternalPlayers.allCases.contains(where: { UIApplication.shared.canOpenURL($0.url) }) {
+                                            Button {
+                                                isOpenExternalPlayerPresented = true
+                                            } label: {
+                                                Label("key.open.external", systemImage: "arrow.up.forward.app")
+                                                    .font(.body)
+                                                    .foregroundStyle(Color.accentColor)
+                                                    .padding(.horizontal, 14)
+                                                    .padding(.vertical, 7)
+                                                    .lineLimit(1)
+                                                    .contentShape(.capsule)
+                                                    .background(.tertiary.opacity(0.05), in: .capsule)
+                                                    .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
+                                            }
+                                            .buttonStyle(.plain)
+                                            .sheet(isPresented: $isOpenExternalPlayerPresented) {
+                                                OpenExternalPlayerSheetView(id: details.movieId)
+                                                    .presentationSizing(.fitted)
+                                            }
                                         }
-
-                                        InfoRow(String(localized: "key.info.date"), releaseDate)
-                                    }
-
-                                    if let year = details.year, !year.isEmpty {
-                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false {
-                                            Divider()
+                                    } else if details.comingSoon {
+                                        Button {} label: {
+                                            Label("key.soon", systemImage: "clock")
+                                                .font(.body)
+                                                .foregroundStyle(.white)
+                                                .padding(.horizontal, 14)
+                                                .padding(.vertical, 7)
+                                                .background(Color.accentColor, in: .capsule)
                                         }
-
-                                        InfoRow(String(localized: "key.info.year"), year)
-                                    }
-
-                                    if let countries = details.countries, !countries.isEmpty {
-                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false {
-                                            Divider()
+                                        .buttonStyle(.plain)
+                                        .disabled(true)
+                                    } else {
+                                        Button {} label: {
+                                            Label("key.unavailable", systemImage: "network.slash")
+                                                .font(.body)
+                                                .foregroundStyle(.white)
+                                                .padding(.horizontal, 14)
+                                                .padding(.vertical, 7)
+                                                .background(Color.accentColor, in: .capsule)
                                         }
-
-                                        InfoRowWithButtons(
-                                            String(localized: "key.info.country"),
-                                            String(localized: "key.info.country.description"),
-                                            countries,
-                                            countryDestination: $countryDestination,
-                                            genreDestination: $genreDestination,
-                                            personDestination: $personDestination,
-                                            listDestination: $listDestination,
-                                            collectionDestination: $collectionDestination,
-                                        )
-                                    }
-
-                                    if let genres = details.genres, !genres.isEmpty {
-                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false || details.countries?.isEmpty == false {
-                                            Divider()
-                                        }
-
-                                        InfoRowWithButtons(
-                                            String(localized: "key.info.genres"),
-                                            String(localized: "key.info.genres.description"),
-                                            genres,
-                                            countryDestination: $countryDestination,
-                                            genreDestination: $genreDestination,
-                                            personDestination: $personDestination,
-                                            listDestination: $listDestination,
-                                            collectionDestination: $collectionDestination,
-                                        )
-                                    }
-
-                                    if let producer = details.producer, !producer.isEmpty {
-                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false {
-                                            Divider()
-                                        }
-
-                                        InfoRowWithButtons(
-                                            String(localized: "key.info.producer"),
-                                            String(localized: "key.info.producer.description"),
-                                            producer,
-                                            countryDestination: $countryDestination,
-                                            genreDestination: $genreDestination,
-                                            personDestination: $personDestination,
-                                            listDestination: $listDestination,
-                                            collectionDestination: $collectionDestination,
-                                        )
-                                    }
-
-                                    if let actors = details.actors, !actors.isEmpty {
-                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false || details.producer?.isEmpty == false {
-                                            Divider()
-                                        }
-
-                                        InfoRowWithButtons(
-                                            String(localized: "key.info.actors"),
-                                            String(localized: "key.info.actors.description"),
-                                            actors,
-                                            countryDestination: $countryDestination,
-                                            genreDestination: $genreDestination,
-                                            personDestination: $personDestination,
-                                            listDestination: $listDestination,
-                                            collectionDestination: $collectionDestination,
-                                        )
-                                    }
-
-                                    if let lists = details.lists, !lists.isEmpty {
-                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false || details.producer?.isEmpty == false || details.actors?.isEmpty == false {
-                                            Divider()
-                                        }
-
-                                        InfoRowWithButtons(
-                                            String(localized: "key.info.lists"),
-                                            String(localized: "key.info.lists.description"),
-                                            lists,
-                                            countryDestination: $countryDestination,
-                                            genreDestination: $genreDestination,
-                                            personDestination: $personDestination,
-                                            listDestination: $listDestination,
-                                            collectionDestination: $collectionDestination,
-                                        )
-                                    }
-
-                                    if let collections = details.collections, !collections.isEmpty {
-                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false || details.producer?.isEmpty == false || details.actors?.isEmpty == false || details.lists?.isEmpty == false {
-                                            Divider()
-                                        }
-
-                                        InfoRowWithButtons(
-                                            String(localized: "key.info.collections"),
-                                            String(localized: "key.info.collections.description"),
-                                            collections,
-                                            countryDestination: $countryDestination,
-                                            genreDestination: $genreDestination,
-                                            personDestination: $personDestination,
-                                            listDestination: $listDestination,
-                                            collectionDestination: $collectionDestination,
-                                        )
-                                    }
-
-                                    if let rating = details.rating {
-                                        if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false || details.producer?.isEmpty == false || details.actors?.isEmpty == false || details.lists?.isEmpty == false || details.collections?.isEmpty == false {
-                                            Divider()
-                                        }
-
-                                        InfoRowRating(String(localized: "key.info.rating"), rating, details.rated, details.votes)
+                                        .buttonStyle(.plain)
+                                        .disabled(true)
                                     }
                                 }
-                                .padding(.horizontal, 10)
-                                .background(.quinary, in: .rect(cornerRadius: 6))
-                                .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                                .matchedGeometryEffect(id: "buttons", in: orientation)
+
+                                if details.slogan?.isEmpty == false
+                                    ||
+                                    details.releaseDate?.isEmpty == false
+                                    ||
+                                    details.year?.isEmpty == false
+                                    ||
+                                    details.countries?.isEmpty == false
+                                    ||
+                                    details.genres?.isEmpty == false
+                                    ||
+                                    details.producer?.isEmpty == false
+                                    ||
+                                    details.actors?.isEmpty == false
+                                    ||
+                                    details.lists?.isEmpty == false
+                                    ||
+                                    details.collections?.isEmpty == false
+                                    ||
+                                    details.rating != nil
+                                {
+                                    VStack(alignment: .leading, spacing: 0) {
+                                        if let slogan = details.slogan, !slogan.isEmpty {
+                                            InfoRow(String(localized: "key.info.slogan"), slogan)
+                                        }
+
+                                        if let releaseDate = details.releaseDate, !releaseDate.isEmpty {
+                                            if details.slogan?.isEmpty == false {
+                                                Divider()
+                                            }
+
+                                            InfoRow(String(localized: "key.info.date"), releaseDate)
+                                        }
+
+                                        if let year = details.year, !year.isEmpty {
+                                            if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false {
+                                                Divider()
+                                            }
+
+                                            InfoRow(String(localized: "key.info.year"), year)
+                                        }
+
+                                        if let countries = details.countries, !countries.isEmpty {
+                                            if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false {
+                                                Divider()
+                                            }
+
+                                            InfoRowWithButtons(
+                                                String(localized: "key.info.country"),
+                                                String(localized: "key.info.country.description"),
+                                                countries,
+                                                countryDestination: $countryDestination,
+                                                genreDestination: $genreDestination,
+                                                personDestination: $personDestination,
+                                                listDestination: $listDestination,
+                                                collectionDestination: $collectionDestination,
+                                            )
+                                        }
+
+                                        if let genres = details.genres, !genres.isEmpty {
+                                            if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false || details.countries?.isEmpty == false {
+                                                Divider()
+                                            }
+
+                                            InfoRowWithButtons(
+                                                String(localized: "key.info.genres"),
+                                                String(localized: "key.info.genres.description"),
+                                                genres,
+                                                countryDestination: $countryDestination,
+                                                genreDestination: $genreDestination,
+                                                personDestination: $personDestination,
+                                                listDestination: $listDestination,
+                                                collectionDestination: $collectionDestination,
+                                            )
+                                        }
+
+                                        if let producer = details.producer, !producer.isEmpty {
+                                            if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false {
+                                                Divider()
+                                            }
+
+                                            InfoRowWithButtons(
+                                                String(localized: "key.info.producer"),
+                                                String(localized: "key.info.producer.description"),
+                                                producer,
+                                                countryDestination: $countryDestination,
+                                                genreDestination: $genreDestination,
+                                                personDestination: $personDestination,
+                                                listDestination: $listDestination,
+                                                collectionDestination: $collectionDestination,
+                                            )
+                                        }
+
+                                        if let actors = details.actors, !actors.isEmpty {
+                                            if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false || details.producer?.isEmpty == false {
+                                                Divider()
+                                            }
+
+                                            InfoRowWithButtons(
+                                                String(localized: "key.info.actors"),
+                                                String(localized: "key.info.actors.description"),
+                                                actors,
+                                                countryDestination: $countryDestination,
+                                                genreDestination: $genreDestination,
+                                                personDestination: $personDestination,
+                                                listDestination: $listDestination,
+                                                collectionDestination: $collectionDestination,
+                                            )
+                                        }
+
+                                        if let lists = details.lists, !lists.isEmpty {
+                                            if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false || details.producer?.isEmpty == false || details.actors?.isEmpty == false {
+                                                Divider()
+                                            }
+
+                                            InfoRowWithButtons(
+                                                String(localized: "key.info.lists"),
+                                                String(localized: "key.info.lists.description"),
+                                                lists,
+                                                countryDestination: $countryDestination,
+                                                genreDestination: $genreDestination,
+                                                personDestination: $personDestination,
+                                                listDestination: $listDestination,
+                                                collectionDestination: $collectionDestination,
+                                            )
+                                        }
+
+                                        if let collections = details.collections, !collections.isEmpty {
+                                            if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false || details.producer?.isEmpty == false || details.actors?.isEmpty == false || details.lists?.isEmpty == false {
+                                                Divider()
+                                            }
+
+                                            InfoRowWithButtons(
+                                                String(localized: "key.info.collections"),
+                                                String(localized: "key.info.collections.description"),
+                                                collections,
+                                                countryDestination: $countryDestination,
+                                                genreDestination: $genreDestination,
+                                                personDestination: $personDestination,
+                                                listDestination: $listDestination,
+                                                collectionDestination: $collectionDestination,
+                                            )
+                                        }
+
+                                        if let rating = details.rating {
+                                            if details.slogan?.isEmpty == false || details.releaseDate?.isEmpty == false || details.year?.isEmpty == false || details.countries?.isEmpty == false || details.genres?.isEmpty == false || details.producer?.isEmpty == false || details.actors?.isEmpty == false || details.lists?.isEmpty == false || details.collections?.isEmpty == false {
+                                                Divider()
+                                            }
+
+                                            InfoRowRating(String(localized: "key.info.rating"), rating, details.rated, details.votes)
+                                        }
+                                    }
+                                    .padding(.horizontal, 10)
+                                    .background(.quinary, in: .rect(cornerRadius: 6))
+                                    .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                                    .matchedGeometryEffect(id: "info", in: orientation)
+                                }
                             }
                         }
                     }
@@ -884,67 +895,12 @@ struct DetailsView: View {
                 }
             }
 
-            if horizontalSizeClass == .regular {
-                HStack(alignment: .center, spacing: 18) {
-                    Text(details.description)
-                        .font(.title3)
-                        .textSelection(.enabled)
-
-                    if let trailerId {
-                        #if DEBUG
-                            let isLoggingEnabled = true
-                        #else
-                            let isLoggingEnabled = false
-                        #endif
-
-                        let trailer = YouTubePlayer(
-                            source: .video(id: trailerId),
-                            parameters: .init(
-                                autoPlay: false,
-                                loopEnabled: true,
-                                showControls: true,
-                                showFullscreenButton: true,
-                            ),
-                            configuration: .init(
-                                openURLAction: .init { url, _ in
-                                    openURL(url)
-                                },
-                            ),
-                            isLoggingEnabled: isLoggingEnabled,
-                        )
-
-                        YouTubePlayerView(trailer, transaction: .init(animation: .easeInOut)) { state in
-                            if state.isIdle {
-                                ProgressView()
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            } else if let error = state.error {
-                                switch error {
-                                case .embeddedVideoPlayingNotAllowed:
-                                    EmptyView()
-                                default:
-                                    Text("key.youtube.error")
-                                }
-                            }
-                        }
-                        .aspectRatio(16 / 9, contentMode: .fit)
-                        .frame(maxWidth: .infinity)
-                        .contentShape(.rect(cornerRadius: 6))
-                        .clipShape(.rect(cornerRadius: 6))
-                        .onScrollVisibilityChange { isVisible in
-                            if !isVisible, trailer.isPlaying {
-                                Task {
-                                    try? await trailer.pause()
-                                }
-                            }
-                        }
-                    }
-                }
-                .padding(.horizontal, 36)
-            } else {
+            OrientationView { orientation in
                 VStack(alignment: .center, spacing: 18) {
                     Text(details.description)
                         .font(.title3)
                         .textSelection(.enabled)
+                        .matchedGeometryEffect(id: "description", in: orientation)
 
                     if let trailerId {
                         Divider()
@@ -995,6 +951,65 @@ struct DetailsView: View {
                                 }
                             }
                         }
+                        .matchedGeometryEffect(id: "trailer", in: orientation)
+                    }
+                }
+                .padding(.horizontal, 36)
+            } landscape: { orientation in
+                HStack(alignment: .center, spacing: 18) {
+                    Text(details.description)
+                        .font(.title3)
+                        .textSelection(.enabled)
+                        .matchedGeometryEffect(id: "description", in: orientation)
+
+                    if let trailerId {
+                        #if DEBUG
+                            let isLoggingEnabled = true
+                        #else
+                            let isLoggingEnabled = false
+                        #endif
+
+                        let trailer = YouTubePlayer(
+                            source: .video(id: trailerId),
+                            parameters: .init(
+                                autoPlay: false,
+                                loopEnabled: true,
+                                showControls: true,
+                                showFullscreenButton: true,
+                            ),
+                            configuration: .init(
+                                openURLAction: .init { url, _ in
+                                    openURL(url)
+                                },
+                            ),
+                            isLoggingEnabled: isLoggingEnabled,
+                        )
+
+                        YouTubePlayerView(trailer, transaction: .init(animation: .easeInOut)) { state in
+                            if state.isIdle {
+                                ProgressView()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            } else if let error = state.error {
+                                switch error {
+                                case .embeddedVideoPlayingNotAllowed:
+                                    EmptyView()
+                                default:
+                                    Text("key.youtube.error")
+                                }
+                            }
+                        }
+                        .aspectRatio(16 / 9, contentMode: .fit)
+                        .frame(maxWidth: .infinity)
+                        .contentShape(.rect(cornerRadius: 6))
+                        .clipShape(.rect(cornerRadius: 6))
+                        .onScrollVisibilityChange { isVisible in
+                            if !isVisible, trailer.isPlaying {
+                                Task {
+                                    try? await trailer.pause()
+                                }
+                            }
+                        }
+                        .matchedGeometryEffect(id: "trailer", in: orientation)
                     }
                 }
                 .padding(.horizontal, 36)

@@ -20,7 +20,7 @@ struct UpdateButton: View {
             Text("key.checkUpdates")
         }
         .disabled(!canCheckForUpdates)
-        .task {
+        .onAppear {
             updater.publisher(for: \.canCheckForUpdates)
                 .receive(on: DispatchQueue.main)
                 .sink { canCheckForUpdates in

@@ -526,7 +526,7 @@ struct PlayerView: View {
         .preferredColorScheme(.dark)
         .tint(.primary)
         .contentShape(.rect)
-        .task {
+        .onAppear {
             setupPlayer(subtitles: selectPositions.first(where: { position in position.id == voiceActing.voiceId })?.subtitles)
 
             if hideMainWindow, let window = appState.window {

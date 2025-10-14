@@ -101,7 +101,7 @@ struct CommentsView: View {
                 .disabled(viewModel.state.data?.isEmpty != false)
             }
         }
-        .task(id: isLoggedIn) {
+        .onAppear {
             switch viewModel.state {
             case .data:
                 break

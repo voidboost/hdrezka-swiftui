@@ -55,7 +55,7 @@ struct PersonView: View {
                 .disabled(viewModel.state.data == nil)
             }
         }
-        .task(id: isLoggedIn) {
+        .onAppear {
             switch viewModel.state {
             case .data:
                 break
@@ -76,15 +76,13 @@ struct PersonView: View {
 
         @Environment(\.openWindow) private var openWindow
 
-        @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-
         init(details: PersonDetailed) {
             self.details = details
         }
 
         var body: some View {
-            if horizontalSizeClass == .compact {
-                HStack(alignment: .bottom, spacing: 27) {
+            OrientationView { orientation in
+                VStack(alignment: .center, spacing: 18) {
                     Button {
                         if let url = URL(string: details.hphoto) ?? URL(string: details.photo) {
                             openWindow(id: "imageViewer", value: url)
@@ -109,20 +107,23 @@ struct PersonView: View {
                         .clipShape(.rect(cornerRadius: 6))
                     }
                     .buttonStyle(.plain)
+                    .matchedGeometryEffect(id: "poster", in: orientation)
 
-                    VStack(alignment: .leading, spacing: 16) {
-                        VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .center, spacing: 16) {
+                        VStack(alignment: .center, spacing: 8) {
                             Text(details.nameRu)
                                 .font(.largeTitle.weight(.semibold))
                                 .textSelection(.enabled)
-                                .multilineTextAlignment(.leading)
+                                .multilineTextAlignment(.center)
+                                .matchedGeometryEffect(id: "nameRu", in: orientation)
 
                             if let nameOriginal = details.nameOrig {
                                 Text(nameOriginal)
                                     .font(.title3)
                                     .foregroundStyle(.secondary)
                                     .textSelection(.enabled)
-                                    .multilineTextAlignment(.leading)
+                                    .multilineTextAlignment(.center)
+                                    .matchedGeometryEffect(id: "nameOriginal", in: orientation)
                             }
                         }
 
@@ -186,113 +187,119 @@ struct PersonView: View {
                             .padding(.horizontal, 10)
                             .background(.quinary, in: .rect(cornerRadius: 6))
                             .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                            .matchedGeometryEffect(id: "info", in: orientation)
                         }
                     }
                 }
                 .padding(.horizontal, 36)
-            } else {
-                Button {
-                    if let url = URL(string: details.hphoto) ?? URL(string: details.photo) {
-                        openWindow(id: "imageViewer", value: url)
-                    }
-                } label: {
-                    AsyncImage(url: URL(string: details.hphoto), transaction: .init(animation: .easeInOut)) { phase in
-                        if let image = phase.image {
-                            image.resizable()
-                        } else {
-                            AsyncImage(url: URL(string: details.photo), transaction: .init(animation: .easeInOut)) { phase in
-                                if let image = phase.image {
-                                    image.resizable()
-                                } else {
-                                    Color.gray.shimmering()
+            } landscape: { orientation in
+                HStack(alignment: .bottom, spacing: 27) {
+                    Button {
+                        if let url = URL(string: details.hphoto) ?? URL(string: details.photo) {
+                            openWindow(id: "imageViewer", value: url)
+                        }
+                    } label: {
+                        AsyncImage(url: URL(string: details.hphoto), transaction: .init(animation: .easeInOut)) { phase in
+                            if let image = phase.image {
+                                image.resizable()
+                            } else {
+                                AsyncImage(url: URL(string: details.photo), transaction: .init(animation: .easeInOut)) { phase in
+                                    if let image = phase.image {
+                                        image.resizable()
+                                    } else {
+                                        Color.gray.shimmering()
+                                    }
                                 }
                             }
                         }
+                        .imageFill(2 / 3)
+                        .frame(width: 250)
+                        .contentShape(.rect(cornerRadius: 6))
+                        .clipShape(.rect(cornerRadius: 6))
                     }
-                    .imageFill(2 / 3)
-                    .frame(width: 250)
-                    .contentShape(.rect(cornerRadius: 6))
-                    .clipShape(.rect(cornerRadius: 6))
-                }
-                .buttonStyle(.plain)
-                .padding(.horizontal, 36)
+                    .buttonStyle(.plain)
+                    .matchedGeometryEffect(id: "poster", in: orientation)
 
-                VStack(alignment: .center, spacing: 16) {
-                    VStack(alignment: .center, spacing: 8) {
-                        Text(details.nameRu)
-                            .font(.largeTitle.weight(.semibold))
-                            .textSelection(.enabled)
-                            .multilineTextAlignment(.center)
-
-                        if let nameOriginal = details.nameOrig {
-                            Text(nameOriginal)
-                                .font(.title3)
-                                .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(details.nameRu)
+                                .font(.largeTitle.weight(.semibold))
                                 .textSelection(.enabled)
-                                .multilineTextAlignment(.center)
-                        }
-                    }
+                                .multilineTextAlignment(.leading)
+                                .matchedGeometryEffect(id: "nameRu", in: orientation)
 
-                    if details.career?.isEmpty == false
-                        ||
-                        details.birthDate?.isEmpty == false
-                        ||
-                        details.birthPlace?.isEmpty == false
-                        ||
-                        details.deathDate?.isEmpty == false
-                        ||
-                        details.deathPlace?.isEmpty == false
-                        ||
-                        details.height?.isEmpty == false
-                    {
-                        VStack(alignment: .leading, spacing: 0) {
-                            if let career = details.career, !career.isEmpty {
-                                InfoRow(String(localized: "key.person.career"), career)
-                            }
-
-                            if let height = details.height, !height.isEmpty {
-                                if details.career?.isEmpty == false {
-                                    Divider()
-                                }
-
-                                InfoRow(String(localized: "key.person.height"), height)
-                            }
-
-                            if let birthDate = details.birthDate, !birthDate.isEmpty {
-                                if details.career?.isEmpty == false || details.height?.isEmpty == false {
-                                    Divider()
-                                }
-
-                                InfoRow(String(localized: "key.person.birth_date"), birthDate)
-                            }
-
-                            if let birthPlace = details.birthPlace, !birthPlace.isEmpty {
-                                if details.career?.isEmpty == false || details.birthDate?.isEmpty == false || details.height?.isEmpty == false {
-                                    Divider()
-                                }
-
-                                InfoRow(String(localized: "key.person.birth_place"), birthPlace)
-                            }
-
-                            if let deathDate = details.deathDate, !deathDate.isEmpty {
-                                if details.career?.isEmpty == false || details.birthDate?.isEmpty == false || details.birthPlace?.isEmpty == false || details.height?.isEmpty == false {
-                                    Divider()
-                                }
-
-                                InfoRow(String(localized: "key.person.death_date"), deathDate)
-                            }
-
-                            if let deathPlace = details.deathPlace, !deathPlace.isEmpty {
-                                if details.career?.isEmpty == false || details.birthDate?.isEmpty == false || details.birthPlace?.isEmpty == false || details.deathDate?.isEmpty == false || details.height?.isEmpty == false {
-                                    Divider()
-                                }
-
-                                InfoRow(String(localized: "key.person.death_place"), deathPlace)
+                            if let nameOriginal = details.nameOrig {
+                                Text(nameOriginal)
+                                    .font(.title3)
+                                    .foregroundStyle(.secondary)
+                                    .textSelection(.enabled)
+                                    .multilineTextAlignment(.leading)
+                                    .matchedGeometryEffect(id: "nameOriginal", in: orientation)
                             }
                         }
-                        .padding(.horizontal, 10)
-                        .background(.quinary, in: .rect(cornerRadius: 6))
-                        .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+
+                        if details.career?.isEmpty == false
+                            ||
+                            details.birthDate?.isEmpty == false
+                            ||
+                            details.birthPlace?.isEmpty == false
+                            ||
+                            details.deathDate?.isEmpty == false
+                            ||
+                            details.deathPlace?.isEmpty == false
+                            ||
+                            details.height?.isEmpty == false
+                        {
+                            VStack(alignment: .leading, spacing: 0) {
+                                if let career = details.career, !career.isEmpty {
+                                    InfoRow(String(localized: "key.person.career"), career)
+                                }
+
+                                if let height = details.height, !height.isEmpty {
+                                    if details.career?.isEmpty == false {
+                                        Divider()
+                                    }
+
+                                    InfoRow(String(localized: "key.person.height"), height)
+                                }
+
+                                if let birthDate = details.birthDate, !birthDate.isEmpty {
+                                    if details.career?.isEmpty == false || details.height?.isEmpty == false {
+                                        Divider()
+                                    }
+
+                                    InfoRow(String(localized: "key.person.birth_date"), birthDate)
+                                }
+
+                                if let birthPlace = details.birthPlace, !birthPlace.isEmpty {
+                                    if details.career?.isEmpty == false || details.birthDate?.isEmpty == false || details.height?.isEmpty == false {
+                                        Divider()
+                                    }
+
+                                    InfoRow(String(localized: "key.person.birth_place"), birthPlace)
+                                }
+
+                                if let deathDate = details.deathDate, !deathDate.isEmpty {
+                                    if details.career?.isEmpty == false || details.birthDate?.isEmpty == false || details.birthPlace?.isEmpty == false || details.height?.isEmpty == false {
+                                        Divider()
+                                    }
+
+                                    InfoRow(String(localized: "key.person.death_date"), deathDate)
+                                }
+
+                                if let deathPlace = details.deathPlace, !deathPlace.isEmpty {
+                                    if details.career?.isEmpty == false || details.birthDate?.isEmpty == false || details.birthPlace?.isEmpty == false || details.deathDate?.isEmpty == false || details.height?.isEmpty == false {
+                                        Divider()
+                                    }
+
+                                    InfoRow(String(localized: "key.person.death_place"), deathPlace)
+                                }
+                            }
+                            .padding(.horizontal, 10)
+                            .background(.quinary, in: .rect(cornerRadius: 6))
+                            .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                            .matchedGeometryEffect(id: "info", in: orientation)
+                        }
                     }
                 }
                 .padding(.horizontal, 36)

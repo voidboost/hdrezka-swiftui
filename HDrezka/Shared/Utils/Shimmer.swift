@@ -16,7 +16,7 @@ struct Shimmer: ViewModifier {
                     endPoint: isInitialState ? UnitPoint(x: 0, y: 0) : UnitPoint(x: 1.3, y: 1.3),
                 ),
             )
-            .task {
+            .onAppear {
                 withAnimation(.linear(duration: 1.5).delay(0.25).repeatForever(autoreverses: false)) {
                     isInitialState = false
                 }
