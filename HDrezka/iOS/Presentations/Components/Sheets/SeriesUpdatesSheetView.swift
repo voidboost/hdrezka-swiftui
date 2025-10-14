@@ -1,0 +1,268 @@
+import Combine
+import FactoryKit
+import SwiftUI
+
+struct SeriesUpdatesSheetView: View {
+    @Injected(\.getSeriesUpdatesUseCase) private var getSeriesUpdatesUseCase
+
+    @State private var subscriptions: Set<AnyCancellable> = []
+
+    @State private var state: DataState<[SeriesUpdateGroup]> = .loading
+
+    @Binding private var movieDestination: MovieSimple?
+
+    init(movieDestination: Binding<MovieSimple?>) {
+        _movieDestination = movieDestination
+    }
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        VStack(alignment: .center, spacing: 25) {
+            VStack(spacing: 5) {
+                Image(systemName: "bell")
+                    .font(.largeTitle)
+                    .foregroundStyle(Color.accentColor)
+
+                Text("key.series_updates")
+                    .font(.largeTitle.weight(.semibold))
+            }
+
+            Group {
+                if let error = state.error {
+                    VStack(alignment: .center, spacing: 9) {
+                        Text(error.localizedDescription)
+                            .lineLimit(nil)
+
+                        Button {
+                            load()
+                        } label: {
+                            Text("key.retry")
+                                .foregroundStyle(Color.accentColor)
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if let seriesUpdates = state.data {
+                    if seriesUpdates.isEmpty {
+                        VStack(alignment: .center, spacing: 9) {
+                            Text("key.empty")
+
+                            Button {
+                                load()
+                            } label: {
+                                Text("key.retry")
+                                    .foregroundStyle(Color.accentColor)
+                            }
+                            .buttonStyle(.bordered)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else {
+                        ScrollView(.vertical) {
+                            LazyVStack(alignment: .leading, spacing: 10) {
+                                ForEach(seriesUpdates) { group in
+                                    CustomSection(group: group, dismiss: { dismiss() }, isExpanded: seriesUpdates.firstIndex(of: group) == 0, movieDestination: $movieDestination)
+
+                                    if group != seriesUpdates.last {
+                                        Divider()
+                                    }
+                                }
+                            }
+                            .padding(.vertical, 8)
+                        }
+                        .scrollIndicators(.never)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                } else {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            }
+
+            Button {
+                dismiss()
+            } label: {
+                Text("key.done")
+                    .frame(width: 250, height: 30)
+                    .contentShape(.rect(cornerRadius: 6))
+                    .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 35)
+        .padding(.top, 35)
+        .padding(.bottom, 25)
+        .frame(width: 520, height: 520)
+        .task {
+            load()
+        }
+    }
+
+    private func load() {
+        withAnimation(.easeInOut) {
+            state = .loading
+        }
+
+        getSeriesUpdatesUseCase()
+            .receive(on: DispatchQueue.main)
+            .sink { completion in
+                guard case let .failure(error) = completion else { return }
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    withAnimation(.easeInOut) {
+                        state = .error(error)
+                    }
+                }
+            } receiveValue: { seriesUpdates in
+                withAnimation(.easeInOut) {
+                    state = .data(seriesUpdates)
+                }
+            }
+            .store(in: &subscriptions)
+    }
+
+    private struct CustomSection: View {
+        private let group: SeriesUpdateGroup
+
+        private let dismiss: () -> Void
+
+        @State private var isExpanded: Bool
+
+        @Binding private var movieDestination: MovieSimple?
+
+        init(group: SeriesUpdateGroup, dismiss: @escaping () -> Void, isExpanded: Bool, movieDestination: Binding<MovieSimple?>) {
+            self.group = group
+            self.dismiss = dismiss
+            self.isExpanded = isExpanded
+            _movieDestination = movieDestination
+        }
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 9) {
+                Button {
+                    withAnimation(.easeInOut) {
+                        isExpanded.toggle()
+                    }
+                } label: {
+                    Label(group.date, systemImage: isExpanded ? "chevron.up" : "chevron.down")
+                        .font(.title3.bold())
+                        .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+
+                if isExpanded {
+                    LazyVStack(alignment: .leading, spacing: 0) {
+                        ForEach(group.releasedEpisodes.filter(\.tracked)) { item in
+                            Button {
+                                dismiss()
+
+                                movieDestination = .init(movieId: item.seriesId, name: item.seriesName)
+                            } label: {
+                                HStack(alignment: .center) {
+                                    Text(verbatim: "\(item.seriesName) \(item.season)")
+                                        .font(.body)
+                                        .lineLimit(nil)
+
+                                    Spacer()
+
+                                    VStack(alignment: .trailing, spacing: 2) {
+                                        Text(item.releasedEpisode).font(.subheadline).foregroundStyle(.secondary)
+                                            .multilineTextAlignment(.trailing)
+
+                                        if !item.chosenVoiceActing.isEmpty {
+                                            HStack(spacing: 3) {
+                                                if item.isChosenVoiceActingPremium {
+                                                    Image("Premium")
+                                                        .font(.subheadline)
+                                                        .foregroundStyle(.white.opacity(0.8))
+                                                }
+
+                                                Text(item.chosenVoiceActing)
+                                                    .font(.subheadline)
+                                                    .foregroundStyle(item.isChosenVoiceActingPremium ? .white.opacity(0.8) : .secondary)
+                                                    .multilineTextAlignment(.trailing)
+                                            }
+                                            .viewModifier { view in
+                                                if item.isChosenVoiceActingPremium {
+                                                    view
+                                                        .padding(.vertical, 2)
+                                                        .padding(.horizontal, 6)
+                                                        .background(Const.premiumGradient, in: .capsule)
+                                                } else {
+                                                    view
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .padding(.vertical, 8)
+                                .contentShape(.rect)
+                            }
+                            .buttonStyle(.plain)
+
+                            if item != group.releasedEpisodes.filter(\.tracked).last || !group.releasedEpisodes.filter({ !$0.tracked }).isEmpty {
+                                Divider()
+                            }
+                        }
+
+                        ForEach(group.releasedEpisodes.filter { !$0.tracked }) { item in
+                            Button {
+                                dismiss()
+
+                                movieDestination = .init(movieId: item.seriesId, name: item.seriesName)
+                            } label: {
+                                HStack(alignment: .center) {
+                                    Text(verbatim: "\(item.seriesName) \(item.season)")
+                                        .font(.body)
+                                        .lineLimit(nil)
+
+                                    Spacer()
+
+                                    VStack(alignment: .trailing, spacing: 2) {
+                                        Text(item.releasedEpisode).font(.subheadline).foregroundStyle(.secondary)
+                                            .multilineTextAlignment(.trailing)
+
+                                        if !item.chosenVoiceActing.isEmpty {
+                                            HStack(spacing: 3) {
+                                                if item.isChosenVoiceActingPremium {
+                                                    Image("Premium")
+                                                        .font(.subheadline)
+                                                        .foregroundStyle(.white.opacity(0.8))
+                                                }
+
+                                                Text(item.chosenVoiceActing)
+                                                    .font(.subheadline)
+                                                    .foregroundStyle(item.isChosenVoiceActingPremium ? .white.opacity(0.8) : .secondary)
+                                                    .multilineTextAlignment(.trailing)
+                                            }
+                                            .viewModifier { view in
+                                                if item.isChosenVoiceActingPremium {
+                                                    view
+                                                        .padding(.vertical, 2)
+                                                        .padding(.horizontal, 6)
+                                                        .background(Const.premiumGradient, in: .capsule)
+                                                } else {
+                                                    view
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                .padding(.vertical, 8)
+                                .contentShape(.rect)
+                            }
+                            .buttonStyle(.plain)
+
+                            if item != group.releasedEpisodes.filter({ !$0.tracked }).last {
+                                Divider()
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 10)
+                    .background(.quinary, in: .rect(cornerRadius: 6))
+                    .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                }
+            }
+        }
+    }
+}
