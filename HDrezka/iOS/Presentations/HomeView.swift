@@ -104,16 +104,16 @@ struct HomeView: View {
         }
         .transition(.opacity)
         .navigationTitle(title)
-//        .toolbar {
-//            ToolbarItem(placement: .primaryAction) {
-//                Button {
-//                    viewModel.isSeriesUpdatesPresented = true
-//                } label: {
-//                    Image(systemName: "bell")
-//                }
-//                .disabled(viewModel.state.data == nil)
-//            }
-//        }
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    viewModel.isSeriesUpdatesPresented = true
+                } label: {
+                    Image(systemName: "bell")
+                }
+                .disabled(viewModel.state.data == nil)
+            }
+        }
         .task(id: isLoggedIn) {
             switch viewModel.state {
             case .data:
@@ -128,9 +128,9 @@ struct HomeView: View {
             }
         }
         .background(.background)
-//        .sheet(isPresented: $viewModel.isSeriesUpdatesPresented) {
-//            SeriesUpdatesSheetView(movieDestination: $movieDestination)
-//        }
+        .sheet(isPresented: $viewModel.isSeriesUpdatesPresented) {
+            SeriesUpdatesSheetView(movieDestination: $movieDestination)
+        }
 //        .navigationDestination(item: $movieDestination) {
 //            DetailsView(movie: $0)
 //        }
