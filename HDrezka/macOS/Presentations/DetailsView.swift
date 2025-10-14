@@ -35,7 +35,7 @@ struct DetailsView: View {
                 if let details = viewModel.state.data {
                     DetailsViewComponent(
                         details: details,
-                        trailer: viewModel.trailer,
+                        trailerId: viewModel.trailerId,
                         topSafeAreaInset: topSafeAreaInset,
                         isSchedulePresented: $isSchedulePresented,
                         countryDestination: $countryDestination,
@@ -169,7 +169,7 @@ struct DetailsView: View {
 
     private struct DetailsViewComponent: View {
         private let details: MovieDetailed
-        private let trailer: YouTubePlayer?
+        private let trailerId: String?
         private let topSafeAreaInset: CGFloat
         @Binding private var isSchedulePresented: Bool
 
@@ -182,7 +182,7 @@ struct DetailsView: View {
         @Binding private var collectionDestination: MoviesCollection?
 
         init(details: MovieDetailed,
-             trailer: YouTubePlayer?,
+             trailerId: String?,
              topSafeAreaInset: CGFloat,
              isSchedulePresented: Binding<Bool>,
              countryDestination: Binding<MovieCountry?>,
@@ -192,7 +192,7 @@ struct DetailsView: View {
              collectionDestination: Binding<MoviesCollection?>)
         {
             self.details = details
-            self.trailer = trailer
+            self.trailerId = trailerId
             self.topSafeAreaInset = topSafeAreaInset
             _isSchedulePresented = isSchedulePresented
             _countryDestination = countryDestination
@@ -212,6 +212,7 @@ struct DetailsView: View {
 
         @Environment(\.colorScheme) private var colorScheme
         @Environment(\.openWindow) private var openWindow
+        @Environment(\.openURL) private var openURL
         @Environment(\.dismissWindow) private var dismissWindow
 
         var body: some View {
@@ -596,7 +597,29 @@ struct DetailsView: View {
                     .font(.title3)
                     .textSelection(.enabled)
 
-                if let trailer {
+                if let trailerId {
+                    #if DEBUG
+                        let isLoggingEnabled = true
+                    #else
+                        let isLoggingEnabled = false
+                    #endif
+
+                    let trailer = YouTubePlayer(
+                        source: .video(id: trailerId),
+                        parameters: .init(
+                            autoPlay: false,
+                            loopEnabled: true,
+                            showControls: true,
+                            showFullscreenButton: true,
+                        ),
+                        configuration: .init(
+                            openURLAction: .init { url, _ in
+                                openURL(url)
+                            },
+                        ),
+                        isLoggingEnabled: isLoggingEnabled,
+                    )
+
                     YouTubePlayerView(trailer, transaction: .init(animation: .easeInOut)) { state in
                         if state.isIdle {
                             ProgressView()

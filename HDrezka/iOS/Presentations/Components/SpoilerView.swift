@@ -40,6 +40,7 @@ final class EmitterView: UIView {
         guard let emitterLayer else { return }
         emitterLayer.emitterPosition = CGPoint(x: bounds.midX, y: bounds.midY)
         emitterLayer.emitterSize = bounds.size
+        emitterLayer.emitterCells?.first?.color = UIColor.label.cgColor
 
         setBirthRate(Float(bounds.width * bounds.height * 0.2))
     }
