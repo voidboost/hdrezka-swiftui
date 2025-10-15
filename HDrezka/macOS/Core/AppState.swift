@@ -69,15 +69,6 @@ enum Tabs: Hashable, Identifiable, CaseIterable {
         }
     }
 
-    var role: TabRole? {
-        switch self {
-        case .search:
-            .search
-        default:
-            nil
-        }
-    }
-
     @ViewBuilder
     func content() -> some View {
         NavigationStack {

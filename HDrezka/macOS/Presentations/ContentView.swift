@@ -26,7 +26,7 @@ struct ContentView: View {
 
         TabView(selection: $appState.selectedTab) {
             ForEach(Tabs.allCases.filter { !$0.needAccount }) { tab in
-                Tab(value: tab, role: tab.role) {
+                Tab(value: tab) {
                     tab.content()
                 } label: {
                     Label {
@@ -40,7 +40,7 @@ struct ContentView: View {
             if isLoggedIn {
                 TabSection {
                     ForEach(Tabs.allCases.filter(\.needAccount)) { tab in
-                        Tab(value: tab, role: tab.role) {
+                        Tab(value: tab) {
                             tab.content()
                         } label: {
                             Label {
