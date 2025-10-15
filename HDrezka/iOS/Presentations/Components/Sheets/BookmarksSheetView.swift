@@ -135,6 +135,7 @@ struct BookmarksSheetView: View {
                                         }
                                         .buttonStyle(.bordered)
                                         .buttonBorderShape(.roundedRectangle(radius: 6))
+                                        .foregroundStyle(.primary)
                                         .changeEffect(
                                             .rise(origin: UnitPoint(x: 0.5, y: 0.25), layer: .named("rise")) {
                                                 Text(verbatim: bookmarks[index].firstState != true ? "+1" : "-1")

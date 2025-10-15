@@ -19,6 +19,7 @@ class AppState {
 enum Tabs: Hashable, Identifiable, CaseIterable {
     case home
     case categories
+    case collections
     case search
     case profile
 
@@ -30,6 +31,8 @@ enum Tabs: Hashable, Identifiable, CaseIterable {
             "key.search"
         case .categories:
             "key.categories"
+        case .collections:
+            "key.collections"
         case .profile:
             "key.profile"
         }
@@ -43,6 +46,8 @@ enum Tabs: Hashable, Identifiable, CaseIterable {
             "magnifyingglass"
         case .categories:
             "square.grid.2x2"
+        case .collections:
+            "film.stack"
         case .profile:
             "person.crop.circle"
         }
@@ -73,11 +78,13 @@ enum Tabs: Hashable, Identifiable, CaseIterable {
                 CategoriesView()
                     .id("categories")
                     .destinations()
+            case .collections:
+                CollectionsView()
+                    .id("collections")
+                    .destinations()
             case .profile:
-                HomeView()
-                    .id("home")
-//                ProfileView()
-//                    .id("profile")
+                ProfileView()
+                    .id("profile")
                     .destinations()
             }
         }
@@ -87,7 +94,6 @@ enum Tabs: Hashable, Identifiable, CaseIterable {
 }
 
 enum Destinations: Hashable, Identifiable {
-    case collections
     case watchingLater
     case bookmarks
     case details(MovieSimple)
@@ -124,9 +130,6 @@ extension View {
     func destinations() -> some View {
         navigationDestination(for: Destinations.self) { destination in
             switch destination {
-            case .collections:
-                CollectionsView()
-                    .id("collections")
             case .watchingLater:
                 WatchingLaterView()
                     .id("watching_later")
