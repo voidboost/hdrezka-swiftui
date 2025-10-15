@@ -55,7 +55,7 @@ struct SliderWithoutText<T: BinaryFloatingPoint>: View {
                             state = true
                         }
                         .onChanged { gesture in
-                            localRealProgress = max(min(T(gesture.location.x / geometry.size.width), 1), 0)
+                            localTempProgress = T(gesture.translation.width / geometry.size.width)
                             value = max(min(getPrgValue(), inRange.upperBound), inRange.lowerBound)
                         }.onEnded { _ in
                             localRealProgress = max(min(localRealProgress + localTempProgress, 1), 0)

@@ -17,7 +17,6 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
     @GestureState private var isActive: Bool = false
     @State private var progressDuration: T = 0
 
-    @State private var showSeekImage: Bool = false
     @State private var unitSeekImage: CGFloat = .zero
 
     init(
@@ -91,13 +90,13 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                 state = true
                             }
                             .onChanged { gesture in
-                                localRealProgress = max(min(T(gesture.location.x / geometry.size.width), 1), 0)
+                                localTempProgress = T(gesture.translation.width / geometry.size.width)
                                 let prg = max(min(localRealProgress + localTempProgress, 1), 0)
                                 progressDuration = inRange.upperBound * prg
                                 value = max(min(getPrgValue(), inRange.upperBound), inRange.lowerBound)
 
                                 withAnimation(.easeInOut) {
-                                    unitSeekImage = gesture.location.x / geometry.size.width
+                                    unitSeekImage = CGFloat(prg)
                                 }
                             }.onEnded { _ in
                                 localRealProgress = max(min(localRealProgress + localTempProgress, 1), 0)
@@ -105,22 +104,8 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                 progressDuration = inRange.upperBound * localRealProgress
                             },
                     )
-                    .onContinuousHover { phase in
-                        switch phase {
-                        case let .active(location):
-                            unitSeekImage = location.x / geometry.size.width
-
-                            withAnimation(.easeInOut) {
-                                showSeekImage = true
-                            }
-                        case .ended:
-                            withAnimation(.easeInOut) {
-                                showSeekImage = false
-                            }
-                        }
-                    }
                     .overlay {
-                        if showSeekImage || isActive, let cue = thumbnails?.cues.first(where: { TimeInterval(unitSeekImage) * TimeInterval(inRange.upperBound) > $0.timeStart && TimeInterval(unitSeekImage) * TimeInterval(inRange.upperBound) < $0.timeEnd }), let imageUrl = cue.imageUrl, let frame = cue.frame {
+                        if isActive, let cue = thumbnails?.cues.first(where: { TimeInterval(unitSeekImage) * TimeInterval(inRange.upperBound) > $0.timeStart && TimeInterval(unitSeekImage) * TimeInterval(inRange.upperBound) < $0.timeEnd }), let imageUrl = cue.imageUrl, let frame = cue.frame {
                             ZStack {
                                 AsyncImage(url: URL(string: imageUrl), transaction: .init(animation: .easeInOut)) { phase in
                                     if let image = phase.image, let uiImage = ImageRenderer(content: image).cgImage?.crop(to: frame) {

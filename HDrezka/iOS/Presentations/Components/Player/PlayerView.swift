@@ -57,7 +57,7 @@ struct PlayerView: View {
     @State private var timer: Int?
     @State private var timerWork: DispatchWorkItem?
     @State private var nextTimer: CGFloat?
-    @State private var currentTime: Double = 0.0
+    @State private var currentTime: Double = .zero
     @State private var duration: Double = .greatestFiniteMagnitude
     @State private var error: Error?
     @State private var subtitles: String?
@@ -67,6 +67,7 @@ struct PlayerView: View {
     @State private var delayHide: DispatchWorkItem?
     @State private var subtitlesOptions: [AVMediaSelectionOption] = []
     @State private var thumbnails: WebVTT?
+    @State private var initialVolume: Float = .zero
 
     init(data: PlayerData) {
         poster = data.details.poster
@@ -86,7 +87,7 @@ struct PlayerView: View {
     }
 
     var body: some View {
-        ZStack(alignment: .center) {
+        ZStack(alignment: .topLeading) {
             if let error {
                 ErrorStateView(error) {
                     resetPlayer {
@@ -94,8 +95,7 @@ struct PlayerView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(.vertical, 18)
-                .padding(.horizontal, 36)
+                .padding(36)
             } else if let player {
                 GeometryReader { geometry in
                     CustomVideoPlayer(player: player, playerLayer: $playerLayer)
@@ -190,25 +190,31 @@ struct PlayerView: View {
                                             } else {
                                                 setMask((isLoading || !isPlaying) && !isPictureInPictureActive)
                                             }
-                                        }),
+                                        }
+                                        .exclusively(before:
+                                            DragGesture(minimumDistance: 0)
+                                                .onChanged { drag in
+                                                    if drag.startLocation.x > geometry.size.width / 2 {
+                                                        let delta = -drag.translation.height / (geometry.size.height / 2)
+
+                                                        if isMuted {
+                                                            player.isMuted.toggle()
+                                                        }
+
+                                                        player.volume = min(max(initialVolume + Float(delta), 0), 1)
+                                                    }
+                                                }
+                                                .onEnded { drag in
+                                                    if drag.startLocation.x > geometry.size.width / 2 {
+                                                        initialVolume = player.volume
+                                                    }
+                                                }))
                         )
                 }
 
                 VStack(alignment: .center) {
                     VStack {
                         HStack(alignment: .center) {
-                            if let pipController, AVPictureInPictureController.isPictureInPictureSupported() {
-                                Button {
-                                    pipController.startPictureInPicture()
-                                } label: {
-                                    Image(systemName: "pip.enter")
-                                        .font(.title2)
-                                }
-                                .buttonStyle(.plain)
-                                .disabled(isPictureInPictureActive || !isPictureInPicturePossible)
-                                .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
-                            }
-
                             Spacer()
 
                             HStack(alignment: .center) {
@@ -339,7 +345,19 @@ struct PlayerView: View {
 
                                 Spacer()
 
-                                HStack(alignment: .center) {
+                                HStack(alignment: .center, spacing: 12) {
+                                    if let pipController, AVPictureInPictureController.isPictureInPictureSupported() {
+                                        Button {
+                                            pipController.startPictureInPicture()
+                                        } label: {
+                                            Image(systemName: "pip.enter")
+                                                .font(.title2)
+                                        }
+                                        .buttonStyle(.plain)
+                                        .disabled(isPictureInPictureActive || !isPictureInPicturePossible)
+                                        .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+                                    }
+
                                     if !subtitlesOptions.isEmpty {
                                         Menu {
                                             Picker(selection: Binding {
@@ -368,120 +386,92 @@ struct PlayerView: View {
                                     }
 
                                     Menu {
-                                        Menu {
-                                            Picker(selection: Binding {
-                                                timer
-                                            } set: {
-                                                timer = $0
+                                        Picker(selection: Binding {
+                                            timer
+                                        } set: {
+                                            timer = $0
 
-                                                resetTimer()
-                                            }) {
-                                                Text("key.off").tag(nil as Int?)
+                                            resetTimer()
+                                        }) {
+                                            Text("key.off").tag(nil as Int?)
 
-                                                ForEach(times, id: \.self) { time in
-                                                    let name = switch time {
-                                                    case 900:
-                                                        String(localized: "key.timer.15m")
-                                                    case 1800:
-                                                        String(localized: "key.timer.30m")
-                                                    case 2700:
-                                                        String(localized: "key.timer.45m")
-                                                    case 3600:
-                                                        String(localized: "key.timer.1h")
-                                                    case -1:
-                                                        String(localized: "key.timer.end")
-                                                    default:
-                                                        String(localized: "key.off")
-                                                    }
-
-                                                    Text(name).tag(time)
+                                            ForEach(times, id: \.self) { time in
+                                                let name = switch time {
+                                                case 900:
+                                                    String(localized: "key.timer.15m")
+                                                case 1800:
+                                                    String(localized: "key.timer.30m")
+                                                case 2700:
+                                                    String(localized: "key.timer.45m")
+                                                case 3600:
+                                                    String(localized: "key.timer.1h")
+                                                case -1:
+                                                    String(localized: "key.timer.end")
+                                                default:
+                                                    String(localized: "key.off")
                                                 }
-                                            } label: {
-                                                EmptyView()
+
+                                                Text(name).tag(time)
                                             }
-                                            .pickerStyle(.inline)
                                         } label: {
                                             Label("key.timer", systemImage: "timer")
-                                                .labelStyle(.titleOnly)
-                                                .font(.title2)
                                         }
-                                        .buttonStyle(.plain)
+                                        .pickerStyle(.menu)
 
-                                        Menu {
-                                            if let playerLayer {
-                                                Picker(selection: Binding {
-                                                    videoGravity
-                                                } set: {
-                                                    playerLayer.videoGravity = $0
-                                                }) {
-                                                    Text("key.video_gravity.fit").tag(AVLayerVideoGravity.resizeAspect)
-
-                                                    Text("key.video_gravity.fill").tag(AVLayerVideoGravity.resizeAspectFill)
-
-                                                    Text("key.video_gravity.stretch").tag(AVLayerVideoGravity.resize)
-                                                } label: {
-                                                    EmptyView()
-                                                }
-                                                .pickerStyle(.inline)
-                                            }
-                                        } label: {
-                                            Label("key.video_gravity", systemImage: "arrow.up.left.and.arrow.down.right")
-                                                .labelStyle(.titleOnly)
-                                                .font(.title2)
-                                        }
-                                        .buttonStyle(.plain)
-
-                                        Menu {
+                                        if let playerLayer {
                                             Picker(selection: Binding {
-                                                rate
-                                            } set: { rate in
-                                                self.rate = rate
-                                                nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = rate
-
-                                                if isPlaying {
-                                                    player.playImmediately(atRate: rate)
-                                                }
+                                                videoGravity
+                                            } set: {
+                                                playerLayer.videoGravity = $0
                                             }) {
-                                                ForEach(rates, id: \.self) { value in
-                                                    Text(verbatim: "\(value)x").tag(value)
-                                                }
+                                                Text("key.video_gravity.fit").tag(AVLayerVideoGravity.resizeAspect)
+
+                                                Text("key.video_gravity.fill").tag(AVLayerVideoGravity.resizeAspectFill)
+
+                                                Text("key.video_gravity.stretch").tag(AVLayerVideoGravity.resize)
                                             } label: {
-                                                EmptyView()
+                                                Label("key.video_gravity", systemImage: "arrow.up.left.and.arrow.down.right")
                                             }
-                                            .pickerStyle(.inline)
+                                            .pickerStyle(.menu)
+                                        }
+
+                                        Picker(selection: Binding {
+                                            rate
+                                        } set: { rate in
+                                            self.rate = rate
+                                            nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = rate
+
+                                            if isPlaying {
+                                                player.playImmediately(atRate: rate)
+                                            }
+                                        }) {
+                                            ForEach(rates, id: \.self) { value in
+                                                Text(verbatim: "\(value)x").tag(value)
+                                            }
                                         } label: {
                                             Label("key.speed", systemImage: "gauge.with.dots.needle.33percent")
-                                                .labelStyle(.titleOnly)
-                                                .font(.title2)
                                         }
-                                        .buttonStyle(.plain)
+                                        .pickerStyle(.menu)
 
                                         if !movie.getAvailableQualities().isEmpty {
-                                            Menu {
-                                                Picker(selection: Binding {
-                                                    quality
-                                                } set: {
-                                                    quality = $0
+                                            Picker(selection: Binding {
+                                                quality
+                                            } set: {
+                                                quality = $0
 
-                                                    let currentSeek = player.currentTime()
+                                                let currentSeek = player.currentTime()
 
-                                                    resetPlayer {
-                                                        setupPlayer(seek: currentSeek, isPlaying: isPlaying, subtitles: subtitles)
-                                                    }
-                                                }) {
-                                                    ForEach(movie.getAvailableQualities(), id: \.self) { value in
-                                                        Text(value).tag(value)
-                                                    }
-                                                } label: {
-                                                    EmptyView()
+                                                resetPlayer {
+                                                    setupPlayer(seek: currentSeek, isPlaying: isPlaying, subtitles: subtitles)
                                                 }
-                                                .pickerStyle(.inline)
+                                            }) {
+                                                ForEach(movie.getAvailableQualities(), id: \.self) { value in
+                                                    Text(value).tag(value)
+                                                }
                                             } label: {
                                                 Label("key.quality", systemImage: "gearshape")
-                                                    .labelStyle(.titleOnly)
-                                                    .font(.title2)
                                             }
-                                            .buttonStyle(.plain)
+                                            .pickerStyle(.menu)
                                         }
                                     } label: {
                                         Label("key.settings", systemImage: "ellipsis.circle")
@@ -571,6 +561,18 @@ struct PlayerView: View {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+
+            if isMaskShow || isPictureInPictureActive || isLoading {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.title2)
+                }
+                .buttonStyle(.plain)
+                .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+                .padding(36)
+            }
         }
         .background(Color.black)
         .preferredColorScheme(.dark)
@@ -578,6 +580,8 @@ struct PlayerView: View {
         .contentShape(.rect)
         .statusBarHidden(!isMaskShow && !isPictureInPictureActive)
         .onAppear {
+            initialVolume = volume
+
             setupPlayer(subtitles: selectPositions.first(where: { position in position.id == voiceActing.voiceId })?.subtitles)
         }
         .onDisappear {
@@ -609,45 +613,6 @@ struct PlayerView: View {
 
             currentItem.allowedAudioSpatializationFormats = spatialAudio.format
         }
-//        .onMoveCommand { direction in
-//            resetTimer()
-//
-//            guard let player ,
-//                  player.status == .readyToPlay,
-//                  !isPictureInPictureActive
-//            else {
-//                return
-//            }
-//
-//            switch direction {
-//            case .up:
-//                guard player.volume < 1.0 else { return }
-//
-//                player.volume = min(player.volume + 0.05, 1.0)
-//            case .down:
-//                guard player.volume > 0.0 else { return }
-//
-//                player.volume = max(player.volume - 0.05, 0.0)
-//            case .left:
-//                player.seek(to: CMTime(seconds: max(currentTime - 10.0, 0.0), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { complete in
-//                    if isPlaying, complete {
-//                        player.playImmediately(atRate: rate)
-//                    }
-//                }
-//
-//                currentTime = max(currentTime - 10.0, 0.0)
-//            case .right:
-//                player.seek(to: CMTime(seconds: min(currentTime + 10.0, duration), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { complete in
-//                    if isPlaying, complete {
-//                        player.playImmediately(atRate: rate)
-//                    }
-//                }
-//
-//                currentTime = min(currentTime + 10.0, duration)
-//            default:
-//                break
-//            }
-//        }
     }
 
     private func setupPlayer(seek: CMTime? = nil, isPlaying playing: Bool = true, subtitles: String? = nil) {
@@ -690,7 +655,7 @@ struct PlayerView: View {
                         acting: voiceActing.translatorId,
                         season: season?.seasonId,
                         episode: episode?.episodeId,
-                        position: currentTime,
+                        position: currentTime
                     )
 
                     modelContext.insert(position)
@@ -1081,7 +1046,7 @@ struct PlayerView: View {
                         acting: voiceActing.translatorId,
                         season: season?.seasonId,
                         episode: episode?.episodeId,
-                        subtitles: language,
+                        subtitles: language
                     )
 
                     modelContext.insert(position)
@@ -1186,7 +1151,7 @@ struct PlayerView: View {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: season.seasonId,
-                                    episode: prevEpisode.episodeId,
+                                    episode: prevEpisode.episodeId
                                 )
 
                                 modelContext.insert(position)
@@ -1237,7 +1202,7 @@ struct PlayerView: View {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: prevSeason.seasonId,
-                                    episode: prevEpisode.episodeId,
+                                    episode: prevEpisode.episodeId
                                 )
 
                                 modelContext.insert(position)
@@ -1293,7 +1258,7 @@ struct PlayerView: View {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: season.seasonId,
-                                    episode: nextEpisode.episodeId,
+                                    episode: nextEpisode.episodeId
                                 )
 
                                 modelContext.insert(position)
@@ -1344,7 +1309,7 @@ struct PlayerView: View {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: nextSeason.seasonId,
-                                    episode: nextEpisode.episodeId,
+                                    episode: nextEpisode.episodeId
                                 )
 
                                 modelContext.insert(position)
