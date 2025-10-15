@@ -25,8 +25,6 @@ struct BookmarksView: View {
                             .badge(Text(verbatim: "\(bookmark.count)").monospacedDigit())
                             .contentTransition(.numericText(value: Double(bookmark.count)))
                             .tag(bookmark.bookmarkId)
-                            .padding(7)
-                            .listRowInsets(.init())
                             .contextMenu {
                                 Button {
                                     viewModel.renameBookmark = bookmark
@@ -79,7 +77,6 @@ struct BookmarksView: View {
                 }
             }
             .scrollContentBackground(.hidden)
-            .environment(\.defaultMinListRowHeight, 0)
             .scrollIndicators(.visible, axes: .vertical)
             .viewModifier { view in
                 if #available(iOS 26, *) {
@@ -143,7 +140,7 @@ struct BookmarksView: View {
                         .padding(18)
                 }
             }
-            .frame(width: 200)
+            .frame(width: 300)
             .refreshable {
                 if viewModel.bookmarksState.data?.isEmpty == false, viewModel.bookmarkState.data?.isEmpty == false || viewModel.selectedBookmark == nil {
                     viewModel.getBookmarks(reset: true)

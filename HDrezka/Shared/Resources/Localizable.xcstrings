@@ -3941,6 +3941,28 @@
         }
       }
     },
+    "key.login_description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authorize to synchronize your series viewing status and track the release of new episodes"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Авторизуйтесь для синхронизации состояния просмотра сериалов и отслеживания выхода новых серий"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Авторизуйтеся для синхронізації стану перегляду серіалів та відстежування виходу нових серій"
+          }
+        }
+      }
+    },
     "key.mark.unwatched" : {
       "localizations" : {
         "en" : {
@@ -4267,6 +4289,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Нічого"
+          }
+        }
+      }
+    },
+    "key.not_logged_in" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You are not logged in"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы не вошли"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви не увійшли"
           }
         }
       }
