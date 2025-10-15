@@ -25,20 +25,16 @@ struct ContentView: View {
         @Bindable var appState = appState
 
         TabView(selection: $appState.selectedTab) {
-            TabSection {
-                ForEach(Tabs.allCases.filter { !$0.needAccount }) { tab in
-                    Tab(value: tab, role: tab.role) {
-                        tab.content()
-                    } label: {
-                        Label {
-                            Text(tab.label)
-                        } icon: {
-                            Image(systemName: tab.image)
-                        }
+            ForEach(Tabs.allCases.filter { !$0.needAccount }) { tab in
+                Tab(value: tab, role: tab.role) {
+                    tab.content()
+                } label: {
+                    Label {
+                        Text(tab.label)
+                    } icon: {
+                        Image(systemName: tab.image)
                     }
                 }
-            } header: {
-                Text(Bundle.main.infoDictionary?["CFBundleName"] as? String ?? "HDrezka")
             }
 
             if isLoggedIn {
