@@ -101,9 +101,9 @@ struct BookmarksView: View {
                         } label: {
                             Text("key.retry")
                                 .font(.body)
-                                .foregroundStyle(Color.accentColor)
                         }
                         .buttonStyle(.bordered)
+                        .buttonBorderShape(.roundedRectangle(radius: 6))
                         .keyboardShortcut("r", modifiers: .command)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -120,9 +120,9 @@ struct BookmarksView: View {
                         } label: {
                             Text("key.create")
                                 .font(.body)
-                                .foregroundStyle(Color.accentColor)
                         }
                         .buttonStyle(.bordered)
+                        .buttonBorderShape(.roundedRectangle(radius: 6))
                         .keyboardShortcut("n", modifiers: .command)
 
                         Button {
@@ -130,9 +130,9 @@ struct BookmarksView: View {
                         } label: {
                             Text("key.retry")
                                 .font(.body)
-                                .foregroundStyle(Color.accentColor)
                         }
                         .buttonStyle(.bordered)
+                        .buttonBorderShape(.roundedRectangle(radius: 6))
                         .keyboardShortcut("r", modifiers: .command)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -208,9 +208,9 @@ struct BookmarksView: View {
                         } label: {
                             Text("key.retry")
                                 .font(.title3)
-                                .foregroundStyle(Color.accentColor)
                         }
                         .buttonStyle(.bordered)
+                        .buttonBorderShape(.roundedRectangle(radius: 6))
                         .keyboardShortcut("r", modifiers: .command)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -228,9 +228,9 @@ struct BookmarksView: View {
                             } label: {
                                 Text("key.retry")
                                     .font(.title3)
-                                    .foregroundStyle(Color.accentColor)
                             }
                             .buttonStyle(.bordered)
+                            .buttonBorderShape(.roundedRectangle(radius: 6))
                             .keyboardShortcut("r", modifiers: .command)
                         }
                     }

@@ -79,6 +79,8 @@ struct PlayerView: View {
         quality = data.selectedQuality
 
         times = data.details.series != nil ? [900, 1800, 2700, 3600, -1] : [900, 1800, 2700, 3600]
+
+        try? AVAudioSession.sharedInstance().setCategory(.playback)
     }
 
     var body: some View {
@@ -89,34 +91,60 @@ struct PlayerView: View {
                         setupPlayer(subtitles: subtitles)
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
             } else if let player = playerLayer.player {
-                CustomAVPlayerView(playerLayer: playerLayer)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .contentShape(.rect)
-                    .gesture(
-                        TapGesture(count: 2)
-                            .onEnded {
-//                                guard player.status == .readyToPlay,
-//                                      let window,
-//                                      !isPictureInPictureActive || (isPictureInPictureActive && window.styleMask.contains(.fullScreen))
-//                                else {
-//                                    return
-//                                }
-//
-//                                window.toggleFullScreen(nil)
-                            }
-                            .exclusively(before:
-                                TapGesture(count: 1)
-                                    .onEnded {
-                                        if !isMaskShow {
-                                            setMask(!isPictureInPictureActive)
-                                        } else {
-                                            setMask(false)
+                GeometryReader { geometry in
+                    CustomAVPlayerView(playerLayer: playerLayer)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .contentShape(.rect)
+                        .gesture(
+                            SpatialTapGesture(count: 2)
+                                .onEnded { event in
+                                    guard player.status == .readyToPlay,
+                                          !isPictureInPictureActive,
+                                          !isLoading
+                                    else {
+                                        return
+                                    }
+
+                                    if event.location.x / geometry.size.width > 0.5 {
+                                        player.seek(to: CMTime(seconds: min(currentTime + 10.0, duration), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { complete in
+                                            if isPlaying, complete {
+                                                player.playImmediately(atRate: rate)
+                                            }
                                         }
-                                    }),
-                    )
+
+                                        currentTime = min(currentTime + 10.0, duration)
+                                    } else {
+                                        player.seek(to: CMTime(seconds: max(currentTime - 10.0, 0.0), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { complete in
+                                            if isPlaying, complete {
+                                                player.playImmediately(atRate: rate)
+                                            }
+                                        }
+
+                                        currentTime = max(currentTime - 10.0, 0.0)
+                                    }
+                                }
+                                .exclusively(before:
+                                    TapGesture(count: 1)
+                                        .onEnded {
+                                            guard player.status == .readyToPlay,
+                                                  !isPictureInPictureActive,
+                                                  !isLoading
+                                            else {
+                                                return
+                                            }
+
+                                            if !isMaskShow {
+                                                setMask(!isPictureInPictureActive)
+                                            } else {
+                                                setMask(false)
+                                            }
+                                        }),
+                        )
+                }
 
                 VStack(alignment: .center) {
                     VStack {
@@ -494,16 +522,11 @@ struct PlayerView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .navigationTitle(Text(verbatim: "Player - \(name)"))
-        .toolbar(.hidden)
-        .frame(minWidth: 900, minHeight: 900 / 16 * 9)
-        .ignoresSafeArea()
-        .focusable()
-        .focusEffectDisabled()
         .background(Color.black)
         .preferredColorScheme(.dark)
         .tint(.primary)
         .contentShape(.rect)
+        .statusBarHidden(!isMaskShow && !isPictureInPictureActive)
         .onAppear {
             setupPlayer(subtitles: selectPositions.first(where: { position in position.id == voiceActing.voiceId })?.subtitles)
         }

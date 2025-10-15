@@ -55,9 +55,9 @@ struct BookmarksSheetView: View {
                             load(reset: true)
                         } label: {
                             Text("key.retry")
-                                .foregroundStyle(Color.accentColor)
                         }
                         .buttonStyle(.bordered)
+                        .buttonBorderShape(.roundedRectangle(radius: 6))
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if var bookmarks = state.data {
@@ -69,9 +69,9 @@ struct BookmarksSheetView: View {
                                 load(reset: true)
                             } label: {
                                 Text("key.retry")
-                                    .foregroundStyle(Color.accentColor)
                             }
                             .buttonStyle(.bordered)
+                            .buttonBorderShape(.roundedRectangle(radius: 6))
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else {
@@ -125,17 +125,16 @@ struct BookmarksSheetView: View {
                                             HStack(alignment: .center) {
                                                 Image(systemName: isChecked ? "bookmark.fill" : "bookmark")
                                                     .contentTransition(.symbolEffect(.replace))
-                                                    .foregroundStyle(.primary)
 
                                                 Text(verbatim: "\(bookmark.name) (\(bookmark.count))")
                                                     .monospacedDigit()
                                                     .lineLimit(nil)
                                                     .multilineTextAlignment(.center)
                                                     .contentTransition(.numericText(value: Double(bookmark.count)))
-                                                    .foregroundStyle(.primary)
                                             }
                                         }
                                         .buttonStyle(.bordered)
+                                        .buttonBorderShape(.roundedRectangle(radius: 6))
                                         .changeEffect(
                                             .rise(origin: UnitPoint(x: 0.5, y: 0.25), layer: .named("rise")) {
                                                 Text(verbatim: bookmarks[index].firstState != true ? "+1" : "-1")

@@ -21,9 +21,9 @@ struct ErrorStateView: View {
             } label: {
                 Text("key.retry")
                     .font(.title3)
-                    .foregroundStyle(Color.accentColor)
             }
             .buttonStyle(.bordered)
+            .buttonBorderShape(.roundedRectangle(radius: 6))
             .keyboardShortcut("r", modifiers: .command)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

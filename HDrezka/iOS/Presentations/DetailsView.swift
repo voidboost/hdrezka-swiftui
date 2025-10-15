@@ -1117,9 +1117,9 @@ struct DetailsView: View {
                                         } label: {
                                             Text(franchiseExpanded ? String(localized: "key.hide").lowercased() : String(localized: "key.view_more").lowercased())
                                                 .font(.body)
-                                                .foregroundStyle(.primary)
                                         }
                                         .buttonStyle(.bordered)
+                                        .buttonBorderShape(.roundedRectangle(radius: 6))
 
                                         Spacer()
                                     }
@@ -1185,9 +1185,9 @@ struct DetailsView: View {
                                             } label: {
                                                 Text(String(localized: "key.view_more").lowercased())
                                                     .font(.body)
-                                                    .foregroundStyle(.primary)
                                             }
                                             .buttonStyle(.bordered)
+                                            .buttonBorderShape(.roundedRectangle(radius: 6))
 
                                             Spacer()
                                         }

@@ -36,14 +36,13 @@ struct HomeView: View {
                                     HStack(alignment: .center) {
                                         Text("key.see_all")
                                             .font(.subheadline)
-                                            .foregroundStyle(Color.accentColor)
 
                                         Image(systemName: "chevron.right")
                                             .font(.subheadline)
-                                            .foregroundStyle(Color.accentColor)
                                     }
                                 }
                                 .buttonStyle(.bordered)
+                                .buttonBorderShape(.roundedRectangle(radius: 6))
                             }
                             .padding(.horizontal, 36)
                         }
