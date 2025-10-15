@@ -38,9 +38,9 @@ struct SeriesUpdatesSheetView: View {
                             load()
                         } label: {
                             Text("key.retry")
-                                .foregroundStyle(Color.accentColor)
                         }
                         .buttonStyle(.bordered)
+                        .buttonBorderShape(.roundedRectangle(radius: 6))
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let seriesUpdates = state.data {
@@ -52,9 +52,9 @@ struct SeriesUpdatesSheetView: View {
                                 load()
                             } label: {
                                 Text("key.retry")
-                                    .foregroundStyle(Color.accentColor)
                             }
                             .buttonStyle(.bordered)
+                            .buttonBorderShape(.roundedRectangle(radius: 6))
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else {

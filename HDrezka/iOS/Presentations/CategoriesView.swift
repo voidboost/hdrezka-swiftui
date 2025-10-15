@@ -100,14 +100,13 @@ struct CategoriesView: View {
                         HStack(alignment: .center) {
                             Text("key.see_all")
                                 .font(.subheadline)
-                                .foregroundStyle(Color.accentColor)
 
                             Image(systemName: "chevron.right")
                                 .font(.subheadline)
-                                .foregroundStyle(Color.accentColor)
                         }
                     }
                     .buttonStyle(.bordered)
+                    .buttonBorderShape(.roundedRectangle(radius: 6))
                 }
 
                 HFlow(horizontalAlignment: .leading, verticalAlignment: .center, horizontalSpacing: 6, verticalSpacing: 6, distributeItemsEvenly: true) {
@@ -149,9 +148,9 @@ struct CategoriesView: View {
 
                     NavigationLink(value: Destinations.list(.init(name: type.name, listId: bestGenre.genreId + (bestYear.year != 0 ? "\(bestYear.year)/" : "")))) {
                         Text("key.go")
-                            .foregroundStyle(.primary)
                     }
                     .buttonStyle(.bordered)
+                    .buttonBorderShape(.roundedRectangle(radius: 6))
                 }
                 .padding(.vertical, 8)
                 .padding(.horizontal, 16)
