@@ -77,6 +77,7 @@
 				iOS/Presentations/HomeView.swift = (ios, );
 				iOS/Presentations/ListView.swift = (ios, );
 				iOS/Presentations/PersonView.swift = (ios, );
+				iOS/Presentations/ProfileView.swift = (ios, );
 				iOS/Presentations/SearchView.swift = (ios, );
 				iOS/Presentations/WatchingLaterView.swift = (ios, );
 				iOS/Resources/Assets.xcassets = (ios, );
