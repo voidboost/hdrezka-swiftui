@@ -26,7 +26,8 @@ struct PlayerView: View {
     @Query private var playerPositions: [PlayerPosition]
     @Query private var selectPositions: [SelectPosition]
 
-    @State private var subscriptions: Set<AnyCancellable> = []
+    @State private var playerSubscriptions: Set<AnyCancellable> = []
+    @State private var layerSubscriptions: Set<AnyCancellable> = []
 
     private let poster: String
     private let name: String
@@ -44,7 +45,8 @@ struct PlayerView: View {
     private let nowPlayingInfoCenter = MPNowPlayingInfoCenter.default()
     private let remoteCommandCenter = MPRemoteCommandCenter.shared()
 
-    private let playerLayer: AVPlayerLayer = .init()
+    @State private var player: AVPlayer?
+    @State private var playerLayer: AVPlayerLayer?
     @State private var pipController: AVPictureInPictureController?
     @State private var isPictureInPictureActive: Bool = false
     @State private var isPictureInPicturePossible: Bool = false
@@ -94,17 +96,70 @@ struct PlayerView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if let player = playerLayer.player {
+            } else if let player {
                 GeometryReader { geometry in
-                    CustomAVPlayerView(playerLayer: playerLayer)
+                    CustomVideoPlayer(player: player, playerLayer: $playerLayer)
                         .frame(width: geometry.size.width, height: geometry.size.height)
                         .contentShape(.rect)
+                        .task(id: playerLayer) {
+                            if let playerLayer {
+                                layerSubscriptions.flush()
+
+                                playerLayer.videoGravity = videoGravity
+
+                                playerLayer.publisher(for: \.videoGravity)
+                                    .receive(on: DispatchQueue.main)
+                                    .sink { videoGravity in
+                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                            self.videoGravity = videoGravity
+                                        }
+                                    }
+                                    .store(in: &layerSubscriptions)
+
+                                let pipController = AVPictureInPictureController(playerLayer: playerLayer)
+
+                                if let pipController {
+                                    pipController.publisher(for: \.isPictureInPictureActive)
+                                        .receive(on: DispatchQueue.main)
+                                        .sink { isPictureInPictureActive in
+                                            withAnimation(.easeInOut) {
+                                                self.isPictureInPictureActive = isPictureInPictureActive
+                                            }
+
+                                            setMask(!isPictureInPictureActive)
+
+                                            updateNextTimer()
+
+                                            //                        if let window {
+                                            //                            if isPictureInPictureActive {
+                                            //                                window.miniaturize(nil)
+                                            //                            } else {
+                                            //                                window.deminiaturize(nil)
+                                            //                            }
+                                            //                        }
+                                        }
+                                        .store(in: &layerSubscriptions)
+
+                                    pipController.publisher(for: \.isPictureInPicturePossible)
+                                        .receive(on: DispatchQueue.main)
+                                        .sink { isPictureInPicturePossible in
+                                            withAnimation(.easeInOut(duration: 0.15)) {
+                                                self.isPictureInPicturePossible = isPictureInPicturePossible
+                                            }
+                                        }
+                                        .store(in: &layerSubscriptions)
+                                }
+
+                                withAnimation(.easeInOut) {
+                                    self.pipController = pipController
+                                }
+                            }
+                        }
                         .gesture(
                             SpatialTapGesture(count: 2)
                                 .onEnded { event in
                                     guard player.status == .readyToPlay,
-                                          !isPictureInPictureActive,
-                                          !isLoading
+                                          !isPictureInPictureActive
                                     else {
                                         return
                                     }
@@ -130,17 +185,10 @@ struct PlayerView: View {
                                 .exclusively(before:
                                     TapGesture(count: 1)
                                         .onEnded {
-                                            guard player.status == .readyToPlay,
-                                                  !isPictureInPictureActive,
-                                                  !isLoading
-                                            else {
-                                                return
-                                            }
-
                                             if !isMaskShow {
                                                 setMask(!isPictureInPictureActive)
                                             } else {
-                                                setMask(false)
+                                                setMask((isLoading || !isPlaying) && !isPictureInPictureActive)
                                             }
                                         }),
                         )
@@ -360,20 +408,22 @@ struct PlayerView: View {
                                         .buttonStyle(.plain)
 
                                         Menu {
-                                            Picker(selection: Binding {
-                                                videoGravity
-                                            } set: {
-                                                playerLayer.videoGravity = $0
-                                            }) {
-                                                Text("key.video_gravity.fit").tag(AVLayerVideoGravity.resizeAspect)
+                                            if let playerLayer {
+                                                Picker(selection: Binding {
+                                                    videoGravity
+                                                } set: {
+                                                    playerLayer.videoGravity = $0
+                                                }) {
+                                                    Text("key.video_gravity.fit").tag(AVLayerVideoGravity.resizeAspect)
 
-                                                Text("key.video_gravity.fill").tag(AVLayerVideoGravity.resizeAspectFill)
+                                                    Text("key.video_gravity.fill").tag(AVLayerVideoGravity.resizeAspectFill)
 
-                                                Text("key.video_gravity.stretch").tag(AVLayerVideoGravity.resize)
-                                            } label: {
-                                                EmptyView()
+                                                    Text("key.video_gravity.stretch").tag(AVLayerVideoGravity.resize)
+                                                } label: {
+                                                    EmptyView()
+                                                }
+                                                .pickerStyle(.inline)
                                             }
-                                            .pickerStyle(.inline)
                                         } label: {
                                             Label("key.video_gravity", systemImage: "arrow.up.left.and.arrow.down.right")
                                                 .labelStyle(.titleOnly)
@@ -534,7 +584,7 @@ struct PlayerView: View {
             resetPlayer()
         }
         .onChange(of: scenePhase) {
-            guard let player = playerLayer.player,
+            guard let player,
                   player.status == .readyToPlay
             else {
                 return
@@ -550,7 +600,7 @@ struct PlayerView: View {
             }
         }
         .onChange(of: spatialAudio) {
-            guard let player = playerLayer.player,
+            guard let player,
                   player.status == .readyToPlay,
                   let currentItem = player.currentItem
             else {
@@ -562,7 +612,7 @@ struct PlayerView: View {
 //        .onMoveCommand { direction in
 //            resetTimer()
 //
-//            guard let player = playerLayer.player,
+//            guard let player ,
 //                  player.status == .readyToPlay,
 //                  !isPictureInPictureActive
 //            else {
@@ -606,10 +656,6 @@ struct PlayerView: View {
         let player = CustomAVPlayer(m3u8: url, subtitles: movie.subtitles)
 
         if let player, let currentItem = player.currentItem {
-            let pipController = AVPictureInPictureController(playerLayer: playerLayer)
-
-            playerLayer.videoGravity = videoGravity
-
             nowPlayingInfoCenter.nowPlayingInfo = [:]
 
             if let thumbnails = movie.thumbnails {
@@ -618,7 +664,7 @@ struct PlayerView: View {
                     .sink { _ in } receiveValue: { thumbnails in
                         self.thumbnails = thumbnails
                     }
-                    .store(in: &subscriptions)
+                    .store(in: &playerSubscriptions)
             }
 
             timeObserverToken = player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.1, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), queue: .main) { time in
@@ -715,7 +761,7 @@ struct PlayerView: View {
                         break
                     }
                 }
-                .store(in: &subscriptions)
+                .store(in: &playerSubscriptions)
 
             player.publisher(for: \.timeControlStatus)
                 .receive(on: DispatchQueue.main)
@@ -749,7 +795,7 @@ struct PlayerView: View {
 
                     updateNextTimer()
                 }
-                .store(in: &subscriptions)
+                .store(in: &playerSubscriptions)
 
             player.publisher(for: \.isMuted)
                 .receive(on: DispatchQueue.main)
@@ -762,7 +808,7 @@ struct PlayerView: View {
 
                     updateNextTimer()
                 }
-                .store(in: &subscriptions)
+                .store(in: &playerSubscriptions)
 
             player.publisher(for: \.volume)
                 .receive(on: DispatchQueue.main)
@@ -775,7 +821,7 @@ struct PlayerView: View {
 
                     updateNextTimer()
                 }
-                .store(in: &subscriptions)
+                .store(in: &playerSubscriptions)
 
             player.publisher(for: \.error)
                 .compactMap(\.self)
@@ -788,7 +834,7 @@ struct PlayerView: View {
                         }
                     }
                 }
-                .store(in: &subscriptions)
+                .store(in: &playerSubscriptions)
 
             currentItem.publisher(for: \.duration)
                 .compactMap(\.self)
@@ -801,7 +847,7 @@ struct PlayerView: View {
 
                     updateNextTimer()
                 }
-                .store(in: &subscriptions)
+                .store(in: &playerSubscriptions)
 
             currentItem.publisher(for: \.loadedTimeRanges)
                 .compactMap { $0 as? [CMTimeRange] }
@@ -809,7 +855,7 @@ struct PlayerView: View {
                 .sink { loadedTimeRanges in
                     self.loadedTimeRanges = loadedTimeRanges
                 }
-                .store(in: &subscriptions)
+                .store(in: &playerSubscriptions)
 
             currentItem.publisher(for: \.error)
                 .compactMap(\.self)
@@ -822,7 +868,7 @@ struct PlayerView: View {
                         }
                     }
                 }
-                .store(in: &subscriptions)
+                .store(in: &playerSubscriptions)
 
             NotificationCenter.default.publisher(for: AVPlayerItem.didPlayToEndTimeNotification, object: currentItem)
                 .receive(on: DispatchQueue.main)
@@ -837,7 +883,7 @@ struct PlayerView: View {
                         updateNextTimer()
                     }
                 }
-                .store(in: &subscriptions)
+                .store(in: &playerSubscriptions)
 
             NotificationCenter.default.publisher(for: AVPlayerItem.failedToPlayToEndTimeNotification, object: currentItem)
                 .compactMap { $0.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? Error }
@@ -850,7 +896,7 @@ struct PlayerView: View {
                         }
                     }
                 }
-                .store(in: &subscriptions)
+                .store(in: &playerSubscriptions)
 
 //            NotificationCenter.default.publisher(for: AVPlayerItem.newErrorLogEntryNotification, object: currentItem)
 //                .compactMap { ($0.object as? AVPlayerItem)?.errorLog()?.events.last }
@@ -862,48 +908,7 @@ struct PlayerView: View {
 //                        }
 //                    }
 //                }
-//                .store(in: &subscriptions)
-
-            playerLayer.publisher(for: \.videoGravity)
-                .receive(on: DispatchQueue.main)
-                .sink { videoGravity in
-                    withAnimation(.easeInOut(duration: 0.15)) {
-                        self.videoGravity = videoGravity
-                    }
-                }
-                .store(in: &subscriptions)
-
-            if let pipController {
-                pipController.publisher(for: \.isPictureInPictureActive)
-                    .receive(on: DispatchQueue.main)
-                    .sink { isPictureInPictureActive in
-                        withAnimation(.easeInOut) {
-                            self.isPictureInPictureActive = isPictureInPictureActive
-                        }
-
-                        setMask(!isPictureInPictureActive)
-
-                        updateNextTimer()
-
-//                        if let window {
-//                            if isPictureInPictureActive {
-//                                window.miniaturize(nil)
-//                            } else {
-//                                window.deminiaturize(nil)
-//                            }
-//                        }
-                    }
-                    .store(in: &subscriptions)
-
-                pipController.publisher(for: \.isPictureInPicturePossible)
-                    .receive(on: DispatchQueue.main)
-                    .sink { isPictureInPicturePossible in
-                        withAnimation(.easeInOut(duration: 0.15)) {
-                            self.isPictureInPicturePossible = isPictureInPicturePossible
-                        }
-                    }
-                    .store(in: &subscriptions)
-            }
+//                .store(in: &playerSubscriptions)
 
             nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyAssetURL] = url
             nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyMediaType] = MPNowPlayingInfoMediaType.video.rawValue
@@ -1006,19 +1011,19 @@ struct PlayerView: View {
             player.isMuted = isMuted
 
             withAnimation(.easeInOut) {
-                playerLayer.player = player
-                self.pipController = pipController
+                self.player = player
             }
         }
     }
 
     private func resetPlayer(completion: (() -> Void)? = nil) {
         if let timeObserverToken {
-            playerLayer.player?.removeTimeObserver(timeObserverToken)
+            player?.removeTimeObserver(timeObserverToken)
             self.timeObserverToken = nil
         }
 
-        subscriptions.flush()
+        layerSubscriptions.flush()
+        playerSubscriptions.flush()
 
         nowPlayingInfoCenter.playbackState = .stopped
         nowPlayingInfoCenter.nowPlayingInfo = nil
@@ -1037,11 +1042,11 @@ struct PlayerView: View {
 
         thumbnails = nil
 
-        playerLayer.player?.pause()
-        playerLayer.player?.replaceCurrentItem(with: nil)
+        player?.pause()
+        player?.replaceCurrentItem(with: nil)
 
         withAnimation(.easeInOut) {
-            playerLayer.player = nil
+            player = nil
             pipController = nil
             error = nil
             nextTimer = nil
@@ -1056,7 +1061,7 @@ struct PlayerView: View {
     }
 
     private func selectSubtitles(_ language: String?) {
-        guard let player = playerLayer.player,
+        guard let player,
               let currentItem = player.currentItem
         else {
             return
@@ -1098,7 +1103,7 @@ struct PlayerView: View {
         }
 
         timerWork = DispatchWorkItem {
-            guard let player = playerLayer.player,
+            guard let player,
                   player.status == .readyToPlay
             else {
                 return
@@ -1166,7 +1171,7 @@ struct PlayerView: View {
                             if isLoggedIn {
                                 saveWatchingStateUseCase(voiceActing: voiceActing, season: season, episode: prevEpisode, position: 0, total: 0)
                                     .sink { _ in } receiveValue: { _ in }
-                                    .store(in: &subscriptions)
+                                    .store(in: &playerSubscriptions)
                             }
 
                             if let position = selectPositions.first(where: { position in
@@ -1193,7 +1198,7 @@ struct PlayerView: View {
                             setupPlayer(subtitles: subtitles)
                         }
                     }
-                    .store(in: &subscriptions)
+                    .store(in: &playerSubscriptions)
             }
         } else if let prevSeason = seasons.element(before: season), let prevEpisode = prevSeason.episodes.last {
             withAnimation(.easeInOut(duration: 0.15)) {
@@ -1218,7 +1223,7 @@ struct PlayerView: View {
                             if isLoggedIn {
                                 saveWatchingStateUseCase(voiceActing: voiceActing, season: prevSeason, episode: prevEpisode, position: 0, total: 0)
                                     .sink { _ in } receiveValue: { _ in }
-                                    .store(in: &subscriptions)
+                                    .store(in: &playerSubscriptions)
                             }
 
                             if let position = selectPositions.first(where: { position in
@@ -1245,7 +1250,7 @@ struct PlayerView: View {
                             setupPlayer(subtitles: subtitles)
                         }
                     }
-                    .store(in: &subscriptions)
+                    .store(in: &playerSubscriptions)
             }
         }
     }
@@ -1274,7 +1279,7 @@ struct PlayerView: View {
                             if isLoggedIn {
                                 saveWatchingStateUseCase(voiceActing: voiceActing, season: season, episode: nextEpisode, position: 0, total: 0)
                                     .sink { _ in } receiveValue: { _ in }
-                                    .store(in: &subscriptions)
+                                    .store(in: &playerSubscriptions)
                             }
 
                             if let position = selectPositions.first(where: { position in
@@ -1300,7 +1305,7 @@ struct PlayerView: View {
                             setupPlayer(subtitles: subtitles)
                         }
                     }
-                    .store(in: &subscriptions)
+                    .store(in: &playerSubscriptions)
             }
         } else if let nextSeason = seasons.element(after: season), let nextEpisode = nextSeason.episodes.first {
             withAnimation(.easeInOut(duration: 0.15)) {
@@ -1325,7 +1330,7 @@ struct PlayerView: View {
                             if isLoggedIn {
                                 saveWatchingStateUseCase(voiceActing: voiceActing, season: nextSeason, episode: nextEpisode, position: 0, total: 0)
                                     .sink { _ in } receiveValue: { _ in }
-                                    .store(in: &subscriptions)
+                                    .store(in: &playerSubscriptions)
                             }
 
                             if let position = selectPositions.first(where: { position in
@@ -1352,49 +1357,45 @@ struct PlayerView: View {
                             setupPlayer(subtitles: subtitles)
                         }
                     }
-                    .store(in: &subscriptions)
+                    .store(in: &playerSubscriptions)
             }
         }
     }
 }
 
-struct CustomAVPlayerView: UIViewRepresentable {
-    let playerLayer: AVPlayerLayer
+class CustomPlayerView: UIView {
+    override static var layerClass: AnyClass { AVPlayerLayer.self }
 
-    func makeUIView(context _: Context) -> PlayerContainerView {
-        let view = PlayerContainerView(playerLayer: playerLayer)
+    var player: AVPlayer? {
+        get { playerLayer.player }
+        set { playerLayer.player = newValue }
+    }
+
+    var playerLayer: AVPlayerLayer { layer as! AVPlayerLayer }
+}
+
+struct CustomVideoPlayer: UIViewRepresentable {
+    private let player: AVPlayer
+    @Binding private var playerLayer: AVPlayerLayer?
+
+    init(player: AVPlayer, playerLayer: Binding<AVPlayerLayer?>) {
+        self.player = player
+        _playerLayer = playerLayer
+    }
+
+    func makeUIView(context _: Context) -> CustomPlayerView {
+        let view = CustomPlayerView()
+        view.player = player
         return view
     }
 
-    func updateUIView(_ uiView: PlayerContainerView, context _: Context) {
-        uiView.updatePlayerLayerFrame()
-    }
-}
+    func updateUIView(_ uiView: CustomPlayerView, context _: Context) {
+        uiView.player = player
 
-final class PlayerContainerView: UIView {
-    private(set) var playerLayer: AVPlayerLayer
-
-    init(playerLayer: AVPlayerLayer) {
-        self.playerLayer = playerLayer
-        super.init(frame: .zero)
-        setupLayer()
-    }
-
-    @available(*, unavailable)
-    required init?(coder _: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    private func setupLayer() {
-        layer.addSublayer(playerLayer)
-    }
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        playerLayer.frame = bounds
-    }
-
-    func updatePlayerLayerFrame() {
-        playerLayer.frame = bounds
+        if playerLayer !== uiView.playerLayer {
+            DispatchQueue.main.async {
+                playerLayer = uiView.playerLayer
+            }
+        }
     }
 }
