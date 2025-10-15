@@ -4,8 +4,6 @@ import SwiftUI
 struct SearchView: View {
     @State private var viewModel = SearchViewModel()
 
-    @FocusState private var searchFocus
-
     private let columns = [
         GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading),
     ]
@@ -65,7 +63,6 @@ struct SearchView: View {
             }
         }
         .searchable(text: $viewModel.query, placement: .toolbar)
-        .searchFocused($searchFocus)
         .transition(.opacity)
         .navigationTitle(viewModel.title)
         .toolbar {
@@ -87,8 +84,6 @@ struct SearchView: View {
             default:
                 viewModel.load(force: true)
             }
-
-            searchFocus = true
         }
         .onChange(of: viewModel.query) {
             viewModel.load(force: viewModel.query.trim().isEmpty)
