@@ -20,8 +20,8 @@ enum Tabs: Hashable, Identifiable, CaseIterable {
     case home
     case categories
     case collections
-    case search
     case profile
+    case search
 
     var label: LocalizedStringKey {
         switch self {
