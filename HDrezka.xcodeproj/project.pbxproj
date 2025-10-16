@@ -54,6 +54,7 @@
 				iOS/Presentations/Components/ErrorStateView.swift = (ios, );
 				iOS/Presentations/Components/LoadingPaginationStateView.swift = (ios, );
 				iOS/Presentations/Components/LoadingStateView.swift = (ios, );
+				iOS/Presentations/Components/OnPressButtonStyle.swift = (ios, );
 				iOS/Presentations/Components/OrientationView.swift = (ios, );
 				iOS/Presentations/Components/Player/CustomAVPlayer.swift = (ios, );
 				iOS/Presentations/Components/Player/PlayerView.swift = (ios, );
@@ -114,6 +115,7 @@
 				macOS/Presentations/Components/LicensesView.swift = (macos, );
 				macOS/Presentations/Components/LoadingPaginationStateView.swift = (macos, );
 				macOS/Presentations/Components/LoadingStateView.swift = (macos, );
+				macOS/Presentations/Components/OnPressButtonStyle.swift = (macos, );
 				macOS/Presentations/Components/Player/CustomAVPlayer.swift = (macos, );
 				macOS/Presentations/Components/Player/PlayerView.swift = (macos, );
 				macOS/Presentations/Components/Player/SliderWithText.swift = (macos, );

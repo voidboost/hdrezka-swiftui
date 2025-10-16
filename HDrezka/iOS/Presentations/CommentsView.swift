@@ -253,18 +253,8 @@ struct CommentsView: View {
                         }
                         .buttonStyle(.plain)
                         .disabled(comment.selfComment)
-                        .onHover { hovering in
-                            delayShow?.cancel()
-
-                            if hovering {
-                                delayShow = DispatchWorkItem {
-                                    viewModel.getLikes(comment: comment)
-                                }
-
-                                if let delayShow {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: delayShow)
-                                }
-                            }
+                        .onLongPressGesture {
+                            viewModel.getLikes(comment: comment)
                         }
                         .popover(item: $viewModel.likes[comment.commentId], attachmentAnchor: .rect(.bounds), arrowEdge: .top) { like in
                             VStack(alignment: .center, spacing: 10) {

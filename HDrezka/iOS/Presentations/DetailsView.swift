@@ -1449,15 +1449,6 @@ struct DetailsView: View {
                                 .aspectRatio(contentMode: .fit)
                         }
                         .buttonStyle(.plain)
-                        .onHover { hover in
-                            withAnimation(.easeInOut(duration: 0.15)) {
-                                if hover {
-                                    self.hover = Float(index + 1)
-                                } else {
-                                    self.hover = nil
-                                }
-                            }
-                        }
                     } else {
                         Image(systemName: "star.fill")
                             .font(.system(.body, design: .rounded))
@@ -1478,11 +1469,10 @@ struct DetailsView: View {
                     stars
                         .background {
                             GeometryReader { geometry in
-                                let width = (CGFloat(hover ?? rating) / 10.0) * geometry.size.width
+                                let width = (CGFloat(rating) / 10.0) * geometry.size.width
 
                                 HStack {
-                                    (hover != nil ? Color.primary : Color.secondary)
-                                        .frame(width: width)
+                                    Color.secondary.frame(width: width)
 
                                     Spacer(minLength: 0)
                                 }
@@ -1497,22 +1487,11 @@ struct DetailsView: View {
                             .foregroundStyle(.secondary)
                             .contentTransition(.numericText(value: Double(rating)))
 
-                        if let votes, vote {
+                        if let votes {
                             Text(verbatim: "(\(votes))")
                                 .font(.caption.monospacedDigit())
                                 .foregroundStyle(.secondary)
                                 .contentTransition(.numericText())
-                        }
-                    }
-                    .viewModifier { view in
-                        if votes != nil {
-                            view.onHover { hover in
-                                withAnimation(.easeInOut) {
-                                    vote = hover
-                                }
-                            }
-                        } else {
-                            view
                         }
                     }
                 }
@@ -1535,8 +1514,8 @@ struct DetailsView: View {
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
-                .onHover {
-                    show = $0
+                .onLongPressGesture {
+                    show = true
                 }
                 .popover(isPresented: $show) {
                     AsyncImage(url: URL(string: person.photo), transaction: .init(animation: .easeInOut)) { phase in
@@ -1611,8 +1590,6 @@ struct DetailsView: View {
             self.url = url
         }
 
-        @State private var show: Bool = false
-
         var body: some View {
             HStack(alignment: .center, spacing: 0) {
                 Spacer()
@@ -1633,21 +1610,10 @@ struct DetailsView: View {
                                         }
                                     }
 
-                                if let hover, show {
+                                if let hover {
                                     Text(verbatim: "(\(hover))")
                                         .font(.subheadline)
                                         .foregroundStyle(.secondary)
-                                }
-                            }
-                            .viewModifier { view in
-                                if hover != nil {
-                                    view.onHover { hover in
-                                        withAnimation(.easeInOut) {
-                                            show = hover
-                                        }
-                                    }
-                                } else {
-                                    view
                                 }
                             }
 
@@ -1671,21 +1637,10 @@ struct DetailsView: View {
                                     }
                                 }
 
-                            if let hover, show {
+                            if let hover {
                                 Text(verbatim: "(\(hover))")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
-                            }
-                        }
-                        .viewModifier { view in
-                            if hover != nil {
-                                view.onHover { hover in
-                                    withAnimation(.easeInOut) {
-                                        show = hover
-                                    }
-                                }
-                            } else {
-                                view
                             }
                         }
 
