@@ -376,7 +376,7 @@ struct PlayerView: View {
                                             }
                                             .buttonStyle(
                                                 OnPressButtonStyle { isPressed in
-                                                    setMask(true, forse: isPressed)
+                                                    setMask(true, force: isPressed)
                                                 },
                                             )
                                             .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
@@ -478,7 +478,7 @@ struct PlayerView: View {
                                         }
                                         .buttonStyle(
                                             OnPressButtonStyle { isPressed in
-                                                setMask(true, forse: isPressed)
+                                                setMask(true, force: isPressed)
                                             },
                                         )
                                         .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
@@ -1076,14 +1076,14 @@ struct PlayerView: View {
         }
     }
 
-    private func setMask(_ newValue: Bool, forse: Bool = false) {
+    private func setMask(_ newValue: Bool, force: Bool = false) {
         withAnimation(.easeInOut) {
             isMaskShow = newValue
         }
 
         delayHide?.cancel()
 
-        if newValue, !isLoading, isPlaying, !forse {
+        if newValue, !isLoading, isPlaying, !force {
             delayHide = DispatchWorkItem {
                 setMask(false)
             }
