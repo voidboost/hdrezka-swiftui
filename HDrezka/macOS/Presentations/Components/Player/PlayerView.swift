@@ -128,7 +128,7 @@ struct PlayerView: View {
                                         } else {
                                             player.playImmediately(atRate: rate)
                                         }
-                                    })
+                                    }),
                     )
 
                 VStack(alignment: .center) {
@@ -140,7 +140,7 @@ struct PlayerView: View {
                                 } label: {
                                     Image(systemName: "pip.enter")
                                         .font(.title2)
-                                        .contentShape(.circle())
+                                        .contentShape(.circle)
                                 }
                                 .buttonStyle(.plain)
                                 .disabled(isPictureInPictureActive || !isPictureInPicturePossible)
@@ -173,7 +173,7 @@ struct PlayerView: View {
                                         Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(volume))
                                             .font(.title2)
                                             .contentTransition(.symbolEffect(.replace))
-                                            .contentShape(.circle())
+                                            .contentShape(.circle)
                                     }
                                     .buttonStyle(.plain)
                                     .keyboardShortcut("m", modifiers: [])
@@ -197,7 +197,7 @@ struct PlayerView: View {
                                 } label: {
                                     Image(systemName: "backward.fill")
                                         .font(.title2)
-                                        .contentShape(.circle())
+                                        .contentShape(.circle)
                                 }
                                 .buttonStyle(.plain)
                                 .disabled(seasons.element(before: season) == nil && season.episodes.element(before: episode) == nil)
@@ -224,7 +224,7 @@ struct PlayerView: View {
                                     Image(systemName: isPlaying ? "pause.fill" : "play.fill")
                                         .font(.largeTitle)
                                         .contentTransition(.symbolEffect(.replace))
-                                        .contentShape(.circle())
+                                        .contentShape(.circle)
                                 }
                                 .buttonStyle(.plain)
                                 .keyboardShortcut(.space, modifiers: [])
@@ -239,7 +239,7 @@ struct PlayerView: View {
                                 } label: {
                                     Image(systemName: "forward.fill")
                                         .font(.title2)
-                                        .contentShape(.circle())
+                                        .contentShape(.circle)
                                 }
                                 .buttonStyle(.plain)
                                 .disabled(seasons.element(after: season) == nil && season.episodes.element(after: episode) == nil)
@@ -304,12 +304,12 @@ struct PlayerView: View {
                                             Label("key.subtitles", systemImage: "captions.bubble")
                                                 .labelStyle(.iconOnly)
                                                 .font(.title2)
-                                                .contentShape(.circle())
+                                                .contentShape(.circle)
                                         }
                                         .buttonStyle(
                                             OnPressButtonStyle { isPressed in
                                                 setMask(true, force: isPressed)
-                                            }
+                                            },
                                         )
                                         .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                                     }
@@ -404,12 +404,12 @@ struct PlayerView: View {
                                         Label("key.settings", systemImage: "ellipsis.circle")
                                             .labelStyle(.iconOnly)
                                             .font(.title2)
-                                            .contentShape(.circle())
+                                            .contentShape(.circle)
                                     }
                                     .buttonStyle(
                                         OnPressButtonStyle { isPressed in
                                             setMask(true, force: isPressed)
-                                        }
+                                        },
                                     )
                                     .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                                 }
@@ -673,7 +673,7 @@ struct PlayerView: View {
                         acting: voiceActing.translatorId,
                         season: season?.seasonId,
                         episode: episode?.episodeId,
-                        position: currentTime
+                        position: currentTime,
                     )
 
                     modelContext.insert(position)
@@ -1117,7 +1117,7 @@ struct PlayerView: View {
                         acting: voiceActing.translatorId,
                         season: season?.seasonId,
                         episode: episode?.episodeId,
-                        subtitles: language
+                        subtitles: language,
                     )
 
                     modelContext.insert(position)
@@ -1232,7 +1232,7 @@ struct PlayerView: View {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: season.seasonId,
-                                    episode: prevEpisode.episodeId
+                                    episode: prevEpisode.episodeId,
                                 )
 
                                 modelContext.insert(position)
@@ -1283,7 +1283,7 @@ struct PlayerView: View {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: prevSeason.seasonId,
-                                    episode: prevEpisode.episodeId
+                                    episode: prevEpisode.episodeId,
                                 )
 
                                 modelContext.insert(position)
@@ -1339,7 +1339,7 @@ struct PlayerView: View {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: season.seasonId,
-                                    episode: nextEpisode.episodeId
+                                    episode: nextEpisode.episodeId,
                                 )
 
                                 modelContext.insert(position)
@@ -1390,7 +1390,7 @@ struct PlayerView: View {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: nextSeason.seasonId,
-                                    episode: nextEpisode.episodeId
+                                    episode: nextEpisode.episodeId,
                                 )
 
                                 modelContext.insert(position)
