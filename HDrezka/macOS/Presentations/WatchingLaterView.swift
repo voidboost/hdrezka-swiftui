@@ -13,8 +13,6 @@ struct WatchingLaterView: View {
         GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading),
     ]
 
-    @Default(.isLoggedIn) private var isLoggedIn
-
     @Environment(\.modelContext) private var modelContext
 
     @Query private var playerPositions: [PlayerPosition]

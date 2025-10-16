@@ -10,8 +10,6 @@ struct CollectionsView: View {
         GridItem(.adaptive(minimum: 200, maximum: .infinity), spacing: 18, alignment: .topLeading),
     ]
 
-    @Default(.isLoggedIn) private var isLoggedIn
-
     var body: some View {
         ScrollView(.vertical) {
             LazyVGrid(columns: columns, alignment: .leading, spacing: 18) {

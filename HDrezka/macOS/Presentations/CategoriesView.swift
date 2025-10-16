@@ -7,8 +7,6 @@ struct CategoriesView: View {
 
     @State private var viewModel = CategoriesViewModel()
 
-    @Default(.isLoggedIn) private var isLoggedIn
-
     var body: some View {
         ScrollView(.vertical) {
             LazyVStack(alignment: .leading, spacing: 18) {
