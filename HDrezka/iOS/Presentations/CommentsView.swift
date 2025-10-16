@@ -14,8 +14,6 @@ struct CommentsView: View {
         viewModel = CommentsViewModel(id: details.movieId, adb: details.adb, type: details.type)
     }
 
-    @Default(.isLoggedIn) private var isLoggedIn
-
     @State private var movieDestination: MovieSimple?
 
     var body: some View {

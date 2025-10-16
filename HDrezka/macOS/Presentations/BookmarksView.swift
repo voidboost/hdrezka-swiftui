@@ -12,8 +12,6 @@ struct BookmarksView: View {
         GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading),
     ]
 
-    @Default(.isLoggedIn) private var isLoggedIn
-
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
             List(selection: $viewModel.selectedBookmark) {

@@ -12,7 +12,6 @@ struct PersonView: View {
     }
 
     @Default(.mirror) private var mirror
-    @Default(.isLoggedIn) private var isLoggedIn
 
     var body: some View {
         ScrollView(.vertical) {

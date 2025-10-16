@@ -30,8 +30,6 @@ struct ListView: View {
 
     private let columns = [GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading)]
 
-    @Default(.isLoggedIn) private var isLoggedIn
-
     var body: some View {
         ScrollView(.vertical) {
             LazyVGrid(columns: columns, alignment: .leading, spacing: 18) {

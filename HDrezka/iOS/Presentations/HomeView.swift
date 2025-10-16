@@ -6,8 +6,6 @@ struct HomeView: View {
 
     @State private var viewModel = HomeViewModel()
 
-    @Default(.isLoggedIn) private var isLoggedIn
-
     @State private var movieDestination: MovieSimple?
 
     var body: some View {
