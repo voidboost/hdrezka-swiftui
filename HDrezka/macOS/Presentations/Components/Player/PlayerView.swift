@@ -88,7 +88,7 @@ struct PlayerView: View {
     }
 
     var body: some View {
-        ZStack(alignment: .center) {
+        Group {
             if let error {
                 ErrorStateView(error) {
                     resetPlayer {
@@ -130,66 +130,61 @@ struct PlayerView: View {
                                         }
                                     }),
                     )
-
-                VStack(alignment: .center) {
-                    VStack {
+                    .overlay(alignment: .topLeading) {
+                        if let pipController, AVPictureInPictureController.isPictureInPictureSupported() {
+                            Button {
+                                pipController.startPictureInPicture()
+                            } label: {
+                                Image(systemName: "pip.enter")
+                                    .font(.title2)
+                                    .contentShape(.circle)
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(isPictureInPictureActive || !isPictureInPicturePossible)
+                            .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+                            .padding(.top, 36)
+                            .padding(.leading, 36)
+                            .opacity(isMaskShow ? 1 : 0)
+                        }
+                    }
+                    .overlay(alignment: .topTrailing) {
                         HStack(alignment: .center) {
-                            if let pipController, AVPictureInPictureController.isPictureInPictureSupported() {
+                            SliderWithoutText(value: Binding {
+                                volume
+                            } set: { volume in
+                                player.volume = volume
+                            }, inRange: 0 ... 1, activeFillColor: .primary, fillColor: .primary.opacity(0.7), emptyColor: .primary.opacity(0.3), height: 8) { onEditingChanged in
+                                if onEditingChanged, isMuted {
+                                    player.isMuted.toggle()
+                                }
+                            }
+                            .frame(width: 120, height: 10)
+                            .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+
+                            VStack(alignment: .center) {
                                 Button {
-                                    pipController.startPictureInPicture()
+                                    resetTimer()
+
+                                    if !isPictureInPictureActive {
+                                        player.isMuted.toggle()
+                                    }
                                 } label: {
-                                    Image(systemName: "pip.enter")
+                                    Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(volume))
                                         .font(.title2)
+                                        .contentTransition(.symbolEffect(.replace))
                                         .contentShape(.circle)
                                 }
                                 .buttonStyle(.plain)
-                                .disabled(isPictureInPictureActive || !isPictureInPicturePossible)
+                                .keyboardShortcut("m", modifiers: [])
                                 .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                             }
-
-                            Spacer()
-
-                            HStack(alignment: .center) {
-                                SliderWithoutText(value: Binding {
-                                    volume
-                                } set: { volume in
-                                    player.volume = volume
-                                }, inRange: 0 ... 1, activeFillColor: .primary, fillColor: .primary.opacity(0.7), emptyColor: .primary.opacity(0.3), height: 8) { onEditingChanged in
-                                    if onEditingChanged, isMuted {
-                                        player.isMuted.toggle()
-                                    }
-                                }
-                                .frame(width: 120, height: 10)
-                                .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
-
-                                VStack(alignment: .center) {
-                                    Button {
-                                        resetTimer()
-
-                                        if !isPictureInPictureActive {
-                                            player.isMuted.toggle()
-                                        }
-                                    } label: {
-                                        Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(volume))
-                                            .font(.title2)
-                                            .contentTransition(.symbolEffect(.replace))
-                                            .contentShape(.circle)
-                                    }
-                                    .buttonStyle(.plain)
-                                    .keyboardShortcut("m", modifiers: [])
-                                    .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
-                                }
-                                .frame(width: 30)
-                            }
-                            .frame(height: 30)
+                            .frame(width: 30, height: 30)
                         }
-
-                        Spacer()
+                        .padding(.top, 36)
+                        .padding(.trailing, 36)
+                        .opacity(isMaskShow ? 1 : 0)
                     }
-
-                    VStack {
-                        Spacer()
-
+                    .overlay(alignment: .center) {
                         HStack(alignment: .center) {
                             if let seasons, let season, let episode {
                                 Button {
@@ -247,13 +242,9 @@ struct PlayerView: View {
                             }
                         }
                         .frame(width: 160)
-
-                        Spacer()
+                        .opacity(isMaskShow ? 1 : 0)
                     }
-
-                    VStack {
-                        Spacer()
-
+                    .overlay(alignment: .bottom) {
                         VStack(alignment: .center, spacing: 8) {
                             HStack(alignment: .bottom) {
                                 VStack(alignment: .leading) {
@@ -281,7 +272,7 @@ struct PlayerView: View {
 
                                 Spacer()
 
-                                HStack(alignment: .center) {
+                                HStack(alignment: .center, spacing: 12) {
                                     if !subtitlesOptions.isEmpty {
                                         Menu {
                                             Picker(selection: Binding {
@@ -427,29 +418,20 @@ struct PlayerView: View {
                                 .frame(height: 25)
                                 .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                         }
+                        .padding(.horizontal, 36)
+                        .padding(.bottom, 36)
+                        .opacity(isMaskShow ? 1 : 0)
                     }
-                }
-                .padding(36)
-                .opacity(isMaskShow ? 1 : 0)
-
-                if let nextTimer, let seasons, let season, let episode {
-                    VStack(alignment: .trailing) {
-                        HStack {
-                            Spacer(minLength: 0)
-
+                    .overlay(alignment: .topTrailing) {
+                        if let nextTimer, let seasons, let season, let episode {
                             Button {
                                 nextTrack(seasons, season, episode)
                             } label: {
                                 HStack(alignment: .center, spacing: 21) {
                                     VStack(alignment: .leading) {
                                         HStack(alignment: .bottom, spacing: 7) {
-                                            if let image = NSImage(named: "Bars") {
-                                                Image(nsImage: image.resized(to: CGSize(width: 15, height: 14)))
-                                                    .offset(y: -14.0 / 4)
-                                            } else {
-                                                Image(systemName: "chart.bar.xaxis")
-                                                    .font(.title3)
-                                            }
+                                            Image(systemName: "waveform.circle")
+                                                .font(.title2.bold())
 
                                             Text("key.next")
                                                 .font(.title2.bold())
@@ -482,13 +464,10 @@ struct PlayerView: View {
                                 .background(.ultraThinMaterial, in: .rect(topLeadingRadius: 6, bottomLeadingRadius: 6))
                             }
                             .buttonStyle(.plain)
+                            .padding(.top, 102)
+                            .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                         }
-
-                        Spacer(minLength: 0)
                     }
-                    .padding(.top, 102)
-                    .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
-                }
             } else if isLoading {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
