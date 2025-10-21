@@ -264,12 +264,14 @@ struct BookmarksView: View {
                             Text(filter.rawValue).tag(filter)
                         }
                     }
+                    .pickerStyle(.inline)
 
                     Picker("key.genre.select", selection: $viewModel.genre) {
                         ForEach(Genres.allCases) { genre in
                             Text(genre.rawValue).tag(genre)
                         }
                     }
+                    .pickerStyle(.inline)
                 } label: {
                     Image(systemName: "line.3.horizontal.decrease")
                 }
