@@ -130,14 +130,6 @@ struct PlayerView: View {
                                             setMask(!isPictureInPictureActive)
 
                                             updateNextTimer()
-
-                                            //                        if let window {
-                                            //                            if isPictureInPictureActive {
-                                            //                                window.miniaturize(nil)
-                                            //                            } else {
-                                            //                                window.deminiaturize(nil)
-                                            //                            }
-                                            //                        }
                                         }
                                         .store(in: &layerSubscriptions)
 
