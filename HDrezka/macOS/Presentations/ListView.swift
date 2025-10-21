@@ -106,6 +106,7 @@ struct ListView: View {
                                     Text(filter.rawValue).tag(filter)
                                 }
                             }
+                            .pickerStyle(.inline)
                         }
 
                         if viewModel.isCategory(.newest) {
@@ -114,6 +115,7 @@ struct ListView: View {
                                     Text(filter.rawValue).tag(filter)
                                 }
                             }
+                            .pickerStyle(.inline)
                         }
 
                         if viewModel.isCategory || viewModel.isCountry {
@@ -122,6 +124,7 @@ struct ListView: View {
                                     Text(genre.rawValue).tag(genre)
                                 }
                             }
+                            .pickerStyle(.inline)
                         }
                     } label: {
                         Image(systemName: "line.3.horizontal.decrease")
