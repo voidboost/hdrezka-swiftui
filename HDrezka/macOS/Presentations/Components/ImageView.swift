@@ -80,7 +80,7 @@ struct ImageView: View {
                             TapGesture(count: 1)
                                 .onEnded {
                                     dismiss()
-                                }))
+                                })),
         )
     }
 }
