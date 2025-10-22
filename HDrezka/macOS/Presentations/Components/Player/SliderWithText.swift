@@ -49,34 +49,28 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                     ZStack(alignment: .center) {
                         emptyColor
                         (isActive ? activeFillColor : fillColor)
-                            .mask {
-                                HStack {
-                                    Color.black
-                                        .frame(width: max(geometry.size.width * CGFloat(localRealProgress + localTempProgress), 0), alignment: .leading)
-                                    Spacer(minLength: 0)
-                                }
+                            .mask(alignment: .leading) {
+                                Color.black.frame(width: max(geometry.size.width * CGFloat(localRealProgress + localTempProgress), 0))
                             }
 
                         ForEach(buffers, id: \.self) { buffer in
                             if let start = buffer.start.seconds as? T, let end = buffer.end.seconds as? T {
                                 emptyColor
-                                    .mask {
-                                        ZStack(alignment: .topLeading) {
-                                            let duration = if isActive {
-                                                max(Double(end / inRange.upperBound) - Double(start / inRange.upperBound), 0)
-                                            } else {
-                                                max(Double(end / inRange.upperBound) - Double(localRealProgress + localTempProgress), 0)
-                                            }
-
-                                            let point = CGPoint(
-                                                x: isActive ? max(geometry.size.width * (Double(start / inRange.upperBound) + duration * 0.5), 0) : max(geometry.size.width * (Double(localRealProgress + localTempProgress) + duration * 0.5), 0),
-                                                y: (isActive ? height * 1.25 : height) * 0.5,
-                                            )
-
-                                            Color.black
-                                                .frame(width: max(geometry.size.width * duration, 0))
-                                                .position(x: point.x, y: point.y)
+                                    .mask(alignment: .leading) {
+                                        let duration = if isActive {
+                                            max(Double(end / inRange.upperBound) - Double(start / inRange.upperBound), 0)
+                                        } else {
+                                            max(Double(end / inRange.upperBound) - Double(localRealProgress + localTempProgress), 0)
                                         }
+
+                                        let point = CGPoint(
+                                            x: isActive ? max(geometry.size.width * (Double(start / inRange.upperBound) + duration * 0.5), 0) : max(geometry.size.width * (Double(localRealProgress + localTempProgress) + duration * 0.5), 0),
+                                            y: (isActive ? height * 1.25 : height) * 0.5,
+                                        )
+
+                                        Color.black
+                                            .frame(width: max(geometry.size.width * duration, 0))
+                                            .position(x: point.x, y: point.y)
                                     }
                             }
                         }

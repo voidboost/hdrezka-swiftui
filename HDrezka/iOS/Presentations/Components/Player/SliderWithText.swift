@@ -48,12 +48,8 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                     ZStack(alignment: .center) {
                         emptyColor
                         (isActive ? activeFillColor : fillColor)
-                            .mask {
-                                HStack {
-                                    Color.black
-                                        .frame(width: max(geometry.size.width * CGFloat(localRealProgress + localTempProgress), 0), alignment: .leading)
-                                    Spacer(minLength: 0)
-                                }
+                            .mask(alignment: .leading) {
+                                Color.black.frame(width: max(geometry.size.width * CGFloat(localRealProgress + localTempProgress), 0))
                             }
 
                         ForEach(buffers, id: \.self) { buffer in
