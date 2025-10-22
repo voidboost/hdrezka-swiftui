@@ -106,36 +106,25 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                     )
                     .overlay {
                         if isActive, let cue = thumbnails?.cues.first(where: { TimeInterval(unitSeekImage) * TimeInterval(inRange.upperBound) > $0.timeStart && TimeInterval(unitSeekImage) * TimeInterval(inRange.upperBound) < $0.timeEnd }), let imageUrl = cue.imageUrl, let frame = cue.frame {
-                            ZStack {
-                                AsyncImage(url: URL(string: imageUrl), transaction: .init(animation: .easeInOut)) { phase in
-                                    if let image = phase.image, let uiImage = ImageRenderer(content: image).cgImage?.crop(to: frame) {
-                                        Image(uiImage: uiImage).resizable()
-                                    } else {
-                                        ProgressView().scaleEffect(0.75)
-                                    }
+                            AsyncImage(url: URL(string: imageUrl), transaction: .init(animation: .easeInOut)) { phase in
+                                if let image = phase.image, let uiImage = ImageRenderer(content: image).cgImage?.crop(to: frame) {
+                                    Image(uiImage: uiImage).resizable()
+                                } else {
+                                    ProgressView().scaleEffect(0.75)
                                 }
-                                .scaledToFill()
-                                .frame(width: frame.width, height: frame.height)
-                                .clipShape(.rect(cornerRadius: 6))
-                                .background(.ultraThinMaterial, in: .rect(cornerRadius: 6))
-                                .overlay(.ultraThinMaterial, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
-                                .overlay {
-                                    VStack {
-                                        Spacer()
-
-                                        HStack {
-                                            Spacer()
-                                            Text((T(Float(unitSeekImage)) * inRange.upperBound).asTimeString(style: .positional))
-                                                .font(.caption)
-                                                .foregroundStyle(.secondary)
-                                            Spacer()
-                                        }
-                                    }
-                                    .padding(3)
-                                }
-                                .position(x: min(max(unitSeekImage * geometry.size.width, frame.width * 0.5), geometry.size.width - frame.width * 0.5), y: -(frame.height * 0.5) - 6)
                             }
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .scaledToFill()
+                            .frame(width: frame.width, height: frame.height)
+                            .clipShape(.rect(cornerRadius: 6))
+                            .background(.ultraThinMaterial, in: .rect(cornerRadius: 6))
+                            .overlay(.ultraThinMaterial, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                            .overlay(alignment: .bottom) {
+                                Text((T(Float(unitSeekImage)) * inRange.upperBound).asTimeString(style: .positional))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .padding(3)
+                            }
+                            .position(x: min(max(unitSeekImage * geometry.size.width, frame.width * 0.5), geometry.size.width - frame.width * 0.5), y: -(frame.height * 0.5) - 6)
                         }
                     }
                 }

@@ -554,7 +554,7 @@ struct DetailsView: View {
             .padding(.top, 18)
             .padding(.top, topSafeAreaInset)
             .background {
-                ZStack(alignment: .topLeading) {
+                ZStack {
                     AsyncImage(url: URL(string: details.poster), transaction: .init(animation: .easeInOut)) { phase in
                         if let image = phase.image {
                             image.resizable()
@@ -567,13 +567,10 @@ struct DetailsView: View {
                     .frame(height: blurHeght)
                     .clipShape(.rect)
 
-                    VStack {}
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(.ultraThickMaterial)
+                    Rectangle().fill(.ultraThickMaterial)
 
-                    VStack {}
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(.background)
+                    Rectangle()
+                        .fill(.background)
                         .mask {
                             LinearGradient(stops: [
                                 .init(color: .black.opacity(0.3), location: 0.9),
@@ -1113,16 +1110,10 @@ struct DetailsView: View {
 
                 HStack(alignment: .center, spacing: 4) {
                     stars
-                        .background {
+                        .background(alignment: .leading) {
                             GeometryReader { geometry in
-                                let width = (CGFloat(hover ?? rating) / 10.0) * geometry.size.width
-
-                                HStack {
-                                    (hover != nil ? Color.primary : Color.secondary)
-                                        .frame(width: width)
-
-                                    Spacer(minLength: 0)
-                                }
+                                (hover != nil ? Color.primary : Color.secondary)
+                                    .frame(width: (CGFloat(hover ?? rating) / 10.0) * geometry.size.width)
                             }
                             .mask(stars)
                         }
@@ -1215,15 +1206,9 @@ struct DetailsView: View {
 
         var body: some View {
             stars
-                .overlay {
+                .overlay(alignment: .leading) {
                     GeometryReader { geometry in
-                        let width = (rating / 5.0) * geometry.size.width
-
-                        HStack {
-                            color.frame(width: width)
-
-                            Spacer(minLength: 0)
-                        }
+                        color.frame(width: (rating / 5.0) * geometry.size.width)
                     }
                     .mask(stars)
                 }

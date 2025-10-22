@@ -55,21 +55,17 @@ struct ImageView: View {
             dismiss()
         }
         .background {
-            ZStack(alignment: .topLeading) {
-                AsyncImage(url: url, transaction: .init(animation: .easeInOut)) { phase in
-                    if let image = phase.image {
-                        image.resizable()
-                    } else {
-                        Color.gray
-                    }
+            AsyncImage(url: url, transaction: .init(animation: .easeInOut)) { phase in
+                if let image = phase.image {
+                    image.resizable()
+                } else {
+                    Color.gray
                 }
-                .scaledToFill()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-                VStack {}
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(.ultraThickMaterial)
             }
+            .scaledToFill()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            Rectangle().fill(.ultraThickMaterial)
         }
         .gesture(
             WindowDragGesture()
@@ -84,7 +80,7 @@ struct ImageView: View {
                             TapGesture(count: 1)
                                 .onEnded {
                                     dismiss()
-                                })),
+                                }))
         )
     }
 }
