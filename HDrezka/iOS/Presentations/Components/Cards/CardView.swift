@@ -23,84 +23,59 @@ struct CardView: View {
                         }
                     }
                     .imageFill(2 / 3)
-                    .overlay {
-                        VStack {
-                            if let cat = movie.cat {
-                                HStack {
-                                    Spacer()
+                    .clipShape(.rect(cornerRadius: 6))
+                    .overlay(alignment: .topTrailing) {
+                        if let cat = movie.cat {
+                            if let rating = cat.rating {
+                                let rating = Text(verbatim: "\(rating)").fontWeight(.medium)
+                                let icon = Text(Image(systemName: cat.icon))
 
-                                    if let rating = cat.rating {
-                                        let rating = Text(verbatim: "\(rating)").fontWeight(.medium)
-                                        let icon = Text(Image(systemName: cat.icon))
+                                Text("key.cat-\(cat.title)-\(rating)-\(icon)")
+                                    .font(.caption)
+                                    .foregroundStyle(.white)
+                                    .padding(.vertical, 3)
+                                    .padding(.horizontal, 6)
+                                    .background(cat.color, in: .rect(bottomLeadingRadius: 6, topTrailingRadius: 6))
+                            } else {
+                                let icon = Text(Image(systemName: cat.icon))
 
-                                        Text("key.cat-\(cat.title)-\(rating)-\(icon)")
-                                            .font(.caption)
-                                            .foregroundStyle(.white)
-                                            .padding(.vertical, 3)
-                                            .padding(.horizontal, 6)
-                                            .background(cat.color)
-                                            .clipShape(.rect(bottomLeadingRadius: 6))
-                                    } else {
-                                        let icon = Text(Image(systemName: cat.icon))
-
-                                        Text("key.cat-\(cat.title)-\(icon)")
-                                            .font(.caption)
-                                            .foregroundStyle(.white)
-                                            .padding(.vertical, 3)
-                                            .padding(.horizontal, 6)
-                                            .background(cat.color)
-                                            .clipShape(.rect(bottomLeadingRadius: 6))
-                                    }
-                                }
-                            }
-
-                            Spacer()
-
-                            if let info = movie.info {
-                                HStack {
-                                    Text(info.title)
-                                        .lineLimit(1)
-                                        .font(.caption)
-                                        .padding(.vertical, 3)
-                                        .padding(.horizontal, 6)
-                                        .background(.ultraThickMaterial)
-                                        .clipShape(.rect(topTrailingRadius: 6))
-
-                                    Spacer()
-                                }
+                                Text("key.cat-\(cat.title)-\(icon)")
+                                    .font(.caption)
+                                    .foregroundStyle(.white)
+                                    .padding(.vertical, 3)
+                                    .padding(.horizontal, 6)
+                                    .background(cat.color, in: .rect(bottomLeadingRadius: 6, topTrailingRadius: 6))
                             }
                         }
                     }
-                    .clipShape(.rect(cornerRadius: 6))
+                    .overlay(alignment: .bottomLeading) {
+                        if let info = movie.info {
+                            Text(info.title)
+                                .lineLimit(1)
+                                .font(.caption)
+                                .padding(.vertical, 3)
+                                .padding(.horizontal, 6)
+                                .background(.ultraThickMaterial, in: .rect(bottomLeadingRadius: 6, topTrailingRadius: 6))
+                        }
+                    }
                 }
 
                 if let name = movie.name, let details = movie.details {
-                    if reservesSpace {
-                        ZStack(alignment: .topLeading) {
+                    ZStack(alignment: .topLeading) {
+                        if reservesSpace {
                             VStack(alignment: .leading) {
                                 Text(name)
                                     .font(.title3.weight(.semibold))
-                                    .foregroundStyle(.clear)
                                     .lineLimit(2, reservesSpace: true)
-
-                                Text(details)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.clear)
-                                    .lineLimit(2, reservesSpace: true)
-                            }
-
-                            VStack(alignment: .leading) {
-                                Text(name)
-                                    .font(.title3.weight(.semibold))
-                                    .lineLimit(2)
 
                                 Text(details)
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
-                                    .lineLimit(2)
+                                    .lineLimit(2, reservesSpace: true)
                             }
+                            .hidden()
                         }
-                    } else {
+
                         VStack(alignment: .leading) {
                             Text(name)
                                 .font(.title3.weight(.semibold))
