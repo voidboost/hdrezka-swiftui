@@ -68,101 +68,100 @@ struct DownloadSheetView: View {
                     if details.series != nil || !(details.voiceActing ?? []).filter({ !$0.name.isEmpty }).isEmpty {
                         VStack(spacing: 2.5) {
                             if let acting = details.voiceActing, !acting.filter({ !$0.name.isEmpty }).isEmpty {
-                                ZStack(alignment: .center) {
-                                    HStack {
-                                        Text("key.acting")
+                                HStack {
+                                    Text("key.acting")
 
-                                        if let rating = details.voiceActingRating?.sorted(by: { $0.percent > $1.percent }), !rating.isEmpty {
-                                            Button {
-                                                showRating = true
-                                            } label: {
-                                                Image(systemName: "questionmark.circle")
-                                                    .foregroundStyle(Color.accentColor)
-                                                    .font(.subheadline)
-                                            }
-                                            .buttonStyle(.plain)
-                                            .popover(isPresented: $showRating, arrowEdge: .trailing) {
-                                                ScrollView(.vertical) {
-                                                    LazyVStack(alignment: .leading, spacing: 5) {
-                                                        ForEach(rating) { rate in
-                                                            ProgressView(value: rate.percent / 100.0) {
-                                                                Text(rate.name)
-                                                            } currentValueLabel: {
-                                                                Text(verbatim: "\(rate.percent)%")
-                                                            }
-                                                        }
-                                                    }
-                                                    .padding(15)
-                                                    .progressViewStyle(.linear)
-                                                }
-                                                .scrollIndicators(.never)
-                                                .frame(width: 300)
-                                                .frame(maxHeight: 300)
-                                            }
-                                        }
-
-                                        Spacer()
-
-                                        Menu {
-                                            if acting.filter({ $0 != selectedActing }).contains(where: \.isPremium) {
-                                                Section {
-                                                    ForEach(acting.filter(\.isPremium).filter { $0 != selectedActing }) { acting in
-                                                        Button {
-                                                            if isUserPremium != nil {
-                                                                withAnimation(.easeInOut) {
-                                                                    selectedActing = acting
-                                                                }
-                                                            } else {
-                                                                dismiss()
-
-                                                                appState.isPremiumPresented = true
-                                                            }
-                                                        } label: {
-                                                            HStack(spacing: 2) {
-                                                                Image("Premium")
-
-                                                                Text(acting.name)
-                                                            }
-                                                        }
-                                                    }
-                                                } header: {
-                                                    Text("key.premium")
-                                                }
-
-                                                Divider()
-                                            }
-
-                                            ForEach(acting.filter {
-                                                !$0.isPremium
-                                            }.filter { $0 != selectedActing }) { acting in
-                                                Button {
-                                                    withAnimation(.easeInOut) {
-                                                        selectedActing = acting
-                                                    }
-                                                } label: {
-                                                    Text(acting.name)
-                                                }
-                                            }
+                                    if let rating = details.voiceActingRating?.sorted(by: { $0.percent > $1.percent }), !rating.isEmpty {
+                                        Button {
+                                            showRating = true
                                         } label: {
-                                            let name = if let selectedActing {
-                                                if selectedActing.name.isEmpty {
-                                                    String(localized: "key.default")
-                                                } else {
-                                                    selectedActing.name
+                                            Image(systemName: "questionmark.circle")
+                                                .foregroundStyle(Color.accentColor)
+                                                .font(.subheadline)
+                                        }
+                                        .buttonStyle(.plain)
+                                        .popover(isPresented: $showRating, arrowEdge: .trailing) {
+                                            ScrollView(.vertical) {
+                                                LazyVStack(alignment: .leading, spacing: 5) {
+                                                    ForEach(rating) { rate in
+                                                        ProgressView(value: rate.percent / 100.0) {
+                                                            Text(rate.name)
+                                                        } currentValueLabel: {
+                                                            Text(verbatim: "\(rate.percent)%")
+                                                        }
+                                                    }
                                                 }
-                                            } else {
-                                                String(localized: "key.acting.select")
+                                                .padding(15)
+                                                .progressViewStyle(.linear)
+                                            }
+                                            .scrollIndicators(.never)
+                                            .frame(width: 300)
+                                            .frame(maxHeight: 300)
+                                        }
+                                    }
+
+                                    Spacer()
+
+                                    Menu {
+                                        if acting.filter({ $0 != selectedActing }).contains(where: \.isPremium) {
+                                            Section {
+                                                ForEach(acting.filter(\.isPremium).filter { $0 != selectedActing }) { acting in
+                                                    Button {
+                                                        if isUserPremium != nil {
+                                                            withAnimation(.easeInOut) {
+                                                                selectedActing = acting
+                                                            }
+                                                        } else {
+                                                            dismiss()
+
+                                                            appState.isPremiumPresented = true
+                                                        }
+                                                    } label: {
+                                                        HStack(spacing: 2) {
+                                                            Image("Premium")
+
+                                                            Text(acting.name)
+                                                        }
+                                                    }
+                                                }
+                                            } header: {
+                                                Text("key.premium")
                                             }
 
-                                            Label(name, systemImage: "chevron.up.chevron.down")
+                                            Divider()
                                         }
-                                        .menuStyle(.button)
-                                        .menuIndicator(.hidden)
-                                        .buttonStyle(.plain)
-                                        .labelStyle(CustomLabelStyle(iconVisible: acting.count > 1))
-                                    }
-                                    .padding(.vertical, 10)
 
+                                        ForEach(acting.filter {
+                                            !$0.isPremium
+                                        }.filter { $0 != selectedActing }) { acting in
+                                            Button {
+                                                withAnimation(.easeInOut) {
+                                                    selectedActing = acting
+                                                }
+                                            } label: {
+                                                Text(acting.name)
+                                            }
+                                        }
+                                    } label: {
+                                        let name = if let selectedActing {
+                                            if selectedActing.name.isEmpty {
+                                                String(localized: "key.default")
+                                            } else {
+                                                selectedActing.name
+                                            }
+                                        } else {
+                                            String(localized: "key.acting.select")
+                                        }
+
+                                        Label(name, systemImage: "chevron.up.chevron.down")
+                                    }
+                                    .menuStyle(.button)
+                                    .menuIndicator(.hidden)
+                                    .buttonStyle(.plain)
+                                    .labelStyle(CustomLabelStyle(iconVisible: acting.count > 1))
+                                }
+                                .padding(.vertical, 10)
+                                .overlay {
                                     if acting.isEmpty != false {
                                         ProgressView().scaleEffect(0.6)
                                     }
@@ -174,44 +173,43 @@ struct DownloadSheetView: View {
                                     Divider()
                                 }
 
-                                ZStack(alignment: .center) {
-                                    HStack {
-                                        Text("key.season")
+                                HStack {
+                                    Text("key.season")
 
-                                        Spacer()
+                                    Spacer()
 
-                                        Menu {
-                                            ForEach((seasons ?? []).filter { $0 != selectedSeason }) { season in
-                                                Button {
-                                                    withAnimation(.easeInOut) {
-                                                        selectedSeason = season
-                                                    }
-                                                } label: {
-                                                    Text(season.name.contains(/^\d/) ? String(localized: "key.season-\(season.name)") : season.name)
+                                    Menu {
+                                        ForEach((seasons ?? []).filter { $0 != selectedSeason }) { season in
+                                            Button {
+                                                withAnimation(.easeInOut) {
+                                                    selectedSeason = season
                                                 }
+                                            } label: {
+                                                Text(season.name.contains(/^\d/) ? String(localized: "key.season-\(season.name)") : season.name)
                                             }
-                                        } label: {
-                                            let name = if let selectedSeason {
-                                                if selectedSeason.name.isEmpty {
-                                                    String(localized: "key.season-\(1)")
-                                                } else if selectedSeason.name.contains(/^\d/) {
-                                                    String(localized: "key.season-\(selectedSeason.name)")
-                                                } else {
-                                                    selectedSeason.name
-                                                }
-                                            } else {
-                                                String(localized: "key.season.select")
-                                            }
-
-                                            Label(name, systemImage: "chevron.up.chevron.down")
                                         }
-                                        .menuStyle(.button)
-                                        .menuIndicator(.hidden)
-                                        .buttonStyle(.plain)
-                                        .labelStyle(CustomLabelStyle(iconVisible: (seasons?.count ?? 0) > 1))
-                                    }
-                                    .padding(.vertical, 10)
+                                    } label: {
+                                        let name = if let selectedSeason {
+                                            if selectedSeason.name.isEmpty {
+                                                String(localized: "key.season-\(1)")
+                                            } else if selectedSeason.name.contains(/^\d/) {
+                                                String(localized: "key.season-\(selectedSeason.name)")
+                                            } else {
+                                                selectedSeason.name
+                                            }
+                                        } else {
+                                            String(localized: "key.season.select")
+                                        }
 
+                                        Label(name, systemImage: "chevron.up.chevron.down")
+                                    }
+                                    .menuStyle(.button)
+                                    .menuIndicator(.hidden)
+                                    .buttonStyle(.plain)
+                                    .labelStyle(CustomLabelStyle(iconVisible: (seasons?.count ?? 0) > 1))
+                                }
+                                .padding(.vertical, 10)
+                                .overlay {
                                     if seasons?.isEmpty != false {
                                         ProgressView().scaleEffect(0.6)
                                     }
@@ -219,44 +217,43 @@ struct DownloadSheetView: View {
 
                                 Divider()
 
-                                ZStack {
-                                    HStack {
-                                        Text("key.episode")
+                                HStack {
+                                    Text("key.episode")
 
-                                        Spacer()
+                                    Spacer()
 
-                                        Menu {
-                                            ForEach((selectedSeason?.episodes ?? []).filter { $0 != selectedEpisode }) { episode in
-                                                Button {
-                                                    withAnimation(.easeInOut) {
-                                                        selectedEpisode = episode
-                                                    }
-                                                } label: {
-                                                    Text(episode.name.contains(/^\d/) ? String(localized: "key.episode-\(episode.name)") : episode.name)
+                                    Menu {
+                                        ForEach((selectedSeason?.episodes ?? []).filter { $0 != selectedEpisode }) { episode in
+                                            Button {
+                                                withAnimation(.easeInOut) {
+                                                    selectedEpisode = episode
                                                 }
+                                            } label: {
+                                                Text(episode.name.contains(/^\d/) ? String(localized: "key.episode-\(episode.name)") : episode.name)
                                             }
-                                        } label: {
-                                            let name = if let selectedEpisode {
-                                                if selectedEpisode.name.isEmpty {
-                                                    String(localized: "key.episode-\(1)")
-                                                } else if selectedEpisode.name.contains(/^\d/) {
-                                                    String(localized: "key.episode-\(selectedEpisode.name)")
-                                                } else {
-                                                    selectedEpisode.name
-                                                }
-                                            } else {
-                                                String(localized: "key.episode.select")
-                                            }
-
-                                            Label(name, systemImage: "chevron.up.chevron.down")
                                         }
-                                        .menuStyle(.button)
-                                        .menuIndicator(.hidden)
-                                        .buttonStyle(.plain)
-                                        .labelStyle(CustomLabelStyle(iconVisible: (selectedSeason?.episodes.count ?? 0) > 1))
-                                    }
-                                    .padding(.vertical, 10)
+                                    } label: {
+                                        let name = if let selectedEpisode {
+                                            if selectedEpisode.name.isEmpty {
+                                                String(localized: "key.episode-\(1)")
+                                            } else if selectedEpisode.name.contains(/^\d/) {
+                                                String(localized: "key.episode-\(selectedEpisode.name)")
+                                            } else {
+                                                selectedEpisode.name
+                                            }
+                                        } else {
+                                            String(localized: "key.episode.select")
+                                        }
 
+                                        Label(name, systemImage: "chevron.up.chevron.down")
+                                    }
+                                    .menuStyle(.button)
+                                    .menuIndicator(.hidden)
+                                    .buttonStyle(.plain)
+                                    .labelStyle(CustomLabelStyle(iconVisible: (selectedSeason?.episodes.count ?? 0) > 1))
+                                }
+                                .padding(.vertical, 10)
+                                .overlay {
                                     if selectedSeason?.episodes.isEmpty != false {
                                         ProgressView().scaleEffect(0.6)
                                     }
@@ -270,141 +267,136 @@ struct DownloadSheetView: View {
                     }
 
                     if (details.series == nil && selectedActing != nil) || selectedEpisode != nil {
-                        ZStack(alignment: .center) {
-                            HStack {
-                                Text("key.quality")
+                        HStack {
+                            Text("key.quality")
 
-                                if let selectedQuality, let movie, let link = movie.getClosestTo(quality: selectedQuality) {
-                                    ShareLink(item: link) {
-                                        Image(systemName: "square.and.arrow.up")
-                                            .foregroundStyle(.secondary)
-                                            .font(.subheadline)
-                                    }
-                                    .buttonStyle(.plain)
+                            if let selectedQuality, let movie, let link = movie.getClosestTo(quality: selectedQuality) {
+                                ShareLink(item: link) {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .foregroundStyle(.secondary)
+                                        .font(.subheadline)
                                 }
-
-                                Spacer()
-
-                                Menu {
-                                    if !(movie?.getLockedQualities() ?? []).isEmpty {
-                                        Section {
-                                            ForEach(movie?.getLockedQualities() ?? [], id: \.self) { quality in
-                                                Button {
-                                                    if isLoggedIn {
-                                                        withAnimation(.easeInOut) {
-                                                            selectedQuality = quality
-                                                        }
-                                                    } else {
-                                                        isLoginPresented = true
-                                                    }
-                                                } label: {
-                                                    Text(quality)
-                                                }
-                                            }
-                                        } header: {
-                                            Text("key.sign_in.access")
-                                        }
-
-                                        Divider()
-                                    }
-
-                                    ForEach((movie?.getAvailableQualities() ?? []).filter { $0 != selectedQuality }, id: \.self) { quality in
-                                        Button {
-                                            withAnimation(.easeInOut) {
-                                                selectedQuality = quality
-                                            }
-                                        } label: {
-                                            Text(quality)
-                                        }
-                                    }
-                                } label: {
-                                    let name = if let selectedQuality {
-                                        if selectedQuality.isEmpty {
-                                            String(localized: "key.default")
-                                        } else {
-                                            selectedQuality
-                                        }
-                                    } else {
-                                        String(localized: "key.quality.select")
-                                    }
-
-                                    Label(name, systemImage: "chevron.up.chevron.down")
-                                }
-                                .menuStyle(.button)
-                                .menuIndicator(.hidden)
                                 .buttonStyle(.plain)
-                                .labelStyle(CustomLabelStyle(iconVisible: ((movie?.getAvailableQualities().count ?? 0) + (movie?.getLockedQualities().count ?? 0)) > 1))
                             }
-                            .padding(.vertical, 10)
 
+                            Spacer()
+
+                            Menu {
+                                if !(movie?.getLockedQualities() ?? []).isEmpty {
+                                    Section {
+                                        ForEach(movie?.getLockedQualities() ?? [], id: \.self) { quality in
+                                            Button {
+                                                if isLoggedIn {
+                                                    withAnimation(.easeInOut) {
+                                                        selectedQuality = quality
+                                                    }
+                                                } else {
+                                                    isLoginPresented = true
+                                                }
+                                            } label: {
+                                                Text(quality)
+                                            }
+                                        }
+                                    } header: {
+                                        Text("key.sign_in.access")
+                                    }
+
+                                    Divider()
+                                }
+
+                                ForEach((movie?.getAvailableQualities() ?? []).filter { $0 != selectedQuality }, id: \.self) { quality in
+                                    Button {
+                                        withAnimation(.easeInOut) {
+                                            selectedQuality = quality
+                                        }
+                                    } label: {
+                                        Text(quality)
+                                    }
+                                }
+                            } label: {
+                                let name = if let selectedQuality {
+                                    if selectedQuality.isEmpty {
+                                        String(localized: "key.default")
+                                    } else {
+                                        selectedQuality
+                                    }
+                                } else {
+                                    String(localized: "key.quality.select")
+                                }
+
+                                Label(name, systemImage: "chevron.up.chevron.down")
+                            }
+                            .menuStyle(.button)
+                            .menuIndicator(.hidden)
+                            .buttonStyle(.plain)
+                            .labelStyle(CustomLabelStyle(iconVisible: ((movie?.getAvailableQualities().count ?? 0) + (movie?.getLockedQualities().count ?? 0)) > 1))
+                        }
+                        .padding(.horizontal, 15)
+                        .padding(.vertical, 15)
+                        .background(.quinary, in: .rect(cornerRadius: 6))
+                        .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                        .overlay {
                             if movie?.getAvailableQualities().isEmpty != false {
                                 ProgressView().scaleEffect(0.6)
                             }
                         }
-                        .padding(.horizontal, 15)
-                        .padding(.vertical, 5)
-                        .background(.quinary, in: .rect(cornerRadius: 6))
-                        .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
 
                     if let movie, !movie.subtitles.isEmpty {
-                        ZStack(alignment: .center) {
-                            HStack {
-                                Text("key.subtitles")
+                        HStack {
+                            Text("key.subtitles")
 
-                                if let selectedSubtitles, let subtitles = movie.subtitles.first(where: { $0 == selectedSubtitles }), let url = URL(string: subtitles.link) {
-                                    ShareLink(item: url) {
-                                        Image(systemName: "square.and.arrow.up")
-                                            .foregroundStyle(.secondary)
-                                            .font(.subheadline)
-                                    }
-                                    .buttonStyle(.plain)
+                            if let selectedSubtitles, let subtitles = movie.subtitles.first(where: { $0 == selectedSubtitles }), let url = URL(string: subtitles.link) {
+                                ShareLink(item: url) {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .foregroundStyle(.secondary)
+                                        .font(.subheadline)
                                 }
-
-                                Spacer()
-
-                                Menu {
-                                    if selectedSubtitles != nil {
-                                        Button {
-                                            withAnimation(.easeInOut) {
-                                                selectedSubtitles = nil
-                                            }
-                                        } label: {
-                                            Text("key.none")
-                                        }
-                                    }
-
-                                    ForEach(movie.subtitles.filter { $0 != selectedSubtitles }) { subtitles in
-                                        Button {
-                                            withAnimation(.easeInOut) {
-                                                selectedSubtitles = subtitles
-                                            }
-                                        } label: {
-                                            Text(subtitles.name)
-                                        }
-                                    }
-                                } label: {
-                                    let name = if let selectedSubtitles {
-                                        if selectedSubtitles.name.isEmpty {
-                                            String(localized: "key.default")
-                                        } else {
-                                            selectedSubtitles.name
-                                        }
-                                    } else {
-                                        String(localized: "key.subtitles.select")
-                                    }
-
-                                    Label(name, systemImage: "chevron.up.chevron.down")
-                                }
-                                .menuStyle(.button)
-                                .menuIndicator(.hidden)
                                 .buttonStyle(.plain)
-                                .labelStyle(CustomLabelStyle(iconVisible: movie.subtitles.count > 0))
                             }
-                            .padding(.vertical, 10)
+
+                            Spacer()
+
+                            Menu {
+                                if selectedSubtitles != nil {
+                                    Button {
+                                        withAnimation(.easeInOut) {
+                                            selectedSubtitles = nil
+                                        }
+                                    } label: {
+                                        Text("key.none")
+                                    }
+                                }
+
+                                ForEach(movie.subtitles.filter { $0 != selectedSubtitles }) { subtitles in
+                                    Button {
+                                        withAnimation(.easeInOut) {
+                                            selectedSubtitles = subtitles
+                                        }
+                                    } label: {
+                                        Text(subtitles.name)
+                                    }
+                                }
+                            } label: {
+                                let name = if let selectedSubtitles {
+                                    if selectedSubtitles.name.isEmpty {
+                                        String(localized: "key.default")
+                                    } else {
+                                        selectedSubtitles.name
+                                    }
+                                } else {
+                                    String(localized: "key.subtitles.select")
+                                }
+
+                                Label(name, systemImage: "chevron.up.chevron.down")
+                            }
+                            .menuStyle(.button)
+                            .menuIndicator(.hidden)
+                            .buttonStyle(.plain)
+                            .labelStyle(CustomLabelStyle(iconVisible: movie.subtitles.count > 0))
                         }
                         .padding(.horizontal, 15)
-                        .padding(.vertical, 5)
+                        .padding(.vertical, 15)
                         .background(.quinary, in: .rect(cornerRadius: 6))
                         .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }

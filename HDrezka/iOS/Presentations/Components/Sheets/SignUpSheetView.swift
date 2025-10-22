@@ -182,44 +182,43 @@ struct SignUpSheetView: View {
 
                         VStack(alignment: .center, spacing: 8) {
                             VStack(spacing: 2.5) {
-                                ZStack(alignment: .bottomLeading) {
-                                    HStack(alignment: .center, spacing: 8) {
-                                        Text("key.email")
+                                HStack(alignment: .center, spacing: 8) {
+                                    Text("key.email")
 
-                                        TextField("key.email", text: $email, prompt: Text(String(localized: "key.email").lowercased()))
-                                            .textFieldStyle(.plain)
-                                            .multilineTextAlignment(.trailing)
-                                            .focused($focusedField, equals: FocusedField.email)
-                                            .onChange(of: email) {
-                                                emailValid = nil
+                                    TextField("key.email", text: $email, prompt: Text(String(localized: "key.email").lowercased()))
+                                        .textFieldStyle(.plain)
+                                        .multilineTextAlignment(.trailing)
+                                        .focused($focusedField, equals: FocusedField.email)
+                                        .onChange(of: email) {
+                                            emailValid = nil
 
-                                                emailCheck?.cancel()
+                                            emailCheck?.cancel()
 
-                                                if !email.isEmpty {
-                                                    emailCheck = DispatchWorkItem {
-                                                        checkEmailUseCase(email: email)
-                                                            .receive(on: DispatchQueue.main)
-                                                            .sink { completion in
-                                                                guard case .failure = completion else { return }
+                                            if !email.isEmpty {
+                                                emailCheck = DispatchWorkItem {
+                                                    checkEmailUseCase(email: email)
+                                                        .receive(on: DispatchQueue.main)
+                                                        .sink { completion in
+                                                            guard case .failure = completion else { return }
 
-                                                                emailValid = false
-                                                            } receiveValue: { valid in
-                                                                emailValid = valid
-                                                            }
-                                                            .store(in: &subscriptions)
-                                                    }
+                                                            emailValid = false
+                                                        } receiveValue: { valid in
+                                                            emailValid = valid
+                                                        }
+                                                        .store(in: &subscriptions)
+                                                }
 
-                                                    if let emailCheck {
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: emailCheck)
-                                                    }
+                                                if let emailCheck {
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: emailCheck)
                                                 }
                                             }
-                                            .onSubmit {
-                                                focusedField = .username
-                                            }
-                                    }
-                                    .padding(.vertical, 10)
-
+                                        }
+                                        .onSubmit {
+                                            focusedField = .username
+                                        }
+                                }
+                                .padding(.vertical, 10)
+                                .overlay(alignment: .bottomLeading) {
                                     Text(String(localized: "key.email.error").lowercased())
                                         .font(.caption)
                                         .foregroundStyle(emailValid == false ? Color.accentColor : Color.clear)
@@ -228,44 +227,43 @@ struct SignUpSheetView: View {
 
                                 Divider()
 
-                                ZStack(alignment: .bottomLeading) {
-                                    HStack(alignment: .center, spacing: 8) {
-                                        Text("key.username")
+                                HStack(alignment: .center, spacing: 8) {
+                                    Text("key.username")
 
-                                        TextField("key.username", text: $username, prompt: Text(String(localized: "key.username").lowercased()))
-                                            .textFieldStyle(.plain)
-                                            .multilineTextAlignment(.trailing)
-                                            .focused($focusedField, equals: .username)
-                                            .onChange(of: username) {
-                                                usernameValid = nil
+                                    TextField("key.username", text: $username, prompt: Text(String(localized: "key.username").lowercased()))
+                                        .textFieldStyle(.plain)
+                                        .multilineTextAlignment(.trailing)
+                                        .focused($focusedField, equals: .username)
+                                        .onChange(of: username) {
+                                            usernameValid = nil
 
-                                                usernameCheck?.cancel()
+                                            usernameCheck?.cancel()
 
-                                                if !username.isEmpty {
-                                                    usernameCheck = DispatchWorkItem {
-                                                        checkUsernameUseCase(username: username)
-                                                            .receive(on: DispatchQueue.main)
-                                                            .sink { completion in
-                                                                guard case .failure = completion else { return }
+                                            if !username.isEmpty {
+                                                usernameCheck = DispatchWorkItem {
+                                                    checkUsernameUseCase(username: username)
+                                                        .receive(on: DispatchQueue.main)
+                                                        .sink { completion in
+                                                            guard case .failure = completion else { return }
 
-                                                                usernameValid = false
-                                                            } receiveValue: { valid in
-                                                                usernameValid = valid
-                                                            }
-                                                            .store(in: &subscriptions)
-                                                    }
+                                                            usernameValid = false
+                                                        } receiveValue: { valid in
+                                                            usernameValid = valid
+                                                        }
+                                                        .store(in: &subscriptions)
+                                                }
 
-                                                    if let usernameCheck {
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: usernameCheck)
-                                                    }
+                                                if let usernameCheck {
+                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: usernameCheck)
                                                 }
                                             }
-                                            .onSubmit {
-                                                focusedField = .password1
-                                            }
-                                    }
-                                    .padding(.vertical, 10)
-
+                                        }
+                                        .onSubmit {
+                                            focusedField = .password1
+                                        }
+                                }
+                                .padding(.vertical, 10)
+                                .overlay(alignment: .bottomLeading) {
                                     Text(String(localized: "key.username.error").lowercased())
                                         .font(.caption)
                                         .foregroundStyle(usernameValid == false ? Color.accentColor : Color.clear)
@@ -274,96 +272,95 @@ struct SignUpSheetView: View {
 
                                 Divider()
 
-                                ZStack(alignment: .bottomLeading) {
-                                    HStack(alignment: .center, spacing: 8) {
-                                        Text("key.password")
+                                HStack(alignment: .center, spacing: 8) {
+                                    Text("key.password")
 
-                                        if showPassword {
-                                            TextField("key.password", text: $password1, prompt: Text(String(localized: "key.password").lowercased()))
-                                                .textFieldStyle(.plain)
-                                                .multilineTextAlignment(.trailing)
-                                                .focused($focusedField, equals: .password1)
-                                                .onChange(of: password1) {
-                                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                                        passwordIsEmpty = password1.isEmpty
+                                    if showPassword {
+                                        TextField("key.password", text: $password1, prompt: Text(String(localized: "key.password").lowercased()))
+                                            .textFieldStyle(.plain)
+                                            .multilineTextAlignment(.trailing)
+                                            .focused($focusedField, equals: .password1)
+                                            .onChange(of: password1) {
+                                                withAnimation(.easeInOut(duration: 0.15)) {
+                                                    passwordIsEmpty = password1.isEmpty
+                                                }
+
+                                                passwordValid = nil
+
+                                                passwordCheck?.cancel()
+
+                                                if !password1.isEmpty {
+                                                    passwordCheck = DispatchWorkItem {
+                                                        passwordValid = password1.count >= 6
+
+                                                        if !password2.isEmpty {
+                                                            confirmPasswordValid = password1 == password2
+                                                        }
                                                     }
 
-                                                    passwordValid = nil
-
-                                                    passwordCheck?.cancel()
-
-                                                    if !password1.isEmpty {
-                                                        passwordCheck = DispatchWorkItem {
-                                                            passwordValid = password1.count >= 6
-
-                                                            if !password2.isEmpty {
-                                                                confirmPasswordValid = password1 == password2
-                                                            }
-                                                        }
-
-                                                        if let passwordCheck {
-                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: passwordCheck)
-                                                        }
+                                                    if let passwordCheck {
+                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: passwordCheck)
                                                     }
                                                 }
-                                                .onSubmit {
-                                                    focusedField = .password2
+                                            }
+                                            .onSubmit {
+                                                focusedField = .password2
+                                            }
+                                    } else {
+                                        SecureField("key.password", text: $password1, prompt: Text(String(localized: "key.password").lowercased()))
+                                            .textFieldStyle(.plain)
+                                            .multilineTextAlignment(.trailing)
+                                            .focused($focusedField, equals: .password1)
+                                            .onChange(of: password1) {
+                                                withAnimation(.easeInOut(duration: 0.15)) {
+                                                    passwordIsEmpty = password1.isEmpty
                                                 }
-                                        } else {
-                                            SecureField("key.password", text: $password1, prompt: Text(String(localized: "key.password").lowercased()))
-                                                .textFieldStyle(.plain)
-                                                .multilineTextAlignment(.trailing)
-                                                .focused($focusedField, equals: .password1)
-                                                .onChange(of: password1) {
-                                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                                        passwordIsEmpty = password1.isEmpty
-                                                    }
 
-                                                    passwordValid = nil
+                                                passwordValid = nil
 
-                                                    passwordCheck?.cancel()
+                                                passwordCheck?.cancel()
 
-                                                    if !password1.isEmpty {
-                                                        passwordCheck = DispatchWorkItem {
-                                                            passwordValid = password1.count >= 6
+                                                if !password1.isEmpty {
+                                                    passwordCheck = DispatchWorkItem {
+                                                        passwordValid = password1.count >= 6
 
-                                                            if !password2.isEmpty {
-                                                                confirmPasswordValid = password1 == password2
-                                                            }
-                                                        }
-
-                                                        if let passwordCheck {
-                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: passwordCheck)
+                                                        if !password2.isEmpty {
+                                                            confirmPasswordValid = password1 == password2
                                                         }
                                                     }
-                                                }
-                                                .onSubmit {
-                                                    focusedField = .password2
-                                                }
-                                        }
 
-                                        if !passwordIsEmpty {
-                                            Image(systemName: "eye")
-                                                .foregroundStyle(Color.accentColor.opacity(showPassword ? 0.5 : 1))
-                                                .simultaneousGesture(
-                                                    DragGesture(minimumDistance: 0)
-                                                        .onChanged { _ in
-                                                            withAnimation(.easeInOut(duration: 0.15)) {
-                                                                showPassword = true
-                                                            }
-                                                        }
-                                                        .onEnded { _ in
-                                                            withAnimation(.easeInOut(duration: 0.15)) {
-                                                                showPassword = false
-                                                            } completion: {
-                                                                focusedField = .password1
-                                                            }
-                                                        },
-                                                )
-                                        }
+                                                    if let passwordCheck {
+                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: passwordCheck)
+                                                    }
+                                                }
+                                            }
+                                            .onSubmit {
+                                                focusedField = .password2
+                                            }
                                     }
-                                    .padding(.vertical, 10)
 
+                                    if !passwordIsEmpty {
+                                        Image(systemName: "eye")
+                                            .foregroundStyle(Color.accentColor.opacity(showPassword ? 0.5 : 1))
+                                            .simultaneousGesture(
+                                                DragGesture(minimumDistance: 0)
+                                                    .onChanged { _ in
+                                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                                            showPassword = true
+                                                        }
+                                                    }
+                                                    .onEnded { _ in
+                                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                                            showPassword = false
+                                                        } completion: {
+                                                            focusedField = .password1
+                                                        }
+                                                    }
+                                            )
+                                    }
+                                }
+                                .padding(.vertical, 10)
+                                .overlay(alignment: .bottomLeading) {
                                     Text(String(localized: "key.password.error").lowercased())
                                         .font(.caption)
                                         .foregroundStyle(passwordValid == false ? Color.accentColor : Color.clear)
@@ -372,92 +369,91 @@ struct SignUpSheetView: View {
 
                                 Divider()
 
-                                ZStack(alignment: .bottomLeading) {
-                                    HStack(alignment: .center, spacing: 8) {
-                                        Text("key.password.confirm")
+                                HStack(alignment: .center, spacing: 8) {
+                                    Text("key.password.confirm")
 
-                                        if showConfirmPassword {
-                                            TextField("key.password.confirm", text: $password2, prompt: Text(String(localized: "key.password.confirm").lowercased()))
-                                                .textFieldStyle(.plain)
-                                                .multilineTextAlignment(.trailing)
-                                                .focused($focusedField, equals: .password2)
-                                                .onChange(of: password2) {
-                                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                                        confirmPasswordIsEmpty = password2.isEmpty
+                                    if showConfirmPassword {
+                                        TextField("key.password.confirm", text: $password2, prompt: Text(String(localized: "key.password.confirm").lowercased()))
+                                            .textFieldStyle(.plain)
+                                            .multilineTextAlignment(.trailing)
+                                            .focused($focusedField, equals: .password2)
+                                            .onChange(of: password2) {
+                                                withAnimation(.easeInOut(duration: 0.15)) {
+                                                    confirmPasswordIsEmpty = password2.isEmpty
+                                                }
+
+                                                confirmPasswordValid = nil
+
+                                                confirmPasswordCheck?.cancel()
+
+                                                if !password2.isEmpty {
+                                                    confirmPasswordCheck = DispatchWorkItem {
+                                                        confirmPasswordValid = password1 == password2
                                                     }
 
-                                                    confirmPasswordValid = nil
-
-                                                    confirmPasswordCheck?.cancel()
-
-                                                    if !password2.isEmpty {
-                                                        confirmPasswordCheck = DispatchWorkItem {
-                                                            confirmPasswordValid = password1 == password2
-                                                        }
-
-                                                        if let confirmPasswordCheck {
-                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: confirmPasswordCheck)
-                                                        }
+                                                    if let confirmPasswordCheck {
+                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: confirmPasswordCheck)
                                                     }
                                                 }
-                                                .onSubmit {
-                                                    if emailValid == true, usernameValid == true, passwordValid == true, confirmPasswordValid == true {
-                                                        load()
+                                            }
+                                            .onSubmit {
+                                                if emailValid == true, usernameValid == true, passwordValid == true, confirmPasswordValid == true {
+                                                    load()
+                                                }
+                                            }
+                                    } else {
+                                        SecureField("key.password.confirm", text: $password2, prompt: Text(String(localized: "key.password.confirm").lowercased()))
+                                            .textFieldStyle(.plain)
+                                            .multilineTextAlignment(.trailing)
+                                            .focused($focusedField, equals: .password2)
+                                            .onChange(of: password2) {
+                                                withAnimation(.easeInOut(duration: 0.15)) {
+                                                    confirmPasswordIsEmpty = password2.isEmpty
+                                                }
+
+                                                confirmPasswordValid = nil
+
+                                                confirmPasswordCheck?.cancel()
+
+                                                if !password2.isEmpty {
+                                                    confirmPasswordCheck = DispatchWorkItem {
+                                                        confirmPasswordValid = password1 == password2
+                                                    }
+
+                                                    if let confirmPasswordCheck {
+                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: confirmPasswordCheck)
                                                     }
                                                 }
-                                        } else {
-                                            SecureField("key.password.confirm", text: $password2, prompt: Text(String(localized: "key.password.confirm").lowercased()))
-                                                .textFieldStyle(.plain)
-                                                .multilineTextAlignment(.trailing)
-                                                .focused($focusedField, equals: .password2)
-                                                .onChange(of: password2) {
-                                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                                        confirmPasswordIsEmpty = password2.isEmpty
-                                                    }
-
-                                                    confirmPasswordValid = nil
-
-                                                    confirmPasswordCheck?.cancel()
-
-                                                    if !password2.isEmpty {
-                                                        confirmPasswordCheck = DispatchWorkItem {
-                                                            confirmPasswordValid = password1 == password2
-                                                        }
-
-                                                        if let confirmPasswordCheck {
-                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: confirmPasswordCheck)
-                                                        }
-                                                    }
+                                            }
+                                            .onSubmit {
+                                                if emailValid == true, usernameValid == true, passwordValid == true, confirmPasswordValid == true {
+                                                    load()
                                                 }
-                                                .onSubmit {
-                                                    if emailValid == true, usernameValid == true, passwordValid == true, confirmPasswordValid == true {
-                                                        load()
-                                                    }
-                                                }
-                                        }
-
-                                        if !confirmPasswordIsEmpty {
-                                            Image(systemName: "eye")
-                                                .foregroundStyle(Color.accentColor.opacity(showConfirmPassword ? 0.5 : 1))
-                                                .simultaneousGesture(
-                                                    DragGesture(minimumDistance: 0)
-                                                        .onChanged { _ in
-                                                            withAnimation(.easeInOut(duration: 0.15)) {
-                                                                showConfirmPassword = true
-                                                            }
-                                                        }
-                                                        .onEnded { _ in
-                                                            withAnimation(.easeInOut(duration: 0.15)) {
-                                                                showConfirmPassword = false
-                                                            } completion: {
-                                                                focusedField = .password2
-                                                            }
-                                                        },
-                                                )
-                                        }
+                                            }
                                     }
-                                    .padding(.vertical, 10)
 
+                                    if !confirmPasswordIsEmpty {
+                                        Image(systemName: "eye")
+                                            .foregroundStyle(Color.accentColor.opacity(showConfirmPassword ? 0.5 : 1))
+                                            .simultaneousGesture(
+                                                DragGesture(minimumDistance: 0)
+                                                    .onChanged { _ in
+                                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                                            showConfirmPassword = true
+                                                        }
+                                                    }
+                                                    .onEnded { _ in
+                                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                                            showConfirmPassword = false
+                                                        } completion: {
+                                                            focusedField = .password2
+                                                        }
+                                                    }
+                                            )
+                                    }
+                                }
+                                .padding(.vertical, 10)
+                                .overlay(alignment: .bottomLeading) {
                                     Text(String(localized: "key.password.confirm.error").lowercased())
                                         .font(.caption)
                                         .foregroundStyle(confirmPasswordValid == false ? Color.accentColor : Color.clear)
