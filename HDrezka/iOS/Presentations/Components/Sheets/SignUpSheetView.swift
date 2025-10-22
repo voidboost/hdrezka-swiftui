@@ -355,7 +355,7 @@ struct SignUpSheetView: View {
                                                         } completion: {
                                                             focusedField = .password1
                                                         }
-                                                    }
+                                                    },
                                             )
                                     }
                                 }
@@ -448,7 +448,7 @@ struct SignUpSheetView: View {
                                                         } completion: {
                                                             focusedField = .password2
                                                         }
-                                                    }
+                                                    },
                                             )
                                     }
                                 }
