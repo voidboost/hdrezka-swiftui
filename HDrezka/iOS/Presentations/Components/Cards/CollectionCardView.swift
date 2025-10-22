@@ -19,39 +19,26 @@ struct CollectionCardView: View {
                         }
                     }
                     .imageFill(5 / 3)
-                    .overlay {
-                        ZStack(alignment: .center) {
-                            VStack {}
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .background(.ultraThickMaterial.opacity(0.75))
-
-                            if let count = collection.count {
-                                VStack {
-                                    HStack {
-                                        Spacer()
-
-                                        Text(verbatim: "\(count)")
-                                            .lineLimit(1)
-                                            .font(.caption)
-                                            .padding(.vertical, 3)
-                                            .padding(.horizontal, 6)
-                                            .background(.ultraThickMaterial)
-                                            .clipShape(.rect(bottomLeadingRadius: 6))
-                                    }
-
-                                    Spacer()
-                                }
-                            }
-
-                            Text(collection.name)
-                                .font(.title3.weight(.semibold))
-                                .lineLimit(2)
-                                .multilineTextAlignment(.center)
-                                .padding(9)
-                        }
-                    }
                     .clipShape(.rect(cornerRadius: 6))
                     .contentShape(.rect(cornerRadius: 6))
+                    .overlay(.ultraThickMaterial.opacity(0.75), in: .rect(cornerRadius: 6))
+                    .overlay(alignment: .topTrailing) {
+                        if let count = collection.count {
+                            Text(verbatim: "\(count)")
+                                .lineLimit(1)
+                                .font(.caption)
+                                .padding(.vertical, 3)
+                                .padding(.horizontal, 6)
+                                .background(.ultraThickMaterial, in: .rect(bottomLeadingRadius: 6, topTrailingRadius: 6))
+                        }
+                    }
+                    .overlay(alignment: .center) {
+                        Text(collection.name)
+                            .font(.title3.weight(.semibold))
+                            .lineLimit(2)
+                            .multilineTextAlignment(.center)
+                            .padding(9)
+                    }
                     .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
             }
