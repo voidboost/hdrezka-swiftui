@@ -277,7 +277,7 @@ struct PlayerView: View {
                                     HStack(alignment: .center, spacing: 12) {
                                         if !subtitlesOptions.isEmpty {
                                             Menu {
-                                                Picker(selection: Binding {
+                                                Picker("key.subtitles", selection: Binding {
                                                     subtitles
                                                 } set: { subtitles in
                                                     self.subtitles = subtitles
@@ -289,13 +289,10 @@ struct PlayerView: View {
                                                     ForEach(subtitlesOptions, id: \.self) { subtitles in
                                                         Text(subtitles.displayName(with: Locale.current)).tag(subtitles.extendedLanguageTag)
                                                     }
-                                                } label: {
-                                                    EmptyView()
                                                 }
                                                 .pickerStyle(.inline)
                                             } label: {
-                                                Label("key.subtitles", systemImage: "captions.bubble")
-                                                    .labelStyle(.iconOnly)
+                                                Image(systemName: "captions.bubble")
                                                     .font(.title2)
                                                     .contentShape(.circle)
                                             }
@@ -308,7 +305,7 @@ struct PlayerView: View {
                                         }
 
                                         Menu {
-                                            Picker(selection: Binding {
+                                            Picker("key.timer", selection: Binding {
                                                 timer
                                             } set: {
                                                 timer = $0
@@ -335,12 +332,10 @@ struct PlayerView: View {
 
                                                     Text(name).tag(time)
                                                 }
-                                            } label: {
-                                                Label("key.timer", systemImage: "timer")
                                             }
                                             .pickerStyle(.menu)
 
-                                            Picker(selection: Binding {
+                                            Picker("key.video_gravity", selection: Binding {
                                                 videoGravity
                                             } set: {
                                                 playerLayer.videoGravity = $0
@@ -350,12 +345,10 @@ struct PlayerView: View {
                                                 Text("key.video_gravity.fill").tag(AVLayerVideoGravity.resizeAspectFill)
 
                                                 Text("key.video_gravity.stretch").tag(AVLayerVideoGravity.resize)
-                                            } label: {
-                                                Label("key.video_gravity", systemImage: "arrow.up.left.and.arrow.down.right")
                                             }
                                             .pickerStyle(.menu)
 
-                                            Picker(selection: Binding {
+                                            Picker("key.speed", selection: Binding {
                                                 rate
                                             } set: { rate in
                                                 self.rate = rate
@@ -368,13 +361,11 @@ struct PlayerView: View {
                                                 ForEach(rates, id: \.self) { value in
                                                     Text(verbatim: "\(value)x").tag(value)
                                                 }
-                                            } label: {
-                                                Label("key.speed", systemImage: "gauge.with.dots.needle.33percent")
                                             }
                                             .pickerStyle(.menu)
 
                                             if !movie.getAvailableQualities().isEmpty {
-                                                Picker(selection: Binding {
+                                                Picker("key.quality", selection: Binding {
                                                     quality
                                                 } set: {
                                                     quality = $0
@@ -388,17 +379,16 @@ struct PlayerView: View {
                                                     ForEach(movie.getAvailableQualities(), id: \.self) { value in
                                                         Text(value).tag(value)
                                                     }
-                                                } label: {
-                                                    Label("key.quality", systemImage: "gearshape")
                                                 }
                                                 .pickerStyle(.menu)
                                             }
                                         } label: {
-                                            Label("key.settings", systemImage: "ellipsis.circle")
-                                                .labelStyle(.iconOnly)
+                                            Image(systemName: "ellipsis.circle")
                                                 .font(.title2)
                                                 .contentShape(.circle)
                                         }
+                                        .menuStyle(.button)
+                                        .menuIndicator(.hidden)
                                         .buttonStyle(
                                             OnPressButtonStyle { isPressed in
                                                 setMask(true, force: isPressed)

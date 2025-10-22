@@ -116,10 +116,10 @@ struct WatchSheetView: View {
                                                             appState.isPremiumPresented = true
                                                         }
                                                     } label: {
-                                                        HStack(spacing: 2) {
-                                                            Image("Premium")
-
+                                                        Label {
                                                             Text(acting.name)
+                                                        } icon: {
+                                                            Image("Premium")
                                                         }
                                                     }
                                                 }

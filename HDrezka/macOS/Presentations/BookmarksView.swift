@@ -275,6 +275,8 @@ struct BookmarksView: View {
                 } label: {
                     Image(systemName: "line.3.horizontal.decrease")
                 }
+                .menuStyle(.button)
+                .menuIndicator(.hidden)
                 .disabled(viewModel.bookmarkState == .loading || viewModel.selectedBookmark == nil)
             }
         }
