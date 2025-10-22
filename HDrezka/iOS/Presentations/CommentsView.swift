@@ -389,31 +389,28 @@ struct CommentsView: View {
                     comment.updateRects(containerWidth: width)
                 }
                 .overlay {
-                    ZStack(alignment: .topLeading) {
-                        ForEach(comment.spoilers) { spoiler in
-                            ForEach(spoiler.rects.indices, id: \.self) { rectIndex in
-                                let rect = spoiler.rects[rectIndex]
+                    ForEach(comment.spoilers) { spoiler in
+                        ForEach(spoiler.rects.indices, id: \.self) { rectIndex in
+                            let rect = spoiler.rects[rectIndex]
 
-//                                        Rectangle()
-//                                            .stroke(.red, lineWidth: 1)
-//                                            .frame(width: rect.width, height: rect.height)
-//                                            .position(x: rect.x + rect.width * 0.5, y: rect.y + rect.height * 0.5)
+//                            Rectangle()
+//                                .stroke(.red, lineWidth: 1)
+//                                .frame(width: rect.width, height: rect.height)
+//                                .position(x: rect.x + rect.width * 0.5, y: rect.y + rect.height * 0.5)
 
-                                SpoilerView()
-                                    .contentShape(.rect)
-                                    .background(.background, in: .rect)
-                                    .clipShape(.rect)
-                                    .onTapGesture {
-                                        withAnimation(.easeInOut) {
-                                            comment.removeSpoiler(spoiler.id)
-                                        }
+                            SpoilerView()
+                                .contentShape(.rect)
+                                .background(.background, in: .rect)
+                                .clipShape(.rect)
+                                .onTapGesture {
+                                    withAnimation(.easeInOut) {
+                                        comment.removeSpoiler(spoiler.id)
                                     }
-                                    .frame(width: rect.width, height: rect.height)
-                                    .position(x: rect.midX, y: rect.midY)
-                            }
+                                }
+                                .frame(width: rect.width, height: rect.height)
+                                .position(x: rect.midX, y: rect.midY)
                         }
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
                 .environment(\.openURL, OpenURLAction { url in
                     if let fragment = url.fragment(), fragment.contains("comment"), !url.path().isEmpty {
