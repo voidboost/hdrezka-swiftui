@@ -7,10 +7,8 @@ import SwiftData
 import SwiftUI
 import UserNotifications
 
-class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-        UNUserNotificationCenter.current().delegate = self
-
         FirebaseApp.configure()
 
         #if DEBUG
@@ -20,10 +18,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         #endif
 
         return true
-    }
-
-    func userNotificationCenter(_: UNUserNotificationCenter, willPresent _: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler([.list, .banner, .sound, .badge])
     }
 }
 
@@ -54,5 +48,27 @@ struct HDrezkaApp: App {
                 .preferredColorScheme(theme.scheme)
         }
         .modelContainer(modelContainer)
+        .commands(content: customCommands)
+        .commands(content: removed)
+    }
+
+    @CommandsBuilder
+    func customCommands() -> some Commands {
+        CommandGroup(replacing: .help) {
+            Link(destination: Const.github) {
+                Text("key.github")
+            }
+        }
+    }
+
+    @CommandsBuilder
+    func removed() -> some Commands {
+        CommandGroup(replacing: .importExport) {}
+        CommandGroup(replacing: .newItem) {}
+        CommandGroup(replacing: .printItem) {}
+        CommandGroup(replacing: .saveItem) {}
+        CommandGroup(replacing: .sidebar) {}
+        CommandGroup(replacing: .systemServices) {}
+        CommandGroup(replacing: .toolbar) {}
     }
 }
