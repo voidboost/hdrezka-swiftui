@@ -158,6 +158,7 @@ struct OpenExternalPlayerSheetView: View {
                                     .menuIndicator(.hidden)
                                     .buttonStyle(.plain)
                                     .labelStyle(CustomLabelStyle(iconVisible: acting.count > 1))
+                                    .disabled(acting.isEmpty != false)
                                 }
                                 .padding(.vertical, 10)
                                 .overlay {
@@ -206,6 +207,7 @@ struct OpenExternalPlayerSheetView: View {
                                     .menuIndicator(.hidden)
                                     .buttonStyle(.plain)
                                     .labelStyle(CustomLabelStyle(iconVisible: (seasons?.count ?? 0) > 1))
+                                    .disabled(seasons?.isEmpty != false)
                                 }
                                 .padding(.vertical, 10)
                                 .overlay {
@@ -250,6 +252,7 @@ struct OpenExternalPlayerSheetView: View {
                                     .menuIndicator(.hidden)
                                     .buttonStyle(.plain)
                                     .labelStyle(CustomLabelStyle(iconVisible: (selectedSeason?.episodes.count ?? 0) > 1))
+                                    .disabled(selectedSeason?.episodes.isEmpty != false)
                                 }
                                 .padding(.vertical, 10)
                                 .overlay {
@@ -329,6 +332,7 @@ struct OpenExternalPlayerSheetView: View {
                             .menuIndicator(.hidden)
                             .buttonStyle(.plain)
                             .labelStyle(CustomLabelStyle(iconVisible: ((movie?.getAvailableQualities().count ?? 0) + (movie?.getLockedQualities().count ?? 0)) > 1))
+                            .disabled(movie?.getAvailableQualities().isEmpty != false)
                         }
                         .padding(.horizontal, 15)
                         .padding(.vertical, 15)
