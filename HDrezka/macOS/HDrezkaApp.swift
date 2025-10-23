@@ -47,10 +47,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         Downloader.shared.terminate()
     }
 
-    func application(_: NSApplication, willEncodeRestorableState _: NSCoder) {}
-
-    func application(_: NSApplication, didDecodeRestorableState _: NSCoder) {}
-
     func userNotificationCenter(_: UNUserNotificationCenter, willPresent _: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.list, .banner, .sound, .badge])
     }
