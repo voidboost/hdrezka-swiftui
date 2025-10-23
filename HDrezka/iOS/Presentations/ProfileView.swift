@@ -66,11 +66,11 @@ struct ProfileView: View {
                     }
                 }
 
-                NavigationLink(value: "") {
+                NavigationLink(value: Destinations.settings) {
                     Image(systemName: "gear")
                 }
             }
         }
-//        .background(.background)
+        .background(.background)
     }
 }

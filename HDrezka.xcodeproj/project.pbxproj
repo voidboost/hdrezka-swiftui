@@ -60,6 +60,7 @@
 				iOS/Presentations/Components/Player/PlayerView.swift = (ios, );
 				iOS/Presentations/Components/Player/SliderWithText.swift = (ios, );
 				iOS/Presentations/Components/Player/SliderWithoutText.swift = (ios, );
+				iOS/Presentations/Components/SettingsView.swift = (ios, );
 				iOS/Presentations/Components/Sheets/BookmarksSheetView.swift = (ios, );
 				iOS/Presentations/Components/Sheets/CommentReportSheet.swift = (ios, );
 				iOS/Presentations/Components/Sheets/CommentsRulesSheet.swift = (ios, );

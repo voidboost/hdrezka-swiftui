@@ -105,6 +105,7 @@ enum Destinations: Hashable, Identifiable {
     case list(MovieList)
     case person(PersonSimple)
     case comments(MovieDetailed)
+    case settings
 
     static func fromNamed(_ item: some Named) -> Destinations {
         if let country = item as? MovieCountry {
@@ -163,6 +164,9 @@ extension View {
             case let .comments(details):
                 CommentsView(details: details)
                     .id(details.movieId)
+            case .settings:
+                SettingsView()
+                    .id("settings")
             }
         }
     }
