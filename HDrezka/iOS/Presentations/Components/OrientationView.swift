@@ -14,7 +14,7 @@ struct OrientationView<Portrait: View, Landscape: View>: View {
 
     init(
         @ViewBuilder portrait: @escaping (Namespace.ID) -> Portrait,
-        @ViewBuilder landscape: @escaping (Namespace.ID) -> Landscape
+        @ViewBuilder landscape: @escaping (Namespace.ID) -> Landscape,
     ) {
         self.portrait = portrait
         self.landscape = landscape
