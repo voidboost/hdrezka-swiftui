@@ -1,6 +1,7 @@
 import Algorithms
 import Combine
 import Defaults
+import Kingfisher
 import Pow
 import SwiftUI
 
@@ -195,17 +196,18 @@ struct CommentsView: View {
             VStack(alignment: .leading, spacing: 16) {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(alignment: .center, spacing: 8) {
-                        AsyncImage(url: URL(string: comment.photo), transaction: .init(animation: .easeInOut)) { phase in
-                            if let image = phase.image {
-                                image.resizable()
-                            } else {
+                        KFImage
+                            .url(URL(string: comment.photo))
+                            .placeholder {
                                 Color.gray.shimmering()
                             }
-                        }
-                        .scaledToFill()
-                        .frame(width: 24, height: 24)
-                        .clipShape(.circle)
-                        .overlay(.tertiary.opacity(0.2), in: .circle.stroke(lineWidth: 1))
+                            .resizable()
+                            .loadTransition(.blurReplace, animation: .easeInOut)
+                            .cancelOnDisappear(true)
+                            .scaledToFill()
+                            .frame(width: 24, height: 24)
+                            .clipShape(.circle)
+                            .overlay(.tertiary.opacity(0.2), in: .circle.stroke(lineWidth: 1))
 
                         Text(comment.author)
                             .font(.body.bold())
@@ -267,16 +269,17 @@ struct CommentsView: View {
                                         HStack(alignment: .center, spacing: 10) {
                                             ForEach(likes) { like in
                                                 VStack(alignment: .center, spacing: 5) {
-                                                    AsyncImage(url: URL(string: like.photo), transaction: .init(animation: .easeInOut)) { phase in
-                                                        if let image = phase.image {
-                                                            image.resizable()
-                                                        } else {
+                                                    KFImage
+                                                        .url(URL(string: like.photo))
+                                                        .placeholder {
                                                             Color.gray.shimmering()
                                                         }
-                                                    }
-                                                    .scaledToFill()
-                                                    .frame(width: 60, height: 60)
-                                                    .clipShape(.circle)
+                                                        .resizable()
+                                                        .loadTransition(.blurReplace, animation: .easeInOut)
+                                                        .cancelOnDisappear(true)
+                                                        .scaledToFill()
+                                                        .frame(width: 60, height: 60)
+                                                        .clipShape(.circle)
 
                                                     Text(like.name)
                                                         .lineLimit(1)

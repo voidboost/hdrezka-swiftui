@@ -16,6 +16,7 @@
 		DE2D67382DC3D5E900A9187C /* LicensesList in Frameworks */ = {isa = PBXBuildFile; productRef = DE2D67372DC3D5E900A9187C /* LicensesList */; };
 		DE3DCCE62DFB92050062CF81 /* SwiftFormat in Frameworks */ = {isa = PBXBuildFile; productRef = DE3DCCE52DFB92050062CF81 /* SwiftFormat */; };
 		DE3EF0392CFF04CA0022C311 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DE3EF0382CFF04CA0022C311 /* Alamofire */; };
+		DE4AD63E2EAA4A7200CE7AB3 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = DE4AD63D2EAA4A7200CE7AB3 /* Kingfisher */; };
 		DEB035B52C89E1DB004ABFA1 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B42C89E1DB004ABFA1 /* FirebaseAnalytics */; };
 		DEB035B72C89E1DB004ABFA1 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B62C89E1DB004ABFA1 /* FirebaseCrashlytics */; };
 		DEB035BA2C89E57A004ABFA1 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B92C89E57A004ABFA1 /* Defaults */; };
@@ -83,6 +84,7 @@
 				iOS/Presentations/SearchView.swift = (ios, );
 				iOS/Presentations/WatchingLaterView.swift = (ios, );
 				iOS/Resources/Assets.xcassets = (ios, );
+				iOS/Utils/RemoveBackgroundImageProcessor.swift = (ios, );
 				iOS/Utils/UIImage.swift = (ios, );
 				macOS/Core/AppState.swift = (macos, );
 				macOS/Core/Const.swift = (macos, );
@@ -148,6 +150,7 @@
 				"macOS/Resources/aria2c-arm64" = (macos, );
 				"macOS/Resources/aria2c-x86_64" = (macos, );
 				macOS/Utils/NSImage.swift = (macos, );
+				macOS/Utils/RemoveBackgroundImageProcessor.swift = (macos, );
 				macOS/Utils/WindowAccessor.swift = (macos, );
 			};
 			target = 04B3CA732BA06C9C0039F76E /* HDrezka */;
@@ -179,6 +182,7 @@
 				04B3CA8A2BA06CAC0039F76E /* SwiftSoup in Frameworks */,
 				DE3EF0392CFF04CA0022C311 /* Alamofire in Frameworks */,
 				DEE64D0B2C8869D0002C2F2F /* Sparkle in Frameworks */,
+				DE4AD63E2EAA4A7200CE7AB3 /* Kingfisher in Frameworks */,
 				DE188EE52CA6AB3100E7B1AE /* Pow in Frameworks */,
 				04E5DC0A2C120C4200BF1B7A /* Flow in Frameworks */,
 				DEF920382DD5CAF20087C32C /* FactoryKit in Frameworks */,
@@ -243,6 +247,7 @@
 				DE2D67372DC3D5E900A9187C /* LicensesList */,
 				DEF920372DD5CAF20087C32C /* FactoryKit */,
 				DE3DCCE52DFB92050062CF81 /* SwiftFormat */,
+				DE4AD63D2EAA4A7200CE7AB3 /* Kingfisher */,
 			);
 			productName = HDRezka;
 			productReference = 04B3CA742BA06C9C0039F76E /* HDrezka.app */;
@@ -286,6 +291,7 @@
 				DE3EF0372CFF04CA0022C311 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				DEF920362DD5CAF20087C32C /* XCRemoteSwiftPackageReference "Factory" */,
 				DE3DCCE42DFB92050062CF81 /* XCRemoteSwiftPackageReference "SwiftFormat" */,
+				DE4AD63C2EAA4A7200CE7AB3 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 04B3CA752BA06C9C0039F76E /* Products */;
@@ -724,6 +730,15 @@
 				minimumVersion = 0.0.1;
 			};
 		};
+		DE4AD63C2EAA4A7200CE7AB3 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 999.0.0;
+				minimumVersion = 0.0.1;
+			};
+		};
 		DEB035B32C89E1DB004ABFA1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
@@ -806,6 +821,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DE3EF0372CFF04CA0022C311 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		DE4AD63D2EAA4A7200CE7AB3 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DE4AD63C2EAA4A7200CE7AB3 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
 		};
 		DEB035B42C89E1DB004ABFA1 /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
