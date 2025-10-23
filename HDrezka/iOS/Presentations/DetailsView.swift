@@ -170,8 +170,6 @@ struct DetailsView: View {
         private let topSafeAreaInset: CGFloat
         @Binding private var isSchedulePresented: Bool
 
-//        @Environment(Downloader.self) private var downloader
-
         @Binding private var countryDestination: MovieCountry?
         @Binding private var genreDestination: MovieGenre?
         @Binding private var personDestination: PersonSimple?
@@ -281,27 +279,6 @@ struct DetailsView: View {
                                                 .background(Color.accentColor, in: .capsule)
                                         }
                                         .buttonStyle(.plain)
-
-                                        //                                    if downloader.isRunning {
-                                        //                                        Button {
-                                        //                                            isDownloadPresented = true
-                                        //                                        } label: {
-                                        //                                            Label("key.download", systemImage: "arrow.down.circle")
-                                        //                                                .font(.body)
-                                        //                                                .foregroundStyle(Color.accentColor)
-                                        //                                                .padding(.horizontal, 14)
-                                        //                                                .padding(.vertical, 7)
-                                        //                                                .lineLimit(1)
-                                        //                                                .contentShape(.capsule)
-                                        //                                                .background(.tertiary.opacity(0.05), in: .capsule)
-                                        //                                                .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
-                                        //                                        }
-                                        //                                        .buttonStyle(.plain)
-                                        //                                        .sheet(isPresented: $isDownloadPresented) {
-                                        //                                            DownloadSheetView(id: details.movieId)
-                                        //                                    .presentationSizing(.fitted)
-                                        //                                        }
-                                        //                                    }
 
                                         if ExternalPlayers.allCases.contains(where: { UIApplication.shared.canOpenURL($0.url) }) {
                                             Button {
@@ -568,27 +545,6 @@ struct DetailsView: View {
                                                 .background(Color.accentColor, in: .capsule)
                                         }
                                         .buttonStyle(.plain)
-
-                                        //                                    if downloader.isRunning {
-                                        //                                        Button {
-                                        //                                            isDownloadPresented = true
-                                        //                                        } label: {
-                                        //                                            Label("key.download", systemImage: "arrow.down.circle")
-                                        //                                                .font(.body)
-                                        //                                                .foregroundStyle(Color.accentColor)
-                                        //                                                .padding(.horizontal, 14)
-                                        //                                                .padding(.vertical, 7)
-                                        //                                                .lineLimit(1)
-                                        //                                                .contentShape(.capsule)
-                                        //                                                .background(.tertiary.opacity(0.05), in: .capsule)
-                                        //                                                .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
-                                        //                                        }
-                                        //                                        .buttonStyle(.plain)
-                                        //                                        .sheet(isPresented: $isDownloadPresented) {
-                                        //                                            DownloadSheetView(id: details.movieId)
-//                                        .presentationSizing(.fitted)
-                                        //                                        }
-                                        //                                    }
 
                                         if ExternalPlayers.allCases.contains(where: { UIApplication.shared.canOpenURL($0.url) }) {
                                             Button {
