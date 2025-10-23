@@ -1,4 +1,5 @@
 import AVFoundation
+import Kingfisher
 import SwiftUI
 
 struct SliderWithText<T: BinaryFloatingPoint>: View {
@@ -100,25 +101,27 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                     )
                     .overlay {
                         if isActive, let cue = thumbnails?.cues.first(where: { TimeInterval(unitSeekImage) * TimeInterval(inRange.upperBound) > $0.timeStart && TimeInterval(unitSeekImage) * TimeInterval(inRange.upperBound) < $0.timeEnd }), let imageUrl = cue.imageUrl, let frame = cue.frame {
-                            AsyncImage(url: URL(string: imageUrl), transaction: .init(animation: .easeInOut)) { phase in
-                                if let image = phase.image, let uiImage = ImageRenderer(content: image).cgImage?.crop(to: frame) {
-                                    Image(uiImage: uiImage).resizable()
-                                } else {
+                            KFImage
+                                .url(URL(string: imageUrl))
+                                .placeholder {
                                     ProgressView().scaleEffect(0.75)
                                 }
-                            }
-                            .scaledToFill()
-                            .frame(width: frame.width, height: frame.height)
-                            .clipShape(.rect(cornerRadius: 6))
-                            .background(.ultraThinMaterial, in: .rect(cornerRadius: 6))
-                            .overlay(.ultraThinMaterial, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
-                            .overlay(alignment: .bottom) {
-                                Text((T(Float(unitSeekImage)) * inRange.upperBound).asTimeString(style: .positional))
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .padding(3)
-                            }
-                            .position(x: min(max(unitSeekImage * geometry.size.width, frame.width * 0.5), geometry.size.width - frame.width * 0.5), y: -(frame.height * 0.5) - 6)
+                                .resizable()
+                                .cropping(rect: frame)
+                                .loadTransition(.blurReplace, animation: .easeInOut)
+                                .cancelOnDisappear(true)
+                                .scaledToFill()
+                                .frame(width: frame.width, height: frame.height)
+                                .clipShape(.rect(cornerRadius: 6))
+                                .background(.ultraThinMaterial, in: .rect(cornerRadius: 6))
+                                .overlay(.ultraThinMaterial, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                                .overlay(alignment: .bottom) {
+                                    Text((T(Float(unitSeekImage)) * inRange.upperBound).asTimeString(style: .positional))
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                        .padding(3)
+                                }
+                                .position(x: min(max(unitSeekImage * geometry.size.width, frame.width * 0.5), geometry.size.width - frame.width * 0.5), y: -(frame.height * 0.5) - 6)
                         }
                     }
                 }
@@ -172,13 +175,5 @@ extension BinaryFloatingPoint {
         formatter.unitsStyle = style
         formatter.zeroFormattingBehavior = .pad
         return formatter.string(from: TimeInterval(self)) ?? ""
-    }
-}
-
-private extension CGImage {
-    func crop(to rect: CGRect) -> UIImage? {
-        guard let cutImageRef = cropping(to: rect) else { return nil }
-
-        return UIImage(cgImage: cutImageRef)
     }
 }

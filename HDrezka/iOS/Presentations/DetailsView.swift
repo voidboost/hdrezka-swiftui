@@ -1,7 +1,6 @@
-import CoreImage.CIFilterBuiltins
 import Defaults
+import Kingfisher
 import SwiftUI
-import Vision
 import YouTubePlayerKit
 
 struct DetailsView: View {
@@ -226,23 +225,25 @@ struct DetailsView: View {
                                     openWindow(id: "imageViewer", value: url)
                                 }
                             } label: {
-                                AsyncImage(url: URL(string: details.hposter), transaction: .init(animation: .easeInOut)) { phase in
-                                    if let image = phase.image {
-                                        image.resizable()
-                                    } else {
-                                        AsyncImage(url: URL(string: details.poster), transaction: .init(animation: .easeInOut)) { phase in
-                                            if let image = phase.image {
-                                                image.resizable()
-                                            } else {
+                                KFImage
+                                    .url(URL(string: details.hposter))
+                                    .placeholder {
+                                        KFImage
+                                            .url(URL(string: details.poster))
+                                            .placeholder {
                                                 Color.gray.shimmering()
                                             }
-                                        }
+                                            .resizable()
+                                            .loadTransition(.blurReplace, animation: .easeInOut)
+                                            .cancelOnDisappear(true)
                                     }
-                                }
-                                .imageFill(2 / 3)
-                                .frame(width: 300)
-                                .contentShape(.rect(cornerRadius: 6))
-                                .clipShape(.rect(cornerRadius: 6))
+                                    .resizable()
+                                    .loadTransition(.blurReplace, animation: .easeInOut)
+                                    .cancelOnDisappear(true)
+                                    .imageFill(2 / 3)
+                                    .frame(width: 300)
+                                    .contentShape(.rect(cornerRadius: 6))
+                                    .clipShape(.rect(cornerRadius: 6))
                             }
                             .buttonStyle(.plain)
                             .matchedGeometryEffect(id: "poster", in: orientation)
@@ -511,23 +512,25 @@ struct DetailsView: View {
                                     openWindow(id: "imageViewer", value: url)
                                 }
                             } label: {
-                                AsyncImage(url: URL(string: details.hposter), transaction: .init(animation: .easeInOut)) { phase in
-                                    if let image = phase.image {
-                                        image.resizable()
-                                    } else {
-                                        AsyncImage(url: URL(string: details.poster), transaction: .init(animation: .easeInOut)) { phase in
-                                            if let image = phase.image {
-                                                image.resizable()
-                                            } else {
+                                KFImage
+                                    .url(URL(string: details.hposter))
+                                    .placeholder {
+                                        KFImage
+                                            .url(URL(string: details.poster))
+                                            .placeholder {
                                                 Color.gray.shimmering()
                                             }
-                                        }
+                                            .resizable()
+                                            .loadTransition(.blurReplace, animation: .easeInOut)
+                                            .cancelOnDisappear(true)
                                     }
-                                }
-                                .imageFill(2 / 3)
-                                .frame(width: 300)
-                                .contentShape(.rect(cornerRadius: 6))
-                                .clipShape(.rect(cornerRadius: 6))
+                                    .resizable()
+                                    .loadTransition(.blurReplace, animation: .easeInOut)
+                                    .cancelOnDisappear(true)
+                                    .imageFill(2 / 3)
+                                    .frame(width: 300)
+                                    .contentShape(.rect(cornerRadius: 6))
+                                    .clipShape(.rect(cornerRadius: 6))
                             }
                             .buttonStyle(.plain)
                             .matchedGeometryEffect(id: "poster", in: orientation)
@@ -854,17 +857,18 @@ struct DetailsView: View {
             .padding(.top, topSafeAreaInset)
             .background {
                 ZStack {
-                    AsyncImage(url: URL(string: details.poster), transaction: .init(animation: .easeInOut)) { phase in
-                        if let image = phase.image {
-                            image.resizable()
-                        } else {
+                    KFImage
+                        .url(URL(string: details.poster))
+                        .placeholder {
                             Color.gray
                         }
-                    }
-                    .scaledToFill()
-                    .frame(maxWidth: .infinity)
-                    .frame(height: blurHeght)
-                    .clipShape(.rect)
+                        .resizable()
+                        .loadTransition(.opacity, animation: .easeInOut)
+                        .cancelOnDisappear(true)
+                        .scaledToFill()
+                        .frame(maxWidth: .infinity)
+                        .frame(height: blurHeght)
+                        .clipShape(.rect)
 
                     Rectangle().fill(.ultraThickMaterial)
 
@@ -1359,19 +1363,21 @@ struct DetailsView: View {
                                         } label: {
                                             if let person = item as? PersonSimple, !person.photo.isEmpty {
                                                 HStack(alignment: .center, spacing: 8) {
-                                                    AsyncImage(url: URL(string: person.photo), transaction: .init(animation: .easeInOut)) { phase in
-                                                        if let image = phase.image, let uiImage = ImageRenderer(content: image).cgImage?.removeBackground() {
-                                                            Image(uiImage: uiImage).resizable()
-                                                        } else {
+                                                    KFImage
+                                                        .url(URL(string: person.photo))
+                                                        .placeholder {
                                                             Color.gray.shimmering()
                                                         }
-                                                    }
-                                                    .imageFill(2 / 3)
-                                                    .frame(width: 36, height: 36)
-                                                    .background(.quinary)
-                                                    .clipShape(.circle)
-                                                    .padding(2)
-                                                    .overlay(.tertiary.opacity(0.2), in: .circle.stroke(lineWidth: 1))
+                                                        .resizable()
+                                                        .loadTransition(.blurReplace, animation: .easeInOut)
+                                                        .removeBackground()
+                                                        .cancelOnDisappear(true)
+                                                        .imageFill(2 / 3)
+                                                        .frame(width: 36, height: 36)
+                                                        .background(.quinary)
+                                                        .clipShape(.circle)
+                                                        .padding(2)
+                                                        .overlay(.tertiary.opacity(0.2), in: .circle.stroke(lineWidth: 1))
 
                                                     Text(person.name)
                                                         .font(.body)
@@ -1509,20 +1515,21 @@ struct DetailsView: View {
                     show = true
                 }
                 .popover(isPresented: $show) {
-                    AsyncImage(url: URL(string: person.photo), transaction: .init(animation: .easeInOut)) { phase in
-                        if let image = phase.image, let uiImage = ImageRenderer(content: image).cgImage?.removeBackground() {
-                            Image(uiImage: uiImage).resizable()
-                        } else {
+                    KFImage
+                        .url(URL(string: person.photo))
+                        .placeholder {
                             Color.gray.shimmering()
                         }
-                    }
-                    .imageFill(2 / 3)
-                    .frame(width: 64, height: 64)
-                    .background(.quinary)
-                    .clipShape(.circle)
-                    .padding(4)
-                    .overlay(.tertiary.opacity(0.2), in: .circle.stroke(lineWidth: 1))
-                    .padding(4)
+                        .resizable()
+                        .loadTransition(.blurReplace, animation: .easeInOut)
+                        .removeBackground()
+                        .cancelOnDisappear(true)
+                        .frame(width: 64, height: 64)
+                        .background(.quinary)
+                        .clipShape(.circle)
+                        .padding(4)
+                        .overlay(.tertiary.opacity(0.2), in: .circle.stroke(lineWidth: 1))
+                        .padding(4)
                 }
         }
     }
@@ -1636,48 +1643,5 @@ struct DetailsView: View {
                 Spacer()
             }
         }
-    }
-}
-
-private extension CGImage {
-    func removeBackground() -> UIImage? {
-        guard let uiImage = processImage(image: self) else {
-            return UIImage(cgImage: self)
-        }
-
-        return uiImage
-    }
-
-    func processImage(image: CGImage) -> UIImage? {
-        let inputImage = CIImage(cgImage: image)
-        let handler = VNImageRequestHandler(ciImage: inputImage)
-        let request = VNGenerateForegroundInstanceMaskRequest()
-
-        do { try handler.perform([request]) } catch { return nil }
-
-        guard let result = request.results?.first,
-              let maskPixelBuffer = try? result.generateScaledMaskForImage(forInstances: result.allInstances, from: handler),
-              let outputImage = inputImage.apply(maskImage: CIImage(cvPixelBuffer: maskPixelBuffer))
-        else {
-            return nil
-        }
-
-        return outputImage.render()
-    }
-}
-
-private extension CIImage {
-    func render() -> UIImage? {
-        guard let cgImage = CIContext(options: nil).createCGImage(self, from: extent) else { return nil }
-
-        return UIImage(cgImage: cgImage)
-    }
-
-    func apply(maskImage: CIImage) -> CIImage? {
-        let filter = CIFilter.blendWithMask()
-        filter.inputImage = self
-        filter.maskImage = maskImage
-        filter.backgroundImage = CIImage.empty()
-        return filter.outputImage
     }
 }

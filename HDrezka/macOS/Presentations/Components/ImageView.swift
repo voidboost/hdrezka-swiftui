@@ -1,3 +1,4 @@
+import Kingfisher
 import SwiftUI
 
 struct ImageView: View {
@@ -13,14 +14,15 @@ struct ImageView: View {
 
     var body: some View {
         ZStack(alignment: .center) {
-            AsyncImage(url: url, transaction: .init(animation: .easeInOut)) { phase in
-                if let image = phase.image {
-                    image.resizable()
-                } else {
+            KFImage
+                .url(url)
+                .placeholder {
                     ProgressView()
                 }
-            }
-            .scaledToFit()
+                .resizable()
+                .loadTransition(.blurReplace, animation: .easeInOut)
+                .cancelOnDisappear(true)
+                .scaledToFit()
 
             VStack {
                 Spacer()
@@ -55,15 +57,16 @@ struct ImageView: View {
             dismiss()
         }
         .background {
-            AsyncImage(url: url, transaction: .init(animation: .easeInOut)) { phase in
-                if let image = phase.image {
-                    image.resizable()
-                } else {
+            KFImage
+                .url(url)
+                .placeholder {
                     Color.gray
                 }
-            }
-            .scaledToFill()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .resizable()
+                .loadTransition(.opacity, animation: .easeInOut)
+                .cancelOnDisappear(true)
+                .scaledToFill()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             Rectangle().fill(.ultraThickMaterial)
         }

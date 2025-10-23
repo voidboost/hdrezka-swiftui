@@ -1,4 +1,5 @@
 import Defaults
+import Kingfisher
 import SwiftUI
 
 struct PersonView: View {
@@ -87,23 +88,25 @@ struct PersonView: View {
                             openWindow(id: "imageViewer", value: url)
                         }
                     } label: {
-                        AsyncImage(url: URL(string: details.hphoto), transaction: .init(animation: .easeInOut)) { phase in
-                            if let image = phase.image {
-                                image.resizable()
-                            } else {
-                                AsyncImage(url: URL(string: details.photo), transaction: .init(animation: .easeInOut)) { phase in
-                                    if let image = phase.image {
-                                        image.resizable()
-                                    } else {
+                        KFImage
+                            .url(URL(string: details.hphoto))
+                            .placeholder {
+                                KFImage
+                                    .url(URL(string: details.photo))
+                                    .placeholder {
                                         Color.gray.shimmering()
                                     }
-                                }
+                                    .resizable()
+                                    .loadTransition(.blurReplace, animation: .easeInOut)
+                                    .cancelOnDisappear(true)
                             }
-                        }
-                        .imageFill(2 / 3)
-                        .frame(width: 250)
-                        .contentShape(.rect(cornerRadius: 6))
-                        .clipShape(.rect(cornerRadius: 6))
+                            .resizable()
+                            .loadTransition(.blurReplace, animation: .easeInOut)
+                            .cancelOnDisappear(true)
+                            .imageFill(2 / 3)
+                            .frame(width: 250)
+                            .contentShape(.rect(cornerRadius: 6))
+                            .clipShape(.rect(cornerRadius: 6))
                     }
                     .buttonStyle(.plain)
                     .matchedGeometryEffect(id: "poster", in: orientation)
@@ -198,23 +201,25 @@ struct PersonView: View {
                             openWindow(id: "imageViewer", value: url)
                         }
                     } label: {
-                        AsyncImage(url: URL(string: details.hphoto), transaction: .init(animation: .easeInOut)) { phase in
-                            if let image = phase.image {
-                                image.resizable()
-                            } else {
-                                AsyncImage(url: URL(string: details.photo), transaction: .init(animation: .easeInOut)) { phase in
-                                    if let image = phase.image {
-                                        image.resizable()
-                                    } else {
+                        KFImage
+                            .url(URL(string: details.hphoto))
+                            .placeholder {
+                                KFImage
+                                    .url(URL(string: details.photo))
+                                    .placeholder {
                                         Color.gray.shimmering()
                                     }
-                                }
+                                    .resizable()
+                                    .loadTransition(.blurReplace, animation: .easeInOut)
+                                    .cancelOnDisappear(true)
                             }
-                        }
-                        .imageFill(2 / 3)
-                        .frame(width: 250)
-                        .contentShape(.rect(cornerRadius: 6))
-                        .clipShape(.rect(cornerRadius: 6))
+                            .resizable()
+                            .loadTransition(.blurReplace, animation: .easeInOut)
+                            .cancelOnDisappear(true)
+                            .imageFill(2 / 3)
+                            .frame(width: 250)
+                            .contentShape(.rect(cornerRadius: 6))
+                            .clipShape(.rect(cornerRadius: 6))
                     }
                     .buttonStyle(.plain)
                     .matchedGeometryEffect(id: "poster", in: orientation)

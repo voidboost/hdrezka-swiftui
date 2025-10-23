@@ -1,3 +1,4 @@
+import Kingfisher
 import SwiftUI
 
 struct WatchingLaterCardView: View {
@@ -13,71 +14,72 @@ struct WatchingLaterCardView: View {
     var body: some View {
         NavigationLink(value: Destinations.details(MovieSimple(movieId: movie.watchLaterId, name: movie.name, poster: movie.cover))) {
             VStack(alignment: .leading, spacing: 6) {
-                AsyncImage(url: URL(string: movie.cover), transaction: .init(animation: .easeInOut)) { phase in
-                    if let image = phase.image {
-                        image.resizable()
-                    } else {
+                KFImage
+                    .url(URL(string: movie.cover))
+                    .placeholder {
                         Color.gray.shimmering()
                     }
-                }
-                .imageFill(2 / 3)
-                .clipShape(.rect(cornerRadius: 6))
-                .overlay(alignment: .bottomLeading) {
-                    UnevenRoundedRectangle(bottomLeadingRadius: 6, bottomTrailingRadius: 6)
-                        .fill(.ultraThinMaterial)
-                        .mask {
-                            LinearGradient(stops: [
-                                .init(color: .clear, location: ((outerHeight - innerHeight) / outerHeight) * 0.75),
-                                .init(color: .black, location: (outerHeight - innerHeight) / outerHeight),
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom)
-                        }
-                }
-                .overlay(alignment: .bottomLeading) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        VStack(alignment: .leading) {
-                            if !movie.watchingInfo.isEmpty, let last = movie.watchingInfo.split(separator: "(", maxSplits: 1).last {
-                                Text(String(last).trim().removeLastCharacterIf(character: ")"))
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(movie.buttonText != nil && !movie.watched ? Color.secondary : Color.primary)
-                                    .lineLimit(1)
+                    .resizable()
+                    .loadTransition(.blurReplace, animation: .easeInOut)
+                    .cancelOnDisappear(true)
+                    .imageFill(2 / 3)
+                    .clipShape(.rect(cornerRadius: 6))
+                    .overlay(alignment: .bottomLeading) {
+                        UnevenRoundedRectangle(bottomLeadingRadius: 6, bottomTrailingRadius: 6)
+                            .fill(.ultraThinMaterial)
+                            .mask {
+                                LinearGradient(stops: [
+                                    .init(color: .clear, location: ((outerHeight - innerHeight) / outerHeight) * 0.75),
+                                    .init(color: .black, location: (outerHeight - innerHeight) / outerHeight),
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom)
+                            }
+                    }
+                    .overlay(alignment: .bottomLeading) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            VStack(alignment: .leading) {
+                                if !movie.watchingInfo.isEmpty, let last = movie.watchingInfo.split(separator: "(", maxSplits: 1).last {
+                                    Text(String(last).trim().removeLastCharacterIf(character: ")"))
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(movie.buttonText != nil && !movie.watched ? Color.secondary : Color.primary)
+                                        .lineLimit(1)
+                                }
+
+                                if !movie.watchingInfo.isEmpty, movie.watchingInfo.split(separator: "(", maxSplits: 1).count > 1, let first = movie.watchingInfo.split(separator: "(", maxSplits: 1).first {
+                                    Text(String(first).trim())
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(movie.buttonText != nil && !movie.watched ? Color.secondary : Color.primary)
+                                        .lineLimit(1)
+                                }
                             }
 
-                            if !movie.watchingInfo.isEmpty, movie.watchingInfo.split(separator: "(", maxSplits: 1).count > 1, let first = movie.watchingInfo.split(separator: "(", maxSplits: 1).first {
-                                Text(String(first).trim())
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(movie.buttonText != nil && !movie.watched ? Color.secondary : Color.primary)
-                                    .lineLimit(1)
-                            }
-                        }
-
-                        if let text = movie.buttonText, !text.isEmpty, !movie.watched {
-                            VStack(alignment: .leading, spacing: 0) {
-                                Text(text.split(separator: " ", maxSplits: 2).dropLast().joined(separator: " ").firstLetterUppercased())
-                                    .font(.caption.weight(.medium))
-                                    .foregroundStyle(.primary)
-
-                                if let last = text.split(separator: " ", maxSplits: 2).last {
-                                    Text(last)
+                            if let text = movie.buttonText, !text.isEmpty, !movie.watched {
+                                VStack(alignment: .leading, spacing: 0) {
+                                    Text(text.split(separator: " ", maxSplits: 2).dropLast().joined(separator: " ").firstLetterUppercased())
                                         .font(.caption.weight(.medium))
                                         .foregroundStyle(.primary)
+
+                                    if let last = text.split(separator: " ", maxSplits: 2).last {
+                                        Text(last)
+                                            .font(.caption.weight(.medium))
+                                            .foregroundStyle(.primary)
+                                    }
                                 }
                             }
                         }
+                        .padding(6)
+                        .onGeometryChange(for: CGFloat.self) { geometry in
+                            geometry.size.height
+                        } action: { height in
+                            innerHeight = height
+                        }
                     }
-                    .padding(6)
                     .onGeometryChange(for: CGFloat.self) { geometry in
                         geometry.size.height
                     } action: { height in
-                        innerHeight = height
+                        outerHeight = height
                     }
-                }
-                .onGeometryChange(for: CGFloat.self) { geometry in
-                    geometry.size.height
-                } action: { height in
-                    outerHeight = height
-                }
 
                 VStack(alignment: .leading) {
                     Text(movie.name)
