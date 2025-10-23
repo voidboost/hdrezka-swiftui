@@ -8,7 +8,7 @@ class Const {
 
     static let redirectMirror = URL(string: "https://rzk.link/")!
 
-    static let github = URL(string: "https://github.com/voidboost/hdrezka-macos")!
+    static let github = URL(string: "https://github.com/voidboost/hdrezka-swiftui")!
 
     static let helpUkraine = URL(string: "https://u24.gov.ua/")!
 
@@ -49,7 +49,7 @@ class Const {
                 .init(name: "X-Hdrezka-Android-App", value: "1"),
                 .init(name: "X-Hdrezka-Android-App-Version", value: Defaults[.lastHdrezkaAppVersion]),
                 .userAgent(userAgent),
-            ] : [.userAgent(userAgent)],
+            ] : [.userAgent(userAgent)]
         )
     }
 }
