@@ -20,7 +20,7 @@ struct SliderWithoutText<T: BinaryFloatingPoint>: View {
         fillColor: Color,
         emptyColor: Color,
         height: CGFloat,
-        onEditingChanged: @escaping (Bool) -> Void,
+        onEditingChanged: @escaping (Bool) -> Void = { _ in },
     ) {
         _value = value
         self.inRange = inRange

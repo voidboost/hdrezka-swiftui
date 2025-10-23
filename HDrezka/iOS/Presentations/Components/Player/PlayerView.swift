@@ -190,10 +190,6 @@ struct PlayerView: View {
                                                     if drag.startLocation.x > geometry.size.width / 2 {
                                                         let delta = -drag.translation.height / (geometry.size.height / 2)
 
-                                                        if isMuted {
-                                                            player.isMuted.toggle()
-                                                        }
-
                                                         player.volume = min(max(initialVolume + Float(delta), 0), 1)
                                                     }
                                                 }
@@ -210,13 +206,9 @@ struct PlayerView: View {
                                         volume
                                     } set: { volume in
                                         player.volume = volume
-                                    }, inRange: 0 ... 1, activeFillColor: .primary, fillColor: .primary.opacity(0.7), emptyColor: .primary.opacity(0.3), height: 8) { onEditingChanged in
-                                        if onEditingChanged, isMuted {
-                                            player.isMuted.toggle()
-                                        }
-                                    }
-                                    .frame(width: 120, height: 10)
-                                    .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+                                    }, inRange: 0 ... 1, activeFillColor: .primary, fillColor: .primary.opacity(0.7), emptyColor: .primary.opacity(0.3), height: 8)
+                                        .frame(width: 120, height: 10)
+                                        .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
 
                                     VStack(alignment: .center) {
                                         Button {
@@ -760,6 +752,10 @@ struct PlayerView: View {
                 .sink { volume in
                     withAnimation(.easeInOut(duration: 0.15)) {
                         self.volume = volume
+                    }
+
+                    if isMuted {
+                        player.isMuted.toggle()
                     }
 
                     setMask(!isPictureInPictureActive)
