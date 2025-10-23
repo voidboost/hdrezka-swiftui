@@ -2,8 +2,10 @@ import Combine
 import SwiftUI
 
 struct OrientationView<Portrait: View, Landscape: View>: View {
-    @State private var orientation: UIDeviceOrientation?
+    @State private var orientation: UIDeviceOrientation = UIDevice.current.orientation
     @State private var subscriptions: Set<AnyCancellable> = []
+
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     @Namespace private var animation
 
@@ -12,7 +14,7 @@ struct OrientationView<Portrait: View, Landscape: View>: View {
 
     init(
         @ViewBuilder portrait: @escaping (Namespace.ID) -> Portrait,
-        @ViewBuilder landscape: @escaping (Namespace.ID) -> Landscape,
+        @ViewBuilder landscape: @escaping (Namespace.ID) -> Landscape
     ) {
         self.portrait = portrait
         self.landscape = landscape
@@ -20,7 +22,7 @@ struct OrientationView<Portrait: View, Landscape: View>: View {
 
     var body: some View {
         Group {
-            if let orientation, orientation.isLandscape {
+            if horizontalSizeClass == .regular, orientation.isLandscape {
                 landscape(animation)
             } else {
                 portrait(animation)
@@ -28,8 +30,6 @@ struct OrientationView<Portrait: View, Landscape: View>: View {
         }
         .onAppear {
             UIDevice.current.beginGeneratingDeviceOrientationNotifications()
-
-            orientation = UIDevice.current.orientation
 
             NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)
                 .compactMap { _ in UIDevice.current.orientation }
