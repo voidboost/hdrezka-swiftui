@@ -86,7 +86,6 @@
 				iOS/Resources/Assets.xcassets = (ios, );
 				"iOS/Resources/Launch Screen.storyboard" = (ios, );
 				iOS/Utils/RemoveBackgroundImageProcessor.swift = (ios, );
-				iOS/Utils/UIImage.swift = (ios, );
 				macOS/Core/AppState.swift = (macos, );
 				macOS/Core/Const.swift = (macos, );
 				macOS/Core/Container.swift = (macos, );

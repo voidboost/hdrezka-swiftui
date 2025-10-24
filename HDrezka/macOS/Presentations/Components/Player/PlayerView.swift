@@ -2,12 +2,12 @@ import AVKit
 import Combine
 import Defaults
 import FactoryKit
+import Kingfisher
 import MediaPlayer
 import SwiftData
 import SwiftUI
 
 struct PlayerView: View {
-    @Injected(\.session) private var session
     @Injected(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
     @Injected(\.getMovieThumbnailsUseCase) private var getMovieThumbnailsUseCase
     @Injected(\.getMovieVideoUseCase) private var getMovieVideoUseCase
@@ -928,20 +928,11 @@ struct PlayerView: View {
             }
 
             if let url = URL(string: poster) {
-                session.request(url, method: .get, headers: [.userAgent(Const.userAgent)])
-                    .validate(statusCode: 200 ..< 400)
-                    .responseData { response in
-                        guard let data = response.value,
-                              !data.isEmpty,
-                              response.error == nil,
-                              let nsImage = NSImage(data: data)
-                        else {
-                            return
-                        }
-
-                        nowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: nsImage.size) { _ in nsImage }
+                ImageDownloader.default.downloadImage(with: url) { result in
+                    if case let .success(value) = result {
+                        nowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: value.image.size) { _ in value.image }
                     }
-                    .resume()
+                }
             }
 
             remoteCommandCenter.playCommand.addTarget { _ in
