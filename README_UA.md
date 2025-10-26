@@ -1,5 +1,5 @@
-<h1>HDrezka для macOS (неофіційний)</h1>
-<p>Неофіційний клієнт HDrezka для macOS. Потрібна macOS 13 Ventura або новіша.</p>
+<h1>HDrezka для macOS/iPadOS (неофіційний)</h1>
+<p>Неофіційний клієнт HDrezka для macOS/iPadOS. Потрібна macOS 13 Ventura/iPadOS 18 або новіша.</p>
 <h2>Можливості</h2>
 <ul>
     <li>⭐️ Кастомний плеєр</li>
@@ -15,8 +15,9 @@
 <p>І багато іншого!</p>
 <h2>Релізи</h2>
 <ul>
-    <li><a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.21.dmg">Завантажити останню версію (macOS 15 Sequoia або новіша)</a></li>
+    <li><a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.22.dmg">Завантажити останню версію (macOS 15 Sequoia або новіша)</a></li>
     <li><a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.10.dmg">Завантажити останню версію (macOS 13 Ventura або новіша)</a></li>
+    <li><a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.22.ipa">Завантажити останню версію (iPadOS 18 або новіша)</a><sup>бета реліз</sup></li>
 </ul>
 <h2>Спонсорство та підтримка</h2>
 <p>
@@ -24,7 +25,7 @@
     <a href="https://t.me/voidboost">@voidboost</a>.
 </p>
 <h2>Вирішення проблем</h2>
-<h3>Помилка під час встановлення/запуску застосунку</h3>
+<h3>Помилка під час встановлення/запуску застосунку (macOS версія)</h3>
 <p>Зазвичай допомагають ці дві команди — введіть їх у терміналі (під час введення пароля символи не відображаються — це нормально).</p>
 <pre><code>sudo xattr -cr /Applications/HDrezka.app</code></pre>
 <p>та</p>

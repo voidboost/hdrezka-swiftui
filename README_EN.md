@@ -1,5 +1,5 @@
-<h1>HDrezka macOS (unofficial)</h1>
-<p>Unofficial macOS client for HDrezka. Requires macOS 13 Ventura or later.</p>
+<h1>HDrezka macOS/iPadOS (unofficial)</h1>
+<p>Unofficial macOS/iPadOS client for HDrezka. Requires macOS 13 Ventura/iPadOS 18 or later.</p>
 <h2>Features</h2>
 <ul>
     <li>⭐️ Custom video player</li>
@@ -15,8 +15,9 @@
 <p>And more!</p>
 <h2>Releases</h2>
 <ul>
-    <li><a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.21.dmg">Download latest version (macOS 15 Sequoia or later)</a></li>
+    <li><a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.22.dmg">Download latest version (macOS 15 Sequoia or later)</a></li>
     <li><a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.10.dmg">Download latest version (macOS 13 Ventura or later)</a></li>
+    <li><a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.22.ipa">Download latest version (iPadOS 18 or later)</a><sup>beta release</sup></li>
 </ul>
 <h2>Sponsor & Support</h2>
 <p>
@@ -24,7 +25,7 @@
     <a href="https://t.me/voidboost">@voidboost</a>.
 </p>
 <h2>Troubleshooting</h2>
-<h3>Error during installation/launch of the application</h3>
+<h3>Error during installation/launch of the application (macOS version)</h3>
 <p>These two commands usually help — you need to run them in the terminal (when entering the password, it will be hidden — that’s normal).</p>
 <pre><code>sudo xattr -cr /Applications/HDrezka.app</code></pre>
 <p>and</p>
