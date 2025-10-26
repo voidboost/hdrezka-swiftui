@@ -4,7 +4,7 @@
         <a href="./README_UA.md" target="_blank">Українська 🇺🇦</a>
     </li>
     <li>
-        <a href="./README_EN.md" target="_blank">English 🇬🇧</a>
+        <a href="./README_EN.md" target="_blank">English 🇺🇸</a>
     </li>
 </ul>
 <h1>🎬 HDrezka для macOS / iPadOS (неофициальный клиент)</h1>
