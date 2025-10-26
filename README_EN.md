@@ -1,36 +1,107 @@
-<h1>HDrezka macOS/iPadOS (unofficial)</h1>
-<p>Unofficial macOS/iPadOS client for HDrezka. Requires macOS 13 Ventura/iPadOS 18 or later.</p>
-<h2>Features</h2>
+<h1>🎬 HDrezka for macOS / iPadOS (Unofficial Client)</h1>
+<p>Unofficial HDrezka client for macOS and iPadOS. <br>Requires <b>macOS 13 Ventura / iPadOS 18</b> or newer.</p>
+<h2>✨ Features</h2>
 <ul>
-    <li>⭐️ Custom video player</li>
-    <li>User account authentication</li>
-    <li>Bookmark your favorite content</li>
-    <li>Commenting system</li>
-    <li>Organized and intuitive movie list</li>
-    <li>Light and dark theme support</li>
-    <li>Localization: English, Ukrainian, and Russian</li>
-    <li>Search</li>
-    <li>Video download support</li>
+    <li>🎞 Custom video player</li>
+    <li>🔐 Account authentication</li>
+    <li>📌 Bookmarks for your favorite content</li>
+    <li>💬 Comments and discussions</li>
+    <li>🎥 Convenient list of movies and TV shows</li>
+    <li>🌗 Light & Dark mode support</li>
+    <li>🌍 Localization: English, Ukrainian, Russian</li>
+    <li>🔎 Search</li>
+    <li>⬇️ Video download capability</li>
 </ul>
-<p>And more!</p>
-<h2>Releases</h2>
+<p><i>...and much more!</i></p>
+<h2>🚀 Releases</h2>
 <ul>
-    <li><a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.22.dmg">Download latest version (macOS 15 Sequoia or later)</a></li>
-    <li><a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.10.dmg">Download latest version (macOS 13 Ventura or later)</a></li>
-    <li><a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.22.ipa">Download latest version (iPadOS 18 or later)</a><sup>beta release</sup></li>
+    <li>
+        <span>💻</span>
+        <a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.22.dmg" target="_blank">Download latest version (macOS 15 Sequoia or newer)</a>
+    </li>
+    <li>
+        <span>💻</span>
+        <a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.10.dmg" target="_blank">Download latest version (macOS 13 Ventura or newer)</a>
+    </li>
+    <li>
+        <span>📱</span>
+        <a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.22.ipa" target="_blank">Download latest version (iPadOS 18 or newer)</a>
+        <sup>beta</sup>
+    </li>
 </ul>
-<h2>Sponsor & Support</h2>
-<p>
-    To keep this app maintained and up-to-date please consider sponsoring it on GitHub. Or if you are looking for a private support or help in customizing the experience, then reach out to me on Telegram
-    <a href="https://t.me/voidboost">@voidboost</a>.
-</p>
-<h2>Troubleshooting</h2>
-<h3>Error during installation/launch of the application (macOS version)</h3>
-<p>These two commands usually help — you need to run them in the terminal (when entering the password, it will be hidden — that’s normal).</p>
+<h2>💖 Support the Project</h2>
+<p>To keep the app up to date, you can support it via GitHub sponsorship. <br>If you need help with installation or setup, contact me on Telegram:<a href="https://t.me/voidboost" target="_blank">@voidboost</a>.</p>
+<h2>🧰 Troubleshooting</h2>
+<h3>Error during installation or launch on macOS</h3>
+<p>If the app won’t start, run these commands in Terminal:</p>
 <pre><code>sudo xattr -cr /Applications/HDrezka.app</code></pre>
-<p>and</p>
+<p>Then:</p>
 <pre><code>sudo codesign --force --deep --sign - /Applications/HDrezka.app</code></pre>
-<h2>Screenshots</h2>
+<h3>Installation on iPadOS</h3>
+<h4>1️⃣ Using Sideloadly (with a computer)</h4>
+<p><b>Sideloadly</b> is a tool for installing IPA files from your computer (Windows / macOS). The app works for 7 days and then requires re-signing.</p>
+<details>
+    <summary>📘 Full Sideloadly Installation Guide</summary>
+    <h5>Requirements:</h5>
+    <ol>
+        <li>Windows or macOS computer</li>
+        <li><a href="https://sideloadly.io/" target="_blank">Sideloadly</a></li>
+        <li>iTunes and iCloud (for Windows — from Apple’s website)</li>
+        <li>Separate Apple ID (recommended)</li>
+        <li>HDrezka IPA file (see above)</li>
+        <li>USB cable</li>
+    </ol>
+    <h5>Steps:</h5>
+    <ol>
+        <li>Install and open Sideloadly.</li>
+        <li>Connect your iPad via USB and select “Trust this computer.”</li>
+        <li>Enter your Apple ID and load the HDrezka IPA file.</li>
+        <li>Click <b>Start</b> and wait for installation.</li>
+        <li>After installation, go to <b>Settings → General → Profiles</b> and tap <b>Trust</b>.</li>
+    </ol>
+</details>
+<h4>2️⃣ Using AltStore (with a computer)</h4>
+<p><b>AltStore</b> allows signing and installing IPA files directly on your device. It requires re-signing every 7 days, but this can be automated.</p>
+<details>
+    <summary>📘 Full AltStore Installation Guide</summary>
+    <h5>Requirements:</h5>
+    <ol>
+        <li>Windows or macOS computer</li>
+        <li><a href="https://altstore.io/" target="_blank">AltStore</a></li>
+        <li>iTunes and iCloud</li>
+        <li>Separate Apple ID</li>
+        <li>HDrezka IPA file (see above)</li>
+    </ol>
+    <h5>Steps:</h5>
+    <ol>
+        <li>Install AltStore on your computer.</li>
+        <li>Connect your iPad and install AltStore on the device.</li>
+        <li>Sign the profile in <b>Settings → General → Profiles</b>.</li>
+        <li>In AltStore, select the HDrezka IPA file for installation.</li>
+        <li>After installation, the app will appear on your home screen.</li>
+    </ol>
+</details>
+<h4>3️⃣ Using GBox (without a computer, with a certificate)</h4>
+<p>This method doesn’t require a computer. A paid developer certificate is needed, which can be purchased via <a href="https://t.me/glesign" target="_blank">GLESign</a>.</p>
+<details>
+    <summary>📘 Full GBox Installation Guide</summary>
+    <h5>Requirements:</h5>
+    <ol>
+        <li>iPad</li>
+        <li><b>GBox</b> app</li>
+        <li>Paid certificate (<a href="https://t.me/glesign" target="_blank">GLESign</a>)</li>
+        <li>HDrezka IPA file (see above)</li>
+    </ol>
+    <h5>Steps:</h5>
+    <ol>
+        <li>Purchase a certificate and install GBox using the provided link.</li>
+        <li>Add your certificate to GBox (support available via <a href="http://t.me/glesign_support" target="_blank">GLESign Support</a>).</li>
+        <li>Open the HDrezka IPA file and share it with GBox.</li>
+        <li>Sign and install the app through GBox.</li>
+        <li>Once complete, HDrezka will appear on your home screen.</li>
+    </ol>
+</details>
+<h2>🖼 Screenshots</h2>
 <p>
     <img width="49%" src="https://github.com/user-attachments/assets/717fce79-2084-4fed-ac8c-64ae601cd581" />
     <img width="49%" src="https://github.com/user-attachments/assets/cd186b48-db12-430a-8ed7-241f3125f16b" />
@@ -78,5 +149,7 @@
 <p>
     <img width="49%" src="https://github.com/user-attachments/assets/5df3dd8e-24c9-4ff4-9a37-39b4cfb1fa5a" />
 </p>
-<h2>License</h2>
-<a href="./LICENSE">MIT</a>
+<h2>📄 License</h2>
+<p>
+    <a href="./LICENSE" target="_blank">MIT License</a>
+</p>
