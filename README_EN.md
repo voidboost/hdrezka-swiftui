@@ -1,5 +1,5 @@
 <h1>🎬 HDrezka for macOS / iPadOS (Unofficial Client)</h1>
-<p>Unofficial HDrezka client for macOS and iPadOS. <br>Requires <b>macOS 13 Ventura / iPadOS 18</b> or newer.</p>
+<p>Unofficial HDrezka client for macOS and iPadOS. <br>Requires <b>macOS 15 Sequoia / iPadOS 18</b> or newer.</p>
 <h2>✨ Features</h2>
 <ul>
     <li>🎞 Custom video player</li>
@@ -18,10 +18,6 @@
     <li>
         <span>💻</span>
         <a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.22.dmg" target="_blank">Download latest version (macOS 15 Sequoia or newer)</a>
-    </li>
-    <li>
-        <span>💻</span>
-        <a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.10.dmg" target="_blank">Download latest version (macOS 13 Ventura or newer)</a>
     </li>
     <li>
         <span>📱</span>
