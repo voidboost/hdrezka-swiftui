@@ -79,6 +79,7 @@ struct PersonView: View {
         private let details: PersonDetailed
 
         @Environment(\.openWindow) private var openWindow
+        @Environment(\.dismissWindow) private var dismissWindow
 
         init(details: PersonDetailed) {
             self.details = details
@@ -88,6 +89,8 @@ struct PersonView: View {
             HStack(alignment: .bottom, spacing: 27) {
                 Button {
                     if let url = URL(string: details.hphoto) ?? URL(string: details.photo) {
+                        dismissWindow(id: "imageViewer")
+
                         openWindow(id: "imageViewer", value: url)
                     }
                 } label: {
