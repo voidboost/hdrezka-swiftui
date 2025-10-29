@@ -1,5 +1,6 @@
 import AVFoundation
 import Defaults
+import Kingfisher
 import SwiftData
 import SwiftUI
 
@@ -9,6 +10,7 @@ struct SettingsView: View {
     @Default(.defaultQuality) private var defaultQuality
     @Default(.spatialAudio) private var spatialAudio
     @Default(.theme) private var theme
+    @Default(.cache) private var cache
 
     @Environment(\.modelContext) private var modelContext
 
@@ -220,6 +222,48 @@ struct SettingsView: View {
                             .disabled(selectPositions.isEmpty)
                         }
                         .frame(height: 40)
+                    }
+
+                    Divider()
+
+                    HStack(alignment: .center, spacing: 8) {
+                        Text("key.cache")
+
+                        Spacer()
+
+                        Picker("key.cache", selection: $cache) {
+                            ForEach(Cache.allCases) { cache in
+                                Text(cache.localizedKey)
+                                    .tag(cache)
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                    }
+                    .frame(height: 40)
+                    .onChange(of: cache) {
+                        let defaultCache = ImageCache.default
+
+                        switch cache {
+                        case .off:
+                            defaultCache.clearCache()
+
+                            defaultCache.memoryStorage.config.expiration = .expired
+                            defaultCache.diskStorage.config.expiration = .expired
+                        case .memory:
+                            defaultCache.clearDiskCache()
+
+                            defaultCache.memoryStorage.config.expiration = .seconds(300)
+                            defaultCache.diskStorage.config.expiration = .expired
+                        case .disk:
+                            defaultCache.clearMemoryCache()
+
+                            defaultCache.memoryStorage.config.expiration = .expired
+                            defaultCache.diskStorage.config.expiration = .days(7)
+                        case .all:
+                            defaultCache.memoryStorage.config.expiration = .seconds(300)
+                            defaultCache.diskStorage.config.expiration = .days(7)
+                        }
                     }
                 }
                 .padding(.horizontal, 15)

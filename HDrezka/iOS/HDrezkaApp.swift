@@ -3,6 +3,7 @@ import Defaults
 import FirebaseAnalytics
 import FirebaseCore
 import FirebaseCrashlytics
+import Kingfisher
 import SwiftData
 import SwiftUI
 import UserNotifications
@@ -36,6 +37,20 @@ struct HDrezkaApp: App {
             let modelContainer = try ModelContainer(for: schema)
             modelContainer.mainContext.autosaveEnabled = true
             self.modelContainer = modelContainer
+
+            let cache = ImageCache.default
+
+            switch Defaults[.cache] {
+            case .off:
+                cache.memoryStorage.config.expiration = .expired
+                cache.diskStorage.config.expiration = .expired
+            case .memory:
+                cache.diskStorage.config.expiration = .expired
+            case .disk:
+                cache.memoryStorage.config.expiration = .expired
+            case .all:
+                break
+            }
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
