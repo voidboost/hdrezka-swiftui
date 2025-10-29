@@ -15,6 +15,8 @@ extension Defaults.Keys {
     static let volume = Key<Float>("volume", default: 1.0)
     static let isMuted = Key<Bool>("is_muted", default: false)
 
+    static let cache = Key<Cache>("cache", default: .all)
+
     static let useHeaders = Key<Bool>("use_headers", default: true)
     static let lastHdrezkaAppVersion = Key<String>("last_hdrezka_app_version", default: Const.lastHdrezkaAppVersion)
     static let isUserPremium = Key<Int?>("is_user_premium", default: nil)

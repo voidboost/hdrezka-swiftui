@@ -3,6 +3,7 @@ import Defaults
 import FirebaseAnalytics
 import FirebaseCore
 import FirebaseCrashlytics
+import Kingfisher
 import Sparkle
 import SwiftData
 import SwiftUI
@@ -129,6 +130,20 @@ struct HDrezkaApp: App {
             self.modelContainer = modelContainer
 
             Downloader.shared.setModelContext(modelContext: modelContainer.mainContext)
+
+            let cache = ImageCache.default
+
+            switch Defaults[.cache] {
+            case .off:
+                cache.memoryStorage.config.expiration = .expired
+                cache.diskStorage.config.expiration = .expired
+            case .memory:
+                cache.diskStorage.config.expiration = .expired
+            case .disk:
+                cache.memoryStorage.config.expiration = .expired
+            case .all:
+                break
+            }
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
