@@ -199,7 +199,7 @@ struct RestoreSheetView: View {
         } message: {
             Text("key.restore.success.message-\(email)")
         }
-        .analyticsScreen(name: "RestoreSheet")
+        .analyticsScreen(name: "restore_sheet", class: "RestoreSheetView")
     }
 
     private func load() {

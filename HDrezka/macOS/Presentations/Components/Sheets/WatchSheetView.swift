@@ -626,7 +626,7 @@ struct WatchSheetView: View {
                     .store(in: &subscriptions)
             }
         }
-        .analyticsScreen(name: "WatchSheet", extraParameters: ["id": id])
+        .analyticsScreen(name: "watch_sheet", class: "WatchSheetView", extraParameters: ["id": id])
     }
 
     private struct CustomLabelStyle: LabelStyle {

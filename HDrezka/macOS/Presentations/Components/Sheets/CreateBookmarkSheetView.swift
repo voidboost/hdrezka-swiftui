@@ -173,7 +173,7 @@ struct CreateBookmarkSheetView: View {
         .padding(.bottom, 25)
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
-        .analyticsScreen(name: "CreateBookmarkSheet")
+        .analyticsScreen(name: "create_bookmark_sheet", class: "CreateBookmarkSheetView")
     }
 
     private func load() {

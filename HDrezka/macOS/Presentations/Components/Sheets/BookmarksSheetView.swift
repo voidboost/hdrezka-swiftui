@@ -212,7 +212,7 @@ struct BookmarksSheetView: View {
         }
         .dialogSeverity(.critical)
         .particleLayer(name: "rise")
-        .analyticsScreen(name: "BookmarksSheet", extraParameters: ["id": id])
+        .analyticsScreen(name: "bookmarks_sheet", class: "BookmarksSheetView", extraParameters: ["id": id])
     }
 
     private func load(reset: Bool = false) {

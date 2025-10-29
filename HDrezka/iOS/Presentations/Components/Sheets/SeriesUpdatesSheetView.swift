@@ -97,7 +97,7 @@ struct SeriesUpdatesSheetView: View {
         .onAppear {
             load()
         }
-        .analyticsScreen(name: "SeriesUpdatesSheet")
+        .analyticsScreen(name: "series_updates_sheet", class: "SeriesUpdatesSheetView")
     }
 
     private func load() {

@@ -793,7 +793,7 @@ struct DownloadSheetView: View {
                 dismiss()
             }
         }
-        .analyticsScreen(name: "DownloadSheet", extraParameters: ["id": id])
+        .analyticsScreen(name: "download_sheet", class: "DownloadSheetView", extraParameters: ["id": id])
     }
 
     private struct CustomLabelStyle: LabelStyle {
