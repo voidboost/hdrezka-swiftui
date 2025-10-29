@@ -263,7 +263,7 @@ struct SignInSheetView: View {
         .padding(.bottom, 25)
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
-        .analyticsScreen(name: "SignInSheet")
+        .analyticsScreen(name: "sign_in_sheet", class: "SignInSheetView")
     }
 
     private func load() {

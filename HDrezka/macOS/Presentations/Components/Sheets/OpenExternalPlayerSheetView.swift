@@ -887,7 +887,7 @@ struct OpenExternalPlayerSheetView: View {
                     .store(in: &subscriptions)
             }
         }
-        .analyticsScreen(name: "OpenExternalPlayerSheet", extraParameters: ["id": id])
+        .analyticsScreen(name: "open_external_player_sheet", class: "OpenExternalPlayerSheetView", extraParameters: ["id": id])
     }
 
     private struct CustomLabelStyle: LabelStyle {

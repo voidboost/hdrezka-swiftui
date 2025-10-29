@@ -162,7 +162,7 @@ struct SignUpSheetView: View {
             .padding(.bottom, 25)
             .fixedSize(horizontal: false, vertical: true)
             .frame(width: 520)
-            .analyticsScreen(name: "SignUpSheet")
+            .analyticsScreen(name: "sign_up_sheet", class: "SignUpSheetView")
         } else {
             Group {
                 switch state {
@@ -595,7 +595,7 @@ struct SignUpSheetView: View {
             .padding(.bottom, 25)
             .fixedSize(horizontal: false, vertical: true)
             .frame(width: 520)
-            .analyticsScreen(name: "SignUpSheet")
+            .analyticsScreen(name: "sign_up_sheet", class: "SignUpSheetView")
         }
     }
 

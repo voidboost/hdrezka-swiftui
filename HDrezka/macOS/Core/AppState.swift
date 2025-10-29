@@ -73,17 +73,34 @@ enum Tabs: Hashable, Identifiable, CaseIterable {
     var name: String {
         switch self {
         case .home:
-            "Home"
+            "home"
         case .search:
-            "Search"
+            "search"
         case .categories:
-            "Categories"
+            "categories"
         case .collections:
-            "Collections"
+            "collections"
         case .watchingLater:
-            "WatchingLater"
+            "watching_later"
         case .bookmarks:
-            "Bookmarks"
+            "bookmarks"
+        }
+    }
+
+    var className: String {
+        switch self {
+        case .home:
+            "HomeView"
+        case .search:
+            "SearchView"
+        case .categories:
+            "CategoriesView"
+        case .collections:
+            "CollectionsView"
+        case .watchingLater:
+            "WatchingLaterView"
+        case .bookmarks:
+            "BookmarksView"
         }
     }
 
@@ -95,32 +112,32 @@ enum Tabs: Hashable, Identifiable, CaseIterable {
                 HomeView()
                     .id("home")
                     .destinations()
-                    .analyticsScreen(name: name)
+                    .analyticsScreen(name: name, class: className)
             case .search:
                 SearchView()
                     .id("search")
                     .destinations()
-                    .analyticsScreen(name: name)
+                    .analyticsScreen(name: name, class: className)
             case .categories:
                 CategoriesView()
                     .id("categories")
                     .destinations()
-                    .analyticsScreen(name: name)
+                    .analyticsScreen(name: name, class: className)
             case .collections:
                 CollectionsView()
                     .id("collections")
                     .destinations()
-                    .analyticsScreen(name: name)
+                    .analyticsScreen(name: name, class: className)
             case .watchingLater:
                 WatchingLaterView()
                     .id("watching_later")
                     .destinations()
-                    .analyticsScreen(name: name)
+                    .analyticsScreen(name: name, class: className)
             case .bookmarks:
                 BookmarksView()
                     .id("bookmarks")
                     .destinations()
-                    .analyticsScreen(name: name)
+                    .analyticsScreen(name: name, class: className)
             }
         }
     }
@@ -158,13 +175,26 @@ enum Destinations: Hashable, Identifiable {
     var name: String {
         switch self {
         case .details:
-            "Details"
+            "details"
         case .country, .category, .genre, .collection, .customList, .list:
-            "List"
+            "list"
         case .person:
-            "Person"
+            "person"
         case .comments:
-            "Comments"
+            "comments"
+        }
+    }
+
+    var className: String {
+        switch self {
+        case .details:
+            "DetailsView"
+        case .country, .category, .genre, .collection, .customList, .list:
+            "ListView"
+        case .person:
+            "PersonView"
+        case .comments:
+            "CommentsView"
         }
     }
 
@@ -202,39 +232,39 @@ extension View {
             case let .details(movie):
                 DetailsView(movie: movie)
                     .id(movie.movieId)
-                    .analyticsScreen(name: destination.name, extraParameters: destination.parameters)
+                    .analyticsScreen(name: destination.name, class: destination.className, extraParameters: destination.parameters)
             case let .country(country):
                 ListView(country: country)
                     .id(country.countryId)
-                    .analyticsScreen(name: destination.name, extraParameters: destination.parameters)
+                    .analyticsScreen(name: destination.name, class: destination.className, extraParameters: destination.parameters)
             case let .category(category):
                 ListView(category: category)
                     .id(category)
-                    .analyticsScreen(name: destination.name, extraParameters: destination.parameters)
+                    .analyticsScreen(name: destination.name, class: destination.className, extraParameters: destination.parameters)
             case let .genre(genre):
                 ListView(genre: genre)
                     .id(genre.genreId)
-                    .analyticsScreen(name: destination.name, extraParameters: destination.parameters)
+                    .analyticsScreen(name: destination.name, class: destination.className, extraParameters: destination.parameters)
             case let .collection(collection):
                 ListView(collection: collection)
                     .id(collection.collectionId)
-                    .analyticsScreen(name: destination.name, extraParameters: destination.parameters)
+                    .analyticsScreen(name: destination.name, class: destination.className, extraParameters: destination.parameters)
             case let .customList(movies, title):
                 ListView(movies: movies, title: title)
                     .id(title)
-                    .analyticsScreen(name: destination.name, extraParameters: destination.parameters)
+                    .analyticsScreen(name: destination.name, class: destination.className, extraParameters: destination.parameters)
             case let .list(list):
                 ListView(list: list)
                     .id(list.listId)
-                    .analyticsScreen(name: destination.name, extraParameters: destination.parameters)
+                    .analyticsScreen(name: destination.name, class: destination.className, extraParameters: destination.parameters)
             case let .person(person):
                 PersonView(person: person)
                     .id(person.personId)
-                    .analyticsScreen(name: destination.name, extraParameters: destination.parameters)
+                    .analyticsScreen(name: destination.name, class: destination.className, extraParameters: destination.parameters)
             case let .comments(details):
                 CommentsView(details: details)
                     .id(details.movieId)
-                    .analyticsScreen(name: destination.name, extraParameters: destination.parameters)
+                    .analyticsScreen(name: destination.name, class: destination.className, extraParameters: destination.parameters)
             }
         }
     }

@@ -189,7 +189,7 @@ struct CommentReportSheet: View {
         .padding(.bottom, 25)
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
-        .analyticsScreen(name: "CommentReportSheet", extraParameters: comment.dictionary)
+        .analyticsScreen(name: "comment_report_sheet", class: "CommentReportSheetView", extraParameters: comment.dictionary)
     }
 
     private struct RadioButton: View {

@@ -160,6 +160,6 @@ struct CommentsRulesSheet: View {
         .padding(.bottom, 25)
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
-        .analyticsScreen(name: "CommentsRulesSheet")
+        .analyticsScreen(name: "comments_rules_sheet", class: "CommentsRulesSheetView")
     }
 }
