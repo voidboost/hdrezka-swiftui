@@ -1,4 +1,5 @@
 import Defaults
+import FirebaseAnalytics
 import Kingfisher
 import SwiftUI
 import YouTubePlayerKit
@@ -201,6 +202,7 @@ struct DetailsView: View {
         @State private var isDownloadPresented: Bool = false
         @State private var isOpenExternalPlayerPresented: Bool = false
         @State private var playerData: PlayerData?
+        @State private var imageURL: IdentifiableURL?
 
         @State private var franchiseExpanded: Bool = false
 
@@ -218,9 +220,7 @@ struct DetailsView: View {
                         VStack(alignment: .center, spacing: 18) {
                             Button {
                                 if let url = URL(string: details.hposter) ?? URL(string: details.poster) {
-                                    dismissWindow(id: "imageViewer")
-
-                                    openWindow(id: "imageViewer", value: url)
+                                    imageURL = .init(url: url)
                                 }
                             } label: {
                                 KFImage
@@ -484,9 +484,7 @@ struct DetailsView: View {
                         HStack(alignment: .bottom, spacing: 27) {
                             Button {
                                 if let url = URL(string: details.hposter) ?? URL(string: details.poster) {
-                                    dismissWindow(id: "imageViewer")
-
-                                    openWindow(id: "imageViewer", value: url)
+                                    imageURL = .init(url: url)
                                 }
                             } label: {
                                 KFImage
@@ -757,6 +755,11 @@ struct DetailsView: View {
                     }
                     .fullScreenCover(item: $playerData) { data in
                         PlayerView(data: data)
+                            .analyticsScreen(name: "Player", extraParameters: data.dictionary)
+                    }
+                    .fullScreenCover(item: $imageURL) { url in
+                        ImageView(url: url.url)
+                            .analyticsScreen(name: "Image", extraParameters: ["url": url.url])
                     }
 
                     Divider().opacity(0)
@@ -1599,5 +1602,15 @@ struct DetailsView: View {
                 Spacer()
             }
         }
+    }
+}
+
+private struct IdentifiableURL: Identifiable, Hashable {
+    let id: UUID
+    let url: URL
+
+    init(url: URL) {
+        id = .init()
+        self.url = url
     }
 }

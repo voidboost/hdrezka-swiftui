@@ -1,6 +1,7 @@
 import Combine
 import Defaults
 import FactoryKit
+import FirebaseAnalytics
 import SwiftData
 import SwiftUI
 
@@ -619,6 +620,7 @@ struct WatchSheetView: View {
                     .store(in: &subscriptions)
             }
         }
+        .analyticsScreen(name: "WatchSheet", extraParameters: ["id": id])
     }
 
     private struct CustomLabelStyle: LabelStyle {

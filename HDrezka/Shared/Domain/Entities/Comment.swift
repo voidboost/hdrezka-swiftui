@@ -1,11 +1,11 @@
 import SwiftUI
 
-struct Comment: Identifiable, Hashable {
+struct Comment: Identifiable, Hashable, Codable {
     let commentId: String
     let date: String
     let author: String
     let photo: String
-    let text: NSAttributedString
+    let text: AttributedString
     private(set) var spoilers: [Spoiler]
     private(set) var replies: [Comment]
     private(set) var likesCount: Int
@@ -15,7 +15,7 @@ struct Comment: Identifiable, Hashable {
     let deleteHash: String?
     let id: UUID
 
-    init(commentId: String, date: String, author: String, photo: String, text: NSAttributedString, spoilers: [Spoiler], replies: [Comment], likesCount: Int, isLiked: Bool, selfComment: Bool, isAdmin: Bool, deleteHash: String?, id: UUID = .init()) {
+    init(commentId: String, date: String, author: String, photo: String, text: AttributedString, spoilers: [Spoiler], replies: [Comment], likesCount: Int, isLiked: Bool, selfComment: Bool, isAdmin: Bool, deleteHash: String?, id: UUID = .init()) {
         self.commentId = commentId
         self.date = date
         self.author = author
@@ -67,7 +67,7 @@ struct Comment: Identifiable, Hashable {
     }
 
     mutating func updateRects(containerWidth: CGFloat) {
-        let textStorage = NSTextStorage(attributedString: text)
+        let textStorage = NSTextStorage(attributedString: NSAttributedString(text))
         let layoutManager = NSLayoutManager()
         let textContainer = NSTextContainer(size: CGSize(width: containerWidth, height: .greatestFiniteMagnitude))
         textContainer.lineFragmentPadding = .zero
@@ -123,7 +123,7 @@ extension Comment {
         case link(String)
     }
 
-    struct Spoiler: Identifiable, Hashable {
+    struct Spoiler: Identifiable, Hashable, Codable {
         let range: NSRange
         private(set) var rects: [CGRect]
         let id: UUID

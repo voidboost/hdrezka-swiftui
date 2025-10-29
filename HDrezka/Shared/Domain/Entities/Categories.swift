@@ -1,6 +1,6 @@
 import SwiftUI
 
-enum Categories: LocalizedStringKey, CaseIterable, Hashable {
+enum Categories: LocalizedStringKey, CaseIterable, Hashable, Codable {
     case hot = "key.filters.hot"
 //    case featured = "key.filters.featured"
     case watchingNow = "key.filters.watching_now"

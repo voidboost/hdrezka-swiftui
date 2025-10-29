@@ -53,6 +53,8 @@
 				iOS/Presentations/Components/EmptyStateView.swift = (ios, );
 				iOS/Presentations/Components/ErrorPaginationStateView.swift = (ios, );
 				iOS/Presentations/Components/ErrorStateView.swift = (ios, );
+				iOS/Presentations/Components/ImageView.swift = (ios, );
+				iOS/Presentations/Components/LicensesView.swift = (ios, );
 				iOS/Presentations/Components/LoadingPaginationStateView.swift = (ios, );
 				iOS/Presentations/Components/LoadingStateView.swift = (ios, );
 				iOS/Presentations/Components/OnPressButtonStyle.swift = (ios, );

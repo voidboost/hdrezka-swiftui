@@ -1,4 +1,5 @@
 import Defaults
+import FirebaseAnalytics
 import SwiftUI
 
 struct CommentsRulesSheet: View {
@@ -159,5 +160,6 @@ struct CommentsRulesSheet: View {
         .padding(.bottom, 25)
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
+        .analyticsScreen(name: "CommentsRulesSheet")
     }
 }

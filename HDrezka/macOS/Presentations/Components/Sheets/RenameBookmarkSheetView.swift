@@ -1,5 +1,6 @@
 import Combine
 import FactoryKit
+import FirebaseAnalytics
 import SwiftUI
 
 struct RenameBookmarkSheetView: View {
@@ -179,6 +180,7 @@ struct RenameBookmarkSheetView: View {
         .padding(.bottom, 25)
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
+        .analyticsScreen(name: "RenameBookmarkSheet", extraParameters: bookmark.dictionary)
     }
 
     private func load() {

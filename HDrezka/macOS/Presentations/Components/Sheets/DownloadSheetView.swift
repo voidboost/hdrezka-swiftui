@@ -1,6 +1,7 @@
 import Combine
 import Defaults
 import FactoryKit
+import FirebaseAnalytics
 import SwiftData
 import SwiftUI
 
@@ -792,6 +793,7 @@ struct DownloadSheetView: View {
                 dismiss()
             }
         }
+        .analyticsScreen(name: "DownloadSheet", extraParameters: ["id": id])
     }
 
     private struct CustomLabelStyle: LabelStyle {

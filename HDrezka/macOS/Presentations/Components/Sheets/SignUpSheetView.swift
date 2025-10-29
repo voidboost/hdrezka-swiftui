@@ -1,6 +1,7 @@
 import Combine
 import Defaults
 import FactoryKit
+import FirebaseAnalytics
 import SwiftUI
 
 struct SignUpSheetView: View {
@@ -161,6 +162,7 @@ struct SignUpSheetView: View {
             .padding(.bottom, 25)
             .fixedSize(horizontal: false, vertical: true)
             .frame(width: 520)
+            .analyticsScreen(name: "SignUpSheet")
         } else {
             Group {
                 switch state {
@@ -593,6 +595,7 @@ struct SignUpSheetView: View {
             .padding(.bottom, 25)
             .fixedSize(horizontal: false, vertical: true)
             .frame(width: 520)
+            .analyticsScreen(name: "SignUpSheet")
         }
     }
 
