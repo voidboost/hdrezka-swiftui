@@ -1,5 +1,6 @@
 import Combine
 import FactoryKit
+import FirebaseAnalytics
 import SwiftUI
 
 struct SeriesUpdatesSheetView: View {
@@ -96,6 +97,7 @@ struct SeriesUpdatesSheetView: View {
         .onAppear {
             load()
         }
+        .analyticsScreen(name: "SeriesUpdatesSheet")
     }
 
     private func load() {

@@ -1,6 +1,7 @@
 import Combine
 import Defaults
 import FactoryKit
+import FirebaseAnalytics
 import SwiftData
 import SwiftUI
 
@@ -704,6 +705,7 @@ struct OpenExternalPlayerSheetView: View {
                     .store(in: &subscriptions)
             }
         }
+        .analyticsScreen(name: "OpenExternalPlayerSheet", extraParameters: ["id": id])
     }
 
     private struct CustomLabelStyle: LabelStyle {

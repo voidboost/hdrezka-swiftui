@@ -1,5 +1,6 @@
 import Combine
 import FactoryKit
+import FirebaseAnalytics
 import SwiftUI
 
 struct CreateBookmarkSheetView: View {
@@ -172,6 +173,7 @@ struct CreateBookmarkSheetView: View {
         .padding(.bottom, 25)
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
+        .analyticsScreen(name: "CreateBookmarkSheet")
     }
 
     private func load() {

@@ -1,3 +1,4 @@
+import FirebaseAnalytics
 import SwiftUI
 
 struct ScheduleSheetView: View {
@@ -48,6 +49,7 @@ struct ScheduleSheetView: View {
         .padding(.top, 35)
         .padding(.bottom, 25)
         .frame(width: 520, height: 520)
+        .analyticsScreen(name: "ScheduleSheet", extraParameters: ["schedule": schedule])
     }
 
     private struct CustomSection: View {

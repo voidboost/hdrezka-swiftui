@@ -1,5 +1,6 @@
 import Combine
 import FactoryKit
+import FirebaseAnalytics
 import SwiftUI
 
 struct RestoreSheetView: View {
@@ -198,6 +199,7 @@ struct RestoreSheetView: View {
         } message: {
             Text("key.restore.success.message-\(email)")
         }
+        .analyticsScreen(name: "RestoreSheet")
     }
 
     private func load() {

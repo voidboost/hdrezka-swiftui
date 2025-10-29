@@ -155,6 +155,7 @@ struct HDrezkaApp: App {
             if let data {
                 PlayerView(data: data)
                     .environment(appState)
+                    .analyticsScreen(name: "Player", extraParameters: data.dictionary)
             }
         }
         .modelContainer(modelContainer)
@@ -166,7 +167,9 @@ struct HDrezkaApp: App {
 
         WindowGroup("key.imageViewer", id: "imageViewer", for: URL.self) { $url in
             if let url {
-                ImageView(url: url).preferredColorScheme(theme.scheme)
+                ImageView(url: url)
+                    .preferredColorScheme(theme.scheme)
+                    .analyticsScreen(name: "Image", extraParameters: ["url": url])
             }
         }
         .defaultPosition(.center)
@@ -176,7 +179,9 @@ struct HDrezkaApp: App {
         .commands(content: removed)
 
         WindowGroup("key.licenses", id: "licenses") {
-            LicensesView().preferredColorScheme(theme.scheme)
+            LicensesView()
+                .preferredColorScheme(theme.scheme)
+                .analyticsScreen(name: "Licenses")
         }
         .defaultPosition(.center)
         .windowResizability(.contentSize)
@@ -188,6 +193,7 @@ struct HDrezkaApp: App {
             SettingsView(updater: delegate.updaterController.updater)
                 .environment(downloader)
                 .preferredColorScheme(theme.scheme)
+                .analyticsScreen(name: "Settings")
         }
         .modelContainer(modelContainer)
         .windowResizability(.contentSize)
@@ -202,6 +208,7 @@ struct HDrezkaApp: App {
             DownloadsView()
                 .environment(downloader)
                 .preferredColorScheme(theme.scheme)
+                .analyticsScreen(name: "Downloads")
         } label: {
             MenuBarIcon()
         }

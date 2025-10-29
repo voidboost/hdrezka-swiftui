@@ -312,7 +312,7 @@ private extension Elements {
 }
 
 private extension Element {
-    func getComment() throws -> (NSAttributedString, [Comment.Spoiler]) {
+    func getComment() throws -> (AttributedString, [Comment.Spoiler]) {
         try select(".title_spoiler").remove()
 
         for br in try select("br") {
@@ -395,7 +395,7 @@ private extension Element {
             }
         }
 
-        return (commentText, spoilers)
+        return (AttributedString(commentText), spoilers)
     }
 
     func getComments(depth: Int = 0) throws -> [Comment] {

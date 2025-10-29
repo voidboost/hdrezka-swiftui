@@ -1,5 +1,6 @@
 import Combine
 import FactoryKit
+import FirebaseAnalytics
 import Flow
 import Pow
 import SwiftUI
@@ -211,6 +212,7 @@ struct BookmarksSheetView: View {
         }
         .dialogSeverity(.critical)
         .particleLayer(name: "rise")
+        .analyticsScreen(name: "BookmarksSheet", extraParameters: ["id": id])
     }
 
     private func load(reset: Bool = false) {

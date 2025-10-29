@@ -1,6 +1,7 @@
 import Combine
 import Defaults
 import FactoryKit
+import FirebaseAnalytics
 import SwiftUI
 
 struct SignInSheetView: View {
@@ -262,6 +263,7 @@ struct SignInSheetView: View {
         .padding(.bottom, 25)
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
+        .analyticsScreen(name: "SignInSheet")
     }
 
     private func load() {

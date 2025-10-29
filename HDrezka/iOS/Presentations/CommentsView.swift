@@ -382,7 +382,7 @@ struct CommentsView: View {
         }
 
         var body: some View {
-            Text(AttributedString(comment.text))
+            Text(comment.text)
                 .lineLimit(nil)
                 .multilineTextAlignment(.leading)
                 .textSelection(.enabled)

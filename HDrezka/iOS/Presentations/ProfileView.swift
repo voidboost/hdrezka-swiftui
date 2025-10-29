@@ -58,6 +58,10 @@ struct ProfileView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
+                NavigationLink(value: Destinations.licenses) {
+                    Image(systemName: "checkmark.seal.text.page")
+                }
+
                 if isLoggedIn {
                     Button {
                         appState.isSignOutPresented = true
