@@ -82,7 +82,7 @@ struct AccountRepositoryImpl: AccountRepository {
             .eraseToAnyPublisher()
     }
 
-    func saveWatchingState(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, position: Int, total: Int) -> AnyPublisher<Bool, Error> {
+    func saveWatchingState(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, position: Int?, total: Int?) -> AnyPublisher<Bool, Error> {
         session.request(AccountService.sendWatching(postId: voiceActing.voiceId, translatorId: voiceActing.translatorId, season: season?.seasonId, episode: episode?.episodeId, currentTime: position, duration: total != 1 ? total : nil))
             .validate(statusCode: 200 ..< 400)
             .publishData()

@@ -299,7 +299,7 @@ class Downloader {
                                 self.notificate(data.notificationId, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(data.name)"), "need_premium")
                             } else {
                                 if Defaults[.isLoggedIn] {
-                                    self.saveWatchingStateUseCase(voiceActing: data.acting, season: season, episode: episode, position: 0, total: 0)
+                                    self.saveWatchingStateUseCase(voiceActing: data.acting, season: season, episode: episode)
                                         .sink { _ in } receiveValue: { _ in }
                                         .store(in: &self.subscriptions)
                                 }
@@ -408,7 +408,7 @@ class Downloader {
                                 self.notificate(data.notificationId, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(data.name)"), "need_premium")
                             } else {
                                 if Defaults[.isLoggedIn] {
-                                    self.saveWatchingStateUseCase(voiceActing: data.acting, season: nil, episode: nil, position: 0, total: 0)
+                                    self.saveWatchingStateUseCase(voiceActing: data.acting, season: nil, episode: nil)
                                         .sink { _ in } receiveValue: { _ in }
                                         .store(in: &self.subscriptions)
                                 }

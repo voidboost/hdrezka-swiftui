@@ -6,7 +6,6 @@ import SwiftData
 import SwiftUI
 
 struct WatchSheetView: View {
-    @Injected(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
     @Injected(\.getMovieDetailsUseCase) private var getMovieDetailsUseCase
     @Injected(\.getMovieVideoUseCase) private var getMovieVideoUseCase
     @Injected(\.getSeriesSeasonsUseCase) private var getSeriesSeasonsUseCase
@@ -353,29 +352,6 @@ struct WatchSheetView: View {
             VStack(alignment: .center, spacing: 10) {
                 Button {
                     if let details, let selectedActing, let selectedQuality, let movie {
-                        if isLoggedIn {
-                            saveWatchingStateUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode, position: 0, total: 0)
-                                .sink { _ in } receiveValue: { _ in }
-                                .store(in: &subscriptions)
-                        }
-
-                        if let position = selectPositions.first(where: { position in
-                            position.id == selectedActing.voiceId
-                        }) {
-                            position.acting = selectedActing.translatorId
-                            position.season = selectedSeason?.seasonId
-                            position.episode = selectedEpisode?.episodeId
-                        } else {
-                            let position = SelectPosition(
-                                id: selectedActing.voiceId,
-                                acting: selectedActing.translatorId,
-                                season: selectedSeason?.seasonId,
-                                episode: selectedEpisode?.episodeId,
-                            )
-
-                            modelContext.insert(position)
-                        }
-
                         dismissWindow(id: "player")
 
                         openWindow(

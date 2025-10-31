@@ -432,7 +432,7 @@ struct DownloadSheetView: View {
                     Button {
                         if let selectedActing {
                             if isLoggedIn {
-                                saveWatchingStateUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode, position: 0, total: 0)
+                                saveWatchingStateUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode)
                                     .sink { _ in } receiveValue: { _ in }
                                     .store(in: &subscriptions)
                             }
@@ -486,7 +486,7 @@ struct DownloadSheetView: View {
                     Button {
                         if let selectedActing {
                             if isLoggedIn {
-                                saveWatchingStateUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode, position: 0, total: 0)
+                                saveWatchingStateUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode)
                                     .sink { _ in } receiveValue: { _ in }
                                     .store(in: &subscriptions)
                             }
