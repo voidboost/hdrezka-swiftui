@@ -21,6 +21,7 @@ struct ImageView: View {
             .resizable()
             .loadTransition(.blurReplace, animation: .easeInOut)
             .cancelOnDisappear(true)
+            .retry(NetworkRetryStrategy())
             .scaledToFit()
             .zoomable(
                 minZoomScale: 1,
@@ -53,6 +54,7 @@ struct ImageView: View {
                     .resizable()
                     .loadTransition(.opacity, animation: .easeInOut)
                     .cancelOnDisappear(true)
+                    .retry(NetworkRetryStrategy())
                     .scaledToFill()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
 
