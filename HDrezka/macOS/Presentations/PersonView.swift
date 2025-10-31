@@ -105,10 +105,12 @@ struct PersonView: View {
                                 .resizable()
                                 .loadTransition(.blurReplace, animation: .easeInOut)
                                 .cancelOnDisappear(true)
+                                .retry(NetworkRetryStrategy())
                         }
                         .resizable()
                         .loadTransition(.blurReplace, animation: .easeInOut)
                         .cancelOnDisappear(true)
+                        .retry(NetworkRetryStrategy())
                         .imageFill(2 / 3)
                         .frame(width: 250)
                         .contentShape(.rect(cornerRadius: 6))

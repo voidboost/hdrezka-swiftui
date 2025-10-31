@@ -862,7 +862,7 @@ struct PlayerView: View {
             }
 
             if let url = URL(string: poster) {
-                ImageDownloader.default.downloadImage(with: url) { result in
+                KingfisherManager.shared.retrieveImage(with: url) { result in
                     if case let .success(value) = result {
                         nowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: value.image.size) { _ in value.image }
                     }

@@ -125,6 +125,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                 .cropping(rect: frame)
                                 .loadTransition(.blurReplace, animation: .easeInOut)
                                 .cancelOnDisappear(true)
+                                .retry(NetworkRetryStrategy())
                                 .scaledToFill()
                                 .frame(width: frame.width, height: frame.height)
                                 .clipShape(.rect(cornerRadius: 6))

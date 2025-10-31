@@ -20,6 +20,7 @@ struct CollectionCardView: View {
                         .resizable()
                         .loadTransition(.blurReplace, animation: .easeInOut)
                         .cancelOnDisappear(true)
+                        .retry(NetworkRetryStrategy())
                         .imageFill(5 / 3)
                         .clipShape(.rect(cornerRadius: 6))
                         .contentShape(.rect(cornerRadius: 6))

@@ -24,6 +24,7 @@ struct CardView: View {
                         .resizable()
                         .loadTransition(.blurReplace, animation: .easeInOut)
                         .cancelOnDisappear(true)
+                        .retry(NetworkRetryStrategy())
                         .imageFill(2 / 3)
                         .clipShape(.rect(cornerRadius: 6))
                         .overlay(alignment: .topTrailing) {
