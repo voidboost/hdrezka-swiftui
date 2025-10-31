@@ -17,6 +17,7 @@
 		DE3DCCE62DFB92050062CF81 /* SwiftFormat in Frameworks */ = {isa = PBXBuildFile; productRef = DE3DCCE52DFB92050062CF81 /* SwiftFormat */; };
 		DE3EF0392CFF04CA0022C311 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DE3EF0382CFF04CA0022C311 /* Alamofire */; };
 		DE4AD63E2EAA4A7200CE7AB3 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = DE4AD63D2EAA4A7200CE7AB3 /* Kingfisher */; };
+		DE7608DA2EB4231600C4A23E /* LRUCache in Frameworks */ = {isa = PBXBuildFile; productRef = DE7608D92EB4231600C4A23E /* LRUCache */; };
 		DEB035B52C89E1DB004ABFA1 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B42C89E1DB004ABFA1 /* FirebaseAnalytics */; };
 		DEB035B72C89E1DB004ABFA1 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B62C89E1DB004ABFA1 /* FirebaseCrashlytics */; };
 		DEB035BA2C89E57A004ABFA1 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B92C89E57A004ABFA1 /* Defaults */; };
@@ -190,6 +191,7 @@
 				DEF920382DD5CAF20087C32C /* FactoryKit in Frameworks */,
 				DEB035B72C89E1DB004ABFA1 /* FirebaseCrashlytics in Frameworks */,
 				DE2D67382DC3D5E900A9187C /* LicensesList in Frameworks */,
+				DE7608DA2EB4231600C4A23E /* LRUCache in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -250,6 +252,7 @@
 				DEF920372DD5CAF20087C32C /* FactoryKit */,
 				DE3DCCE52DFB92050062CF81 /* SwiftFormat */,
 				DE4AD63D2EAA4A7200CE7AB3 /* Kingfisher */,
+				DE7608D92EB4231600C4A23E /* LRUCache */,
 			);
 			productName = HDRezka;
 			productReference = 04B3CA742BA06C9C0039F76E /* HDrezka.app */;
@@ -294,6 +297,7 @@
 				DEF920362DD5CAF20087C32C /* XCRemoteSwiftPackageReference "Factory" */,
 				DE3DCCE42DFB92050062CF81 /* XCRemoteSwiftPackageReference "SwiftFormat" */,
 				DE4AD63C2EAA4A7200CE7AB3 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				DE7608D82EB4231600C4A23E /* XCRemoteSwiftPackageReference "LRUCache" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 04B3CA752BA06C9C0039F76E /* Products */;
@@ -743,6 +747,15 @@
 				minimumVersion = 0.0.1;
 			};
 		};
+		DE7608D82EB4231600C4A23E /* XCRemoteSwiftPackageReference "LRUCache" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/nicklockwood/LRUCache.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 999.0.0;
+				minimumVersion = 0.0.1;
+			};
+		};
 		DEB035B32C89E1DB004ABFA1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
@@ -830,6 +843,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DE4AD63C2EAA4A7200CE7AB3 /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
+		};
+		DE7608D92EB4231600C4A23E /* LRUCache */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DE7608D82EB4231600C4A23E /* XCRemoteSwiftPackageReference "LRUCache" */;
+			productName = LRUCache;
 		};
 		DEB035B42C89E1DB004ABFA1 /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;

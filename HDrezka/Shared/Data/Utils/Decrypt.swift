@@ -1,19 +1,20 @@
 import Foundation
+import LRUCache
 
 func decrypt(encrypted: String) -> String {
     guard encrypted.hasPrefix("#") else { return encrypted }
 
     let trash = generateTrash()
-    var cache = [String: String]()
+    let cache = LRUCache<String, String>()
 
     func decryptRecursive(input: String) -> String {
-        if let cached = cache[input] {
+        if let cached = cache.value(forKey: input) {
             return cached
         } else {
             let indexes = input.indexesOf(substr: "//_//")
 
             if indexes.isEmpty {
-                cache[input] = input
+                cache.setValue(input, forKey: input)
                 return input
             } else {
                 let result = indexes
@@ -23,7 +24,7 @@ func decrypt(encrypted: String) -> String {
                     }
                     .min { $0.count < $1.count } ?? input
 
-                cache[input] = result
+                cache.setValue(result, forKey: input)
                 return result
             }
         }
