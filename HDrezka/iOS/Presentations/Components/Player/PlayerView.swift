@@ -641,6 +641,29 @@ struct PlayerView: View {
                 .sink { status in
                     switch status {
                     case .readyToPlay:
+                        if isLoggedIn {
+                            saveWatchingStateUseCase(voiceActing: voiceActing, season: season, episode: episode)
+                                .sink { _ in } receiveValue: { _ in }
+                                .store(in: &subscriptions)
+                        }
+
+                        if let position = selectPositions.first(where: { position in
+                            position.id == voiceActing.voiceId
+                        }) {
+                            position.acting = voiceActing.translatorId
+                            position.season = season?.seasonId
+                            position.episode = episode?.episodeId
+                        } else {
+                            let position = SelectPosition(
+                                id: voiceActing.voiceId,
+                                acting: voiceActing.translatorId,
+                                season: season?.seasonId,
+                                episode: episode?.episodeId,
+                            )
+
+                            modelContext.insert(position)
+                        }
+
                         currentItem.asset.loadMediaSelectionGroup(for: .legible) { mediaSelectionGroup, _ in
                             if let mediaSelectionGroup {
                                 currentItem.select(mediaSelectionGroup.options.filter { $0.extendedLanguageTag != nil }.first(where: { $0.extendedLanguageTag == subtitles }), in: mediaSelectionGroup)
@@ -1088,30 +1111,6 @@ struct PlayerView: View {
 
                             appState.isPremiumPresented = true
                         } else {
-                            if isLoggedIn {
-                                saveWatchingStateUseCase(voiceActing: voiceActing, season: season, episode: prevEpisode, position: 0, total: 0)
-                                    .sink { _ in } receiveValue: { _ in }
-                                    .store(in: &playerSubscriptions)
-                            }
-
-                            if let position = selectPositions.first(where: { position in
-                                position.id == voiceActing.voiceId
-                            }) {
-                                position.acting = voiceActing.translatorId
-                                position.season = season.seasonId
-                                position.episode = prevEpisode.episodeId
-
-                            } else {
-                                let position = SelectPosition(
-                                    id: voiceActing.voiceId,
-                                    acting: voiceActing.translatorId,
-                                    season: season.seasonId,
-                                    episode: prevEpisode.episodeId,
-                                )
-
-                                modelContext.insert(position)
-                            }
-
                             self.movie = movie
                             self.episode = prevEpisode
 
@@ -1140,29 +1139,6 @@ struct PlayerView: View {
 
                             appState.isPremiumPresented = true
                         } else {
-                            if isLoggedIn {
-                                saveWatchingStateUseCase(voiceActing: voiceActing, season: prevSeason, episode: prevEpisode, position: 0, total: 0)
-                                    .sink { _ in } receiveValue: { _ in }
-                                    .store(in: &playerSubscriptions)
-                            }
-
-                            if let position = selectPositions.first(where: { position in
-                                position.id == voiceActing.voiceId
-                            }) {
-                                position.acting = voiceActing.translatorId
-                                position.season = prevSeason.seasonId
-                                position.episode = prevEpisode.episodeId
-                            } else {
-                                let position = SelectPosition(
-                                    id: voiceActing.voiceId,
-                                    acting: voiceActing.translatorId,
-                                    season: prevSeason.seasonId,
-                                    episode: prevEpisode.episodeId,
-                                )
-
-                                modelContext.insert(position)
-                            }
-
                             self.movie = movie
                             self.season = prevSeason
                             self.episode = prevEpisode
@@ -1196,29 +1172,6 @@ struct PlayerView: View {
 
                             appState.isPremiumPresented = true
                         } else {
-                            if isLoggedIn {
-                                saveWatchingStateUseCase(voiceActing: voiceActing, season: season, episode: nextEpisode, position: 0, total: 0)
-                                    .sink { _ in } receiveValue: { _ in }
-                                    .store(in: &playerSubscriptions)
-                            }
-
-                            if let position = selectPositions.first(where: { position in
-                                position.id == voiceActing.voiceId
-                            }) {
-                                position.acting = voiceActing.translatorId
-                                position.season = season.seasonId
-                                position.episode = nextEpisode.episodeId
-                            } else {
-                                let position = SelectPosition(
-                                    id: voiceActing.voiceId,
-                                    acting: voiceActing.translatorId,
-                                    season: season.seasonId,
-                                    episode: nextEpisode.episodeId,
-                                )
-
-                                modelContext.insert(position)
-                            }
-
                             self.movie = movie
                             self.episode = nextEpisode
 
@@ -1247,29 +1200,6 @@ struct PlayerView: View {
 
                             appState.isPremiumPresented = true
                         } else {
-                            if isLoggedIn {
-                                saveWatchingStateUseCase(voiceActing: voiceActing, season: nextSeason, episode: nextEpisode, position: 0, total: 0)
-                                    .sink { _ in } receiveValue: { _ in }
-                                    .store(in: &playerSubscriptions)
-                            }
-
-                            if let position = selectPositions.first(where: { position in
-                                position.id == voiceActing.voiceId
-                            }) {
-                                position.acting = voiceActing.translatorId
-                                position.season = nextSeason.seasonId
-                                position.episode = nextEpisode.episodeId
-                            } else {
-                                let position = SelectPosition(
-                                    id: voiceActing.voiceId,
-                                    acting: voiceActing.translatorId,
-                                    season: nextSeason.seasonId,
-                                    episode: nextEpisode.episodeId,
-                                )
-
-                                modelContext.insert(position)
-                            }
-
                             self.movie = movie
                             self.season = nextSeason
                             self.episode = nextEpisode

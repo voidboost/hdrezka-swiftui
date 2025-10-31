@@ -15,7 +15,7 @@ protocol AccountRepository {
 
     func getWatchingLaterMovies() -> AnyPublisher<[MovieWatchLater], Error>
 
-    func saveWatchingState(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, position: Int, total: Int) -> AnyPublisher<Bool, Error>
+    func saveWatchingState(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, position: Int?, total: Int?) -> AnyPublisher<Bool, Error>
 
     func switchWatchedItem(item: MovieWatchLater) -> AnyPublisher<Bool, Error>
 

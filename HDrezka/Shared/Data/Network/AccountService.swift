@@ -9,7 +9,7 @@ enum AccountService {
     case checkEmail(email: String)
     case checkUsername(username: String)
     case getWatchingLaterMovies
-    case sendWatching(postId: String, translatorId: String, season: String?, episode: String?, currentTime: Int, duration: Int? = nil)
+    case sendWatching(postId: String, translatorId: String, season: String?, episode: String?, currentTime: Int?, duration: Int?)
     case switchWatchedItem(id: String)
     case removeWatchingItem(id: String)
     case getSeriesUpdates
