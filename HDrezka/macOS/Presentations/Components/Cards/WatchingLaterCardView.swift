@@ -39,19 +39,19 @@ struct WatchingLaterCardView: View {
                     }
                     .overlay(alignment: .bottomLeading) {
                         VStack(alignment: .leading, spacing: 2) {
-                            VStack(alignment: .leading) {
-                                if !movie.watchingInfo.isEmpty, let last = movie.watchingInfo.split(separator: "(", maxSplits: 1).last {
-                                    Text(String(last).trim().removeLastCharacterIf(character: ")"))
+                            if !movie.watchingInfo.isEmpty {
+                                VStack(alignment: .leading) {
+                                    Text(movie.watchingInfo.substringAfter("(").substringBeforeLast(")").trim())
                                         .font(.caption.weight(.semibold))
                                         .foregroundStyle(movie.buttonText != nil && !movie.watched ? Color.secondary : Color.primary)
                                         .lineLimit(1)
-                                }
 
-                                if !movie.watchingInfo.isEmpty, movie.watchingInfo.split(separator: "(", maxSplits: 1).count > 1, let first = movie.watchingInfo.split(separator: "(", maxSplits: 1).first {
-                                    Text(String(first).trim())
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundStyle(movie.buttonText != nil && !movie.watched ? Color.secondary : Color.primary)
-                                        .lineLimit(1)
+                                    if movie.watchingInfo.contains("(") {
+                                        Text(movie.watchingInfo.substringBefore("(").trim())
+                                            .font(.caption.weight(.semibold))
+                                            .foregroundStyle(movie.buttonText != nil && !movie.watched ? Color.secondary : Color.primary)
+                                            .lineLimit(1)
+                                    }
                                 }
                             }
 
@@ -101,6 +101,6 @@ struct WatchingLaterCardView: View {
         }
         .buttonStyle(.plain)
         .opacity(movie.watched ? 0.6 : 1)
-        .disabled(movie.watchLaterId.removeMirror().components(separatedBy: "/").count(where: { !$0.isEmpty }) != 3)
+        .disabled(movie.watchLaterId.id == nil)
     }
 }

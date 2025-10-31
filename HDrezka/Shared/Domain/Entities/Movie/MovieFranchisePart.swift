@@ -1,7 +1,7 @@
 import Foundation
 
 struct MovieFranchisePart: Identifiable, Codable, Hashable {
-    let franchiseId: String
+    let franchiseId: String?
     let name: String
     let year: String
     let rating: Float?
@@ -9,7 +9,7 @@ struct MovieFranchisePart: Identifiable, Codable, Hashable {
     let position: Int
     let id: UUID
 
-    init(franchiseId: String, name: String, year: String, rating: Float?, current: Bool, position: Int, id: UUID = .init()) {
+    init(franchiseId: String?, name: String, year: String, rating: Float?, current: Bool, position: Int, id: UUID = .init()) {
         self.franchiseId = franchiseId
         self.name = name
         self.year = year

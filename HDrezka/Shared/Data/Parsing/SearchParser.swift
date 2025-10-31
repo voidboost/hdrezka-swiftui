@@ -41,7 +41,7 @@ private extension Document {
 
 private extension Element {
     func getTypeId() throws -> String {
-        try select(".b-topnav__item-link").first().orThrow().attr("href").removeMirror()
+        try select(".b-topnav__item-link").first().orThrow().attr("href").cleanPath.orThrow()
     }
 
     func getTypeName() throws -> String {
@@ -53,7 +53,7 @@ private extension Element {
             .select("li a")
             .map {
                 let name = try $0.text()
-                let id = try $0.attr("href").removeMirror()
+                let id = try $0.attr("href").cleanPath.orThrow()
 
                 return MovieGenre(
                     name: name,
@@ -71,7 +71,7 @@ private extension Element {
             .select("option")
             .map {
                 let name = try $0.text()
-                let id = try $0.attr("value").removeMirror()
+                let id = try $0.attr("value").cleanPath.orThrow()
 
                 return MovieGenre(
                     name: name,

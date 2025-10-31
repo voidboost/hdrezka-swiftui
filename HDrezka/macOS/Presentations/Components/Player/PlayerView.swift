@@ -858,18 +858,6 @@ struct PlayerView: View {
                 }
                 .store(in: &subscriptions)
 
-//            NotificationCenter.default.publisher(for: AVPlayerItem.newErrorLogEntryNotification, object: currentItem)
-//                .compactMap { ($0.object as? AVPlayerItem)?.errorLog()?.events.last }
-//                .receive(on: DispatchQueue.main)
-//                .sink { error in
-//                    resetPlayer {
-//                        withAnimation(.easeInOut) {
-//                            self.error = HDrezkaErrorplayer(error.errorComment ?? "")
-//                        }
-//                    }
-//                }
-//                .store(in: &subscriptions)
-
             playerLayer.publisher(for: \.videoGravity)
                 .receive(on: DispatchQueue.main)
                 .sink { videoGravity in

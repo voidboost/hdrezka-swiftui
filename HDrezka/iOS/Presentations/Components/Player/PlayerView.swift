@@ -839,18 +839,6 @@ struct PlayerView: View {
                 }
                 .store(in: &playerSubscriptions)
 
-//            NotificationCenter.default.publisher(for: AVPlayerItem.newErrorLogEntryNotification, object: currentItem)
-//                .compactMap { ($0.object as? AVPlayerItem)?.errorLog()?.events.last }
-//                .receive(on: DispatchQueue.main)
-//                .sink { error in
-//                    resetPlayer {
-//                        withAnimation(.easeInOut) {
-//                            self.error = HDrezkaErrorplayer(error.errorComment ?? "")
-//                        }
-//                    }
-//                }
-//                .store(in: &playerSubscriptions)
-
             nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyAssetURL] = url
             nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyMediaType] = MPNowPlayingInfoMediaType.video.rawValue
             nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyIsLiveStream] = false

@@ -95,7 +95,6 @@ class MovieDetailsParser {
                 collections = try chunk.last().orThrow().getDetailsMovieCollections()
             case "Слоган":
                 slogan = try chunk.last().orThrow().text()
-//            case "В переводе":
             default:
                 if let act = try chunk.getDetailsActors() {
                     actors = act
@@ -182,7 +181,7 @@ class MovieDetailsParser {
                                 episodeId: episode.attr("data-episode_id"),
                                 name: episode.text().trimmingCharacters(in: .decimalDigits.inverted).isEmpty ? episode.text() : episode.text().trimmingCharacters(in: .decimalDigits.inverted),
                                 isSelected: episode.hasClass("active"),
-                                url: episode.hasAttr("href") ? episode.attr("href").removeMirror() : nil,
+                                url: episode.attr("href").cleanPath,
                             )
                         }
 
@@ -191,7 +190,7 @@ class MovieDetailsParser {
                         name: season.text().trimmingCharacters(in: .decimalDigits.inverted).isEmpty ? season.text() : season.text().trimmingCharacters(in: .decimalDigits.inverted),
                         episodes: seasonEpisodes,
                         isSelected: season.hasClass("active"),
-                        url: season.hasAttr("href") ? season.attr("href").removeMirror() : nil,
+                        url: season.attr("href").cleanPath,
                     )
                 }
         }
@@ -274,7 +273,7 @@ private extension Elements {
             .compactMap {
                 guard try !$0.select("a").isEmpty() else { return nil }
 
-                let link = try $0.select("a").attr("href").removeMirror()
+                let link = try $0.select("a").attr("href").cleanPath.orThrow()
                 let name = try $0.select("a").text()
                 let photo = try $0.select(".person-name-item").attr("data-photo")
 
@@ -298,7 +297,7 @@ private extension Elements {
             .compactMap {
                 guard try !$0.select("a").isEmpty() else { return nil }
 
-                let link = try $0.select("a").attr("href").removeMirror()
+                let link = try $0.select("a").attr("href").cleanPath.orThrow()
                 let name = try $0.select("a").text()
                 let photo = try $0.select(".person-name-item").attr("data-photo")
 
@@ -414,7 +413,7 @@ private extension Element {
                 isLiked: $0.select(".b-comment__like_it").first()?.hasClass("disabled") == true,
                 selfComment: $0.select(".b-comment__like_it").first()?.hasClass("self-disabled") == true,
                 isAdmin: $0.select(".b-comment").first()?.hasClass("b-comment__admin") == true,
-                deleteHash: $0.select(".actions").first()?.select(".edit li a").first(where: { try $0.text().contains("Удалить") })?.attr("onclick").components(separatedBy: "(").filter { !$0.isEmpty }.last?.components(separatedBy: ")").filter { !$0.isEmpty }.first?.components(separatedBy: ",").filter { !$0.isEmpty }.first(where: { $0.contains("'") })?.trimmingCharacters(in: .alphanumerics.inverted),
+                deleteHash: $0.select(".actions").first()?.select(".edit li a").first(where: { try $0.text().contains("Удалить") })?.attr("onclick").substringAfterLast("(").substringBefore(")").components(separatedBy: ",").filter { !$0.isEmpty }.first(where: { $0.contains("'") })?.trimmingCharacters(in: .alphanumerics.inverted),
             )
         }
     }
@@ -464,7 +463,7 @@ private extension Element {
             .map {
                 try MovieCountry(
                     name: $0.text(),
-                    countryId: $0.attr("href").removeMirror(),
+                    countryId: $0.attr("href").cleanPath.orThrow(),
                 )
             }
     }
@@ -474,7 +473,7 @@ private extension Element {
             .map {
                 try MovieGenre(
                     name: $0.text(),
-                    genreId: $0.attr("href").removeMirror(),
+                    genreId: $0.attr("href").cleanPath.orThrow(),
                 )
             }
     }
@@ -488,8 +487,8 @@ private extension Element {
 
                 return try MovieList(
                     name: listItem.select("a").first().orThrow().text(),
-                    listId: listItem.select("a").first().orThrow().attr("href").removeMirror(),
-                    moviePosition: Int(listItem.text().components(separatedBy: "(").filter { !$0.isEmpty }.last?.trimmingCharacters(in: .decimalDigits.inverted) ?? "").orThrow(),
+                    listId: listItem.select("a").first().orThrow().attr("href").cleanPath.orThrow(),
+                    moviePosition: Int(listItem.text().substringAfterLast("(").trimmingCharacters(in: .decimalDigits.inverted)).orThrow(),
                 )
             }
     }
@@ -497,7 +496,7 @@ private extension Element {
     func getDetailsMovieCollections() throws -> [MoviesCollection] {
         try select("a").map {
             try MoviesCollection(
-                collectionId: $0.attr("href").removeMirror().replacingOccurrences(of: "collections/", with: ""),
+                collectionId: $0.attr("href").cleanPath.orThrow().replacingOccurrences(of: "collections/", with: ""),
                 name: $0.text(),
                 poster: nil,
                 count: nil,
@@ -606,7 +605,7 @@ private extension Document {
                         episodeId: episode.attr("data-episode_id"),
                         name: episode.text().trimmingCharacters(in: .decimalDigits.inverted).isEmpty ? episode.text() : episode.text().trimmingCharacters(in: .decimalDigits.inverted),
                         isSelected: episode.hasClass("active"),
-                        url: episode.hasAttr("href") ? episode.attr("href").removeMirror() : nil,
+                        url: episode.attr("href").cleanPath,
                     )
                 }
 
@@ -629,7 +628,7 @@ private extension Document {
                             episodeId: episode.attr("data-episode_id"),
                             name: episode.text().trimmingCharacters(in: .decimalDigits.inverted).isEmpty ? episode.text() : episode.text().trimmingCharacters(in: .decimalDigits.inverted),
                             isSelected: episode.hasClass("active"),
-                            url: episode.hasAttr("href") ? episode.attr("href").removeMirror() : nil,
+                            url: episode.attr("href").cleanPath,
                         )
                     }
 
@@ -638,7 +637,7 @@ private extension Document {
                     name: season.text().trimmingCharacters(in: .decimalDigits.inverted).isEmpty ? season.text() : season.text().trimmingCharacters(in: .decimalDigits.inverted),
                     episodes: episodes,
                     isSelected: season.hasClass("active"),
-                    url: season.hasAttr("href") ? season.attr("href").removeMirror() : nil,
+                    url: season.attr("href").cleanPath,
                 )
             }
         }
@@ -660,7 +659,7 @@ private extension Document {
                         isDirector: $0.attr("data-director"),
                         isPremium: $0.hasClass("b-prem_translator"),
                         isSelected: $0.hasClass("active"),
-                        url: $0.hasAttr("href") ? $0.attr("href").removeMirror() : nil,
+                        url: $0.attr("href").cleanPath,
                     )
                 }
         } else {
@@ -730,7 +729,7 @@ private extension Document {
         return try select(".b-post__partcontent_item")
             .map { item in
                 let name = try item.select(".td.title").text()
-                let id = try item.getId()
+                let id = try item.attr("data-url").cleanPath
                 let year = try item.select(".td.year").text().trimmingCharacters(in: .decimalDigits.inverted)
                 let rating = try Float(item.select(".td.rating").text())
                 let current = item.hasClass("current")
@@ -762,11 +761,8 @@ private extension String {
         let trailerId = try SwiftSoup.parse(code)
             .select("iframe").first().orThrow()
             .attr("src")
-            .replacingOccurrences(of: "https://www.youtube.com/embed/", with: "")
-            .components(separatedBy: "?").filter { !$0.isEmpty }.first.orThrow()
-
-//        return "https://youtu.be/\(trailerId)"
-//        return "https://www.youtube.com/watch?v=\(trailerId)"
+            .substringAfter("https://www.youtube.com/embed/")
+            .substringBefore("?")
 
         return trailerId
     }
@@ -774,11 +770,7 @@ private extension String {
     func getMovieVideo() throws -> MovieVideo {
         guard let jsonObject =
             (try? JSONSerialization.jsonObject(with: data(using: .utf8).orThrow(), options: .allowFragments) as? [String: Any]) ??
-            range(of: "{\"id\":").flatMap({ startIndex in
-                range(of: "});", range: startIndex.lowerBound ..< endIndex).flatMap { endIndex in
-                    try? JSONSerialization.jsonObject(with: self[startIndex.lowerBound ... endIndex.lowerBound].data(using: .utf8).orThrow(), options: .allowFragments) as? [String: Any]
-                }
-            })
+            (try? JSONSerialization.jsonObject(with: substringAfter("{\"id\":", includeSeparator: true).substringBefore("); });").data(using: .utf8).orThrow(), options: .allowFragments) as? [String: Any])
         else {
             throw HDrezkaError.parseJson("json", "getMovieVideo")
         }
@@ -812,9 +804,9 @@ private extension String {
         }
 
         let subtitles: [MovieSubtitles] = if let subtitles = (jsonObject["subtitle"] as? String), let subtitlesLns = (jsonObject["subtitle_lns"] as? [String: Any]) {
-            try subtitles.components(separatedBy: ",").filter { !$0.isEmpty }.compactMap {
-                let name = try $0.components(separatedBy: "]").filter { !$0.isEmpty }.first.orThrow().replacingOccurrences(of: "[", with: "")
-                let link = try $0.components(separatedBy: "]").filter { !$0.isEmpty }.last.orThrow()
+            subtitles.components(separatedBy: ",").filter { !$0.isEmpty }.compactMap {
+                let name = $0.substringAfter("[").substringBefore("]")
+                let link = $0.substringAfter("]")
                 let lang = subtitlesLns[name] as? String
 
                 if let lang {

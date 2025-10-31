@@ -28,20 +28,12 @@ extension Document {
 }
 
 extension String {
-    var id: String? {
-        let string = if hasPrefix("/") {
-            String(dropFirst())
-        } else {
-            self
-        }
+    var id: String? { URL(string: self)?.id }
 
-        let parts = string.components(separatedBy: "/").filter { !$0.isEmpty }
+    var cleanPath: String? { URL(string: self)?.cleanPath }
 
-        if parts.count == 3, let id = parts[2].components(separatedBy: "-").filter({ !$0.isEmpty }).first, !id.isEmpty, id.isNumber, parts[2].hasSuffix(".html") {
-            return id
-        }
-
-        return nil
+    var isNumber: Bool {
+        CharacterSet.decimalDigits.isSuperset(of: CharacterSet(charactersIn: self))
     }
 
     var shortNumber: String {
@@ -83,20 +75,6 @@ extension String {
             return numFormatter.string(from: NSNumber(value: value)) ?? "0"
         } else {
             return "0"
-        }
-    }
-
-    var isNumber: Bool {
-        CharacterSet.decimalDigits.isSuperset(of: CharacterSet(charactersIn: self))
-    }
-
-    func removeMirror(_ scheme: String = "http") -> String {
-        if hasPrefix(scheme) {
-            components(separatedBy: "/").filter { !$0.isEmpty }.dropFirst(2).joined(separator: "/")
-        } else if hasPrefix("/") {
-            String(dropFirst())
-        } else {
-            self
         }
     }
 
