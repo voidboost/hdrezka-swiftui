@@ -644,7 +644,7 @@ struct PlayerView: View {
                         if isLoggedIn {
                             saveWatchingStateUseCase(voiceActing: voiceActing, season: season, episode: episode)
                                 .sink { _ in } receiveValue: { _ in }
-                                .store(in: &subscriptions)
+                                .store(in: &playerSubscriptions)
                         }
 
                         if let position = selectPositions.first(where: { position in
