@@ -9,7 +9,7 @@ extension Document {
 
 extension Element {
     func getId() throws -> String {
-        try attr("data-url").removeMirror()
+        try attr("data-url").cleanPath.orThrow()
     }
 
     func getName() throws -> String {

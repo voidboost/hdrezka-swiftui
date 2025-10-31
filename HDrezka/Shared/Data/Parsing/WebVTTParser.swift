@@ -219,10 +219,12 @@ private class CueTextParser {
     }
 
     func parseFrame() -> CGRect? {
-        if let frames = text.components(separatedBy: "#xywh=").filter({ !$0.isEmpty }).last?.components(separatedBy: ",").filter({ !$0.isEmpty }).compactMap({ Double($0) }), frames.count == 4 {
-            CGRect(x: frames[0], y: frames[1], width: frames[2], height: frames[3])
+        let frames = text.substringAfter("#xywh=").components(separatedBy: ",").filter { !$0.isEmpty }.compactMap { Double($0) }
+
+        if frames.count == 4 {
+            return CGRect(x: frames[0], y: frames[1], width: frames[2], height: frames[3])
         } else {
-            nil
+            return nil
         }
     }
 }

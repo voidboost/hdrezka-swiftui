@@ -418,20 +418,19 @@ struct CommentsView: View {
                     }
                 }
                 .environment(\.openURL, OpenURLAction { url in
-                    if let fragment = url.fragment(), fragment.contains("comment"), !url.path().isEmpty {
-                        let movieId = String(url.path().dropFirst())
+                    guard let path = url.cleanPath, url.id != nil else { return .systemAction }
+
+                    if let fragment = url.cleanFragment, fragment.contains("comment") {
                         let commentId = fragment.replacingOccurrences(of: "comment", with: "")
 
-                        viewModel.getComment(movieId: movieId, commentId: commentId)
+                        viewModel.getComment(movieId: path, commentId: commentId)
 
                         return .handled
-                    } else if !url.path().isEmpty, String(url.path().dropFirst()).id != nil {
-                        movieDestination = .init(movieId: String(url.path().dropFirst()))
+                    } else {
+                        movieDestination = .init(movieId: path)
 
                         return .handled
                     }
-
-                    return .systemAction
                 })
         }
     }

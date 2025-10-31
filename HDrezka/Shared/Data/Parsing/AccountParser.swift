@@ -32,7 +32,7 @@ class AccountParser {
                     .getSeriesUpdateItems()
                     .map { item in
                         try SeriesUpdateItem(
-                            seriesId: item.getSeriesUpdateId().removeMirror(),
+                            seriesId: item.getSeriesUpdateId(),
                             seriesName: item.getSeriesUpdateName(),
                             season: item.getSeriesUpdateSeason(),
                             releasedEpisode: item.getSeriesUpdateReleasedEpisode(),
@@ -96,7 +96,7 @@ private extension Document {
 
 private extension Element {
     func getWatchingLaterId() throws -> String {
-        try select(".td.title a").first().orThrow().attr("href").removeMirror()
+        try select(".td.title a").first().orThrow().attr("href").cleanPath.orThrow()
     }
 
     func getWatchingLaterCover() throws -> String {
@@ -142,7 +142,7 @@ private extension Element {
     }
 
     func getSeriesUpdateId() throws -> String {
-        try select(".b-seriesupdate__block_list_link").attr("href")
+        try select(".b-seriesupdate__block_list_link").attr("href").cleanPath.orThrow()
     }
 
     func getSeriesUpdateName() throws -> String {

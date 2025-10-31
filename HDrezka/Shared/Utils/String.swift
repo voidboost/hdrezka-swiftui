@@ -5,12 +5,6 @@ extension String {
         guard let first, first.isLowercase else { return self }
         return first.uppercased() + dropFirst()
     }
-
-    func removeLastCharacterIf(character: Character) -> String {
-        guard let last, last == character else { return self }
-
-        return String(dropLast())
-    }
 }
 
 extension LocalizedStringKey {
