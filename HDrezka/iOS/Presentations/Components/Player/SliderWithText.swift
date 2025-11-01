@@ -114,8 +114,8 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                 .scaledToFill()
                                 .frame(width: frame.width, height: frame.height)
                                 .clipShape(.rect(cornerRadius: 6))
-                                .background(.ultraThinMaterial, in: .rect(cornerRadius: 6))
-                                .overlay(.ultraThinMaterial, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                                .background(.ultraThickMaterial, in: .rect(cornerRadius: 6))
+                                .overlay(.ultraThickMaterial, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                                 .overlay(alignment: .bottom) {
                                     Text((T(Float(unitSeekImage)) * inRange.upperBound).asTimeString(style: .positional))
                                         .font(.caption)
