@@ -449,7 +449,7 @@ struct PlayerView: View {
                                 .padding(.leading, 16)
                                 .padding(.trailing, 36)
                                 .contentShape(.rect(topLeadingRadius: 6, bottomLeadingRadius: 6))
-                                .background(.ultraThinMaterial, in: .rect(topLeadingRadius: 6, bottomLeadingRadius: 6))
+                                .background(.ultraThickMaterial, in: .rect(topLeadingRadius: 6, bottomLeadingRadius: 6))
                             }
                             .buttonStyle(.plain)
                             .padding(.top, 102)

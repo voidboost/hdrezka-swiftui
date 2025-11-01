@@ -27,7 +27,7 @@ struct WatchingLaterCardView: View {
                     .clipShape(.rect(cornerRadius: 6))
                     .overlay(alignment: .bottomLeading) {
                         UnevenRoundedRectangle(bottomLeadingRadius: 6, bottomTrailingRadius: 6)
-                            .fill(.ultraThinMaterial)
+                            .fill(.ultraThickMaterial)
                             .mask {
                                 LinearGradient(stops: [
                                     .init(color: .clear, location: ((outerHeight - innerHeight) / outerHeight) * 0.75),

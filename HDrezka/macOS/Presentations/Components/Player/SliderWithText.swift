@@ -30,7 +30,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
         emptyColor: Color,
         height: Double,
         thumbnails: WebVTT?,
-        onEditingChanged: @escaping (Bool) -> Void = { _ in },
+        onEditingChanged: @escaping (Bool) -> Void = { _ in }
     ) {
         _value = value
         self.inRange = inRange
@@ -66,7 +66,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
 
                                         let point = CGPoint(
                                             x: isActive ? max(geometry.size.width * (Double(start / inRange.upperBound) + duration * 0.5), 0) : max(geometry.size.width * (Double(localRealProgress + localTempProgress) + duration * 0.5), 0),
-                                            y: (isActive ? height * 1.25 : height) * 0.5,
+                                            y: (isActive ? height * 1.25 : height) * 0.5
                                         )
 
                                         Color.black
@@ -98,7 +98,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                 localRealProgress = max(min(localRealProgress + localTempProgress, 1), 0)
                                 localTempProgress = 0
                                 progressDuration = inRange.upperBound * localRealProgress
-                            },
+                            }
                     )
                     .onContinuousHover { phase in
                         switch phase {
@@ -129,8 +129,8 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
                                 .scaledToFill()
                                 .frame(width: frame.width, height: frame.height)
                                 .clipShape(.rect(cornerRadius: 6))
-                                .background(.ultraThinMaterial, in: .rect(cornerRadius: 6))
-                                .overlay(.ultraThinMaterial, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                                .background(.ultraThickMaterial, in: .rect(cornerRadius: 6))
+                                .overlay(.ultraThickMaterial, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                                 .overlay(alignment: .bottom) {
                                     Text((T(Float(unitSeekImage)) * inRange.upperBound).asTimeString(style: .positional))
                                         .font(.caption)
