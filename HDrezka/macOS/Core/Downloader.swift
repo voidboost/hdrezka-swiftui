@@ -59,10 +59,14 @@ class Downloader {
             "--enable-rpc=true",
             "--rpc-listen-port=6800",
             "--rpc-secret=\(Const.token)",
+            "--min-split-size=1M",
+            "--max-connection-per-server=16",
+            "--split=16",
             "--max-concurrent-downloads=\(Defaults[.maxConcurrentDownloads])",
+            "--allow-overwrite=true",
             "--stop-with-process=\(ProcessInfo.processInfo.processIdentifier)",
             "--quiet=true",
-            "--allow-overwrite=true",
+            "--no-conf",
             "--user-agent=\(Const.userAgent)",
         ]
 
