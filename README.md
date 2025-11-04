@@ -28,11 +28,11 @@
 <ul>
     <li>
         <span> 💻 </span>
-        <a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.23.dmg" target="_blank">Скачать последнюю версию (macOS 15 Sequoia или новее)</a>
+        <a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.24.dmg" target="_blank">Скачать последнюю версию (macOS 15 Sequoia или новее)</a>
     </li>
     <li>
         <span> 📱 </span>
-        <a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.23.ipa" target="_blank">Скачать последнюю версию (iPadOS 18 или новее)</a>
+        <a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.24.ipa" target="_blank">Скачать последнюю версию (iPadOS 18 или новее)</a>
         <sup>бета</sup>
     </li>
 </ul>
