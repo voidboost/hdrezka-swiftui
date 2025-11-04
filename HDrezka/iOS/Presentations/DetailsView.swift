@@ -124,15 +124,21 @@ struct DetailsView: View {
         .sheet(isPresented: $isBookmarksPresented) {
             BookmarksSheetView(id: viewModel.id, isCreateBookmarkPresented: $isCreateBookmarkPresented)
                 .presentationSizing(.fitted)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $isCreateBookmarkPresented) {
             CreateBookmarkSheetView()
                 .presentationSizing(.fitted)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $isSchedulePresented) {
             if let details = viewModel.state.data, let schedule = details.schedule, !schedule.isEmpty {
                 ScheduleSheetView(schedule: schedule)
                     .presentationSizing(.fitted)
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.visible)
             }
         }
         .alert("key.ops", isPresented: $viewModel.isErrorPresented) {
@@ -279,6 +285,21 @@ struct DetailsView: View {
                                                 .lineLimit(1)
                                                 .contentShape(.capsule)
                                                 .background(Color.accentColor, in: .capsule)
+                                        }
+                                        .buttonStyle(.plain)
+
+                                        Button {
+                                            isDownloadPresented = true
+                                        } label: {
+                                            Label("key.download", systemImage: "arrow.down.circle")
+                                                .font(.body)
+                                                .foregroundStyle(Color.accentColor)
+                                                .padding(.horizontal, 14)
+                                                .padding(.vertical, 7)
+                                                .lineLimit(1)
+                                                .contentShape(.capsule)
+                                                .background(.tertiary.opacity(0.05), in: .capsule)
+                                                .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                                         }
                                         .buttonStyle(.plain)
 
@@ -548,6 +569,21 @@ struct DetailsView: View {
                                         }
                                         .buttonStyle(.plain)
 
+                                        Button {
+                                            isDownloadPresented = true
+                                        } label: {
+                                            Label("key.download", systemImage: "arrow.down.circle")
+                                                .font(.body)
+                                                .foregroundStyle(Color.accentColor)
+                                                .padding(.horizontal, 14)
+                                                .padding(.vertical, 7)
+                                                .lineLimit(1)
+                                                .contentShape(.capsule)
+                                                .background(.tertiary.opacity(0.05), in: .capsule)
+                                                .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
+                                        }
+                                        .buttonStyle(.plain)
+
                                         if ExternalPlayers.allCases.contains(where: { UIApplication.shared.canOpenURL($0.url) }) {
                                             Button {
                                                 isOpenExternalPlayerPresented = true
@@ -752,10 +788,20 @@ struct DetailsView: View {
                     .sheet(isPresented: $isPlayPresented) {
                         WatchSheetView(id: details.movieId, playerData: $playerData)
                             .presentationSizing(.fitted)
+                            .presentationDetents([.large])
+                            .presentationDragIndicator(.visible)
+                    }
+                    .sheet(isPresented: $isDownloadPresented) {
+                        DownloadSheetView(id: details.movieId)
+                            .presentationSizing(.fitted)
+                            .presentationDetents([.large])
+                            .presentationDragIndicator(.visible)
                     }
                     .sheet(isPresented: $isOpenExternalPlayerPresented) {
                         OpenExternalPlayerSheetView(id: details.movieId)
                             .presentationSizing(.fitted)
+                            .presentationDetents([.large])
+                            .presentationDragIndicator(.visible)
                     }
                     .fullScreenCover(item: $playerData) { data in
                         PlayerView(data: data)

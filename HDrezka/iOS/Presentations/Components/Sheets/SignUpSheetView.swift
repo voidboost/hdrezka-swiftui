@@ -140,17 +140,6 @@ struct SignUpSheetView: View {
                                     .background(Color.accentColor, in: .rect(cornerRadius: 6))
                             }
                             .buttonStyle(.plain)
-
-                            Button {
-                                dismiss()
-                            } label: {
-                                Text("key.cancel")
-                                    .frame(height: 30)
-                                    .frame(maxWidth: .infinity)
-                                    .contentShape(.rect(cornerRadius: 6))
-                                    .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
-                            }
-                            .buttonStyle(.plain)
                         }
                     }
                     .padding(15)
@@ -481,16 +470,6 @@ struct SignUpSheetView: View {
                             .buttonStyle(.plain)
                             .disabled(emailValid != true || usernameValid != true || passwordValid != true || confirmPasswordValid != true)
                             .animation(.easeInOut, value: emailValid == true && usernameValid == true && passwordValid == true && confirmPasswordValid == true)
-
-                            Button {
-                                dismiss()
-                            } label: {
-                                Text("key.cancel")
-                                    .frame(width: 250, height: 30)
-                                    .contentShape(.rect(cornerRadius: 6))
-                                    .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
-                            }
-                            .buttonStyle(.plain)
                         }
 
                         HStack(alignment: .center, spacing: 8) {
@@ -574,16 +553,6 @@ struct SignUpSheetView: View {
                                     .foregroundStyle(.white)
                                     .contentShape(.rect(cornerRadius: 6))
                                     .background(Color.accentColor, in: .rect(cornerRadius: 6))
-                            }
-                            .buttonStyle(.plain)
-
-                            Button {
-                                dismiss()
-                            } label: {
-                                Text("key.cancel")
-                                    .frame(width: 250, height: 30)
-                                    .contentShape(.rect(cornerRadius: 6))
-                                    .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
                             }
                             .buttonStyle(.plain)
                         }

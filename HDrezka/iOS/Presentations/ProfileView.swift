@@ -62,6 +62,10 @@ struct ProfileView: View {
                     Image(systemName: "checkmark.seal.text.page")
                 }
 
+                NavigationLink(value: Destinations.downloads) {
+                    Image(systemName: "arrow.down.circle")
+                }
+
                 if isLoggedIn {
                     Button {
                         appState.isSignOutPresented = true

@@ -130,16 +130,6 @@ struct CommentsView: View {
                 } else {
                     ProgressView()
                 }
-
-                Button {
-                    viewModel.isCommentPresented = false
-                } label: {
-                    Text("key.done")
-                        .frame(width: 250, height: 30)
-                        .contentShape(.rect(cornerRadius: 6))
-                        .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
-                }
-                .buttonStyle(.plain)
             }
             .padding(.horizontal, 35)
             .padding(.top, 35)
@@ -147,10 +137,14 @@ struct CommentsView: View {
             .frame(width: 650)
             .frame(maxHeight: 520)
             .presentationSizing(.fitted)
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
         }
         .sheet(item: $viewModel.reportComment) { comment in
             CommentReportSheet(comment: comment)
                 .presentationSizing(.fitted)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
         .confirmationDialog("key.comment.delete.label", isPresented: Binding {
             viewModel.deleteComment != nil

@@ -85,18 +85,6 @@ struct RestoreSheetView: View {
                         .buttonStyle(.plain)
                         .disabled(login.isEmpty)
                         .animation(.easeInOut, value: !login.isEmpty)
-
-                        Button {
-                            dismiss()
-
-                            appState.isSignInPresented = true
-                        } label: {
-                            Text("key.cancel")
-                                .frame(width: 250, height: 30)
-                                .contentShape(.rect(cornerRadius: 6))
-                                .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6)).background(Color.accentColor, in: .rect(cornerRadius: 6))
-                        }
-                        .buttonStyle(.plain)
                     }
                 }
                 .onAppear {
@@ -167,18 +155,6 @@ struct RestoreSheetView: View {
                                 .background(Color.accentColor, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
-
-                        Button {
-                            dismiss()
-
-                            appState.isSignInPresented = true
-                        } label: {
-                            Text("key.cancel")
-                                .frame(width: 250, height: 30)
-                                .contentShape(.rect(cornerRadius: 6))
-                                .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
-                        }
-                        .buttonStyle(.plain)
                     }
                 }
             }
@@ -191,13 +167,14 @@ struct RestoreSheetView: View {
         .alert("key.restore.success", isPresented: $isSuccessPresented) {
             Button(role: .cancel) {
                 dismiss()
-
-                appState.isSignInPresented = true
             } label: {
                 Text("key.ok")
             }
         } message: {
             Text("key.restore.success.message-\(email)")
+        }
+        .onDisappear {
+            appState.isSignInPresented = true
         }
         .analyticsScreen(name: "restore_sheet", class: "RestoreSheetView")
     }

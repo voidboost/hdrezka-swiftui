@@ -179,16 +179,6 @@ struct BookmarksSheetView: View {
                         .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
-
-                Button {
-                    dismiss()
-                } label: {
-                    Text("key.done")
-                        .frame(width: 250, height: 30)
-                        .contentShape(.rect(cornerRadius: 6))
-                        .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
-                }
-                .buttonStyle(.plain)
             }
         }
         .padding(.horizontal, 35)

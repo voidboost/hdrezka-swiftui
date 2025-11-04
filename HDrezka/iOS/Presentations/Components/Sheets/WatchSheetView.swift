@@ -365,16 +365,6 @@ struct WatchSheetView: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(selectedQuality == nil)
-
-                Button {
-                    dismiss()
-                } label: {
-                    Text("key.cancel")
-                        .frame(width: 250, height: 30)
-                        .contentShape(.rect(cornerRadius: 6))
-                        .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
-                }
-                .buttonStyle(.plain)
             }
         }
         .alert("key.ops", isPresented: $isErrorPresented) {

@@ -14,6 +14,8 @@ class Const {
 
     static let fakeUpdate = URL(string: "https://api.hdrezka.tech/")!
 
+    static let photos = URL(string: "photos-redirect://")!
+
     static let lastHdrezkaAppVersion = "2.2.2"
 
     static let premiumGradient = LinearGradient(colors: [

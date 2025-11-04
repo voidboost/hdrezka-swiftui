@@ -2301,6 +2301,28 @@
         }
       }
     },
+    "key.downloads" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloads"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Загрузки"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Завантаження"
+          }
+        }
+      }
+    },
     "key.downloads.empty" : {
       "localizations" : {
         "en" : {
@@ -4553,6 +4575,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Відкрити у сторонньому плеєрі"
+          }
+        }
+      }
+    },
+    "key.open.gallery" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open gallery"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть галерею"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити галерею"
           }
         }
       }

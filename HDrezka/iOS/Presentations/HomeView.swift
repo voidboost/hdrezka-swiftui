@@ -129,6 +129,8 @@ struct HomeView: View {
         .sheet(isPresented: $viewModel.isSeriesUpdatesPresented) {
             SeriesUpdatesSheetView(movieDestination: $movieDestination)
                 .presentationSizing(.fitted)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
         .navigationDestination(item: $movieDestination) {
             DetailsView(movie: $0)

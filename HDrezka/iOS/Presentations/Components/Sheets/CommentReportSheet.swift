@@ -94,16 +94,6 @@ struct CommentReportSheet: View {
                         .buttonStyle(.plain)
                         .disabled(report == nil || (report == .other && message.trim().isEmpty))
                         .animation(.easeInOut, value: (report != nil && report != .other) || (report == .other && !message.trim().isEmpty))
-
-                        Button {
-                            dismiss()
-                        } label: {
-                            Text("key.cancel")
-                                .frame(width: 250, height: 30)
-                                .contentShape(.rect(cornerRadius: 6))
-                                .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
-                        }
-                        .buttonStyle(.plain)
                     }
                 }
             case .loading:
@@ -168,16 +158,6 @@ struct CommentReportSheet: View {
                                 .foregroundStyle(.white)
                                 .contentShape(.rect(cornerRadius: 6))
                                 .background(Color.accentColor, in: .rect(cornerRadius: 6))
-                        }
-                        .buttonStyle(.plain)
-
-                        Button {
-                            dismiss()
-                        } label: {
-                            Text("key.cancel")
-                                .frame(width: 250, height: 30)
-                                .contentShape(.rect(cornerRadius: 6))
-                                .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6)).background(Color.accentColor, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                     }

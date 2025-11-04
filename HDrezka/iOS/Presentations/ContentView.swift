@@ -43,14 +43,20 @@ struct ContentView: View {
         .sheet(isPresented: $appState.isSignInPresented) {
             SignInSheetView()
                 .presentationSizing(.fitted)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $appState.isSignUpPresented) {
             SignUpSheetView()
                 .presentationSizing(.fitted)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $appState.isRestorePresented) {
             RestoreSheetView()
                 .presentationSizing(.fitted)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
         .confirmationDialog("key.sign_out.label", isPresented: $appState.isSignOutPresented) {
             Button(role: .destructive) {
@@ -69,6 +75,8 @@ struct ContentView: View {
         .sheet(isPresented: $appState.commentsRulesPresented) {
             CommentsRulesSheet()
                 .presentationSizing(.fitted)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
     }
 }

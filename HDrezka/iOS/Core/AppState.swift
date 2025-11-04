@@ -143,6 +143,7 @@ enum Destinations: Hashable, Identifiable {
     case comments(MovieDetailed)
     case settings
     case licenses
+    case downloads
 
     static func fromNamed(_ item: some Named) -> Destinations {
         if let country = item as? MovieCountry {
@@ -178,6 +179,8 @@ enum Destinations: Hashable, Identifiable {
             "setting"
         case .licenses:
             "licenses"
+        case .downloads:
+            "downloads"
         }
     }
 
@@ -199,6 +202,8 @@ enum Destinations: Hashable, Identifiable {
             "SettingView"
         case .licenses:
             "LicensesView"
+        case .downloads:
+            "DownloadsView"
         }
     }
 
@@ -286,6 +291,10 @@ extension View {
             case .licenses:
                 LicensesView()
                     .id("licenses")
+                    .analyticsScreen(name: destination.name, class: destination.className, extraParameters: destination.parameters)
+            case .downloads:
+                DownloadsView()
+                    .id("downloads")
                     .analyticsScreen(name: destination.name, class: destination.className, extraParameters: destination.parameters)
             }
         }

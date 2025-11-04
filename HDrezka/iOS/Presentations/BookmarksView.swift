@@ -314,10 +314,14 @@ struct BookmarksView: View {
         .sheet(item: $viewModel.renameBookmark) { bookmark in
             RenameBookmarkSheetView(bookmark: bookmark)
                 .presentationSizing(.fitted)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $viewModel.isCreateBookmarkPresented) {
             CreateBookmarkSheetView()
                 .presentationSizing(.fitted)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
         .background(.background)
     }
