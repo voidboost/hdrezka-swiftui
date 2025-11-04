@@ -1,7 +1,7 @@
 import Combine
 import Defaults
 import FactoryKit
-import MediaCore
+import Photos
 import SwiftData
 import UserNotifications
 
@@ -18,8 +18,6 @@ class Downloader {
     @ObservationIgnored @LazyInjected(\.getMovieVideoUseCase) private var getMovieVideoUseCase
 
     var downloads: [Download] = []
-
-//    @ObservationIgnored var backgroundCompletionHandler: (() -> Void)?
 
     init() {
         let open = UNNotificationAction(identifier: "open", title: String(localized: "key.open.gallery"))
@@ -41,125 +39,151 @@ class Downloader {
         self.modelContext = modelContext
     }
 
-    private func notificate(_ id: String, _ title: String, _ subtitle: String? = nil, _ category: String? = nil, _ userInfo: [AnyHashable: Any] = [:]) {
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
-            if settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional {
-                let content = UNMutableNotificationContent()
-                content.title = title
-                if let subtitle, !subtitle.isEmpty {
-                    content.subtitle = subtitle
-                }
-                content.sound = UNNotificationSound.default
-                if let category, !category.isEmpty {
-                    content.categoryIdentifier = category
-                }
-                content.userInfo = userInfo
+    private func notificate(_ id: String, _ title: String, _ subtitle: String? = nil, _ category: String? = nil, _ userInfo: [AnyHashable: Any] = [:]) async {
+        let settings = await UNUserNotificationCenter.current().notificationSettings()
 
-                let request = UNNotificationRequest(identifier: id, content: content, trigger: nil)
+        if settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional {
+            let content = UNMutableNotificationContent()
+            content.title = title
+            if let subtitle, !subtitle.isEmpty {
+                content.subtitle = subtitle
+            }
+            content.sound = UNNotificationSound.default
+            if let category, !category.isEmpty {
+                content.categoryIdentifier = category
+            }
+            content.userInfo = userInfo
 
-                UNUserNotificationCenter.current().add(request)
-            } else if settings.authorizationStatus == .notDetermined {
-                UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, _ in
-                    if granted {
-                        self.notificate(id, title, subtitle, category, userInfo)
-                    }
-                }
+            let request = UNNotificationRequest(identifier: id, content: content, trigger: nil)
+
+            try? await UNUserNotificationCenter.current().add(request)
+        } else if settings.authorizationStatus == .notDetermined {
+            if let granted = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]), granted {
+                await notificate(id, title, subtitle, category, userInfo)
             }
         }
     }
 
-    private func saveToPhotos(_ url: URL, _ data: DownloadData, _ retryData: Data, _ completion: @escaping () -> Void = {}) {
-        if Media.isAccessAllowed {
-            if let album = try? Album.with(localizedTitle: "HDrezka") {
-                do {
-                    try Video.save(.init(url: url)) { result in
-                        switch result {
-                        case let .success(video):
-                            album.add(video) { result in
-                                switch result {
-                                case .success:
-                                    try? FileManager.default.removeItem(at: url)
+    @ObservationIgnored
+    private var isAccessAllowed: Bool {
+        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
 
-                                    self.notificate(data.notificationId, String(localized: "key.download.success"), String(localized:
-                                        "key.download.success.notification-\(data.name)"), "open", ["url": Const.photos.absoluteString])
+        return status == .authorized || status == .limited
+    }
 
-                                    completion()
-                                case let .failure(error):
-                                    self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
-                                }
-                            }
-                        case let .failure(error):
-                            self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
-                        }
-                    }
-                } catch {
-                    notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
-                }
-            } else {
-                Album.create(title: "HDrezka") { result in
-                    switch result {
-                    case .success:
-                        self.saveToPhotos(url, data, retryData, completion)
-                    case let .failure(error):
-                        self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
-                    }
-                }
-            }
-        } else {
-            Media.requestPermission { result in
-                switch result {
-                case .success:
-                    self.saveToPhotos(url, data, retryData, completion)
-                case let .failure(error):
-                    self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
-                }
+    private func requestPermission() async throws {
+        guard !isAccessAllowed else { return }
+
+        let authorizationStatus = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
+
+        guard authorizationStatus == .authorized || authorizationStatus == .limited else { throw HDrezkaError.photosDenied }
+    }
+
+    private func getAlbum(localizedTitle: String) -> PHAssetCollection? {
+        let options = PHFetchOptions()
+        options.predicate = NSPredicate(format: "localizedTitle = %@", localizedTitle)
+
+        return PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: options).firstObject
+    }
+
+    private func getOrCreateAlbum(title: String, in folder: PHCollectionList? = nil) async throws -> PHAssetCollection {
+        if let album = getAlbum(localizedTitle: title) { return album }
+
+        try await PHPhotoLibrary.shared().performChanges {
+            let album = PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: title)
+
+            if let folder {
+                let listChangeRequest = PHCollectionListChangeRequest(for: folder)
+                listChangeRequest?.addChildCollections([album.placeholderForCreatedAssetCollection] as NSArray)
             }
         }
+
+        guard let album = getAlbum(localizedTitle: title) else { throw HDrezkaError.unknown }
+
+        return album
+    }
+
+    private func saveVideo(url: URL) async throws -> PHAsset {
+        var placeholder: PHObjectPlaceholder?
+
+        try await PHPhotoLibrary.shared().performChanges {
+            placeholder = PHAssetChangeRequest
+                .creationRequestForAssetFromVideo(atFileURL: url)?
+                .placeholderForCreatedAsset
+        }
+
+        guard let localIdentifier = placeholder?.localIdentifier else { throw HDrezkaError.unknown }
+
+        let options = PHFetchOptions()
+        options.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "mediaType = %d", PHAssetMediaType.video.rawValue),
+            NSPredicate(format: "localIdentifier = %@", localIdentifier),
+        ])
+
+        guard let asset = PHAsset.fetchAssets(with: options).firstObject else { throw HDrezkaError.unknown }
+
+        return asset
+    }
+
+    private func getVideos(album: PHAssetCollection) -> [PHAsset] {
+        let options = PHFetchOptions()
+        options.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.video.rawValue)
+        options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+
+        let assets = PHAsset.fetchAssets(in: album, options: options)
+
+        return assets.objects(at: IndexSet(integersIn: 0 ..< assets.count))
+    }
+
+    private func addVideoToAlbum(album: PHAssetCollection, video: PHAsset) async throws {
+        guard !getVideos(album: album).contains(where: { $0.localIdentifier == video.localIdentifier }) else { return }
+
+        try await PHPhotoLibrary.shared().performChanges {
+            let addAssetRequest = PHAssetCollectionChangeRequest(for: album)
+            let assets: NSArray = [video]
+            addAssetRequest?.addAssets(assets)
+        }
+    }
+
+    private func saveToPhotos(_ url: URL, _ data: DownloadData) async throws {
+        try await requestPermission()
+
+        let album = try await getOrCreateAlbum(title: "HDrezka")
+
+        let video = try await saveVideo(url: url)
+
+        try await addVideoToAlbum(album: album, video: video)
+
+        try? FileManager.default.removeItem(at: url)
+
+        await notificate(data.notificationId, String(localized: "key.download.success"), String(localized:
+            "key.download.success.notification-\(data.name)"), "open", ["url": Const.photos.absoluteString])
     }
 
     func download(_ data: DownloadData) {
         if let retryData = data.retryData {
-            let name = data.details.nameRussian
-
-            let actingName = if !data.acting.name.isEmpty {
-                " [\(data.acting.name)]"
-            } else {
-                ""
-            }
-
-            let qualityName = if !data.quality.isEmpty {
-                " [\(data.quality)]"
-            } else {
-                ""
-            }
-
             if let season = data.season, let episode = data.episode {
-                let (seasonName, episodeName) = (
-                    String(localized: "key.season-\(season.name.contains(/^\d/) ? season.name : season.seasonId)"),
-                    String(localized: "key.episode-\(episode.name.contains(/^\d/) ? episode.name : episode.episodeId)"),
-                )
-
-                let (movieFolder, seasonFolder, movieFile) = (
-                    name.count > 255 - actingName.count - qualityName.count ? "\(name.prefix(255 - actingName.count - qualityName.count - 4))... \(qualityName)\(actingName)" : "\(name)\(qualityName)\(actingName)",
-                    seasonName.count > 255 ? "\(seasonName.prefix(255 - 3))..." : "\(seasonName)",
-                    episodeName.count > 255 - 4 ? "\(episodeName.prefix(255 - 8))... .mp4" : "\(episodeName).mp4",
-                )
-
                 if let movieDestination = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?
                     .appending(path: "HDrezka", directoryHint: .isDirectory)
-                    .appending(path: movieFolder.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .isDirectory)
-                    .appending(path: seasonFolder.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .isDirectory)
-                    .appending(path: movieFile.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .notDirectory)
+                    .appending(path: data.file, directoryHint: .notDirectory)
                 {
                     getMovieVideoUseCase(voiceActing: data.acting, season: season, episode: episode, favs: data.details.favs)
                         .receive(on: DispatchQueue.main)
                         .sink { completion in
                             guard case let .failure(error) = completion else { return }
 
-                            self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
+                            Task { [weak self] in
+                                guard let self else { return }
+
+                                await notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
+                            }
                         } receiveValue: { movie in
                             if movie.needPremium {
-                                self.notificate(data.notificationId, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(data.name)"), "need_premium")
+                                Task { [weak self] in
+                                    guard let self else { return }
+
+                                    await notificate(data.notificationId, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(data.name)"), "need_premium")
+                                }
                             } else {
                                 if Defaults[.isLoggedIn] {
                                     self.saveWatchingStateUseCase(voiceActing: data.acting, season: season, episode: episode, position: 0, total: 0)
@@ -187,7 +211,11 @@ class Downloader {
                                 }
 
                                 if let movieUrl = movie.getClosestTo(quality: data.quality) {
-                                    self.notificate(data.notificationId, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(data.name)"), "cancel", ["id": data.notificationId])
+                                    Task { [weak self] in
+                                        guard let self else { return }
+
+                                        await notificate(data.notificationId, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(data.name)"), "cancel", ["id": data.notificationId])
+                                    }
 
                                     let request = self.session.download(movieUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination, [.createIntermediateDirectories, .removePreviousFile]) })
                                         .validate(statusCode: 200 ..< 400)
@@ -195,15 +223,29 @@ class Downloader {
                                             self.downloads.removeAll(where: { $0.id == data.notificationId })
 
                                             if let error = response.error {
-                                                if error.isExplicitlyCancelledError {
-                                                    self.notificate(data.notificationId, String(localized: "key.download.canceled"), String(localized: "key.download.canceled.notification-\(data.name)"), "retry", ["data": retryData])
-                                                } else {
-                                                    self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
+                                                Task { [weak self] in
+                                                    guard let self else { return }
+
+                                                    if error.isExplicitlyCancelledError {
+                                                        await notificate(data.notificationId, String(localized: "key.download.canceled"), String(localized: "key.download.canceled.notification-\(data.name)"), "retry", ["data": retryData])
+                                                    } else {
+                                                        await notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
+                                                    }
                                                 }
                                             } else if let destination = response.value {
-                                                self.saveToPhotos(destination, data, retryData) {
-                                                    if data.all, let nextEpisode = season.episodes.element(after: episode) {
-                                                        self.download(data.newEpisede(nextEpisode))
+                                                Task.detached { [weak self] in
+                                                    guard let self else { return }
+
+                                                    do {
+                                                        try await saveToPhotos(destination, data)
+
+                                                        if data.all, let nextEpisode = season.episodes.element(after: episode) {
+                                                            await MainActor.run {
+                                                                self.download(data.newEpisede(nextEpisode))
+                                                            }
+                                                        }
+                                                    } catch {
+                                                        await notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
                                                     }
                                                 }
                                             }
@@ -227,28 +269,38 @@ class Downloader {
                         }
                         .store(in: &subscriptions)
                 } else {
-                    notificate(data.notificationId, String(localized: "key.download.failed"), String(localized:
-                        "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
+                    Task { [weak self] in
+                        guard let self else { return }
+
+                        await notificate(data.notificationId, String(localized: "key.download.failed"), String(localized:
+                            "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
+                    }
                 }
             } else if let season = data.season, let episode = season.episodes.first {
                 download(data.newEpisede(episode))
             } else {
-                let file = name.count > 255 - 4 - actingName.count - qualityName.count ? "\(name.prefix(255 - 8 - actingName.count - qualityName.count))... \(qualityName)\(actingName).mp4" : "\(name)\(qualityName)\(actingName).mp4"
-
                 if let movieDestination = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?
                     .appending(path: "HDrezka", directoryHint: .isDirectory)
-                    .appending(path: file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .notDirectory)
+                    .appending(path: data.file, directoryHint: .notDirectory)
                 {
                     getMovieVideoUseCase(voiceActing: data.acting, season: nil, episode: nil, favs: data.details.favs)
                         .receive(on: DispatchQueue.main)
                         .sink { completion in
                             guard case let .failure(error) = completion else { return }
 
-                            self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized:
-                                "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
+                            Task { [weak self] in
+                                guard let self else { return }
+
+                                await notificate(data.notificationId, String(localized: "key.download.failed"), String(localized:
+                                    "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
+                            }
                         } receiveValue: { movie in
                             if movie.needPremium {
-                                self.notificate(data.notificationId, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(data.name)"), "need_premium")
+                                Task { [weak self] in
+                                    guard let self else { return }
+
+                                    await notificate(data.notificationId, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(data.name)"), "need_premium")
+                                }
                             } else {
                                 if Defaults[.isLoggedIn] {
                                     self.saveWatchingStateUseCase(voiceActing: data.acting, season: nil, episode: nil, position: 0, total: 0)
@@ -272,21 +324,36 @@ class Downloader {
                                 }
 
                                 if let movieUrl = movie.getClosestTo(quality: data.quality) {
-                                    self.notificate(data.notificationId, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(data.name)"), "cancel", ["id": data.notificationId])
+                                    Task { [weak self] in
+                                        guard let self else { return }
+
+                                        await notificate(data.notificationId, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(data.name)"), "cancel", ["id": data.notificationId])
+                                    }
 
                                     let request = self.session.download(movieUrl, method: .get, headers: [.userAgent(Const.userAgent)], to: { _, _ in (movieDestination, [.createIntermediateDirectories, .removePreviousFile]) })
                                         .validate(statusCode: 200 ..< 400)
                                         .responseURL(queue: .main) { response in
                                             self.downloads.removeAll(where: { $0.id == data.notificationId })
-
                                             if let error = response.error {
-                                                if error.isExplicitlyCancelledError {
-                                                    self.notificate(data.notificationId, String(localized: "key.download.canceled"), String(localized: "key.download.canceled.notification-\(data.name)"), "retry", ["data": retryData])
-                                                } else {
-                                                    self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
+                                                Task { [weak self] in
+                                                    guard let self else { return }
+
+                                                    if error.isExplicitlyCancelledError {
+                                                        await notificate(data.notificationId, String(localized: "key.download.canceled"), String(localized: "key.download.canceled.notification-\(data.name)"), "retry", ["data": retryData])
+                                                    } else {
+                                                        await notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
+                                                    }
                                                 }
                                             } else if let destination = response.value {
-                                                self.saveToPhotos(destination, data, retryData)
+                                                Task.detached { [weak self] in
+                                                    guard let self else { return }
+
+                                                    do {
+                                                        try await saveToPhotos(destination, data)
+                                                    } catch {
+                                                        await notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
+                                                    }
+                                                }
                                             }
                                         }
 
@@ -308,11 +375,19 @@ class Downloader {
                         }
                         .store(in: &subscriptions)
                 } else {
-                    notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
+                    Task { [weak self] in
+                        guard let self else { return }
+
+                        await notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
+                    }
                 }
             }
         } else {
-            notificate(UUID().uuidString, String(localized: "key.download.failed"))
+            Task { [weak self] in
+                guard let self else { return }
+
+                await notificate(UUID().uuidString, String(localized: "key.download.failed"))
+            }
         }
     }
 }

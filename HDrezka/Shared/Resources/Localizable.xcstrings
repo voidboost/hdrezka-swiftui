@@ -2609,6 +2609,28 @@
         }
       }
     },
+    "key.errors.photosDenied" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You have denied access to your photo library"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вы запретили доступ к своей фотобиблиотеке"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ви заборонили доступ до своєї фотобібліотеки"
+          }
+        }
+      }
+    },
     "key.errors.swiftsoup-%@-%@" : {
       "localizations" : {
         "en" : {

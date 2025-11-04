@@ -63,6 +63,10 @@ extension DownloadData {
         }
     }
 
+    var file: String {
+        "\(name.count > 255 - 4 ? "\(name.prefix(255 - 4 - 4))... " : name).mp4".replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":")
+    }
+
     var retryData: Data? {
         try? JSONEncoder().encode(self)
     }

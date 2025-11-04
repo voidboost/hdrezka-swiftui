@@ -15,7 +15,6 @@ struct WatchSheetView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
-    @Environment(\.modelContext) private var modelContext
 
     @Environment(AppState.self) private var appState
 

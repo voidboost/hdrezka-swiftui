@@ -37,10 +37,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         }
     }
 
-//    func application(_: UIApplication, handleEventsForBackgroundURLSession _: String, completionHandler: @escaping () -> Void) {
-//        Downloader.shared.backgroundCompletionHandler = completionHandler
-//    }
-
     func userNotificationCenter(_: UNUserNotificationCenter, willPresent _: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.list, .banner, .sound, .badge])
     }
