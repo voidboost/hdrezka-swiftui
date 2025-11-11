@@ -590,7 +590,7 @@ struct PlayerView: View {
                 break
             }
         }
-        .onKeyPress(keys: [.space, .init("m")], phases: .up) { keyPress in
+        .onKeyPress(keys: [.space, .init("m")], phases: .down) { keyPress in
             guard let player = playerLayer.player,
                   player.status == .readyToPlay,
                   !isPictureInPictureActive
