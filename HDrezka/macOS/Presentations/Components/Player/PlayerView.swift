@@ -171,7 +171,6 @@ struct PlayerView: View {
                                             .contentShape(.circle)
                                     }
                                     .buttonStyle(.plain)
-                                    .keyboardShortcut("m", modifiers: [])
                                     .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                                 }
                                 .frame(width: 30, height: 30)
@@ -219,7 +218,6 @@ struct PlayerView: View {
                                             .contentShape(.circle)
                                     }
                                     .buttonStyle(.plain)
-                                    .keyboardShortcut(.space, modifiers: [])
                                     .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                                 }
 
@@ -591,6 +589,28 @@ struct PlayerView: View {
             default:
                 break
             }
+        }
+        .onKeyPress(keys: [.space, .init("m")], phases: .up) { keyPress in
+            guard let player = playerLayer.player,
+                  player.status == .readyToPlay,
+                  !isPictureInPictureActive
+            else {
+                return .ignored
+            }
+
+            resetTimer()
+
+            if keyPress.key == .space {
+                if isPlaying {
+                    player.pause()
+                } else {
+                    player.playImmediately(atRate: rate)
+                }
+            } else {
+                player.isMuted.toggle()
+            }
+
+            return .handled
         }
         .gesture(WindowDragGesture())
         .allowsWindowActivationEvents()
