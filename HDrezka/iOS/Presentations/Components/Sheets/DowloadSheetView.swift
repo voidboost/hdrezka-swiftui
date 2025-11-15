@@ -635,7 +635,7 @@ struct DownloadSheetView: View {
                     .store(in: &subscriptions)
             }
         }
-        .analyticsScreen(name: "download_sheet", class: "DownloadSheetView", extraParameters: ["id": id])
+        .analyticsScreen(name: "download_sheet", class: "DownloadSheetView")
     }
 
     private struct CustomLabelStyle: LabelStyle {

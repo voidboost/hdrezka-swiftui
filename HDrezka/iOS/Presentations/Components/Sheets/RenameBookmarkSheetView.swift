@@ -160,7 +160,7 @@ struct RenameBookmarkSheetView: View {
         .padding(.bottom, 25)
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
-        .analyticsScreen(name: "rename_bookmark_sheet", class: "RenameBookmarkSheetView", extraParameters: bookmark.dictionary)
+        .analyticsScreen(name: "rename_bookmark_sheet", class: "RenameBookmarkSheetView")
     }
 
     private func load() {

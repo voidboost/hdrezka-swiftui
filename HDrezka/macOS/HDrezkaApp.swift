@@ -170,7 +170,7 @@ struct HDrezkaApp: App {
             if let data {
                 PlayerView(data: data)
                     .environment(appState)
-                    .analyticsScreen(name: "player", class: "PlayerView", extraParameters: data.dictionary)
+                    .analyticsScreen(name: "player", class: "PlayerView")
             }
         }
         .modelContainer(modelContainer)
@@ -184,7 +184,7 @@ struct HDrezkaApp: App {
             if let url {
                 ImageView(url: url)
                     .preferredColorScheme(theme.scheme)
-                    .analyticsScreen(name: "image", class: "ImageView", extraParameters: ["url": url])
+                    .analyticsScreen(name: "image", class: "ImageView")
             }
         }
         .defaultPosition(.center)

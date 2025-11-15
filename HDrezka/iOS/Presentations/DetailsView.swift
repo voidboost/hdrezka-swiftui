@@ -805,11 +805,11 @@ struct DetailsView: View {
                     }
                     .fullScreenCover(item: $playerData) { data in
                         PlayerView(data: data)
-                            .analyticsScreen(name: "player", class: "PlayerView", extraParameters: data.dictionary)
+                            .analyticsScreen(name: "player", class: "PlayerView")
                     }
                     .fullScreenCover(item: $imageURL) { url in
                         ImageView(url: url.url)
-                            .analyticsScreen(name: "image", class: "ImageView", extraParameters: ["url": url.url])
+                            .analyticsScreen(name: "image", class: "ImageView")
                     }
 
                     Divider().opacity(0)

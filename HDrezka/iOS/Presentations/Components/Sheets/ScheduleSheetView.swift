@@ -37,7 +37,7 @@ struct ScheduleSheetView: View {
         .padding(.top, 35)
         .padding(.bottom, 25)
         .frame(width: 520, height: 520)
-        .analyticsScreen(name: "schedule_sheet", class: "ScheduleSheetView", extraParameters: ["schedule": schedule])
+        .analyticsScreen(name: "schedule_sheet", class: "ScheduleSheetView")
     }
 
     private struct CustomSection: View {
