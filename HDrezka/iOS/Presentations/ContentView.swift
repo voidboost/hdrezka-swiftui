@@ -21,7 +21,7 @@ struct ContentView: View {
         TabView(selection: $appState.selectedTab) {
             ForEach(Tabs.allCases) { tab in
                 Tab(value: tab, role: tab.role) {
-                    tab.content()
+                    tab
                 } label: {
                     Label {
                         Text(tab.label)

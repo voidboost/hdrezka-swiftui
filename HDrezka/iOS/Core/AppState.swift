@@ -17,7 +17,7 @@ class AppState {
     var selectedTab: Tabs = .home
 }
 
-enum Tabs: Hashable, Identifiable, CaseIterable {
+enum Tabs: Hashable, Identifiable, CaseIterable, View {
     case home
     case categories
     case collections
@@ -93,8 +93,7 @@ enum Tabs: Hashable, Identifiable, CaseIterable {
         }
     }
 
-    @ViewBuilder
-    func content() -> some View {
+    var body: some View {
         NavigationStack {
             switch self {
             case .home:

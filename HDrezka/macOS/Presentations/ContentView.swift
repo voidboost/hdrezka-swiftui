@@ -27,7 +27,7 @@ struct ContentView: View {
         TabView(selection: $appState.selectedTab) {
             ForEach(Tabs.allCases.filter { !$0.needAccount }) { tab in
                 Tab(value: tab) {
-                    tab.content()
+                    tab
                 } label: {
                     Label {
                         Text(tab.label)
@@ -41,7 +41,7 @@ struct ContentView: View {
                 TabSection {
                     ForEach(Tabs.allCases.filter(\.needAccount)) { tab in
                         Tab(value: tab) {
-                            tab.content()
+                            tab
                         } label: {
                             Label {
                                 Text(tab.label)
