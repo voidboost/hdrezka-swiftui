@@ -291,19 +291,44 @@ struct SettingsView: View {
     }
 
     private func migrateCookies(_ from: URL, _ to: URL) {
-        if isLoggedIn {
-            HTTPCookieStorage.shared.cookies(for: from)?.forEach { cookie in
-                var cookieProperties = [HTTPCookiePropertyKey: Any]()
-                cookieProperties[.version] = cookie.version
-                cookieProperties[.name] = cookie.name
-                cookieProperties[.value] = cookie.value
-                cookieProperties[.expires] = cookie.expiresDate
-                cookieProperties[.domain] = ".\(to.host() ?? "")"
-                cookieProperties[.path] = cookie.path
+        guard isLoggedIn,
+              let cookies = HTTPCookieStorage.shared.cookies(for: from),
+              !cookies.isEmpty,
+              let host = to.host(),
+              !host.isEmpty
+        else {
+            return
+        }
 
-                if let newCookie = HTTPCookie(properties: cookieProperties) {
-                    HTTPCookieStorage.shared.setCookie(newCookie)
-                }
+        for cookie in cookies {
+            HTTPCookieStorage.shared.deleteCookie(cookie)
+
+            var props: [HTTPCookiePropertyKey: Any] = [
+                .name: cookie.name,
+                .value: cookie.value,
+                .domain: ".\(host)",
+                .path: cookie.path,
+                .version: cookie.version,
+            ]
+
+            if let expires = cookie.expiresDate {
+                props[.expires] = expires
+            }
+
+            if cookie.isSecure {
+                props[.secure] = true
+            }
+
+            if cookie.isHTTPOnly {
+                props[HTTPCookiePropertyKey("HttpOnly")] = true
+            }
+
+            if cookie.isSessionOnly {
+                props[HTTPCookiePropertyKey("SessionOnly")] = true
+            }
+
+            if let newCookie = HTTPCookie(properties: props) {
+                HTTPCookieStorage.shared.setCookie(newCookie)
             }
         }
     }
