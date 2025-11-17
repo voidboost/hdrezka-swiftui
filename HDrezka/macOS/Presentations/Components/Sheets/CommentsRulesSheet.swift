@@ -122,13 +122,16 @@ struct CommentsRulesSheet: View {
 
             VStack(alignment: .center, spacing: 10) {
                 Button {
-                    if let cookie = HTTPCookie(properties: [
-                        .name: "allowed_comments",
-                        .value: "1",
-                        .domain: ".\(mirror.host() ?? "")",
-                        .path: "/",
-                        .expires: Date.now.addingTimeInterval(30 * 24 * 60 * 60),
-                    ]) {
+                    if let host = mirror.host(),
+                       !host.isEmpty,
+                       let cookie = HTTPCookie(properties: [
+                           .name: "allowed_comments",
+                           .value: "1",
+                           .domain: ".\(host)",
+                           .path: "/",
+                           .expires: Date.now.addingTimeInterval(30 * 24 * 60 * 60),
+                       ])
+                    {
                         HTTPCookieStorage.shared.setCookie(cookie)
 
                         allowedComments = true
