@@ -316,7 +316,7 @@ private extension Publisher {
         return error
     }
 
-    func recordToCrashlytics(_ error: Error) {
+    private func recordToCrashlytics(_ error: Error) {
         Crashlytics.crashlytics().record(error: error)
     }
 }
