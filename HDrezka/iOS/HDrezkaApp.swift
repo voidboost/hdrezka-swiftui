@@ -13,6 +13,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         UNUserNotificationCenter.current().delegate = self
 
         FirebaseApp.configure()
+        Crashlytics.crashlytics().setUserID(Const.deviceUUID)
+        Analytics.setUserID(Const.deviceUUID)
 
         #if DEBUG
             Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(false)
