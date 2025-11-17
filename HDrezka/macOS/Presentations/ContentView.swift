@@ -58,7 +58,7 @@ struct ContentView: View {
         .tabViewStyle(.sidebarAdaptable)
         .tabViewSidebarHeader {
             if let isUserPremium {
-                Link(destination: (mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory)) {
+                Link(destination: (!_mirror.isDefaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory)) {
                     HStack(spacing: 3) {
                         Image("Premium")
                             .foregroundStyle(Color(red: 222.0 / 255.0, green: 21.0 / 255.0, blue: 226.0 / 255.0))
@@ -151,7 +151,7 @@ struct ContentView: View {
         }
         .dialogSeverity(.critical)
         .confirmationDialog("key.premium_content", isPresented: $appState.isPremiumPresented) {
-            Link("key.buy", destination: (mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
+            Link("key.buy", destination: (!_mirror.isDefaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
         } message: {
             Text("key.premium.description")
         }

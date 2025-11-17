@@ -63,7 +63,7 @@ struct SettingsView: View {
                             }
 
                         Button {
-                            if currentMirror != _currentMirror.defaultValue {
+                            if !_currentMirror.isDefaultValue {
                                 migrateCookies(currentMirror, _currentMirror.defaultValue)
 
                                 _currentMirror.reset()

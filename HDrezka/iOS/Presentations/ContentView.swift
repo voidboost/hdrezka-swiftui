@@ -68,7 +68,7 @@ struct ContentView: View {
             Text("key.sign_out.q")
         }
         .confirmationDialog("key.premium_content", isPresented: $appState.isPremiumPresented) {
-            Link("key.buy", destination: (mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
+            Link("key.buy", destination: (!_mirror.isDefaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
         } message: {
             Text("key.premium.description")
         }

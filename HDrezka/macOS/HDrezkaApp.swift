@@ -74,7 +74,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
                     Downloader.shared.download(data)
                 }
             case "need_premium":
-                NSWorkspace.shared.open((Defaults[.mirror] != Defaults.Keys.mirror.defaultValue ? Defaults[.mirror] : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
+                NSWorkspace.shared.open((!Defaults.Keys.mirror.isDefaultValue ? Defaults[.mirror] : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
             default:
                 break
             }

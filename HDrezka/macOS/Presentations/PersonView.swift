@@ -58,7 +58,7 @@ struct PersonView: View {
             }
 
             ToolbarItem(placement: .primaryAction) {
-                ShareLink(item: (mirror != _mirror.defaultValue ? mirror : Const.redirectMirror).appending(path: viewModel.id, directoryHint: .notDirectory)) {
+                ShareLink(item: (!_mirror.isDefaultValue ? mirror : Const.redirectMirror).appending(path: viewModel.id, directoryHint: .notDirectory)) {
                     Image(systemName: "square.and.arrow.up")
                 }
                 .disabled(viewModel.state.data == nil)

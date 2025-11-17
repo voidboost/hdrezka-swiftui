@@ -60,8 +60,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                 Downloader.shared.download(data)
             }
         case "need_premium":
-            if UIApplication.shared.canOpenURL((Defaults[.mirror] != Defaults.Keys.mirror.defaultValue ? Defaults[.mirror] : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory)) {
-                UIApplication.shared.open((Defaults[.mirror] != Defaults.Keys.mirror.defaultValue ? Defaults[.mirror] : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
+            if UIApplication.shared.canOpenURL((!Defaults.Keys.mirror.isDefaultValue ? Defaults[.mirror] : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory)) {
+                UIApplication.shared.open((!Defaults.Keys.mirror.isDefaultValue ? Defaults[.mirror] : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
             }
         default:
             break
