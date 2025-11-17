@@ -413,34 +413,16 @@ struct SettingsView: View {
             return
         }
 
+        let newDomain = ".\(host)"
+
         for cookie in cookies {
             HTTPCookieStorage.shared.deleteCookie(cookie)
 
-            var props: [HTTPCookiePropertyKey: Any] = [
-                .name: cookie.name,
-                .value: cookie.value,
-                .domain: ".\(host)",
-                .path: cookie.path,
-                .version: cookie.version,
-            ]
+            guard var properties = cookie.properties else { continue }
 
-            if let expires = cookie.expiresDate {
-                props[.expires] = expires
-            }
+            properties[.domain] = newDomain
 
-            if cookie.isSecure {
-                props[.secure] = true
-            }
-
-            if cookie.isHTTPOnly {
-                props[HTTPCookiePropertyKey("HttpOnly")] = true
-            }
-
-            if cookie.isSessionOnly {
-                props[HTTPCookiePropertyKey("SessionOnly")] = true
-            }
-
-            if let newCookie = HTTPCookie(properties: props) {
+            if let newCookie = HTTPCookie(properties: properties) {
                 HTTPCookieStorage.shared.setCookie(newCookie)
             }
         }

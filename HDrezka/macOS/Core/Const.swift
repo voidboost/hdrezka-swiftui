@@ -66,7 +66,7 @@ class Const {
                 .init(name: "X-Hdrezka-Android-App", value: "1"),
                 .init(name: "X-Hdrezka-Android-App-Version", value: Defaults[.lastHdrezkaAppVersion]),
                 .userAgent(userAgent),
-            ] : [.userAgent(userAgent)]
+            ] : [.userAgent(userAgent)],
         )
     }
 }
