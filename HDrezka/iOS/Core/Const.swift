@@ -38,11 +38,21 @@ class Const {
             }
         }
 
-        if let uuid = UIDevice.current.identifierForVendor?.uuidString {
-            return "\(appName)/\(appVersion)(\(appBundle)) (\(deviceModel); \(osName) \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion); \(uuid))"
+        return "\(appName)/\(appVersion)(\(appBundle)) (\(deviceModel); \(osName) \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion); \(Self.deviceUUID))"
+    }
+
+    static var deviceUUID: String {
+        if let uuid = UIDevice.current.identifierForVendor?.uuidString, !uuid.isEmpty {
+            return uuid.uppercased()
         }
 
-        return "\(appName)/\(appVersion)(\(appBundle)) (\(deviceModel); \(osName) \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion))"
+        if let uuid = Defaults[.deviceUUID], !uuid.isEmpty {
+            return uuid.uppercased()
+        }
+
+        let uuid = UUID().uuidString.uppercased()
+        Defaults[.deviceUUID] = uuid
+        return uuid
     }
 
     static var headers: HTTPHeaders {
@@ -51,7 +61,7 @@ class Const {
                 .init(name: "X-Hdrezka-Android-App", value: "1"),
                 .init(name: "X-Hdrezka-Android-App-Version", value: Defaults[.lastHdrezkaAppVersion]),
                 .userAgent(userAgent),
-            ] : [.userAgent(userAgent)],
+            ] : [.userAgent(userAgent)]
         )
     }
 }

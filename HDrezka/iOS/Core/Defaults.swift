@@ -18,4 +18,5 @@ extension Defaults.Keys {
     static let isUserPremium = Key<Int?>("is_user_premium", default: nil)
     static let isLoggedIn = Key<Bool>("is_logged_in", default: false)
     static let allowedComments = Key<Bool>("allowed_comments", default: false)
+    static let deviceUUID = Key<String?>("device_uuid", default: nil)
 }
