@@ -268,14 +268,14 @@ struct HDrezkaApp: App {
                     credits.addAttribute(.link, value: Const.helpUkraine, range: NSRange(location: 0, length: credits.length))
                     credits.append(NSAttributedString(string: "\n\n© 2025 "))
                     credits.append(NSAttributedString(string: "HDrezka macOS", attributes: [.link: Const.github]))
-                    credits.append(NSAttributedString(string: "\n\nDevice ID: \(Const.deviceUUID)"))
+                    credits.append(NSAttributedString(string: "\n\n\(String(localized: "key.id-\(Const.deviceUUID)"))"))
                     credits.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: credits.length))
 
                     NSApp.orderFrontStandardAboutPanel(options: [.credits: credits])
                 } else {
                     let credits = NSMutableAttributedString(string: "© 2025 ")
                     credits.append(NSAttributedString(string: "HDrezka macOS", attributes: [.link: Const.github]))
-                    credits.append(NSAttributedString(string: "\n\nDevice ID: \(Const.deviceUUID)"))
+                    credits.append(NSAttributedString(string: "\n\n\(String(localized: "key.id-\(Const.deviceUUID)"))"))
                     credits.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: credits.length))
 
                     NSApp.orderFrontStandardAboutPanel(options: [.credits: credits])

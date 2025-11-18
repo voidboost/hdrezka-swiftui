@@ -3401,6 +3401,28 @@
         }
       }
     },
+    "key.id-%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Device ID: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Идентификатор устройства: %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ідентифікатор пристрою: %@"
+          }
+        }
+      }
+    },
     "key.imageViewer" : {
       "localizations" : {
         "en" : {

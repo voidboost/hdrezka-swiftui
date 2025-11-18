@@ -57,7 +57,7 @@ struct ProfileView: View {
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.large)
         .overlay(alignment: .bottom) {
-            Text(verbatim: "Device ID: \(Const.deviceUUID)")
+            Text("key.id-\(Const.deviceUUID)")
                 .foregroundStyle(.secondary)
                 .textSelection(.enabled)
         }
