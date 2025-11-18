@@ -17,6 +17,7 @@ struct SettingsView: View {
     @Default(.cache) private var cache
 
     @Environment(Downloader.self) private var downloader
+    @Environment(CookiesManager.self) private var cookiesManager
 
     @Environment(\.modelContext) private var modelContext
 
@@ -80,9 +81,9 @@ struct SettingsView: View {
 
                     Button {
                         if !_currentMirror.isDefaultValue {
-                            migrateCookies(currentMirror, _currentMirror.defaultValue)
-
-                            _currentMirror.reset()
+                            cookiesManager.migrateCookies(from: currentMirror, to: _currentMirror.defaultValue) {
+                                _currentMirror.reset()
+                            }
                         }
 
                         mirrorValid = nil
@@ -108,9 +109,9 @@ struct SettingsView: View {
                         urlComponents.password = nil
 
                         if let newMirror = urlComponents.url, currentMirror != newMirror {
-                            migrateCookies(currentMirror, newMirror)
-
-                            currentMirror = newMirror
+                            cookiesManager.migrateCookies(from: currentMirror, to: newMirror) {
+                                currentMirror = newMirror
+                            }
                         }
 
                         withAnimation(.easeInOut) {
@@ -400,31 +401,6 @@ struct SettingsView: View {
         .background(.background)
         .onChange(of: currentMirror) {
             mirror = nil
-        }
-    }
-
-    private func migrateCookies(_ from: URL, _ to: URL) {
-        guard isLoggedIn,
-              let cookies = HTTPCookieStorage.shared.cookies(for: from),
-              !cookies.isEmpty,
-              let host = to.host(),
-              !host.isEmpty
-        else {
-            return
-        }
-
-        let newDomain = ".\(host)"
-
-        for cookie in cookies {
-            HTTPCookieStorage.shared.deleteCookie(cookie)
-
-            guard var properties = cookie.properties else { continue }
-
-            properties[.domain] = newDomain
-
-            if let newCookie = HTTPCookie(properties: properties) {
-                HTTPCookieStorage.shared.setCookie(newCookie)
-            }
         }
     }
 }

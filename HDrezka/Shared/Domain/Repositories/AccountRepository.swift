@@ -7,7 +7,7 @@ protocol AccountRepository {
 
     func restore(login: String) -> AnyPublisher<String?, Error>
 
-    func logout()
+    func logout() -> AnyPublisher<Bool, Error>
 
     func checkEmail(email: String) -> AnyPublisher<Bool, Error>
 

@@ -6,6 +6,7 @@ enum AccountService {
     case signIn(login: String, password: String)
     case signUp(email: String, login: String, password: String)
     case restore(login: String)
+    case logout
     case checkEmail(email: String)
     case checkUsername(username: String)
     case getWatchingLaterMovies
@@ -43,6 +44,8 @@ extension AccountService: URLRequestConvertible {
             "engine/ajax/quick_register.php"
         case .restore:
             "index.php"
+        case .logout:
+            "logout/"
         case .checkEmail, .checkUsername:
             "engine/ajax/registration.php"
         case .getWatchingLaterMovies:

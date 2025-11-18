@@ -10,20 +10,6 @@ final class CustomMonitor: EventMonitor {
         #else
             Crashlytics.crashlytics().log(response.customDebugDescription)
         #endif
-
-        check()
-    }
-
-    private func check() {
-        let isLoggedIn = HTTPCookieStorage.shared.cookies(for: Defaults[.mirror])?.first { $0.name == "dle_password" }?.value.isNotEqualAndNotEmpty("deleted") ?? false
-
-        Defaults[.isLoggedIn] = isLoggedIn
-
-        if !isLoggedIn {
-            Defaults[.isUserPremium] = nil
-        }
-
-        Defaults[.allowedComments] = HTTPCookieStorage.shared.cookies(for: Defaults[.mirror])?.first { $0.name == "allowed_comments" }?.value.isEqual("1") ?? false
     }
 }
 

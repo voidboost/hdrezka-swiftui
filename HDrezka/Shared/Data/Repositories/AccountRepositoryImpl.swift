@@ -45,11 +45,14 @@ struct AccountRepositoryImpl: AccountRepository {
             .eraseToAnyPublisher()
     }
 
-    func logout() {
-        HTTPCookieStorage.shared.cookies?.forEach(HTTPCookieStorage.shared.deleteCookie)
-
-        Defaults[.isLoggedIn] = false
-        Defaults[.isUserPremium] = nil
+    func logout() -> AnyPublisher<Bool, Error> {
+        session.request(AccountService.logout)
+            .validate(statusCode: 200 ..< 400)
+            .publishUnserialized()
+            .value()
+            .tryMap { _ in true }
+            .handleError()
+            .eraseToAnyPublisher()
     }
 
     func checkEmail(email: String) -> AnyPublisher<Bool, Error> {

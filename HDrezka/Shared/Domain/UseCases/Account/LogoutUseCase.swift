@@ -7,7 +7,7 @@ struct LogoutUseCase {
         self.repository = repository
     }
 
-    func callAsFunction() {
+    func callAsFunction() -> AnyPublisher<Bool, Error> {
         repository.logout()
     }
 }

@@ -118,6 +118,7 @@ struct HDrezkaApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @State private var appState: AppState = .shared
     @State private var downloader: Downloader = .shared
+    @State private var cookiesManager: CookiesManager = .shared
     @Environment(\.openWindow) private var openWindow
 
     @State private var modelContainer: ModelContainer
@@ -156,6 +157,7 @@ struct HDrezkaApp: App {
             ContentView()
                 .environment(appState)
                 .environment(downloader)
+                .environment(cookiesManager)
                 .background(WindowAccessor { window in
                     appState.window = window
                 })
@@ -209,6 +211,7 @@ struct HDrezkaApp: App {
         Settings {
             SettingsView(updater: delegate.updaterController.updater)
                 .environment(downloader)
+                .environment(cookiesManager)
                 .preferredColorScheme(theme.scheme)
                 .analyticsScreen(name: "settings", class: "SettingsView")
         }

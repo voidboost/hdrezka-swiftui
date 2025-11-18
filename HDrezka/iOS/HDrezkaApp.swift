@@ -76,6 +76,7 @@ struct HDrezkaApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @State private var appState: AppState = .shared
     @State private var downloader: Downloader = .shared
+    @State private var cookiesManager: CookiesManager = .shared
 
     @State private var modelContainer: ModelContainer
 
@@ -113,6 +114,7 @@ struct HDrezkaApp: App {
             ContentView()
                 .environment(appState)
                 .environment(downloader)
+                .environment(cookiesManager)
                 .preferredColorScheme(theme.scheme)
         }
         .modelContainer(modelContainer)

@@ -82,10 +82,6 @@ extension String {
         self != str && !isEmpty
     }
 
-    func isEqual(_ str: String) -> Bool {
-        self == str
-    }
-
     func page(_ page: Int) -> String {
         if page > 1 {
             appending("page/\(page)/")

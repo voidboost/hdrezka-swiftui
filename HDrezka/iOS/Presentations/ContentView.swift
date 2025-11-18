@@ -13,6 +13,9 @@ struct ContentView: View {
 
     @Environment(AppState.self) private var appState
 
+    @State private var error: Error?
+    @State private var isErrorPresented: Bool = false
+
     @State private var subscriptions: Set<AnyCancellable> = []
 
     var body: some View {
@@ -61,11 +64,30 @@ struct ContentView: View {
         .confirmationDialog("key.sign_out.label", isPresented: $appState.isSignOutPresented) {
             Button(role: .destructive) {
                 logoutUseCase()
+                    .receive(on: DispatchQueue.main)
+                    .sink { completion in
+                        guard case let .failure(error) = completion else { return }
+
+                        self.error = error
+                        isErrorPresented = true
+                    } receiveValue: { success in
+                        isErrorPresented = !success
+                    }
+                    .store(in: &subscriptions)
             } label: {
                 Text("key.yes")
             }
         } message: {
             Text("key.sign_out.q")
+        }
+        .alert("key.ops", isPresented: $isErrorPresented) {
+            Button(role: .cancel) {} label: {
+                Text("key.ok")
+            }
+        } message: {
+            if let error {
+                Text(error.localizedDescription)
+            }
         }
         .confirmationDialog("key.premium_content", isPresented: $appState.isPremiumPresented) {
             Link("key.buy", destination: (!_mirror.isDefaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
