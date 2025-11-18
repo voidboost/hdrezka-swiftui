@@ -56,6 +56,11 @@ struct ProfileView: View {
         .transition(.opacity)
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.large)
+        .overlay(alignment: .bottom) {
+            Text(verbatim: "Device ID: \(Const.deviceUUID)")
+                .foregroundStyle(.secondary)
+                .textSelection(.enabled)
+        }
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 NavigationLink(value: Destinations.licenses) {
