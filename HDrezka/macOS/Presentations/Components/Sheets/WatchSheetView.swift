@@ -118,7 +118,7 @@ struct WatchSheetView: View {
                                                         Label {
                                                             Text(acting.name)
                                                         } icon: {
-                                                            Image("Premium")
+                                                            Image(.premium)
                                                         }
                                                     }
                                                 }

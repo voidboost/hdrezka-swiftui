@@ -20,7 +20,7 @@ struct SpoilerView: UIViewRepresentable {
         let emitterView = EmitterView()
 
         let emitterCell = CAEmitterCell()
-        emitterCell.contents = UIImage(named: "Speckle")?.cgImage
+        emitterCell.contents = UIImage(resource: .speckle).cgImage
         emitterCell.contentsScale = 1.8
         emitterCell.emissionRange = .pi * 2
         emitterCell.lifetime = 1

@@ -63,7 +63,7 @@ struct ContentView: View {
             if let isUserPremium {
                 Link(destination: (!_mirror.isDefaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory)) {
                     HStack(spacing: 3) {
-                        Image("Premium")
+                        Image(.premium)
                             .foregroundStyle(Color(red: 222.0 / 255.0, green: 21.0 / 255.0, blue: 226.0 / 255.0))
 
                         Text("key.premium")

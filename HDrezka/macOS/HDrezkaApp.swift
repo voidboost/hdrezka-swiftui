@@ -260,26 +260,17 @@ struct HDrezkaApp: App {
                 let paragraphStyle = NSMutableParagraphStyle()
                 paragraphStyle.alignment = NSTextAlignment.center
 
-                if let image = NSImage(named: "GS") {
-                    let imageAttachment = NSTextAttachment()
-                    imageAttachment.image = image.resized(to: CGSize(width: 76, height: 100)).tint(NSColor(Color.accentColor))
+                let imageAttachment = NSTextAttachment()
+                imageAttachment.image = NSImage(resource: .GS).resized(to: CGSize(width: 76, height: 100)).tint(NSColor(Color.accentColor))
 
-                    let credits = NSMutableAttributedString(attachment: imageAttachment)
-                    credits.addAttribute(.link, value: Const.helpUkraine, range: NSRange(location: 0, length: credits.length))
-                    credits.append(NSAttributedString(string: "\n\n© 2025 "))
-                    credits.append(NSAttributedString(string: "HDrezka macOS", attributes: [.link: Const.github]))
-                    credits.append(NSAttributedString(string: "\n\n\(String(localized: "key.id-\(Const.deviceUUID)"))"))
-                    credits.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: credits.length))
+                let credits = NSMutableAttributedString(attachment: imageAttachment)
+                credits.addAttribute(.link, value: Const.helpUkraine, range: NSRange(location: 0, length: credits.length))
+                credits.append(NSAttributedString(string: "\n\n© 2025 "))
+                credits.append(NSAttributedString(string: "HDrezka macOS", attributes: [.link: Const.github]))
+                credits.append(NSAttributedString(string: "\n\n\(String(localized: "key.id-\(Const.deviceUUID)"))"))
+                credits.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: credits.length))
 
-                    NSApp.orderFrontStandardAboutPanel(options: [.credits: credits])
-                } else {
-                    let credits = NSMutableAttributedString(string: "© 2025 ")
-                    credits.append(NSAttributedString(string: "HDrezka macOS", attributes: [.link: Const.github]))
-                    credits.append(NSAttributedString(string: "\n\n\(String(localized: "key.id-\(Const.deviceUUID)"))"))
-                    credits.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: credits.length))
-
-                    NSApp.orderFrontStandardAboutPanel(options: [.credits: credits])
-                }
+                NSApp.orderFrontStandardAboutPanel(options: [.credits: credits])
             } label: {
                 Text("key.about-\(Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String ?? "HDrezka")")
             }
@@ -316,11 +307,7 @@ struct HDrezkaApp: App {
 
     private struct MenuBarIcon: View {
         var body: some View {
-            if let image = NSImage(named: "BarIcon") {
-                Image(nsImage: image.resized(to: CGSize(width: 18, height: 18)))
-            } else {
-                Image(systemName: "list.and.film")
-            }
+            Image(nsImage: NSImage(resource: .barIcon).resized(to: CGSize(width: 18, height: 18)))
         }
     }
 }

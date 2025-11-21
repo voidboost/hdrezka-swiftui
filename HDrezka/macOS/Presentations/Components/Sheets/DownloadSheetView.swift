@@ -121,7 +121,7 @@ struct DownloadSheetView: View {
                                                         Label {
                                                             Text(acting.name)
                                                         } icon: {
-                                                            Image("Premium")
+                                                            Image(.premium)
                                                         }
                                                     }
                                                 }

@@ -164,7 +164,7 @@ struct SeriesUpdatesSheetView: View {
                                         if !item.chosenVoiceActing.isEmpty {
                                             HStack(spacing: 3) {
                                                 if item.isChosenVoiceActingPremium {
-                                                    Image("Premium")
+                                                    Image(.premium)
                                                         .font(.subheadline)
                                                         .foregroundStyle(.white.opacity(0.8))
                                                 }
@@ -217,7 +217,7 @@ struct SeriesUpdatesSheetView: View {
                                         if !item.chosenVoiceActing.isEmpty {
                                             HStack(spacing: 3) {
                                                 if item.isChosenVoiceActingPremium {
-                                                    Image("Premium")
+                                                    Image(.premium)
                                                         .font(.subheadline)
                                                         .foregroundStyle(.white.opacity(0.8))
                                                 }

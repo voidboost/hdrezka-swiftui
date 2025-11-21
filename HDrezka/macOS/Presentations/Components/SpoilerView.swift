@@ -20,7 +20,7 @@ final class EmitterView: NSView {
         emitterLayer.emitterShape = .rectangle
 
         let emitterCell = CAEmitterCell()
-        emitterCell.contents = NSImage(named: "Speckle")?.cgImage(forProposedRect: nil, context: nil, hints: nil)
+        emitterCell.contents = NSImage(resource: .speckle).cgImage(forProposedRect: nil, context: nil, hints: nil)
         emitterCell.contentsScale = 1.8
         emitterCell.emissionRange = .pi * 2
         emitterCell.lifetime = 1
