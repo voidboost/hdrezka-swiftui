@@ -6,6 +6,8 @@ struct ProfileView: View {
 
     @Environment(AppState.self) private var appState
 
+    @Environment(\.openURL) private var openURL
+
     @Default(.isLoggedIn) private var isLoggedIn
 
     var body: some View {
@@ -57,9 +59,21 @@ struct ProfileView: View {
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.large)
         .overlay(alignment: .bottom) {
-            Text("key.id-\(Const.deviceUUID)")
-                .foregroundStyle(.secondary)
-                .textSelection(.enabled)
+            VStack(alignment: .center, spacing: 50) {
+                Button {
+                    openURL(Const.helpUkraine)
+                } label: {
+                    Image(.GS)
+                        .resizable()
+                        .frame(width: 76, height: 100)
+                        .tint(.accentColor)
+                        .contentShape(.rect)
+                }
+
+                Text("key.id-\(Const.deviceUUID)")
+                    .foregroundStyle(.secondary)
+                    .textSelection(.enabled)
+            }
         }
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
