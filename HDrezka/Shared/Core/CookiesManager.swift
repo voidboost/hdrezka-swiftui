@@ -70,7 +70,7 @@ class CookiesManager {
                .value: "1",
                .domain: ".\(host)",
                .path: "/",
-               .expires: Date(timeIntervalSinceNow: 30 * 24 * 60 * 60),
+               .expires: Date(timeIntervalSinceNow: 60 * 60 * 24 * 30),
            ])
         {
             HTTPCookieStorage.shared.setCookie(cookie)
