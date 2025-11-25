@@ -48,17 +48,16 @@ class CookiesManager {
 
         let newDomain = ".\(host)"
 
-        for cookie in cookies {
-            HTTPCookieStorage.shared.deleteCookie(cookie)
-
-            guard var properties = cookie.properties else { continue }
+        let newCookies: [HTTPCookie] = cookies.compactMap { cookie in
+            guard var properties = cookie.properties else { return nil }
 
             properties[.domain] = newDomain
 
-            if let newCookie = HTTPCookie(properties: properties) {
-                HTTPCookieStorage.shared.setCookie(newCookie)
-            }
+            return HTTPCookie(properties: properties)
         }
+
+        cookies.forEach(HTTPCookieStorage.shared.deleteCookie)
+        newCookies.forEach(HTTPCookieStorage.shared.setCookie)
 
         completion()
     }
