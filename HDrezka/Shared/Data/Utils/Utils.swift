@@ -21,7 +21,7 @@ extension Document {
             throw HDrezkaError.mirrorBanned(Defaults[.mirror])
         }
 
-        Defaults[.isUserPremium] = try Int(body.select(".b-tophead-premuser").select("b").text().trimmingCharacters(in: .decimalDigits.inverted))
+        Defaults[.isUserPremium] = try Int(body.select(".b-tophead-premuser b").text().trimmingCharacters(in: .decimalDigits.inverted))
 
         return self
     }

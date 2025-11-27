@@ -164,7 +164,7 @@ private extension Element {
     }
 
     func isSeriesUpdateVoiceActingPremium() throws -> Bool {
-        try !select(".cell.cell-2 i").select(".b-content__inline_item-prem-label").isEmpty()
+        try !select(".cell.cell-2 i .b-content__inline_item-prem-label").isEmpty()
     }
 
     func getSeriesUpdateGroupDate() throws -> String {
