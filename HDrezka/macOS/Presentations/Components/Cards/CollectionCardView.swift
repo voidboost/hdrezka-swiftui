@@ -10,7 +10,7 @@ struct CollectionCardView: View {
 
     var body: some View {
         NavigationLink(value: Destinations.collection(collection)) {
-            VStack {
+            VStack(alignment: .center, spacing: 6) {
                 if let poster = collection.poster {
                     KFImage
                         .url(URL(string: poster))
@@ -23,7 +23,6 @@ struct CollectionCardView: View {
                         .retry(NetworkRetryStrategy())
                         .imageFill(5 / 3)
                         .clipShape(.rect(cornerRadius: 6))
-                        .contentShape(.rect(cornerRadius: 6))
                         .overlay(alignment: .topTrailing) {
                             if let count = collection.count {
                                 Text(verbatim: "\(count)")
@@ -34,17 +33,14 @@ struct CollectionCardView: View {
                                     .background(.ultraThickMaterial, in: .rect(bottomLeadingRadius: 6, topTrailingRadius: 6))
                             }
                         }
-                        .overlay(alignment: .bottom) {
-                            Text(collection.name)
-                                .font(.title3.weight(.semibold))
-                                .multilineTextAlignment(.center)
-                                .padding(9)
-                                .frame(maxWidth: .infinity)
-                                .background(.ultraThickMaterial, in: .rect(bottomLeadingRadius: 6, bottomTrailingRadius: 6))
-                        }
-                        .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
+
+                Text(collection.name)
+                    .font(.title3.weight(.semibold))
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
             }
+            .contentShape(.rect(topLeadingRadius: 6, topTrailingRadius: 6))
         }
         .buttonStyle(.plain)
     }

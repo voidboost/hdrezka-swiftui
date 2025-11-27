@@ -32,6 +32,7 @@ struct ProfileView: View {
                     .buttonStyle(.bordered)
                     .buttonBorderShape(.roundedRectangle(radius: 6))
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 Form {
                     NavigationLink(value: Destinations.watchingLater) {
