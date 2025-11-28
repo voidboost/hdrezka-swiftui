@@ -22,7 +22,6 @@ struct ImageView: View {
             .retry(NetworkRetryStrategy())
             .scaledToFit()
             .zoomable(
-                minZoomScale: 1,
                 maxZoomScale: 5,
                 doubleTapZoomScale: 3,
             )

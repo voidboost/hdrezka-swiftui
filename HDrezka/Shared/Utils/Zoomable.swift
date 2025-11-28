@@ -1,10 +1,15 @@
 import SwiftUI
 
 struct ZoomableModifier: ViewModifier {
-    let minZoomScale: CGFloat
     let maxZoomScale: CGFloat?
     let doubleTapZoomScale: CGFloat?
 
+    init(maxZoomScale: CGFloat?, doubleTapZoomScale: CGFloat?) {
+        self.maxZoomScale = maxZoomScale
+        self.doubleTapZoomScale = doubleTapZoomScale
+    }
+
+    private let minZoomScale: CGFloat = 1
     @State private var lastTransform: CGAffineTransform = .identity
     @State private var transform: CGAffineTransform = .identity
     @State private var contentSize: CGSize = .zero
@@ -25,34 +30,40 @@ struct ZoomableModifier: ViewModifier {
             .gesture(
                 DragGesture()
                     .onChanged { value in
+                        let rawTransform = lastTransform.translatedBy(
+                            x: value.translation.width / max(transform.scaleX, .leastNonzeroMagnitude),
+                            y: value.translation.height / max(transform.scaleY, .leastNonzeroMagnitude),
+                        )
+
+                        let limitedTransform = limitTransform(rawTransform)
+
                         withAnimation(.interactiveSpring) {
-                            transform = lastTransform.translatedBy(
-                                x: value.translation.width
-                                    / max(transform.scaleX, .leastNonzeroMagnitude),
-                                y: value.translation.height
-                                    / max(transform.scaleY, .leastNonzeroMagnitude),
-                            )
+                            transform = limitedTransform
                         }
                     }
                     .onEnded { _ in
-                        onEndGesture()
+                        lastTransform = transform
                     },
                 including: transform == .identity ? .none : .all,
             )
             .gesture(
                 MagnifyGesture(minimumScaleDelta: 0)
                     .onChanged { value in
-                        let newTransform = CGAffineTransform.anchoredScale(
-                            scale: value.magnification,
-                            anchor: value.startAnchor.scaledBy(contentSize),
+                        let rawTransform = lastTransform.concatenating(
+                            .anchoredScale(
+                                scale: value.magnification,
+                                anchor: value.startAnchor.scaledBy(contentSize),
+                            ),
                         )
 
+                        let limitedTransform = limitTransform(rawTransform)
+
                         withAnimation(.interactiveSpring) {
-                            transform = lastTransform.concatenating(newTransform)
+                            transform = limitedTransform
                         }
                     }
                     .onEnded { _ in
-                        onEndGesture()
+                        lastTransform = transform
                     },
             )
             .viewModifier { view in
@@ -60,34 +71,25 @@ struct ZoomableModifier: ViewModifier {
                     view.gesture(
                         SpatialTapGesture(count: 2)
                             .onEnded { value in
-                                let newTransform: CGAffineTransform =
+                                let rawTransform: CGAffineTransform =
                                     if transform.isIdentity {
                                         .anchoredScale(scale: doubleTapZoomScale, anchor: value.location)
                                     } else {
                                         .identity
                                     }
 
-                                withAnimation(.linear(duration: 0.15)) {
-                                    transform = newTransform
-                                    lastTransform = newTransform
-                                }
+                                let limitedTransform = limitTransform(rawTransform)
 
-                                onEndGesture()
+                                withAnimation(.linear(duration: 0.15)) {
+                                    transform = limitedTransform
+                                    lastTransform = limitedTransform
+                                }
                             },
                     )
                 } else {
                     view
                 }
             }
-    }
-
-    private func onEndGesture() {
-        let newTransform = limitTransform(transform)
-
-        withAnimation(.snappy(duration: 0.1)) {
-            transform = newTransform
-            lastTransform = newTransform
-        }
     }
 
     private func limitTransform(
@@ -139,13 +141,11 @@ struct ZoomableModifier: ViewModifier {
 public extension View {
     @ViewBuilder
     func zoomable(
-        minZoomScale: CGFloat = 1,
         maxZoomScale: CGFloat? = 5,
         doubleTapZoomScale: CGFloat? = 3,
     ) -> some View {
         modifier(
             ZoomableModifier(
-                minZoomScale: minZoomScale,
                 maxZoomScale: maxZoomScale,
                 doubleTapZoomScale: doubleTapZoomScale,
             ),
