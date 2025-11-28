@@ -64,11 +64,11 @@ struct HomeView: View {
         }
         .scrollIndicators(.visible, axes: .vertical)
         .onScrollTargetVisibilityChange(idType: Category.ID.self) { onScreenCategories in
-            if let categories = viewModel.state.data,
+            if viewModel.paginationState == .idle,
+               let categories = viewModel.state.data,
                !categories.isEmpty,
                let last = categories.last,
-               onScreenCategories.contains(where: { $0 == last.id }),
-               viewModel.paginationState == .idle
+               onScreenCategories.contains(where: { $0 == last.id })
             {
                 viewModel.loadMore()
             }

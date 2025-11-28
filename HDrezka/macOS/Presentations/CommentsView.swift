@@ -42,11 +42,11 @@ struct CommentsView: View {
         }
         .scrollIndicators(.visible, axes: .vertical)
         .onScrollTargetVisibilityChange(idType: Comment.ID.self) { onScreenComments in
-            if let comments = viewModel.state.data,
+            if viewModel.paginationState == .idle,
+               let comments = viewModel.state.data,
                !comments.isEmpty,
                let last = comments.last,
-               onScreenComments.contains(where: { $0 == last.id }),
-               viewModel.paginationState == .idle
+               onScreenComments.contains(where: { $0 == last.id })
             {
                 viewModel.loadMore()
             }
@@ -533,7 +533,7 @@ struct CommentsView: View {
                 selection: Binding<TextSelection?>,
                 prefix: String,
                 suffix: String,
-                icon: String? = nil,
+                icon: String? = nil
             ) {
                 _feedback = feedback
                 _selection = selection

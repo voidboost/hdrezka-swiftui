@@ -29,11 +29,11 @@ struct CollectionsView: View {
         }
         .scrollIndicators(.visible, axes: .vertical)
         .onScrollTargetVisibilityChange(idType: MoviesCollection.ID.self) { onScreenCards in
-            if let collections = viewModel.state.data,
+            if viewModel.paginationState == .idle,
+               let collections = viewModel.state.data,
                !collections.isEmpty,
                let last = collections.last,
-               onScreenCards.contains(where: { $0 == last.id }),
-               viewModel.paginationState == .idle
+               onScreenCards.contains(where: { $0 == last.id })
             {
                 viewModel.loadMore()
             }
