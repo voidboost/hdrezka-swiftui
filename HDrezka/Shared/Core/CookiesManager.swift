@@ -27,7 +27,7 @@ class CookiesManager {
                     Defaults[.isUserPremium] = nil
                 }
 
-                Defaults[.allowedComments] = cookies.contains { $0.name == "allowed_comments" }
+                Defaults[.allowedComments] = cookies.contains { $0.name == "allowed_comments" && $0.value == "1" }
             }
             .store(in: &subscriptions)
     }
