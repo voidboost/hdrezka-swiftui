@@ -512,7 +512,7 @@ struct CommentsView: View {
                 selection: Binding<TextSelection?>,
                 prefix: String,
                 suffix: String,
-                icon: String? = nil
+                icon: String? = nil,
             ) {
                 _feedback = feedback
                 _selection = selection
