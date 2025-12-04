@@ -11,22 +11,15 @@ func decrypt(encrypted: String) -> String {
         if let cached = cache.value(forKey: input) {
             return cached
         } else {
-            let indexes = input.indexesOf(substr: "//_//")
+            let result = input.indexesOf(substr: "//_//")
+                .map { index in
+                    let (before, after) = String(input[(input.index(input.startIndex, offsetBy: index + 5, limitedBy: input.endIndex) ?? input.endIndex)...]).divideAtFirstOccurrenceOfSymbols()
+                    return decryptRecursive(input: "\(String(input[..<(input.index(input.startIndex, offsetBy: index, limitedBy: input.endIndex) ?? input.endIndex)]))\(before.clear(trash: trash))\(after)")
+                }
+                .min { $0.count < $1.count } ?? input
 
-            if indexes.isEmpty {
-                cache.setValue(input, forKey: input)
-                return input
-            } else {
-                let result = indexes
-                    .map { index in
-                        let (before, after) = String(input[(input.index(input.startIndex, offsetBy: index + 5, limitedBy: input.endIndex) ?? input.endIndex)...]).divideAtFirstOccurrenceOfSymbols()
-                        return decryptRecursive(input: "\(String(input[..<(input.index(input.startIndex, offsetBy: index, limitedBy: input.endIndex) ?? input.endIndex)]))\(before.clear(trash: trash))\(after)")
-                    }
-                    .min { $0.count < $1.count } ?? input
-
-                cache.setValue(result, forKey: input)
-                return result
-            }
+            cache.setValue(result, forKey: input)
+            return result
         }
     }
 
