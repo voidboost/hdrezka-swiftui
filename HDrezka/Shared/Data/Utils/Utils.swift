@@ -12,8 +12,6 @@ extension Document {
         let body = try body().orThrow()
 
         guard try body.select("#check-form").isEmpty() else {
-            AppState.shared.isSignInPresented = true
-
             throw HDrezkaError.loginRequired(Defaults[.mirror])
         }
 
@@ -285,6 +283,12 @@ private extension Publisher {
             return avError
         } else if let afError = error.asAFError {
             if afError.responseCode != nil || afError.isSessionTaskError {
+                if let code = afError.responseCode, code == 403 {
+                    AppState.shared.isSignInPresented = true
+
+                    return HDrezkaError.loginRequired(Defaults[.mirror])
+                }
+
                 return afError
             }
 
@@ -295,6 +299,8 @@ private extension Publisher {
             if case .mirrorBanned = hdrezkaError {
                 return hdrezkaError
             } else if case .loginRequired = hdrezkaError {
+                AppState.shared.isSignInPresented = true
+
                 return hdrezkaError
             }
 

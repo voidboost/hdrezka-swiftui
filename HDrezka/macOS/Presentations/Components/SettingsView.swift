@@ -81,9 +81,7 @@ struct SettingsView: View {
 
                     Button {
                         if !_currentMirror.isDefaultValue {
-                            cookiesManager.migrateCookies(from: currentMirror, to: _currentMirror.defaultValue) {
-                                _currentMirror.reset()
-                            }
+                            cookiesManager.setMirror(_currentMirror.defaultValue)
                         }
 
                         mirrorValid = nil
@@ -109,9 +107,7 @@ struct SettingsView: View {
                         urlComponents.password = nil
 
                         if let newMirror = urlComponents.url, currentMirror != newMirror {
-                            cookiesManager.migrateCookies(from: currentMirror, to: newMirror) {
-                                currentMirror = newMirror
-                            }
+                            cookiesManager.setMirror(newMirror)
                         }
 
                         withAnimation(.easeInOut) {

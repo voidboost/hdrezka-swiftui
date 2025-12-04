@@ -32,34 +32,32 @@ class CookiesManager {
             .store(in: &subscriptions)
     }
 
-    func migrateCookies(from: URL, to: URL, completion: @escaping () -> Void) {
-        guard Defaults[.isLoggedIn],
-              let cookies = HTTPCookieStorage.shared.cookies(for: from),
-              !cookies.isEmpty,
-              let host = to.host(),
-              !host.isEmpty
-        else {
-            return
-        }
-
+    func setMirror(_ mirror: URL) {
         subscriptions.flush()
 
         defer { observe() }
 
-        let newDomain = ".\(host)"
+        if Defaults[.isLoggedIn],
+           let cookies = HTTPCookieStorage.shared.cookies(for: Defaults[.mirror]),
+           !cookies.isEmpty,
+           let host = mirror.host(),
+           !host.isEmpty
+        {
+            let newDomain = ".\(host)"
 
-        let newCookies: [HTTPCookie] = cookies.compactMap { cookie in
-            guard var properties = cookie.properties else { return nil }
+            let newCookies: [HTTPCookie] = cookies.compactMap { cookie in
+                guard var properties = cookie.properties else { return nil }
 
-            properties[.domain] = newDomain
+                properties[.domain] = newDomain
 
-            return HTTPCookie(properties: properties)
+                return HTTPCookie(properties: properties)
+            }
+
+            cookies.forEach(HTTPCookieStorage.shared.deleteCookie)
+            newCookies.forEach(HTTPCookieStorage.shared.setCookie)
         }
 
-        cookies.forEach(HTTPCookieStorage.shared.deleteCookie)
-        newCookies.forEach(HTTPCookieStorage.shared.setCookie)
-
-        completion()
+        Defaults[.mirror] = mirror
     }
 
     func allowComments() {
