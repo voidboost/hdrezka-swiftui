@@ -189,7 +189,7 @@ class CommentsViewModel {
                     .sink { completion in
                         guard case let .failure(error) = completion else { return }
 
-                        self.likes = [:]
+                        self.likes[comment.commentId] = nil
                         self.error = error
                         self.message = nil
                         self.isErrorPresented = true
@@ -200,9 +200,7 @@ class CommentsViewModel {
                             self.message = nil
                             self.isErrorPresented = true
                         } else {
-                            withAnimation(.easeInOut) {
-                                self.likes[comment.commentId, default: .init()] = .init(likes: likes)
-                            }
+                            self.likes[comment.commentId, default: .init()] = .init(likes: likes)
                         }
                     }
                     .store(in: &subscriptions)
