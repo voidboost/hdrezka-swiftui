@@ -200,257 +200,161 @@ struct PlayerView: View {
                                                 })),
                         )
                         .overlay(alignment: .topTrailing) {
-                            if isMaskShow {
-                                HStack(alignment: .center) {
-                                    SliderWithoutText(value: Binding {
-                                        volume
-                                    } set: { volume in
-                                        player.volume = volume
-                                    }, inRange: 0 ... 1, activeFillColor: .primary, fillColor: .primary.opacity(0.7), emptyColor: .primary.opacity(0.3), height: 8)
-                                        .frame(width: 120, height: 10)
-                                        .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+                            HStack(alignment: .center) {
+                                SliderWithoutText(value: Binding {
+                                    volume
+                                } set: { volume in
+                                    player.volume = volume
+                                }, inRange: 0 ... 1, activeFillColor: .primary, fillColor: .primary.opacity(0.7), emptyColor: .primary.opacity(0.3), height: 8)
+                                    .frame(width: 120, height: 10)
+                                    .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
 
-                                    VStack(alignment: .center) {
-                                        Button {
-                                            resetTimer()
+                                VStack(alignment: .center) {
+                                    Button {
+                                        resetTimer()
 
-                                            if !isPictureInPictureActive {
-                                                player.isMuted.toggle()
-                                            }
-                                        } label: {
-                                            Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(volume))
-                                                .font(.title2)
-                                                .contentTransition(.symbolEffect(.replace))
-                                                .contentShape(.circle)
+                                        if !isPictureInPictureActive {
+                                            player.isMuted.toggle()
                                         }
-                                        .buttonStyle(.plain)
-                                        .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+                                    } label: {
+                                        Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(volume))
+                                            .font(.title2)
+                                            .contentTransition(.symbolEffect(.replace))
+                                            .contentShape(.circle)
                                     }
-                                    .frame(width: 30, height: 30)
+                                    .buttonStyle(.plain)
+                                    .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+                                    .keyboardShortcut(.init("m"), modifiers: [])
                                 }
-                                .padding(.top, 36)
-                                .padding(.trailing, 36)
+                                .frame(width: 30, height: 30)
                             }
+                            .padding(.top, 36)
+                            .padding(.trailing, 36)
+                            .opacity(isMaskShow ? 1 : 0)
                         }
                         .overlay(alignment: .center) {
-                            if isMaskShow {
-                                HStack(alignment: .center) {
-                                    if let seasons, let season, let episode {
-                                        Button {
-                                            prevTrack(seasons, season, episode)
-                                        } label: {
-                                            Image(systemName: "backward.fill")
-                                                .font(.title2)
-                                                .contentShape(.circle)
-                                        }
-                                        .buttonStyle(.plain)
-                                        .disabled(seasons.element(before: season) == nil && season.episodes.element(before: episode) == nil)
-                                        .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+                            HStack(alignment: .center) {
+                                if let seasons, let season, let episode {
+                                    Button {
+                                        prevTrack(seasons, season, episode)
+                                    } label: {
+                                        Image(systemName: "backward.fill")
+                                            .font(.title2)
+                                            .contentShape(.circle)
                                     }
-
-                                    Spacer()
-
-                                    if isLoading {
-                                        ProgressView()
-                                            .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
-                                    } else {
-                                        Button {
-                                            resetTimer()
-
-                                            if !isPictureInPictureActive {
-                                                if isPlaying {
-                                                    player.pause()
-                                                } else {
-                                                    player.playImmediately(atRate: rate)
-                                                }
-                                            }
-                                        } label: {
-                                            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
-                                                .font(.largeTitle)
-                                                .contentTransition(.symbolEffect(.replace))
-                                                .contentShape(.circle)
-                                        }
-                                        .buttonStyle(.plain)
-                                        .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
-                                    }
-
-                                    Spacer()
-
-                                    if let seasons, let season, let episode {
-                                        Button {
-                                            nextTrack(seasons, season, episode)
-                                        } label: {
-                                            Image(systemName: "forward.fill")
-                                                .font(.title2)
-                                                .contentShape(.circle)
-                                        }
-                                        .buttonStyle(.plain)
-                                        .disabled(seasons.element(after: season) == nil && season.episodes.element(after: episode) == nil)
-                                        .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
-                                    }
+                                    .buttonStyle(.plain)
+                                    .disabled(seasons.element(before: season) == nil && season.episodes.element(before: episode) == nil)
+                                    .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                                 }
-                                .frame(width: 160)
+
+                                Spacer()
+
+                                if isLoading {
+                                    ProgressView()
+                                        .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+                                } else {
+                                    Button {
+                                        resetTimer()
+
+                                        if !isPictureInPictureActive {
+                                            if isPlaying {
+                                                player.pause()
+                                            } else {
+                                                player.playImmediately(atRate: rate)
+                                            }
+                                        }
+                                    } label: {
+                                        Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                                            .font(.largeTitle)
+                                            .contentTransition(.symbolEffect(.replace))
+                                            .contentShape(.circle)
+                                    }
+                                    .buttonStyle(.plain)
+                                    .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+                                    .keyboardShortcut(.space, modifiers: [])
+                                }
+
+                                Spacer()
+
+                                if let seasons, let season, let episode {
+                                    Button {
+                                        nextTrack(seasons, season, episode)
+                                    } label: {
+                                        Image(systemName: "forward.fill")
+                                            .font(.title2)
+                                            .contentShape(.circle)
+                                    }
+                                    .buttonStyle(.plain)
+                                    .disabled(seasons.element(after: season) == nil && season.episodes.element(after: episode) == nil)
+                                    .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+                                }
                             }
+                            .frame(width: 160)
+                            .opacity(isMaskShow ? 1 : 0)
                         }
                         .overlay(alignment: .bottom) {
-                            if isMaskShow {
-                                VStack(alignment: .center, spacing: 8) {
-                                    HStack(alignment: .bottom) {
-                                        VStack(alignment: .leading) {
-                                            HStack(alignment: .center) {
-                                                if let season, let episode {
-                                                    Text("key.season-\(season.name).episode-\(episode.name)")
-                                                        .font(.title2.bold())
-                                                        .lineLimit(1)
-                                                        .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
-                                                }
-
-                                                Text(voiceActing.name)
+                            VStack(alignment: .center, spacing: 8) {
+                                HStack(alignment: .bottom) {
+                                    VStack(alignment: .leading) {
+                                        HStack(alignment: .center) {
+                                            if let season, let episode {
+                                                Text("key.season-\(season.name).episode-\(episode.name)")
                                                     .font(.title2.bold())
-                                                    .foregroundStyle(.secondary)
                                                     .lineLimit(1)
                                                     .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                                             }
 
-                                            Text(name)
-                                                .font(.largeTitle.bold())
+                                            Text(voiceActing.name)
+                                                .font(.title2.bold())
+                                                .foregroundStyle(.secondary)
                                                 .lineLimit(1)
-                                                .help(name)
                                                 .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                                         }
 
-                                        Spacer()
+                                        Text(name)
+                                            .font(.largeTitle.bold())
+                                            .lineLimit(1)
+                                            .help(name)
+                                            .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+                                    }
 
-                                        HStack(alignment: .center, spacing: 12) {
-                                            if let pipController, AVPictureInPictureController.isPictureInPictureSupported() {
-                                                Button {
-                                                    pipController.startPictureInPicture()
-                                                } label: {
-                                                    Image(systemName: "pip.enter")
-                                                        .font(.title2)
-                                                        .contentShape(.circle)
-                                                }
-                                                .buttonStyle(.plain)
-                                                .disabled(isPictureInPictureActive || !isPictureInPicturePossible)
-                                                .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
-                                            }
+                                    Spacer()
 
-                                            if !subtitlesOptions.isEmpty {
-                                                Menu {
-                                                    Picker("key.subtitles", selection: Binding {
-                                                        subtitles
-                                                    } set: { subtitles in
-                                                        self.subtitles = subtitles
-
-                                                        selectSubtitles(subtitles)
-                                                    }) {
-                                                        Text("key.off").tag(nil as String?)
-
-                                                        ForEach(subtitlesOptions, id: \.self) { subtitles in
-                                                            Text(subtitles.displayName(with: Locale.current)).tag(subtitles.extendedLanguageTag)
-                                                        }
-                                                    }
-                                                    .pickerStyle(.inline)
-                                                } label: {
-                                                    Image(systemName: "captions.bubble")
-                                                        .font(.title2)
-                                                        .contentShape(.circle)
-                                                }
-                                                .buttonStyle(
-                                                    OnPressButtonStyle { isPressed in
-                                                        setMask(true, force: isPressed)
-                                                    },
-                                                )
-                                                .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
-                                            }
-
-                                            Menu {
-                                                Picker("key.timer", selection: Binding {
-                                                    timer
-                                                } set: {
-                                                    timer = $0
-
-                                                    resetTimer()
-                                                }) {
-                                                    Text("key.off").tag(nil as Int?)
-
-                                                    ForEach(times, id: \.self) { time in
-                                                        let name = switch time {
-                                                        case 900:
-                                                            String(localized: "key.timer.15m")
-                                                        case 1800:
-                                                            String(localized: "key.timer.30m")
-                                                        case 2700:
-                                                            String(localized: "key.timer.45m")
-                                                        case 3600:
-                                                            String(localized: "key.timer.1h")
-                                                        case -1:
-                                                            String(localized: "key.timer.end")
-                                                        default:
-                                                            String(localized: "key.off")
-                                                        }
-
-                                                        Text(name).tag(time)
-                                                    }
-                                                }
-                                                .pickerStyle(.menu)
-
-                                                if let playerLayer {
-                                                    Picker("key.video_gravity", selection: Binding {
-                                                        videoGravity
-                                                    } set: {
-                                                        playerLayer.videoGravity = $0
-                                                    }) {
-                                                        Text("key.video_gravity.fit").tag(AVLayerVideoGravity.resizeAspect)
-
-                                                        Text("key.video_gravity.fill").tag(AVLayerVideoGravity.resizeAspectFill)
-
-                                                        Text("key.video_gravity.stretch").tag(AVLayerVideoGravity.resize)
-                                                    }
-                                                    .pickerStyle(.menu)
-                                                }
-
-                                                Picker("key.speed", selection: Binding {
-                                                    rate
-                                                } set: { rate in
-                                                    self.rate = rate
-                                                    nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = rate
-
-                                                    if isPlaying {
-                                                        player.playImmediately(atRate: rate)
-                                                    }
-                                                }) {
-                                                    ForEach(rates, id: \.self) { value in
-                                                        Text(verbatim: "\(value)x").tag(value)
-                                                    }
-                                                }
-                                                .pickerStyle(.menu)
-
-                                                if !movie.getAvailableQualities().isEmpty {
-                                                    Picker("key.quality", selection: Binding {
-                                                        quality
-                                                    } set: {
-                                                        quality = $0
-
-                                                        let currentSeek = player.currentTime()
-
-                                                        resetPlayer {
-                                                            setupPlayer(seek: currentSeek, isPlaying: isPlaying, subtitles: subtitles)
-                                                        }
-                                                    }) {
-                                                        ForEach(movie.getAvailableQualities(), id: \.self) { value in
-                                                            Text(value).tag(value)
-                                                        }
-                                                    }
-                                                    .pickerStyle(.menu)
-                                                }
+                                    HStack(alignment: .center, spacing: 12) {
+                                        if let pipController, AVPictureInPictureController.isPictureInPictureSupported() {
+                                            Button {
+                                                pipController.startPictureInPicture()
                                             } label: {
-                                                Image(systemName: "ellipsis.circle")
+                                                Image(systemName: "pip.enter")
                                                     .font(.title2)
                                                     .contentShape(.circle)
                                             }
-                                            .menuStyle(.button)
-                                            .menuIndicator(.hidden)
+                                            .buttonStyle(.plain)
+                                            .disabled(isPictureInPictureActive || !isPictureInPicturePossible)
+                                            .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+                                        }
+
+                                        if !subtitlesOptions.isEmpty {
+                                            Menu {
+                                                Picker("key.subtitles", selection: Binding {
+                                                    subtitles
+                                                } set: { subtitles in
+                                                    self.subtitles = subtitles
+
+                                                    selectSubtitles(subtitles)
+                                                }) {
+                                                    Text("key.off").tag(nil as String?)
+
+                                                    ForEach(subtitlesOptions, id: \.self) { subtitles in
+                                                        Text(subtitles.displayName(with: Locale.current)).tag(subtitles.extendedLanguageTag)
+                                                    }
+                                                }
+                                                .pickerStyle(.inline)
+                                            } label: {
+                                                Image(systemName: "captions.bubble")
+                                                    .font(.title2)
+                                                    .contentShape(.circle)
+                                            }
                                             .buttonStyle(
                                                 OnPressButtonStyle { isPressed in
                                                     setMask(true, force: isPressed)
@@ -458,23 +362,118 @@ struct PlayerView: View {
                                             )
                                             .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                                         }
-                                    }
 
-                                    SliderWithText(value: Binding {
-                                        currentTime
-                                    } set: { time in
-                                        player.seek(to: CMTime(seconds: time, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { success in
-                                            if success {
-                                                updateNextTimer()
+                                        Menu {
+                                            Picker("key.timer", selection: Binding {
+                                                timer
+                                            } set: {
+                                                timer = $0
+
+                                                resetTimer()
+                                            }) {
+                                                Text("key.off").tag(nil as Int?)
+
+                                                ForEach(times, id: \.self) { time in
+                                                    let name = switch time {
+                                                    case 900:
+                                                        String(localized: "key.timer.15m")
+                                                    case 1800:
+                                                        String(localized: "key.timer.30m")
+                                                    case 2700:
+                                                        String(localized: "key.timer.45m")
+                                                    case 3600:
+                                                        String(localized: "key.timer.1h")
+                                                    case -1:
+                                                        String(localized: "key.timer.end")
+                                                    default:
+                                                        String(localized: "key.off")
+                                                    }
+
+                                                    Text(name).tag(time)
+                                                }
                                             }
+                                            .pickerStyle(.menu)
+
+                                            if let playerLayer {
+                                                Picker("key.video_gravity", selection: Binding {
+                                                    videoGravity
+                                                } set: {
+                                                    playerLayer.videoGravity = $0
+                                                }) {
+                                                    Text("key.video_gravity.fit").tag(AVLayerVideoGravity.resizeAspect)
+
+                                                    Text("key.video_gravity.fill").tag(AVLayerVideoGravity.resizeAspectFill)
+
+                                                    Text("key.video_gravity.stretch").tag(AVLayerVideoGravity.resize)
+                                                }
+                                                .pickerStyle(.menu)
+                                            }
+
+                                            Picker("key.speed", selection: Binding {
+                                                rate
+                                            } set: { rate in
+                                                self.rate = rate
+                                                nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = rate
+
+                                                if isPlaying {
+                                                    player.playImmediately(atRate: rate)
+                                                }
+                                            }) {
+                                                ForEach(rates, id: \.self) { value in
+                                                    Text(verbatim: "\(value)x").tag(value)
+                                                }
+                                            }
+                                            .pickerStyle(.menu)
+
+                                            if !movie.getAvailableQualities().isEmpty {
+                                                Picker("key.quality", selection: Binding {
+                                                    quality
+                                                } set: {
+                                                    quality = $0
+
+                                                    let currentSeek = player.currentTime()
+
+                                                    resetPlayer {
+                                                        setupPlayer(seek: currentSeek, isPlaying: isPlaying, subtitles: subtitles)
+                                                    }
+                                                }) {
+                                                    ForEach(movie.getAvailableQualities(), id: \.self) { value in
+                                                        Text(value).tag(value)
+                                                    }
+                                                }
+                                                .pickerStyle(.menu)
+                                            }
+                                        } label: {
+                                            Image(systemName: "ellipsis.circle")
+                                                .font(.title2)
+                                                .contentShape(.circle)
                                         }
-                                    }, inRange: 0 ... duration, buffers: loadedTimeRanges, activeFillColor: .primary, fillColor: .primary.opacity(0.7), emptyColor: .primary.opacity(0.3), height: 8, thumbnails: thumbnails) { _ in }
-                                        .frame(height: 25)
+                                        .menuStyle(.button)
+                                        .menuIndicator(.hidden)
+                                        .buttonStyle(
+                                            OnPressButtonStyle { isPressed in
+                                                setMask(true, force: isPressed)
+                                            },
+                                        )
                                         .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+                                    }
                                 }
-                                .padding(.horizontal, 36)
-                                .padding(.bottom, 36)
+
+                                SliderWithText(value: Binding {
+                                    currentTime
+                                } set: { time in
+                                    player.seek(to: CMTime(seconds: time, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { success in
+                                        if success {
+                                            updateNextTimer()
+                                        }
+                                    }
+                                }, inRange: 0 ... duration, buffers: loadedTimeRanges, activeFillColor: .primary, fillColor: .primary.opacity(0.7), emptyColor: .primary.opacity(0.3), height: 8, thumbnails: thumbnails) { _ in }
+                                    .frame(height: 25)
+                                    .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                             }
+                            .padding(.horizontal, 36)
+                            .padding(.bottom, 36)
+                            .opacity(isMaskShow ? 1 : 0)
                         }
                         .overlay(alignment: .topTrailing) {
                             if let nextTimer, let seasons, let season, let episode {
@@ -531,19 +530,18 @@ struct PlayerView: View {
         .safeAreaPadding(.top)
         .ignoresSafeArea(edges: .top)
         .overlay(alignment: .topLeading) {
-            if isMaskShow || isPictureInPictureActive || isLoading {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.title2)
-                        .contentShape(.circle)
-                }
-                .buttonStyle(.plain)
-                .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
-                .padding(.top, 36)
-                .padding(.leading, 36)
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.title2)
+                    .contentShape(.circle)
             }
+            .buttonStyle(.plain)
+            .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+            .padding(.top, 36)
+            .padding(.leading, 36)
+            .opacity(isMaskShow || isPictureInPictureActive || isLoading ? 1 : 0)
         }
         .background(Color.black)
         .preferredColorScheme(.dark)
@@ -582,28 +580,6 @@ struct PlayerView: View {
             }
 
             currentItem.allowedAudioSpatializationFormats = spatialAudio.format
-        }
-        .onKeyPress(keys: [.space, .init("m")], phases: .down) { keyPress in
-            guard let player,
-                  player.status == .readyToPlay,
-                  !isPictureInPictureActive
-            else {
-                return .ignored
-            }
-
-            resetTimer()
-
-            if keyPress.key == .space {
-                if isPlaying {
-                    player.pause()
-                } else {
-                    player.playImmediately(atRate: rate)
-                }
-            } else {
-                player.isMuted.toggle()
-            }
-
-            return .handled
         }
     }
 
