@@ -10,13 +10,21 @@ import SwiftUI
 import UserNotifications
 
 class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate, SPUUpdaterDelegate, SPUStandardUserDriverDelegate {
+    var updaterController: SPUStandardUpdaterController!
+
+    override init() {
+        super.init()
+
+        updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: self, userDriverDelegate: self)
+    }
+
     func applicationDidFinishLaunching(_: Notification) {
         UNUserNotificationCenter.current().delegate = self
 
         NSWindow.allowsAutomaticWindowTabbing = false
 
         UserDefaults.standard.register(
-            defaults: ["NSApplicationCrashOnExceptions": true],
+            defaults: ["NSApplicationCrashOnExceptions": true]
         )
 
         FirebaseApp.configure()
@@ -83,7 +91,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         completionHandler()
     }
 
-    let updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
     private let updateNotificationIdentifier = "UpdateCheck".base64Decoded
 
     func updater(_: SPUUpdater, willScheduleUpdateCheckAfterDelay _: TimeInterval) {
