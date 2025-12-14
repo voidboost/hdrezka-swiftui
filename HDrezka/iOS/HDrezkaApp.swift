@@ -8,7 +8,7 @@ import SwiftData
 import SwiftUI
 import UserNotifications
 
-class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_: UIApplication, didFinishLaunchingWithOptions _: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         UNUserNotificationCenter.current().delegate = self
 
@@ -38,7 +38,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             }
         }
     }
+}
 
+extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_: UNUserNotificationCenter, willPresent _: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.list, .banner, .sound, .badge])
     }
