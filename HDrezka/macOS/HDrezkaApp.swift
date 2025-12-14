@@ -9,7 +9,8 @@ import SwiftData
 import SwiftUI
 import UserNotifications
 
-class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate, SPUUpdaterDelegate, SPUStandardUserDriverDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate {
+    private let updateNotificationIdentifier = "UpdateCheck".base64Decoded
     var updaterController: SPUStandardUpdaterController!
 
     override init() {
@@ -24,7 +25,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
         NSWindow.allowsAutomaticWindowTabbing = false
 
         UserDefaults.standard.register(
-            defaults: ["NSApplicationCrashOnExceptions": true]
+            defaults: ["NSApplicationCrashOnExceptions": true],
         )
 
         FirebaseApp.configure()
@@ -57,7 +58,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
         Downloader.shared.terminate()
     }
+}
 
+extension AppDelegate: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_: UNUserNotificationCenter, willPresent _: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.list, .banner, .sound, .badge])
     }
@@ -90,9 +93,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
         completionHandler()
     }
+}
 
-    private let updateNotificationIdentifier = "UpdateCheck".base64Decoded
-
+extension AppDelegate: SPUUpdaterDelegate, SPUStandardUserDriverDelegate {
     func updater(_: SPUUpdater, willScheduleUpdateCheckAfterDelay _: TimeInterval) {
         UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound]) { _, _ in }
     }
