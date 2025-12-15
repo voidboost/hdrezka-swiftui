@@ -14,6 +14,7 @@ struct ContentView: View {
     @Default(.mirror) private var mirror
     @Default(.isUserPremium) private var isUserPremium
     @Default(.lastHdrezkaAppVersion) private var lastHdrezkaAppVersion
+    @Default(.isFirstLaunch) private var isFirstLaunch
 
     @Environment(AppState.self) private var appState
 
@@ -180,5 +181,13 @@ struct ContentView: View {
         .sheet(isPresented: $appState.commentsRulesPresented) {
             CommentsRulesSheet()
         }
+        .alert("key.disclaimer", isPresented: $isFirstLaunch) {
+            Button(role: .cancel) {} label: {
+                Text("key.ok")
+            }
+        } message: {
+            Text("key.disclaimer.description")
+        }
+        .dialogSeverity(.critical)
     }
 }

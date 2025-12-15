@@ -23,4 +23,5 @@ extension Defaults.Keys {
     static let isLoggedIn = Key<Bool>("is_logged_in", default: false)
     static let allowedComments = Key<Bool>("allowed_comments", default: false)
     static let deviceUUID = Key<String?>("device_uuid", default: nil)
+    static let isFirstLaunch = Key<Bool>("is_first_launch", default: true)
 }

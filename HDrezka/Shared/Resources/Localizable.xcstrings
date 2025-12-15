@@ -1927,6 +1927,50 @@
         }
       }
     },
+    "key.disclaimer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disclaimer"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отказ от ответственности"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відмова від відповідальності"
+          }
+        }
+      }
+    },
+    "key.disclaimer.description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "- This program is provided **\"as is\"**.\n- The author does **not encourage any illegal activity**.\n- Use it entirely **at your own risk**."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "- Эта программа предоставляется **«как есть»**.\n- Автор **не поощряет какую-либо незаконную деятельность**.\n- Используйте её исключительно **на свой страх и риск**."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "- Ця програма надається **«як є»**.\n- Автор **не заохочує жодної незаконної діяльності**.\n- Використовуйте її виключно **на свій страх і ризик**."
+          }
+        }
+      }
+    },
     "key.done" : {
       "localizations" : {
         "en" : {

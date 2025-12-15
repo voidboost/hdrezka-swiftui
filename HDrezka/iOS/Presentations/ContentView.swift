@@ -10,6 +10,7 @@ struct ContentView: View {
 
     @Default(.mirror) private var mirror
     @Default(.lastHdrezkaAppVersion) private var lastHdrezkaAppVersion
+    @Default(.isFirstLaunch) private var isFirstLaunch
 
     @Environment(AppState.self) private var appState
 
@@ -99,6 +100,13 @@ struct ContentView: View {
                 .presentationSizing(.fitted)
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
+        }
+        .alert("key.disclaimer", isPresented: $isFirstLaunch) {
+            Button(role: .cancel) {} label: {
+                Text("key.ok")
+            }
+        } message: {
+            Text("key.disclaimer.description")
         }
     }
 }
