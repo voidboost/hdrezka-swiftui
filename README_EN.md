@@ -1,5 +1,11 @@
 <h1>🎬 HDrezka for macOS / iPadOS (Unofficial Client)</h1>
 <p>Unofficial HDrezka client for macOS and iPadOS. <br>Requires <b>macOS 15 Sequoia / iPadOS 18</b> or newer.</p>
+<h2>⚠️ Disclaimer</h2>
+<ul>
+   <li>This program is provided <b>"as is"</b>.</li>
+   <li>The author does <b>not encourage any illegal activity</b>.</li>
+   <li>Use it entirely <b>at your own risk</b>.</li>
+</ul>
 <h2>✨ Features</h2>
 <ul>
     <li>🎞 Custom video player</li>
