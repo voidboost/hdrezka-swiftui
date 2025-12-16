@@ -83,6 +83,7 @@ struct HDrezkaApp: App {
     @State private var modelContainer: ModelContainer
 
     @Default(.theme) private var theme
+    @Default(.isFirstLaunch) private var isFirstLaunch
 
     init() {
         do {
@@ -129,6 +130,12 @@ struct HDrezkaApp: App {
         CommandGroup(replacing: .help) {
             Link(destination: Const.github) {
                 Text("key.github")
+            }
+
+            Button {
+                isFirstLaunch = true
+            } label: {
+                Text("key.disclaimer")
             }
         }
     }
