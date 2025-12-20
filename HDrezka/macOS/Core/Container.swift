@@ -8,7 +8,7 @@ extension Container {
             Session(
                 rootQueue: .main,
                 startRequestsImmediately: false,
-                interceptor: CustomInterceptor(),
+                interceptor: Interceptor(interceptors: [CustomInterceptor(), OfflineRetrier()]),
                 redirectHandler: .modify { task, request, _ in
                     var newRequest = task.originalRequest ?? task.currentRequest ?? request
                     newRequest.url = request.url
