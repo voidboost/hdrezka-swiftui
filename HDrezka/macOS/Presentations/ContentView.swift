@@ -189,5 +189,10 @@ struct ContentView: View {
             Text("key.disclaimer.description")
         }
         .dialogSeverity(.critical)
+        .overlay {
+            SnowflakesView()
+                .allowsHitTesting(false)
+                .ignoresSafeArea()
+        }
     }
 }
