@@ -26,9 +26,9 @@ struct SnowflakesView: View {
                         Snowflake(
                             startX: .random(in: 0 ... size.width),
                             startY: .random(in: -size.height ... 0),
-                            startRotation: .random(in: 0 ... (.pi * 2)),
+                            startRotation: .random(in: 0 ... 360),
                             speed: .random(in: 10 ... 30),
-                            rotationSpeed: .random(in: -0.5 ... 0.5),
+                            rotationSpeed: .random(in: -25 ... 25),
                             opacity: .random(in: 0.3 ... 0.4),
                             size: 5,
                             noiseSeed: .random(in: 0 ... 1000),

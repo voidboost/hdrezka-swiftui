@@ -43,24 +43,22 @@ extension Snowflake {
         let posX = (truncatedX < 0 ? truncatedX + rangeX : truncatedX) - (self.size * 2)
         let posY = y.truncatingRemainder(dividingBy: rangeY) - (self.size * 2)
 
-        let angleStep = CGFloat.pi / (CGFloat(raysCount) / 2.0)
+        let angleStep = 360 / CGFloat(raysCount)
 
         ctx.drawLayer { ctx in
             ctx.translateBy(x: posX, y: posY)
-            ctx.rotate(by: .radians(rotation))
+            ctx.rotate(by: .degrees(rotation))
 
             for ray in 0 ..< raysCount {
-                var rectWidth = self.size
-
                 ctx.drawLayer { ctx in
-                    ctx.rotate(by: .radians(angleStep * CGFloat(ray)))
+                    ctx.rotate(by: .degrees(angleStep * CGFloat(ray)))
 
                     for rect in 0 ..< rectCount {
-                        rectWidth *= 0.9
+                        let rectWidth = self.size * pow(0.9, CGFloat(rect) + 1)
 
                         ctx.drawLayer { ctx in
                             ctx.translateBy(x: rectWidth * 0.7 * (CGFloat(rect) + 0.8), y: 0)
-                            ctx.rotate(by: .radians(.pi / 4.0))
+                            ctx.rotate(by: .degrees(45))
                             ctx.opacity = opacity
                             ctx.fill(
                                 Path(
