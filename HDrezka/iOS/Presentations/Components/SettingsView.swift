@@ -11,6 +11,8 @@ struct SettingsView: View {
     @Default(.spatialAudio) private var spatialAudio
     @Default(.theme) private var theme
     @Default(.cache) private var cache
+    @Default(.snow) private var snow
+    @Default(.forceSnow) private var forceSnow
 
     @Environment(CookiesManager.self) private var cookiesManager
 
