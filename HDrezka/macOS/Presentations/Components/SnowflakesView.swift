@@ -7,9 +7,13 @@ struct SnowflakesView: View {
 
     var body: some View {
         TimelineView(.animation) { timeline in
-            Canvas { ctx, size in
+            Canvas(rendersAsynchronously: true) { ctx, size in
                 for snowflake in snowflakes {
                     snowflake.draw(ctx: &ctx, size: size, date: timeline.date, noise: noise)
+                }
+            } symbols: {
+                ForEach(snowflakes) { snowflake in
+                    snowflake.symbol
                 }
             }
             .onGeometryChange(for: CGSize.self) { geometry in
