@@ -13,7 +13,7 @@ struct SnowflakesView: View {
                 }
             } symbols: {
                 ForEach(snowflakes) { snowflake in
-                    snowflake.symbol
+                    snowflake
                 }
             }
             .onGeometryChange(for: CGSize.self) { geometry in

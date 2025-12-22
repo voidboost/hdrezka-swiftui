@@ -15,6 +15,8 @@ struct SettingsView: View {
     @Default(.theme) private var theme
     @Default(.maxConcurrentDownloads) private var maxConcurrentDownloads
     @Default(.cache) private var cache
+    @Default(.snow) private var snow
+    @Default(.forceSnow) private var forceSnow
 
     @Environment(Downloader.self) private var downloader
     @Environment(CookiesManager.self) private var cookiesManager
@@ -42,236 +44,209 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        VStack(alignment: .center, spacing: 10) {
-            HStack(alignment: .center, spacing: 8) {
+        ScrollView(.vertical) {
+            LazyVStack(alignment: .center, spacing: 10) {
                 HStack(alignment: .center, spacing: 8) {
-                    Text("key.mirror")
+                    HStack(alignment: .center, spacing: 8) {
+                        Text("key.mirror")
 
-                    TextField("key.mirror", value: $mirror, format: .url, prompt: Text(currentMirror.absoluteString))
-                        .textFieldStyle(.plain)
-                        .multilineTextAlignment(.trailing)
-                        .autocorrectionDisabled()
-                        .onChange(of: mirror) {
+                        TextField("key.mirror", value: $mirror, format: .url, prompt: Text(currentMirror.absoluteString))
+                            .textFieldStyle(.plain)
+                            .multilineTextAlignment(.trailing)
+                            .autocorrectionDisabled()
+                            .onChange(of: mirror) {
+                                withAnimation(.easeInOut) {
+                                    mirrorValid = nil
+                                }
+
+                                mirrorCheck?.cancel()
+
+                                if mirror != nil {
+                                    mirrorCheck = DispatchWorkItem {
+                                        withAnimation(.easeInOut) {
+                                            mirrorValid = if let mirror,
+                                                             !mirror.isFileURL,
+                                                             let host = mirror.host(),
+                                                             host != currentMirror.host()
+                                            {
+                                                true
+                                            } else {
+                                                false
+                                            }
+                                        }
+                                    }
+
+                                    if let mirrorCheck {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: mirrorCheck)
+                                    }
+                                }
+                            }
+
+                        Button {
+                            if !_currentMirror.isDefaultValue {
+                                cookiesManager.setMirror(_currentMirror.defaultValue)
+                            }
+
+                            mirrorValid = nil
+                            mirrorCheck?.cancel()
+                        } label: {
+                            Image(systemName: "gobackward")
+                        }
+                        .buttonStyle(.accessoryBar)
+                    }
+                    .padding(.horizontal, 15)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(.quinary, in: .rect(cornerRadius: 6))
+                    .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+
+                    if mirrorValid == true, let mirror, var urlComponents = URLComponents(url: mirror, resolvingAgainstBaseURL: false) {
+                        Button {
+                            urlComponents.scheme = "https"
+                            urlComponents.path = "/"
+                            urlComponents.port = nil
+                            urlComponents.query = nil
+                            urlComponents.fragment = nil
+                            urlComponents.user = nil
+                            urlComponents.password = nil
+
+                            if let newMirror = urlComponents.url, currentMirror != newMirror {
+                                cookiesManager.setMirror(newMirror)
+                            }
+
                             withAnimation(.easeInOut) {
                                 mirrorValid = nil
                             }
 
                             mirrorCheck?.cancel()
+                        } label: {
+                            Image(systemName: "checkmark")
+                                .foregroundStyle(Color.accentColor)
+                                .bold()
+                                .imageFill(1)
+                                .contentShape(.rect(cornerRadius: 6))
+                                .overlay(Color.accentColor, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .frame(height: 40)
 
-                            if mirror != nil {
-                                mirrorCheck = DispatchWorkItem {
-                                    withAnimation(.easeInOut) {
-                                        mirrorValid = if let mirror,
-                                                         !mirror.isFileURL,
-                                                         let host = mirror.host(),
-                                                         host != currentMirror.host()
-                                        {
-                                            true
-                                        } else {
-                                            false
-                                        }
-                                    }
-                                }
+                VStack(spacing: 0) {
+                    HStack(alignment: .center, spacing: 8) {
+                        Text("key.theme")
 
-                                if let mirrorCheck {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: mirrorCheck)
-                                }
+                        Spacer()
+
+                        Picker("key.theme", selection: $theme) {
+                            ForEach(Theme.allCases) { theme in
+                                Text(theme.localizedKey)
+                                    .tag(theme)
                             }
                         }
-
-                    Button {
-                        if !_currentMirror.isDefaultValue {
-                            cookiesManager.setMirror(_currentMirror.defaultValue)
-                        }
-
-                        mirrorValid = nil
-                        mirrorCheck?.cancel()
-                    } label: {
-                        Image(systemName: "gobackward")
-                    }
-                    .buttonStyle(.accessoryBar)
-                }
-                .padding(.horizontal, 15)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(.quinary, in: .rect(cornerRadius: 6))
-                .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
-
-                if mirrorValid == true, let mirror, var urlComponents = URLComponents(url: mirror, resolvingAgainstBaseURL: false) {
-                    Button {
-                        urlComponents.scheme = "https"
-                        urlComponents.path = "/"
-                        urlComponents.port = nil
-                        urlComponents.query = nil
-                        urlComponents.fragment = nil
-                        urlComponents.user = nil
-                        urlComponents.password = nil
-
-                        if let newMirror = urlComponents.url, currentMirror != newMirror {
-                            cookiesManager.setMirror(newMirror)
-                        }
-
-                        withAnimation(.easeInOut) {
-                            mirrorValid = nil
-                        }
-
-                        mirrorCheck?.cancel()
-                    } label: {
-                        Image(systemName: "checkmark")
-                            .foregroundStyle(Color.accentColor)
-                            .bold()
-                            .imageFill(1)
-                            .contentShape(.rect(cornerRadius: 6))
-                            .overlay(Color.accentColor, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .frame(height: 40)
-
-            VStack(spacing: 0) {
-                HStack(alignment: .center, spacing: 8) {
-                    Text("key.theme")
-
-                    Spacer()
-
-                    Picker("key.theme", selection: $theme) {
-                        ForEach(Theme.allCases) { theme in
-                            Text(theme.localizedKey)
-                                .tag(theme)
-                        }
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                }
-                .frame(height: 40)
-
-                Divider()
-
-                HStack(alignment: .center, spacing: 8) {
-                    Text("key.playerFullscreen")
-
-                    Spacer()
-
-                    Toggle("key.playerFullscreen", isOn: $playerFullscreen)
-                        .toggleStyle(.switch)
                         .labelsHidden()
-                }
-                .frame(height: 40)
-
-                Divider()
-
-                HStack(alignment: .center, spacing: 8) {
-                    Text("key.hideMainWindow")
-
-                    Spacer()
-
-                    Toggle("key.hideMainWindow", isOn: $hideMainWindow)
-                        .toggleStyle(.switch)
-                        .labelsHidden()
-                }
-                .frame(height: 40)
-
-                Divider()
-
-                HStack(alignment: .center, spacing: 8) {
-                    Text("key.spatialAudio")
-
-                    Spacer()
-
-                    Picker("key.spatialAudio", selection: $spatialAudio) {
-                        ForEach(SpatialAudio.allCases) { format in
-                            Text(format.localizedKey)
-                                .tag(format)
-                        }
+                        .pickerStyle(.menu)
                     }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                }
-                .frame(height: 40)
+                    .frame(height: 40)
 
-                Divider()
-
-                HStack(alignment: .center, spacing: 8) {
-                    Text("key.defaultQuality")
-
-                    Spacer()
-
-                    Picker("key.defaultQuality", selection: $defaultQuality) {
-                        ForEach(DefaultQuality.allCases) { quality in
-                            Text(quality.localizedKey)
-                                .tag(quality)
-                        }
-                    }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
-                }
-                .frame(height: 40)
-
-                Divider()
-
-                HStack(alignment: .center, spacing: 8) {
-                    Text("key.maxConcurrentDownloads-\(maxConcurrentDownloads)")
-                        .monospacedDigit()
-                        .contentTransition(.numericText(value: Double(maxConcurrentDownloads)))
-                        .animation(.easeInOut, value: maxConcurrentDownloads)
-
-                    Spacer()
-
-                    Slider(value: Binding { Double(maxConcurrentDownloads) } set: { value in maxConcurrentDownloads = Int(value) }, in: 1 ... 10, step: 1) {
-                        Text("key.maxConcurrentDownloads-\(maxConcurrentDownloads)")
-                    } minimumValueLabel: {
-                        Text(verbatim: "1")
-                    } maximumValueLabel: {
-                        Text(verbatim: "10")
-                    } onEditingChanged: { isEditing in
-                        if !isEditing {
-                            downloader.maxConcurrentDownloadsChange()
-                        }
-                    }
-                    .labelsHidden()
-                    .controlSize(.large)
-                }
-                .frame(height: 40)
-
-                Divider()
-
-                HStack(alignment: .center, spacing: 8) {
-                    Text("key.playerPositions-\(playerPositions.count)")
-                        .monospacedDigit()
-                        .contentTransition(.numericText(value: Double(playerPositions.count)))
-
-                    Spacer()
-
-                    Button {
-                        for position in playerPositions {
-                            modelContext.delete(position)
-                        }
-                    } label: {
-                        Image(systemName: "trash")
-                            .foregroundStyle(Color.accentColor)
-                            .bold()
-                            .imageFill(1)
-                            .frame(height: 30)
-                            .contentShape(.rect(cornerRadius: 6))
-                            .overlay(Color.accentColor, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(playerPositions.isEmpty)
-                }
-                .frame(height: 40)
-
-                if !isLoggedIn {
                     Divider()
 
                     HStack(alignment: .center, spacing: 8) {
-                        Text("key.selectPositions-\(selectPositions.count)")
+                        Text("key.playerFullscreen")
+
+                        Spacer()
+
+                        Toggle("key.playerFullscreen", isOn: $playerFullscreen)
+                            .toggleStyle(.switch)
+                            .labelsHidden()
+                    }
+                    .frame(height: 40)
+
+                    Divider()
+
+                    HStack(alignment: .center, spacing: 8) {
+                        Text("key.hideMainWindow")
+
+                        Spacer()
+
+                        Toggle("key.hideMainWindow", isOn: $hideMainWindow)
+                            .toggleStyle(.switch)
+                            .labelsHidden()
+                    }
+                    .frame(height: 40)
+
+                    Divider()
+
+                    HStack(alignment: .center, spacing: 8) {
+                        Text("key.spatialAudio")
+
+                        Spacer()
+
+                        Picker("key.spatialAudio", selection: $spatialAudio) {
+                            ForEach(SpatialAudio.allCases) { format in
+                                Text(format.localizedKey)
+                                    .tag(format)
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                    }
+                    .frame(height: 40)
+
+                    Divider()
+
+                    HStack(alignment: .center, spacing: 8) {
+                        Text("key.defaultQuality")
+
+                        Spacer()
+
+                        Picker("key.defaultQuality", selection: $defaultQuality) {
+                            ForEach(DefaultQuality.allCases) { quality in
+                                Text(quality.localizedKey)
+                                    .tag(quality)
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                    }
+                    .frame(height: 40)
+
+                    Divider()
+
+                    HStack(alignment: .center, spacing: 8) {
+                        Text("key.maxConcurrentDownloads-\(maxConcurrentDownloads)")
                             .monospacedDigit()
-                            .contentTransition(.numericText(value: Double(selectPositions.count)))
+                            .contentTransition(.numericText(value: Double(maxConcurrentDownloads)))
+                            .animation(.easeInOut, value: maxConcurrentDownloads)
+
+                        Spacer()
+
+                        Slider(value: Binding { Double(maxConcurrentDownloads) } set: { value in maxConcurrentDownloads = Int(value) }, in: 1 ... 10, step: 1) {
+                            Text("key.maxConcurrentDownloads-\(maxConcurrentDownloads)")
+                        } minimumValueLabel: {
+                            Text(verbatim: "1")
+                        } maximumValueLabel: {
+                            Text(verbatim: "10")
+                        } onEditingChanged: { isEditing in
+                            if !isEditing {
+                                downloader.maxConcurrentDownloadsChange()
+                            }
+                        }
+                        .labelsHidden()
+                        .controlSize(.large)
+                    }
+                    .frame(height: 40)
+
+                    Divider()
+
+                    HStack(alignment: .center, spacing: 8) {
+                        Text("key.playerPositions-\(playerPositions.count)")
+                            .monospacedDigit()
+                            .contentTransition(.numericText(value: Double(playerPositions.count)))
 
                         Spacer()
 
                         Button {
-                            for position in selectPositions {
+                            for position in playerPositions {
                                 modelContext.delete(position)
                             }
                         } label: {
@@ -284,119 +259,190 @@ struct SettingsView: View {
                                 .overlay(Color.accentColor, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                         }
                         .buttonStyle(.plain)
-                        .disabled(selectPositions.isEmpty)
+                        .disabled(playerPositions.isEmpty)
                     }
                     .frame(height: 40)
-                }
 
-                Divider()
+                    if !isLoggedIn {
+                        Divider()
 
-                HStack(alignment: .center, spacing: 8) {
-                    Text("key.cache")
+                        HStack(alignment: .center, spacing: 8) {
+                            Text("key.selectPositions-\(selectPositions.count)")
+                                .monospacedDigit()
+                                .contentTransition(.numericText(value: Double(selectPositions.count)))
 
-                    Spacer()
+                            Spacer()
 
-                    Picker("key.cache", selection: $cache) {
-                        ForEach(Cache.allCases) { cache in
-                            Text(cache.localizedKey)
-                                .tag(cache)
+                            Button {
+                                for position in selectPositions {
+                                    modelContext.delete(position)
+                                }
+                            } label: {
+                                Image(systemName: "trash")
+                                    .foregroundStyle(Color.accentColor)
+                                    .bold()
+                                    .imageFill(1)
+                                    .frame(height: 30)
+                                    .contentShape(.rect(cornerRadius: 6))
+                                    .overlay(Color.accentColor, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(selectPositions.isEmpty)
+                        }
+                        .frame(height: 40)
+                    }
+
+                    Divider()
+
+                    HStack(alignment: .center, spacing: 8) {
+                        Text("key.cache")
+
+                        Spacer()
+
+                        Picker("key.cache", selection: $cache) {
+                            ForEach(Cache.allCases) { cache in
+                                Text(cache.localizedKey)
+                                    .tag(cache)
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                    }
+                    .frame(height: 40)
+                    .onChange(of: cache) {
+                        let defaultCache = ImageCache.default
+
+                        switch cache {
+                        case .off:
+                            defaultCache.clearCache()
+
+                            defaultCache.memoryStorage.config.expiration = .expired
+                            defaultCache.diskStorage.config.expiration = .expired
+                        case .memory:
+                            defaultCache.clearDiskCache()
+
+                            defaultCache.memoryStorage.config.expiration = .seconds(300)
+                            defaultCache.diskStorage.config.expiration = .expired
+                        case .disk:
+                            defaultCache.clearMemoryCache()
+
+                            defaultCache.memoryStorage.config.expiration = .expired
+                            defaultCache.diskStorage.config.expiration = .days(7)
+                        case .all:
+                            defaultCache.memoryStorage.config.expiration = .seconds(300)
+                            defaultCache.diskStorage.config.expiration = .days(7)
                         }
                     }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
                 }
-                .frame(height: 40)
-                .onChange(of: cache) {
-                    let defaultCache = ImageCache.default
+                .padding(.horizontal, 15)
+                .background(.quinary, in: .rect(cornerRadius: 6))
+                .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
 
-                    switch cache {
-                    case .off:
-                        defaultCache.clearCache()
+                VStack(spacing: 0) {
+                    HStack(alignment: .center, spacing: 8) {
+                        Text("key.snow")
 
-                        defaultCache.memoryStorage.config.expiration = .expired
-                        defaultCache.diskStorage.config.expiration = .expired
-                    case .memory:
-                        defaultCache.clearDiskCache()
+                        Spacer()
 
-                        defaultCache.memoryStorage.config.expiration = .seconds(300)
-                        defaultCache.diskStorage.config.expiration = .expired
-                    case .disk:
-                        defaultCache.clearMemoryCache()
-
-                        defaultCache.memoryStorage.config.expiration = .expired
-                        defaultCache.diskStorage.config.expiration = .days(7)
-                    case .all:
-                        defaultCache.memoryStorage.config.expiration = .seconds(300)
-                        defaultCache.diskStorage.config.expiration = .days(7)
+                        Toggle("key.snow", isOn: $snow)
+                            .toggleStyle(.switch)
+                            .labelsHidden()
                     }
-                }
-            }
-            .padding(.horizontal, 15)
-            .background(.quinary, in: .rect(cornerRadius: 6))
-            .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                    .frame(height: 40)
 
-            VStack(spacing: 0) {
-                HStack(alignment: .center, spacing: 8) {
-                    Text("key.autoCheckUpdates")
+                    let weekOfYear = Calendar.current.component(.weekOfYear, from: .now)
 
-                    Spacer()
+                    if snow, weekOfYear > 2, weekOfYear < 51 {
+                        Divider()
 
-                    Toggle("key.autoCheckUpdates", isOn: $automaticallyChecksForUpdates)
-                        .toggleStyle(.switch)
-                        .labelsHidden()
-                }
-                .frame(height: 40)
-                .onChange(of: automaticallyChecksForUpdates) {
-                    updater.automaticallyChecksForUpdates = automaticallyChecksForUpdates
-                }
+                        HStack(alignment: .center, spacing: 8) {
+                            Text("key.forceSnow")
 
-                Divider()
+                            Spacer()
 
-                HStack(alignment: .center, spacing: 8) {
-                    Text("key.autoDownloadUpdates")
-
-                    Spacer()
-
-                    Toggle("key.autoDownloadUpdates", isOn: $automaticallyDownloadsUpdates)
-                        .toggleStyle(.switch)
-                        .labelsHidden()
-                }
-                .frame(height: 40)
-                .disabled(!automaticallyChecksForUpdates)
-                .onChange(of: automaticallyDownloadsUpdates) {
-                    updater.automaticallyDownloadsUpdates = automaticallyDownloadsUpdates
-                }
-
-                Divider()
-
-                HStack(alignment: .center, spacing: 8) {
-                    Text("key.updateCheckInterval")
-
-                    Spacer()
-
-                    Picker("key.updateCheckInterval", selection: $updateCheckInterval) {
-                        ForEach(UpdateInterval.allCases) { interval in
-                            Text(interval.localizedKey)
-                                .tag(TimeInterval(interval.rawValue))
+                            Toggle("key.forceSnow", isOn: $forceSnow)
+                                .toggleStyle(.switch)
+                                .labelsHidden()
                         }
+                        .frame(height: 40)
                     }
-                    .labelsHidden()
-                    .pickerStyle(.menu)
                 }
-                .frame(height: 40)
-                .disabled(!automaticallyChecksForUpdates)
-                .onChange(of: updateCheckInterval) {
-                    updater.updateCheckInterval = updateCheckInterval
+                .padding(.horizontal, 15)
+                .background(.quinary, in: .rect(cornerRadius: 6))
+                .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+
+                VStack(spacing: 0) {
+                    HStack(alignment: .center, spacing: 8) {
+                        Text("key.autoCheckUpdates")
+
+                        Spacer()
+
+                        Toggle("key.autoCheckUpdates", isOn: $automaticallyChecksForUpdates)
+                            .toggleStyle(.switch)
+                            .labelsHidden()
+                    }
+                    .frame(height: 40)
+                    .onChange(of: automaticallyChecksForUpdates) {
+                        updater.automaticallyChecksForUpdates = automaticallyChecksForUpdates
+                    }
+
+                    Divider()
+
+                    HStack(alignment: .center, spacing: 8) {
+                        Text("key.autoDownloadUpdates")
+
+                        Spacer()
+
+                        Toggle("key.autoDownloadUpdates", isOn: $automaticallyDownloadsUpdates)
+                            .toggleStyle(.switch)
+                            .labelsHidden()
+                    }
+                    .frame(height: 40)
+                    .disabled(!automaticallyChecksForUpdates)
+                    .onChange(of: automaticallyDownloadsUpdates) {
+                        updater.automaticallyDownloadsUpdates = automaticallyDownloadsUpdates
+                    }
+
+                    Divider()
+
+                    HStack(alignment: .center, spacing: 8) {
+                        Text("key.updateCheckInterval")
+
+                        Spacer()
+
+                        Picker("key.updateCheckInterval", selection: $updateCheckInterval) {
+                            ForEach(UpdateInterval.allCases) { interval in
+                                Text(interval.localizedKey)
+                                    .tag(TimeInterval(interval.rawValue))
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                    }
+                    .frame(height: 40)
+                    .disabled(!automaticallyChecksForUpdates)
+                    .onChange(of: updateCheckInterval) {
+                        updater.updateCheckInterval = updateCheckInterval
+                    }
                 }
+                .padding(.horizontal, 15)
+                .background(.quinary, in: .rect(cornerRadius: 6))
+                .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
             }
-            .padding(.horizontal, 15)
-            .background(.quinary, in: .rect(cornerRadius: 6))
-            .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+            .padding(25)
+            .background(.background)
+            .onChange(of: currentMirror) {
+                mirror = nil
+            }
         }
-        .padding(25)
-        .background(.background)
-        .onChange(of: currentMirror) {
-            mirror = nil
+        .scrollIndicators(.visible, axes: .vertical)
+        .viewModifier { view in
+            if #available(macOS 26, *) {
+                view.scrollEdgeEffectStyle(.soft, for: .all)
+            } else {
+                view
+            }
         }
+        .frame(minHeight: 400, maxHeight: 500)
     }
 }

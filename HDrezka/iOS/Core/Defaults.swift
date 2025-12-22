@@ -20,4 +20,7 @@ extension Defaults.Keys {
     static let allowedComments = Key<Bool>("allowed_comments", default: false)
     static let deviceUUID = Key<String?>("device_uuid", default: nil)
     static let isFirstLaunch = Key<Bool>("is_first_launch", default: true)
+
+    static let snow = Key<Bool>("snow", default: true)
+    static let forceSnow = Key<Bool>("force_snow", default: false)
 }

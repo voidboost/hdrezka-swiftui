@@ -27,7 +27,7 @@ struct SettingsView: View {
 
     var body: some View {
         ScrollView(.vertical) {
-            VStack(alignment: .center, spacing: 10) {
+            LazyVStack(alignment: .center, spacing: 10) {
                 HStack(alignment: .center, spacing: 8) {
                     HStack(alignment: .center, spacing: 8) {
                         Text("key.mirror")
@@ -262,6 +262,39 @@ struct SettingsView: View {
                             defaultCache.memoryStorage.config.expiration = .seconds(300)
                             defaultCache.diskStorage.config.expiration = .days(7)
                         }
+                    }
+                }
+                .padding(.horizontal, 15)
+                .background(.quinary, in: .rect(cornerRadius: 6))
+                .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+
+                VStack(spacing: 0) {
+                    HStack(alignment: .center, spacing: 8) {
+                        Text("key.snow")
+
+                        Spacer()
+
+                        Toggle("key.snow", isOn: $snow)
+                            .toggleStyle(.switch)
+                            .labelsHidden()
+                    }
+                    .frame(height: 40)
+
+                    let weekOfYear = Calendar.current.component(.weekOfYear, from: .now)
+
+                    if snow, weekOfYear > 2, weekOfYear < 51 {
+                        Divider()
+
+                        HStack(alignment: .center, spacing: 8) {
+                            Text("key.forceSnow")
+
+                            Spacer()
+
+                            Toggle("key.forceSnow", isOn: $forceSnow)
+                                .toggleStyle(.switch)
+                                .labelsHidden()
+                        }
+                        .frame(height: 40)
                     }
                 }
                 .padding(.horizontal, 15)

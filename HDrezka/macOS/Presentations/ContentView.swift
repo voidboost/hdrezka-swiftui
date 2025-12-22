@@ -15,6 +15,8 @@ struct ContentView: View {
     @Default(.isUserPremium) private var isUserPremium
     @Default(.lastHdrezkaAppVersion) private var lastHdrezkaAppVersion
     @Default(.isFirstLaunch) private var isFirstLaunch
+    @Default(.snow) private var snow
+    @Default(.forceSnow) private var forceSnow
 
     @Environment(AppState.self) private var appState
 
@@ -190,9 +192,13 @@ struct ContentView: View {
         }
         .dialogSeverity(.critical)
         .overlay {
-            SnowflakesView()
-                .allowsHitTesting(false)
-                .ignoresSafeArea()
+            let weekOfYear = Calendar.current.component(.weekOfYear, from: .now)
+
+            if snow, weekOfYear <= 2 || weekOfYear >= 51 || forceSnow {
+                SnowflakesView()
+                    .allowsHitTesting(false)
+                    .ignoresSafeArea()
+            }
         }
     }
 }

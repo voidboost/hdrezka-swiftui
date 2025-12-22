@@ -2939,6 +2939,28 @@
         }
       }
     },
+    "key.forceSnow" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Force snow"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Принудительно включить снег"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Примусово увімкнути сніг"
+          }
+        }
+      }
+    },
     "key.franchise" : {
       "localizations" : {
         "en" : {
@@ -7039,6 +7061,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "У вас вже є обліковий запис?"
+          }
+        }
+      }
+    },
+    "key.snow" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snow"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Снег"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сніг"
           }
         }
       }

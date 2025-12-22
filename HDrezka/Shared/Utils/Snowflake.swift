@@ -64,8 +64,10 @@ extension Snowflake {
     var angleStep: CGFloat {
         360 / CGFloat(raysCount)
     }
+}
 
-    var symbol: some View {
+extension Snowflake: View {
+    var body: some View {
         Canvas(rendersAsynchronously: true) { ctx, size in
             ctx.drawLayer { ctx in
                 ctx.translateBy(x: size.width / 2, y: size.height / 2)
