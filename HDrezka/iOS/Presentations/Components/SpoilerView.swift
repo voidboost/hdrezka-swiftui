@@ -1,6 +1,6 @@
 import SwiftUI
 
-final class EmitterView: UIView {
+final class SpoilerEmitterView: UIView {
     override static var layerClass: AnyClass { CAEmitterLayer.self }
 
     var emitterLayer: CAEmitterLayer { layer as! CAEmitterLayer }
@@ -16,8 +16,8 @@ final class EmitterView: UIView {
 }
 
 struct SpoilerView: UIViewRepresentable {
-    func makeUIView(context _: Context) -> EmitterView {
-        let emitterView = EmitterView()
+    func makeUIView(context _: Context) -> SpoilerEmitterView {
+        let spoilerEmitterView = SpoilerEmitterView()
 
         let emitterCell = CAEmitterCell()
         emitterCell.contents = UIImage(resource: .speckle).cgImage
@@ -28,13 +28,13 @@ struct SpoilerView: UIViewRepresentable {
         emitterCell.velocityRange = 20
         emitterCell.alphaRange = 1
 
-        emitterView.emitterLayer.emitterShape = .rectangle
-        emitterView.emitterLayer.emitterCells = [emitterCell]
-        emitterView.emitterLayer.seed = UInt32.random(in: .min ... .max)
-        emitterView.emitterLayer.beginTime = CACurrentMediaTime()
+        spoilerEmitterView.emitterLayer.emitterShape = .rectangle
+        spoilerEmitterView.emitterLayer.emitterCells = [emitterCell]
+        spoilerEmitterView.emitterLayer.seed = UInt32.random(in: .min ... .max)
+        spoilerEmitterView.emitterLayer.beginTime = CACurrentMediaTime()
 
-        return emitterView
+        return spoilerEmitterView
     }
 
-    func updateUIView(_: EmitterView, context _: Context) {}
+    func updateUIView(_: SpoilerEmitterView, context _: Context) {}
 }

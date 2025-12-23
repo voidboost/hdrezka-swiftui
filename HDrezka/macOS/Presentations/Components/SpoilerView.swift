@@ -1,6 +1,6 @@
 import SwiftUI
 
-final class EmitterView: NSView {
+final class SpoilerEmitterView: NSView {
     private var emitterLayer: CAEmitterLayer?
 
     override init(frame frameRect: CGRect) {
@@ -57,11 +57,11 @@ final class EmitterView: NSView {
 }
 
 struct SpoilerView: NSViewRepresentable {
-    func makeNSView(context _: Context) -> EmitterView {
-        EmitterView()
+    func makeNSView(context _: Context) -> SpoilerEmitterView {
+        SpoilerEmitterView()
     }
 
-    func updateNSView(_ nsView: EmitterView, context _: Context) {
+    func updateNSView(_ nsView: SpoilerEmitterView, context _: Context) {
         nsView.setBirthRate(Float(nsView.bounds.width * nsView.bounds.height * 0.2))
     }
 }

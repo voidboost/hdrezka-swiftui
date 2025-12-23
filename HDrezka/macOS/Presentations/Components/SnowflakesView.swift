@@ -1,49 +1,132 @@
+import Algorithms
 import SwiftUI
 
-struct SnowflakesView: View {
-    @State private var snowflakes: [Snowflake] = []
+final class SnowflakesEmitterView: NSView {
+    private var emitterLayer: CAEmitterLayer?
 
-    private let noise: Perlin = .init()
+    override init(frame frameRect: CGRect) {
+        super.init(frame: frameRect)
+        setupEmitterLayer()
+    }
 
-    var body: some View {
-        TimelineView(.animation) { timeline in
-            let currentTime = timeline.date.timeIntervalSinceReferenceDate
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupEmitterLayer()
+    }
 
-            Canvas(rendersAsynchronously: true) { ctx, size in
-                for snowflake in snowflakes {
-                    snowflake.draw(ctx: &ctx, size: size, time: currentTime, noise: noise)
-                }
-            } symbols: {
-                ForEach(snowflakes) { snowflake in
-                    snowflake
-                }
-            }
+    private func setupEmitterLayer() {
+        wantsLayer = true
+
+        let emitterCells = generateCGImages().map { image in
+            let emitterCell = CAEmitterCell()
+            emitterCell.contents = image
+            emitterCell.scale = 0.9
+            emitterCell.scaleRange = 0.1
+            emitterCell.birthRate = 0.2
+            emitterCell.velocity = -15
+            emitterCell.velocityRange = -5
+            emitterCell.yAcceleration = -5
+            emitterCell.spinRange = Angle(degrees: 45).radians
+            emitterCell.emissionRange = .pi / 2
+
+            return emitterCell
         }
-        .onGeometryChange(for: CGSize.self) { geometry in
-            geometry.size
-        } action: { size in
-            let targetCount = Int((size.width * size.height) / 20000)
 
-            guard targetCount != snowflakes.count else { return }
+        let emitterLayer = CAEmitterLayer()
+        emitterLayer.emitterShape = .line
+        emitterLayer.emitterCells = emitterCells
+        emitterLayer.seed = UInt32.random(in: UInt32.min ... UInt32.max)
+        emitterLayer.beginTime = CACurrentMediaTime()
 
-            if snowflakes.count > targetCount {
-                snowflakes.removeLast(snowflakes.count - targetCount)
-            } else if snowflakes.count < targetCount {
-                snowflakes.append(contentsOf: (0 ..< (targetCount - snowflakes.count)).map { _ in
-                    Snowflake(
-                        startX: .random(in: 0 ... size.width),
-                        startY: .random(in: -size.height ... 0),
-                        startRotation: .random(in: 0 ... 360),
-                        speed: .random(in: 10 ... 30),
-                        rotationSpeed: .random(in: -25 ... 25),
-                        opacity: .random(in: 0.3 ... 0.4),
-                        size: .random(in: 4 ... 5),
-                        noiseSeed: .random(in: 0 ... 1000),
-                        rectCount: .random(in: 2 ... 5),
-                        raysCount: .random(in: 5 ... 7),
-                    )
-                })
-            }
+        layer?.addSublayer(emitterLayer)
+        self.emitterLayer = emitterLayer
+    }
+
+    override func layout() {
+        super.layout()
+
+        guard let emitterLayer else { return }
+
+        emitterLayer.emitterPosition = CGPoint(x: bounds.midX, y: bounds.maxY + (maxRadius * 2))
+        emitterLayer.emitterSize = CGSize(width: bounds.width, height: 0)
+        emitterLayer.emitterCells?.forEach { emitterCell in
+            emitterCell.lifetime = Float((bounds.height + (maxRadius * 4)) / max(abs(emitterCell.velocity) - abs(emitterCell.velocityRange), 1))
         }
     }
+
+    private func getRadius(size: CGFloat, rectCount: Int) -> CGFloat {
+        let lastRectSize = size * pow(0.9, CGFloat(rectCount - 1))
+        let lastRectOffset = lastRectSize * 0.7 * (CGFloat(rectCount - 1) + 0.8)
+        let halfDiagonal = lastRectSize * sqrt(2) / 2
+        return lastRectOffset + halfDiagonal
+    }
+
+    private var maxRadius: CGFloat {
+        getRadius(size: 5, rectCount: 5)
+    }
+
+    private func getAngleStep(raysCount: Int) -> CGFloat {
+        360 / CGFloat(raysCount)
+    }
+
+    private func createCGImage(size: CGFloat, rectCount: Int, raysCount: Int) -> CGImage? {
+        let radius = getRadius(size: size, rectCount: rectCount)
+        let angleStep = getAngleStep(raysCount: raysCount)
+
+        guard let context = CGContext(
+            data: nil,
+            width: Int(radius * 2),
+            height: Int(radius * 2),
+            bitsPerComponent: 8,
+            bytesPerRow: 0,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue,
+        ) else {
+            return nil
+        }
+
+        context.translateBy(x: radius, y: radius)
+
+        for ray in 0 ..< raysCount {
+            context.saveGState()
+
+            context.rotate(by: Angle(degrees: angleStep * CGFloat(ray)).radians)
+
+            for rect in 0 ..< rectCount {
+                let rectWidth = size * pow(0.9, CGFloat(rect) + 1)
+
+                context.saveGState()
+
+                context.translateBy(x: rectWidth * 0.7 * (CGFloat(rect) + 0.8), y: 0)
+                context.rotate(by: Angle(degrees: 45).radians)
+                context.setFillColor(NSColor.systemBlue.withAlphaComponent(0.4).cgColor)
+                context.fill(
+                    CGRect(
+                        x: -rectWidth / 2,
+                        y: -rectWidth / 2,
+                        width: rectWidth,
+                        height: rectWidth,
+                    ),
+                )
+
+                context.restoreGState()
+            }
+
+            context.restoreGState()
+        }
+
+        return context.makeImage()
+    }
+
+    private func generateCGImages() -> [CGImage] {
+        product(2 ... 5, 5 ... 7).compactMap { rectCount, raysCount in
+            createCGImage(size: 5, rectCount: rectCount, raysCount: raysCount)
+        }
+    }
+}
+
+struct SnowflakesView: NSViewRepresentable {
+    func makeNSView(context _: Context) -> SnowflakesEmitterView { SnowflakesEmitterView() }
+
+    func updateNSView(_: SnowflakesEmitterView, context _: Context) {}
 }
