@@ -38,9 +38,9 @@ struct SnowflakesView: UIViewRepresentable {
             emitterCell.birthRate = 0.2
             emitterCell.velocity = 20
             emitterCell.velocityRange = 10
-            emitterCell.spinRange = Angle(degrees: 45).radians
-            emitterCell.emissionLongitude = Angle(degrees: 180).radians
-            emitterCell.emissionRange = Angle(degrees: 30).radians
+            emitterCell.spinRange = Angle.degrees(45).radians
+            emitterCell.emissionLongitude = Angle.degrees(180).radians
+            emitterCell.emissionRange = Angle.degrees(30).radians
 
             return emitterCell
         }
@@ -92,7 +92,7 @@ struct SnowflakesView: UIViewRepresentable {
         for ray in 0 ..< raysCount {
             context.saveGState()
 
-            context.rotate(by: Angle(degrees: angleStep * CGFloat(ray)).radians)
+            context.rotate(by: Angle.degrees(angleStep * CGFloat(ray)).radians)
 
             for rect in 0 ..< rectCount {
                 let rectWidth = size * pow(0.9, CGFloat(rect) + 1)
@@ -100,7 +100,7 @@ struct SnowflakesView: UIViewRepresentable {
                 context.saveGState()
 
                 context.translateBy(x: rectWidth * 0.7 * (CGFloat(rect) + 0.8), y: 0)
-                context.rotate(by: Angle(degrees: 45).radians)
+                context.rotate(by: Angle.degrees(45).radians)
                 context.setFillColor(UIColor.systemBlue.withAlphaComponent(0.4).cgColor)
                 context.fill(
                     CGRect(
