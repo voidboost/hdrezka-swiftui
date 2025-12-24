@@ -36,11 +36,11 @@ struct SnowflakesView: UIViewRepresentable {
             emitterCell.scale = 0.9
             emitterCell.scaleRange = 0.1
             emitterCell.birthRate = 0.2
-            emitterCell.velocity = 15
-            emitterCell.velocityRange = 5
-            emitterCell.yAcceleration = 5
+            emitterCell.velocity = 20
+            emitterCell.velocityRange = 10
             emitterCell.spinRange = Angle(degrees: 45).radians
-            emitterCell.emissionRange = .pi / 2
+            emitterCell.emissionLongitude = Angle(degrees: 180).radians
+            emitterCell.emissionRange = Angle(degrees: 30).radians
 
             return emitterCell
         }
