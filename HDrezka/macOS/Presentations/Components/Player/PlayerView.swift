@@ -29,6 +29,8 @@ struct PlayerView: View {
 
     @State private var subscriptions: Set<AnyCancellable> = []
 
+    @FocusState private var isFocused: Bool
+
     private let poster: String
     private let name: String
     private let favs: String
@@ -464,6 +466,7 @@ struct PlayerView: View {
         .frame(minWidth: 900, minHeight: 900 / 16 * 9)
         .ignoresSafeArea()
         .focusable()
+        .focused($isFocused)
         .focusEffectDisabled()
         .background(Color.black)
         .background(WindowAccessor { window in
@@ -652,6 +655,8 @@ struct PlayerView: View {
                 .sink { status in
                     switch status {
                     case .readyToPlay:
+                        isFocused = true
+
                         if isLoggedIn {
                             saveWatchingStateUseCase(voiceActing: voiceActing, season: season, episode: episode)
                                 .sink { _ in } receiveValue: { _ in }
