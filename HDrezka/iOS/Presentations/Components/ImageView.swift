@@ -52,6 +52,12 @@ struct ImageView: View {
                 .buttonStyle(.bordered)
                 .padding(10)
             }
+            .gesture(
+                TapGesture(count: 1)
+                    .onEnded {
+                        dismiss()
+                    },
+            )
             .overlay(alignment: .bottomTrailing) {
                 ShareLink(item: url) {
                     Image(systemName: "square.and.arrow.up")
@@ -60,11 +66,5 @@ struct ImageView: View {
                 .buttonStyle(.bordered)
                 .padding(10)
             }
-            .gesture(
-                TapGesture(count: 1)
-                    .onEnded {
-                        dismiss()
-                    },
-            )
     }
 }

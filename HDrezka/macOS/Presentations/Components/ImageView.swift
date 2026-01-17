@@ -59,14 +59,6 @@ struct ImageView: View {
 
                 Rectangle().fill(.ultraThickMaterial)
             }
-            .overlay(alignment: .bottomTrailing) {
-                ShareLink(item: url) {
-                    Image(systemName: "square.and.arrow.up")
-                        .foregroundStyle(.primary)
-                }
-                .buttonStyle(.accessoryBar)
-                .padding(10)
-            }
             .gesture(
                 WindowDragGesture()
                     .exclusively(before:
@@ -82,5 +74,13 @@ struct ImageView: View {
                                         dismiss()
                                     })),
             )
+            .overlay(alignment: .bottomTrailing) {
+                ShareLink(item: url) {
+                    Image(systemName: "square.and.arrow.up")
+                        .foregroundStyle(.primary)
+                }
+                .buttonStyle(.accessoryBar)
+                .padding(10)
+            }
     }
 }
