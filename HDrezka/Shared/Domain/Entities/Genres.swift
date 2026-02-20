@@ -8,7 +8,9 @@ enum Genres: LocalizedStringKey, CaseIterable, Identifiable {
     case anime = "key.genres.anime"
     case show = "key.genres.show"
 
-    var id: Genres { self }
+    var id: Genres {
+        self
+    }
 
     var genreCode: Int {
         switch self {

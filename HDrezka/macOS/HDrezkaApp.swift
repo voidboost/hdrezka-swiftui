@@ -100,7 +100,9 @@ extension AppDelegate: SPUUpdaterDelegate, SPUStandardUserDriverDelegate {
         UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound]) { _, _ in }
     }
 
-    var supportsGentleScheduledUpdateReminders: Bool { true }
+    var supportsGentleScheduledUpdateReminders: Bool {
+        true
+    }
 
     func standardUserDriverWillHandleShowingUpdate(_: Bool, forUpdate update: SUAppcastItem, state: SPUUserUpdateState) {
         if !state.userInitiated {

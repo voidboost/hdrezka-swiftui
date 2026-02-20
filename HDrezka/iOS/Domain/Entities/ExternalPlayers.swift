@@ -3,7 +3,9 @@ import SwiftUI
 enum ExternalPlayers: Int, CaseIterable, Identifiable {
     case infuse = 0
 
-    var id: Self { self }
+    var id: Self {
+        self
+    }
 
     var url: URL {
         switch self {

@@ -1,9 +1,13 @@
 import SwiftUI
 
 final class SpoilerEmitterView: UIView {
-    override static var layerClass: AnyClass { CAEmitterLayer.self }
+    override static var layerClass: AnyClass {
+        CAEmitterLayer.self
+    }
 
-    var emitterLayer: CAEmitterLayer { layer as! CAEmitterLayer }
+    var emitterLayer: CAEmitterLayer {
+        layer as! CAEmitterLayer
+    }
 
     override func layoutSubviews() {
         super.layoutSubviews()

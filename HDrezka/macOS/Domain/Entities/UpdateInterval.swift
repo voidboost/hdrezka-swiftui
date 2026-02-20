@@ -6,7 +6,9 @@ enum UpdateInterval: Double, CaseIterable, Identifiable {
     case weekly = 604_800
     case monthly = 2_629_800
 
-    var id: Self { self }
+    var id: Self {
+        self
+    }
 
     var localizedKey: LocalizedStringKey {
         switch self {

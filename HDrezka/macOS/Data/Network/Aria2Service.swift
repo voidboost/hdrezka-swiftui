@@ -8,11 +8,17 @@ enum Aria2Service<E: Encodable & Sendable> {
 }
 
 extension Aria2Service: URLRequestConvertible {
-    var baseURL: URL { Const.rpc }
+    var baseURL: URL {
+        Const.rpc
+    }
 
-    var path: String { "jsonrpc" }
+    var path: String {
+        "jsonrpc"
+    }
 
-    var method: HTTPMethod { .post }
+    var method: HTTPMethod {
+        .post
+    }
 
     func asURLRequest() throws -> URLRequest {
         let url = baseURL.appending(path: path, directoryHint: .notDirectory)

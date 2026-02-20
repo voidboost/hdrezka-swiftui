@@ -7,7 +7,9 @@ enum Cache: Int, CaseIterable, Identifiable, Defaults.Serializable {
     case disk
     case all
 
-    var id: Self { self }
+    var id: Self {
+        self
+    }
 
     var localizedKey: LocalizedStringKey {
         switch self {

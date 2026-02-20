@@ -5,5 +5,7 @@ enum BookmarkFilters: LocalizedStringKey, CaseIterable, Identifiable {
     case year = "key.filters.year"
     case popular = "key.filters.popular"
 
-    var id: BookmarkFilters { self }
+    var id: BookmarkFilters {
+        self
+    }
 }

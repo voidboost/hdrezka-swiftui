@@ -12,7 +12,9 @@ enum DefaultQuality: String, CaseIterable, Identifiable, Defaults.Serializable {
     case k2 = "2K"
     case k4 = "4K"
 
-    var id: Self { self }
+    var id: Self {
+        self
+    }
 
     var localizedKey: LocalizedStringKey {
         switch self {

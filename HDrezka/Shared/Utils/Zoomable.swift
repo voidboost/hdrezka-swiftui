@@ -139,7 +139,6 @@ struct ZoomableModifier: ViewModifier {
 }
 
 public extension View {
-    @ViewBuilder
     func zoomable(
         maxZoomScale: CGFloat? = 5,
         doubleTapZoomScale: CGFloat? = 3,

@@ -6,7 +6,9 @@ enum Theme: Int, CaseIterable, Identifiable, Defaults.Serializable {
     case light
     case dark
 
-    var id: Self { self }
+    var id: Self {
+        self
+    }
 
     var localizedKey: LocalizedStringKey {
         switch self {

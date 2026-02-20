@@ -5,5 +5,7 @@ enum NewFilters: LocalizedStringKey, CaseIterable, Identifiable {
     case popular = "key.filters.popular"
     case watching = "key.filters.watching_now"
 
-    var id: NewFilters { self }
+    var id: NewFilters {
+        self
+    }
 }

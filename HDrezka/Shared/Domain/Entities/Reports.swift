@@ -7,5 +7,7 @@ enum Reports: LocalizedStringKey, CaseIterable, Identifiable {
     case flood = "key.report.flood"
     case other = "key.report.other"
 
-    var id: Reports { self }
+    var id: Reports {
+        self
+    }
 }

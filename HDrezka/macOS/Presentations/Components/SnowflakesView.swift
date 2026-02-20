@@ -58,7 +58,9 @@ final class SnowflakesEmitterView: NSView {
 }
 
 struct SnowflakesView: NSViewRepresentable {
-    func makeNSView(context _: Context) -> SnowflakesEmitterView { SnowflakesEmitterView() }
+    func makeNSView(context _: Context) -> SnowflakesEmitterView {
+        SnowflakesEmitterView()
+    }
 
     func updateNSView(_: SnowflakesEmitterView, context _: Context) {}
 }

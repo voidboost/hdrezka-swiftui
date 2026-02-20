@@ -8,7 +8,9 @@ enum SpatialAudio: Int, CaseIterable, Identifiable, Defaults.Serializable {
     case multichannel
     case monoStereoAndMultichannel
 
-    var id: Self { self }
+    var id: Self {
+        self
+    }
 
     var localizedKey: LocalizedStringKey {
         switch self {

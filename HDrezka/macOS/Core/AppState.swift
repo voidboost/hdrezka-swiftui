@@ -141,7 +141,9 @@ enum Tabs: Hashable, Identifiable, CaseIterable, View {
         }
     }
 
-    var id: Self { self }
+    var id: Self {
+        self
+    }
 }
 
 enum Destinations: Hashable, Identifiable {
@@ -197,11 +199,12 @@ enum Destinations: Hashable, Identifiable {
         }
     }
 
-    var id: Self { self }
+    var id: Self {
+        self
+    }
 }
 
 extension View {
-    @ViewBuilder
     func destinations() -> some View {
         navigationDestination(for: Destinations.self) { destination in
             switch destination {

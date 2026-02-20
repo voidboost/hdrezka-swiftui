@@ -4,7 +4,9 @@ enum ExternalDownloaders: Int, CaseIterable, Identifiable {
     case folx = 0
     case motrix
 
-    var id: Self { self }
+    var id: Self {
+        self
+    }
 
     var url: URL {
         switch self {

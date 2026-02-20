@@ -758,13 +758,11 @@ private extension String {
             throw HDrezkaError.parseJson("code", "getTrailerLink")
         }
 
-        let trailerId = try SwiftSoup.parse(code)
+        return try SwiftSoup.parse(code)
             .select("iframe").first().orThrow()
             .attr("src")
             .substringAfter("https://www.youtube.com/embed/")
             .substringBefore("?")
-
-        return trailerId
     }
 
     func getMovieVideo() throws -> MovieVideo {

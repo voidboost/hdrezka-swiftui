@@ -1210,14 +1210,18 @@ struct PlayerView: View {
 }
 
 class CustomPlayerView: UIView {
-    override static var layerClass: AnyClass { AVPlayerLayer.self }
+    override static var layerClass: AnyClass {
+        AVPlayerLayer.self
+    }
 
     var player: AVPlayer? {
         get { playerLayer.player }
         set { playerLayer.player = newValue }
     }
 
-    var playerLayer: AVPlayerLayer { layer as! AVPlayerLayer }
+    var playerLayer: AVPlayerLayer {
+        layer as! AVPlayerLayer
+    }
 }
 
 struct CustomVideoPlayer: UIViewRepresentable {

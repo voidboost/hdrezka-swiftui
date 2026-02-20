@@ -8,7 +8,9 @@ enum CollectionsService {
 }
 
 extension CollectionsService: URLRequestConvertible {
-    var baseURL: URL { Defaults[.mirror] }
+    var baseURL: URL {
+        Defaults[.mirror]
+    }
 
     var path: String {
         switch self {
@@ -19,7 +21,9 @@ extension CollectionsService: URLRequestConvertible {
         }
     }
 
-    var method: HTTPMethod { .get }
+    var method: HTTPMethod {
+        .get
+    }
 
     func asURLRequest() throws -> URLRequest {
         let url = baseURL.appending(path: path, directoryHint: .notDirectory)

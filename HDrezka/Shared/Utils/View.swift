@@ -2,7 +2,7 @@ import Defaults
 import SwiftUI
 
 extension View {
-    @ViewBuilder func imageFill(
+    func imageFill(
         _ ratio: CGFloat? = nil,
     ) -> some View {
         aspectRatio(contentMode: .fill)
@@ -10,7 +10,7 @@ extension View {
             .aspectRatio(ratio, contentMode: .fit)
     }
 
-    @ViewBuilder func viewModifier(
+    func viewModifier(
         @ViewBuilder body: (_ content: Self) -> some View,
     ) -> some View {
         body(self)

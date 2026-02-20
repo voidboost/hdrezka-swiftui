@@ -156,8 +156,7 @@ struct SliderWithText<T: BinaryFloatingPoint>: View {
     private func getPrgPercentage(_ value: T) -> T {
         let range = inRange.upperBound - inRange.lowerBound
         let correctedStartValue = value - inRange.lowerBound
-        let percentage = correctedStartValue / range
-        return percentage
+        return correctedStartValue / range
     }
 
     private func getPrgValue() -> T {

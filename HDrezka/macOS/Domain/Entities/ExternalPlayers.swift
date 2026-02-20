@@ -6,7 +6,9 @@ enum ExternalPlayers: Int, CaseIterable, Identifiable {
     case mpv
     case vlc
 
-    var id: Self { self }
+    var id: Self {
+        self
+    }
 
     var url: URL {
         switch self {
