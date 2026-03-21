@@ -316,7 +316,7 @@ enum Status: String, Decodable {
     case active, waiting, paused, error, complete, removed
 }
 
-enum Aria2Method: String, Encodable, Sendable {
+enum Aria2Method: String, Encodable {
     case addUri = "aria2.addUri"
     case remove = "aria2.remove"
     case pause = "aria2.pause"

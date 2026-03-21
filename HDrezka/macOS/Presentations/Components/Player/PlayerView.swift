@@ -469,37 +469,29 @@ struct PlayerView: View {
         .focused($isFocused)
         .focusEffectDisabled()
         .background(Color.black)
-        .background(WindowAccessor { window in
-            self.window = window
-
-            if playerFullscreen,
-               !window.styleMask.contains(.fullScreen)
-            {
-                window.toggleFullScreen(nil)
-            }
-        })
+        .background(WindowAccessor(window: $window))
         .preferredColorScheme(.dark)
         .tint(.primary)
         .contentShape(.rect)
         .onAppear {
             setupPlayer(subtitles: selectPositions.first(where: { position in position.id == voiceActing.voiceId })?.subtitles)
 
-            if hideMainWindow, let window = appState.window {
-                let animation = window.animationBehavior
-                window.animationBehavior = .none
-                window.orderOut(nil)
-                window.animationBehavior = animation
-            }
+            guard hideMainWindow, let window = appState.window else { return }
+
+            let animation = window.animationBehavior
+            window.animationBehavior = .none
+            window.orderOut(nil)
+            window.animationBehavior = animation
         }
         .onDisappear {
             resetPlayer()
 
-            if hideMainWindow, let window = appState.window {
-                let animation = window.animationBehavior
-                window.animationBehavior = .none
-                window.orderFront(nil)
-                window.animationBehavior = animation
-            }
+            guard hideMainWindow, let window = appState.window else { return }
+
+            let animation = window.animationBehavior
+            window.animationBehavior = .none
+            window.orderFront(nil)
+            window.animationBehavior = animation
         }
         .onContinuousHover { phase in
             resetTimer()
@@ -514,6 +506,16 @@ struct PlayerView: View {
 
                 setMask((isLoading || !isPlaying) && !isPictureInPictureActive)
             }
+        }
+        .onChange(of: window) {
+            guard let window,
+                  playerFullscreen,
+                  !window.styleMask.contains(.fullScreen)
+            else {
+                return
+            }
+
+            window.toggleFullScreen(nil)
         }
         .onChange(of: scenePhase) {
             guard let player = playerLayer.player,

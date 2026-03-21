@@ -35,12 +35,12 @@ struct ImageView: View {
             .focusEffectDisabled()
             .contentShape(.rect)
             .background(Color.clear)
-            .background(WindowAccessor { window in
-                self.window = window
-                if !window.styleMask.contains(.fullScreen) {
-                    window.toggleFullScreen(nil)
-                }
-            })
+            .background(WindowAccessor(window: $window))
+            .onChange(of: window) {
+                guard let window, !window.styleMask.contains(.fullScreen) else { return }
+
+                window.toggleFullScreen(nil)
+            }
             .onExitCommand {
                 dismiss()
             }

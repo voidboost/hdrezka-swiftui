@@ -171,9 +171,7 @@ struct HDrezkaApp: App {
                 .environment(appState)
                 .environment(downloader)
                 .environment(cookiesManager)
-                .background(WindowAccessor { window in
-                    appState.window = window
-                })
+                .background(WindowAccessor(window: $appState.window))
                 .preferredColorScheme(theme.scheme)
         }
         .modelContainer(modelContainer)

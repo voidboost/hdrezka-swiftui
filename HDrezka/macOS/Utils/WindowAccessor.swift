@@ -1,19 +1,20 @@
+import AppKit
 import SwiftUI
 
 struct WindowAccessor: NSViewRepresentable {
-    private let callback: (NSWindow) -> Void
+    @Binding private var window: NSWindow?
 
-    init(callback: @escaping (NSWindow) -> Void) {
-        self.callback = callback
+    init(window: Binding<NSWindow?>) {
+        _window = window
     }
 
     func makeNSView(context _: Context) -> NSView {
         let view = NSView()
+
         DispatchQueue.main.async {
-            if let window = view.window {
-                callback(window)
-            }
+            window = view.window
         }
+
         return view
     }
 
