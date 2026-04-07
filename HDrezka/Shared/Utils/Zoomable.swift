@@ -138,7 +138,7 @@ struct ZoomableModifier: ViewModifier {
     }
 }
 
-public extension View {
+extension View {
     func zoomable(
         maxZoomScale: CGFloat? = 5,
         doubleTapZoomScale: CGFloat? = 3,

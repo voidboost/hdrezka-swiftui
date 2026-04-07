@@ -71,7 +71,7 @@ struct SeriesUpdatesSheetView: View {
                             }
                             .padding(.vertical, 8)
                         }
-                        .scrollIndicators(.never)
+                        .scrollIndicators(.visible, axes: .vertical)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                 } else {

@@ -5,7 +5,8 @@ public struct Library: Identifiable, Hashable {
     public let name: String
     public let url: URL?
     public let licenseBody: String
-    public let version: String
+    public let version: String?
+    public let branch: String?
 
     init(sourcePackagesParserLibrary: SourcePackagesParserLibrary) {
         id = .init()
@@ -13,6 +14,7 @@ public struct Library: Identifiable, Hashable {
         url = URL(string: sourcePackagesParserLibrary.url)
         licenseBody = sourcePackagesParserLibrary.licenseBody
         version = sourcePackagesParserLibrary.version
+        branch = sourcePackagesParserLibrary.branch
     }
 }
 

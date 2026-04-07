@@ -95,7 +95,7 @@ struct DownloadSheetView: View {
                                                 .padding(15)
                                                 .progressViewStyle(.linear)
                                             }
-                                            .scrollIndicators(.never)
+                                            .scrollIndicators(.visible, axes: .vertical)
                                             .frame(width: 300)
                                             .frame(maxHeight: 300)
                                         }

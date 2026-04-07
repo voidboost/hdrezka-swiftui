@@ -6,7 +6,7 @@ struct DownloadsView: View {
 
     var body: some View {
         ScrollView(.vertical) {
-            LazyVStack(alignment: .leading, spacing: 5) {
+            LazyVStack(alignment: .center, spacing: 5) {
                 if downloader.downloads.isEmpty {
                     Text("key.downloads.empty")
                 } else {
@@ -49,7 +49,7 @@ struct DownloadsView: View {
             .padding(15)
             .animation(.easeInOut, value: downloader.downloads)
         }
-        .scrollIndicators(.never)
-        .frame(maxHeight: 200)
+        .scrollIndicators(.visible, axes: .vertical)
+        .frame(minHeight: 100, maxHeight: 200)
     }
 }

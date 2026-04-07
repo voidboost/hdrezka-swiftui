@@ -191,6 +191,7 @@ struct HDrezkaApp: App {
         .modelContainer(modelContainer)
         .defaultPosition(.center)
         .windowStyle(.hiddenTitleBar)
+        .windowResizability(.contentMinSize)
         .restorationBehavior(.disabled)
         .commands(content: customCommands)
         .commands(content: removed)
@@ -204,6 +205,7 @@ struct HDrezkaApp: App {
         }
         .defaultPosition(.center)
         .windowStyle(.hiddenTitleBar)
+        .windowResizability(.contentMinSize)
         .restorationBehavior(.disabled)
         .commands(content: customCommands)
         .commands(content: removed)
@@ -214,7 +216,7 @@ struct HDrezkaApp: App {
                 .analyticsScreen(name: "licenses", class: "LicensesView")
         }
         .defaultPosition(.center)
-        .windowResizability(.contentSize)
+        .windowResizability(.contentMinSize)
         .restorationBehavior(.disabled)
         .commands(content: customCommands)
         .commands(content: removed)
@@ -227,7 +229,7 @@ struct HDrezkaApp: App {
                 .analyticsScreen(name: "settings", class: "SettingsView")
         }
         .modelContainer(modelContainer)
-        .windowResizability(.contentSize)
+        .windowResizability(.contentMinSize)
         .defaultPosition(.center)
         .restorationBehavior(.disabled)
         .commands(content: customCommands)
@@ -245,6 +247,7 @@ struct HDrezkaApp: App {
         }
         .menuBarExtraStyle(.window)
         .restorationBehavior(.disabled)
+        .windowResizability(.contentMinSize)
         .commands(content: customCommands)
         .commands(content: removed)
     }

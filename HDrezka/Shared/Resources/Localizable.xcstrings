@@ -7944,6 +7944,28 @@
           }
         }
       }
+    },
+    "library.branch-%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Branch: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ветка: %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Гілка: %@"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

@@ -33,7 +33,7 @@ struct ScheduleSheetView: View {
                 }
                 .padding(.vertical, 8)
             }
-            .scrollIndicators(.never)
+            .scrollIndicators(.visible, axes: .vertical)
 
             Button {
                 dismiss()

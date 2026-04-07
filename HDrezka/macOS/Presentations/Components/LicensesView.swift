@@ -47,9 +47,15 @@ struct LicensesView: View {
                         .font(.title)
                         .textSelection(.enabled)
 
-                    Text(library.version)
-                        .textSelection(.enabled)
-                        .foregroundStyle(.secondary)
+                    if let version = library.version {
+                        Text(version)
+                            .textSelection(.enabled)
+                            .foregroundStyle(.secondary)
+                    } else if let branch = library.branch {
+                        Text("library.branch-\(branch)")
+                            .textSelection(.enabled)
+                            .foregroundStyle(.secondary)
+                    }
                 }
 
                 if let url = library.url {

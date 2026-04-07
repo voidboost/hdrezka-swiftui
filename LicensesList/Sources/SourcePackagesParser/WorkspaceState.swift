@@ -23,6 +23,7 @@ struct WorkspaceState: Decodable {
     }
 
     struct CheckoutStateRef: Decodable {
-        let version: String
+        let version: String?
+        let branch: String?
     }
 }

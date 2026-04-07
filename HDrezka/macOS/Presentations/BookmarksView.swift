@@ -14,7 +14,13 @@ struct BookmarksView: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
-            List(selection: $viewModel.selectedBookmark) {
+            List(selection: Binding {
+                viewModel.selectedBookmark
+            } set: { selectedBookmark in
+                guard let selectedBookmark else { return }
+
+                viewModel.selectedBookmark = selectedBookmark
+            }) {
                 if let bookmarks = viewModel.bookmarksState.data, !bookmarks.isEmpty {
                     ForEach(bookmarks) { bookmark in
                         Text(bookmark.name)

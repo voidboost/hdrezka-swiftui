@@ -132,7 +132,7 @@ struct CommentsView: View {
                     ScrollView(.vertical) {
                         CommentsViewComponent(comment: comment, movieDestination: $movieDestination)
                     }
-                    .scrollIndicators(.never)
+                    .scrollIndicators(.visible, axes: .vertical)
                     .environment(viewModel)
                 } else {
                     ProgressView()

@@ -31,7 +31,7 @@ struct ScheduleSheetView: View {
                 }
                 .padding(.vertical, 8)
             }
-            .scrollIndicators(.never)
+            .scrollIndicators(.visible, axes: .vertical)
         }
         .padding(.horizontal, 35)
         .padding(.top, 35)

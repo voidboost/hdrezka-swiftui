@@ -38,6 +38,7 @@ final class SourcePackagesParser {
                 url: dependency.packageRef.location.replacingOccurrences(of: ".git", with: ""),
                 licenseBody: licenseBody,
                 version: dependency.state.checkoutState.version,
+                branch: dependency.state.checkoutState.branch,
                 identity: dependency.packageRef.identity.components(separatedBy: .letters.inverted).filter { !$0.isEmpty }.joined(separator: "_"),
             )
         }
@@ -96,6 +97,19 @@ final class SourcePackagesParser {
         return "var \(variableName): String {\n\(switchSelf)\n}"
     }
 
+    private func makeComputedProperty(
+        _ libraries: [Library],
+        variableName: String,
+        keyPath: KeyPath<Library, String?>,
+    ) -> String {
+        let cases = libraries
+            .map { "case .\($0.identity): \($0[keyPath: keyPath].debugDescription)" }
+            .joined(separator: "\n")
+        let switchSelf = "switch self {\n\(cases)\n}".nest()
+
+        return "var \(variableName): String? {\n\(switchSelf)\n}"
+    }
+
     private func exportLicensesList(_ libraries: [Library]) throws {
         var text = ""
 
@@ -109,6 +123,7 @@ final class SourcePackagesParser {
                 makeComputedProperty(libraries, variableName: "url", keyPath: \.url),
                 makeComputedProperty(libraries, variableName: "licenseBody", keyPath: \.licenseBody),
                 makeComputedProperty(libraries, variableName: "version", keyPath: \.version),
+                makeComputedProperty(libraries, variableName: "branch", keyPath: \.branch),
             ].joined(separator: "\n\n")
         }
 
