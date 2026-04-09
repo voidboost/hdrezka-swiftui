@@ -1,5 +1,7 @@
+import AVKit
 import Combine
 import Defaults
+import SwiftData
 import SwiftUI
 
 struct PlayerView: View {
@@ -16,7 +18,7 @@ struct PlayerView: View {
             season: data.selectedSeason,
             episode: data.selectedEpisode,
             movie: data.movie,
-            quality: data.selectedQuality
+            quality: data.selectedQuality,
         )
     }
 
@@ -25,10 +27,11 @@ struct PlayerView: View {
 
     @Environment(AppState.self) private var appState
 
+    @Query private var selectPositions: [SelectPosition]
+
     @FocusState private var isFocused: Bool
 
     var body: some View {
-        let _ = Self._printChanges()
         Group {
             if let error = viewModel.error {
                 ErrorStateView(error) {
@@ -69,7 +72,7 @@ struct PlayerView: View {
                                         } else {
                                             player.playImmediately(atRate: viewModel.rate)
                                         }
-                                    })
+                                    }),
                     )
                     .overlay(alignment: .top) {
                         TopControlsView(player: player)
@@ -102,8 +105,9 @@ struct PlayerView: View {
         .contentShape(.rect)
         .environment(viewModel)
         .onAppear {
-//            viewModel.setupPlayer(subtitles: selectPositions.first(where: { position in position.id == voiceActing.voiceId })?.subtitles)
-            viewModel.setupPlayer()
+            viewModel.dismiss = dismiss
+
+            viewModel.setupPlayer(subtitles: selectPositions.first(where: { position in position.id == viewModel.voiceActing.voiceId })?.subtitles)
 
             guard viewModel.hideMainWindow, let window = appState.window else { return }
 

@@ -27,7 +27,7 @@ struct TopControlsView: View {
 
             Spacer()
 
-            SliderWithoutText(value: Binding {
+            SliderWithoutTextView(value: Binding {
                 viewModel.volume
             } set: { volume in
                 player.volume = volume

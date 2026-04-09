@@ -1,6 +1,13 @@
 import Alamofire
 import FactoryKit
 import Foundation
+import SwiftData
+
+extension Container {
+    var modelContainer: Factory<ModelContainer> {
+        self { try! ModelContainer(for: PlayerPosition.self, SelectPosition.self) }.singleton
+    }
+}
 
 extension Container {
     var session: Factory<Session> {

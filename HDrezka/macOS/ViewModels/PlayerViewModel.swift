@@ -4,6 +4,7 @@ import Defaults
 import FactoryKit
 import Kingfisher
 import MediaPlayer
+import SwiftData
 import SwiftUI
 
 @Observable
@@ -11,6 +12,7 @@ class PlayerViewModel {
     @ObservationIgnored @LazyInjected(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
     @ObservationIgnored @LazyInjected(\.getMovieThumbnailsUseCase) private var getMovieThumbnailsUseCase
     @ObservationIgnored @LazyInjected(\.getMovieVideoUseCase) private var getMovieVideoUseCase
+    @ObservationIgnored @LazyInjected(\.modelContainer) private var modelContainer
 
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
@@ -98,6 +100,7 @@ class PlayerViewModel {
     var spatialAudio: SpatialAudio = Defaults[.spatialAudio]
     var playerFullscreen: Bool = Defaults[.playerFullscreen]
     var isFocused = false
+    var dismiss: DismissAction?
 
     func setupPlayer(seek: CMTime? = nil, isPlaying playing: Bool = true, subtitles: String? = nil) {
         guard let urls = movie.getClosestTo(quality: quality)?.compactMap(\.hls), !urls.isEmpty else { return }
@@ -130,24 +133,30 @@ class PlayerViewModel {
                 self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyCurrentPlaybackDate] = currentItem.currentDate()
                 self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyDefaultPlaybackRate] = player.defaultRate
 
-//                if let position = playerPositions.first(where: { position in
-//                    position.id == voiceActing.voiceId &&
-//                        position.acting == voiceActing.translatorId &&
-//                        position.season == season?.seasonId &&
-//                        position.episode == episode?.episodeId
-//                }) {
-//                    position.position = currentTime
-//                } else {
-//                    let position = PlayerPosition(
-//                        id: voiceActing.voiceId,
-//                        acting: voiceActing.translatorId,
-//                        season: season?.seasonId,
-//                        episode: episode?.episodeId,
-//                        position: currentTime,
-//                    )
-//
-//                    modelContext.insert(position)
-//                }
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+
+                    let modelContext = modelContainer.mainContext
+
+                    if let position = try? modelContext.fetch(FetchDescriptor<PlayerPosition>(predicate: nil)).first(where: { position in
+                        position.id == self.voiceActing.voiceId &&
+                            position.acting == self.voiceActing.translatorId &&
+                            position.season == self.season?.seasonId &&
+                            position.episode == self.episode?.episodeId
+                    }) {
+                        position.position = currentTime
+                    } else {
+                        let position = PlayerPosition(
+                            id: voiceActing.voiceId,
+                            acting: voiceActing.translatorId,
+                            season: season?.seasonId,
+                            episode: episode?.episodeId,
+                            position: currentTime,
+                        )
+
+                        modelContext.insert(position)
+                    }
+                }
 
                 self.updateNextTimer()
             }
@@ -165,22 +174,28 @@ class PlayerViewModel {
                                 .store(in: &self.subscriptions)
                         }
 
-//                        if let position = selectPositions.first(where: { position in
-//                            position.id == voiceActing.voiceId
-//                        }) {
-//                            position.acting = voiceActing.translatorId
-//                            position.season = season?.seasonId
-//                            position.episode = episode?.episodeId
-//                        } else {
-//                            let position = SelectPosition(
-//                                id: voiceActing.voiceId,
-//                                acting: voiceActing.translatorId,
-//                                season: season?.seasonId,
-//                                episode: episode?.episodeId,
-//                            )
-//
-//                            modelContext.insert(position)
-//                        }
+                        Task { @MainActor [weak self] in
+                            guard let self else { return }
+
+                            let modelContext = modelContainer.mainContext
+
+                            if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: nil)).first(where: { position in
+                                position.id == self.voiceActing.voiceId
+                            }) {
+                                position.acting = voiceActing.translatorId
+                                position.season = season?.seasonId
+                                position.episode = episode?.episodeId
+                            } else {
+                                let position = SelectPosition(
+                                    id: voiceActing.voiceId,
+                                    acting: voiceActing.translatorId,
+                                    season: season?.seasonId,
+                                    episode: episode?.episodeId,
+                                )
+
+                                modelContext.insert(position)
+                            }
+                        }
 
                         currentItem.asset.loadMediaSelectionGroup(for: .legible) { mediaSelectionGroup, _ in
                             if let mediaSelectionGroup {
@@ -220,20 +235,25 @@ class PlayerViewModel {
                                 }
                             }
                         } else {
-//                            if let position = playerPositions.first(where: { position in
-//                                position.id == voiceActing.voiceId &&
-//                                    position.acting == voiceActing.translatorId &&
-//                                    position.season == season?.seasonId &&
-//                                    position.episode == episode?.episodeId
-//                            }) {
-//                                player.seek(to: CMTime(seconds: position.position, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { _ in
-//                                    if playing {
-//                                        player.playImmediately(atRate: rate)
-//                                    }
-//                                }
-//                            } else
-                            if playing {
-                                player.playImmediately(atRate: self.rate)
+                            Task { @MainActor [weak self] in
+                                guard let self else { return }
+
+                                let modelContext = modelContainer.mainContext
+
+                                if let position = try? modelContext.fetch(FetchDescriptor<PlayerPosition>(predicate: nil)).first(where: { position in
+                                    position.id == self.voiceActing.voiceId &&
+                                        position.acting == self.voiceActing.translatorId &&
+                                        position.season == self.season?.seasonId &&
+                                        position.episode == self.episode?.episodeId
+                                }) {
+                                    player.seek(to: CMTime(seconds: position.position, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { _ in
+                                        if playing {
+                                            player.playImmediately(atRate: self.rate)
+                                        }
+                                    }
+                                } else if playing {
+                                    player.playImmediately(atRate: rate)
+                                }
                             }
                         }
                     default:
@@ -630,21 +650,27 @@ class PlayerViewModel {
             if let mediaSelectionGroup {
                 currentItem.select(mediaSelectionGroup.options.filter { $0.extendedLanguageTag != nil }.first(where: { $0.extendedLanguageTag == language }), in: mediaSelectionGroup)
 
-//                if let position = selectPositions.first(where: { position in
-//                    position.id == voiceActing.voiceId
-//                }) {
-//                    position.subtitles = language
-//                } else {
-//                    let position = SelectPosition(
-//                        id: voiceActing.voiceId,
-//                        acting: voiceActing.translatorId,
-//                        season: season?.seasonId,
-//                        episode: episode?.episodeId,
-//                        subtitles: language
-//                    )
-//
-//                    modelContext.insert(position)
-//                }
+                Task { @MainActor [weak self] in
+                    guard let self else { return }
+
+                    let modelContext = modelContainer.mainContext
+
+                    if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: nil)).first(where: { position in
+                        position.id == self.voiceActing.voiceId
+                    }) {
+                        position.subtitles = language
+                    } else {
+                        let position = SelectPosition(
+                            id: voiceActing.voiceId,
+                            acting: voiceActing.translatorId,
+                            season: season?.seasonId,
+                            episode: episode?.episodeId,
+                            subtitles: language,
+                        )
+
+                        modelContext.insert(position)
+                    }
+                }
             }
         }
     }
@@ -735,7 +761,7 @@ class PlayerViewModel {
                         }
                     } receiveValue: { movie in
                         if movie.needPremium {
-//                            dismiss()
+                            self.dismiss?()
 
                             AppState.shared.isPremiumPresented = true
                         } else {
@@ -763,7 +789,7 @@ class PlayerViewModel {
                         }
                     } receiveValue: { movie in
                         if movie.needPremium {
-//                            dismiss()
+                            self.dismiss?()
 
                             AppState.shared.isPremiumPresented = true
                         } else {
@@ -798,7 +824,7 @@ class PlayerViewModel {
                         }
                     } receiveValue: { movie in
                         if movie.needPremium {
-//                            dismiss()
+                            self.dismiss?()
 
                             AppState.shared.isPremiumPresented = true
                         } else {
@@ -826,7 +852,7 @@ class PlayerViewModel {
                         }
                     } receiveValue: { movie in
                         if movie.needPremium {
-//                            dismiss()
+                            self.dismiss?()
 
                             AppState.shared.isPremiumPresented = true
                         } else {

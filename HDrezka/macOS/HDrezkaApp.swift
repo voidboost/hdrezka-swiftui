@@ -1,5 +1,6 @@
 import Combine
 import Defaults
+import FactoryKit
 import FirebaseAnalytics
 import FirebaseCore
 import FirebaseCrashlytics
@@ -133,35 +134,24 @@ struct HDrezkaApp: App {
     @State private var cookiesManager: CookiesManager = .shared
     @Environment(\.openWindow) private var openWindow
 
-    @State private var modelContainer: ModelContainer
-
     @Default(.theme) private var theme
     @Default(.isFirstLaunch) private var isFirstLaunch
 
+    @Injected(\.modelContainer) private var modelContainer
+
     init() {
-        do {
-            let schema = Schema([PlayerPosition.self, SelectPosition.self])
-            let modelContainer = try ModelContainer(for: schema)
-            modelContainer.mainContext.autosaveEnabled = true
-            self.modelContainer = modelContainer
+        let cache = ImageCache.default
 
-            Downloader.shared.setModelContext(modelContext: modelContainer.mainContext)
-
-            let cache = ImageCache.default
-
-            switch Defaults[.cache] {
-            case .off:
-                cache.memoryStorage.config.expiration = .expired
-                cache.diskStorage.config.expiration = .expired
-            case .memory:
-                cache.diskStorage.config.expiration = .expired
-            case .disk:
-                cache.memoryStorage.config.expiration = .expired
-            case .all:
-                break
-            }
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+        switch Defaults[.cache] {
+        case .off:
+            cache.memoryStorage.config.expiration = .expired
+            cache.diskStorage.config.expiration = .expired
+        case .memory:
+            cache.diskStorage.config.expiration = .expired
+        case .disk:
+            cache.memoryStorage.config.expiration = .expired
+        case .all:
+            break
         }
     }
 

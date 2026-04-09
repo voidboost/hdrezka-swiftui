@@ -11,7 +11,7 @@ struct SeekBarView: View {
     @Environment(PlayerViewModel.self) private var viewModel
 
     var body: some View {
-        SliderWithText(value: Binding {
+        SliderWithTextView(value: Binding {
             viewModel.currentTime
         } set: { time in
             player.seek(to: CMTime(seconds: time, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { success in

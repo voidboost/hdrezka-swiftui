@@ -9,14 +9,13 @@ import UserNotifications
 class Downloader {
     @ObservationIgnored static let shared = Downloader()
 
-    @ObservationIgnored private var modelContext: ModelContext?
-
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
     @ObservationIgnored @LazyInjected(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
     @ObservationIgnored @LazyInjected(\.getMovieVideoUseCase) private var getMovieVideoUseCase
     @ObservationIgnored @LazyInjected(\.callUseCase) private var callUseCase
     @ObservationIgnored @LazyInjected(\.multicallUseCase) private var multicallUseCase
+    @ObservationIgnored @LazyInjected(\.modelContainer) private var modelContainer
 
     @ObservationIgnored private let fileManager = FileManager.default
 
@@ -228,10 +227,6 @@ class Downloader {
             .store(in: &subscriptions)
     }
 
-    func setModelContext(modelContext: ModelContext) {
-        self.modelContext = modelContext
-    }
-
     private func notificate(_ id: String, _ title: String, _ subtitle: String? = nil, _ category: String? = nil, _ userInfo: [AnyHashable: Any] = [:]) {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             if settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional {
@@ -308,7 +303,11 @@ class Downloader {
                                         .store(in: &self.subscriptions)
                                 }
 
-                                if let modelContext = self.modelContext {
+                                Task { @MainActor [weak self] in
+                                    guard let self else { return }
+
+                                    let modelContext = modelContainer.mainContext
+
                                     if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: nil)).first(where: { position in
                                         position.id == data.acting.voiceId
                                     }) {
@@ -417,7 +416,11 @@ class Downloader {
                                         .store(in: &self.subscriptions)
                                 }
 
-                                if let modelContext = self.modelContext {
+                                Task { @MainActor [weak self] in
+                                    guard let self else { return }
+
+                                    let modelContext = modelContainer.mainContext
+
                                     if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: nil)).first(where: { position in
                                         position.id == data.acting.voiceId
                                     }) {
