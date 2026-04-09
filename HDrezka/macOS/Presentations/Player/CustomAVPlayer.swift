@@ -11,7 +11,7 @@ class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
     private let subtitlesScheme = "subtitlesm3u8"
     private let extInfPrefix = "#EXTINF:"
 
-    private let m3u8: URL
+    private let urls: [URL]
     private let subtitles: [MovieSubtitles]
 
     private var m3u8String: String?
@@ -19,12 +19,12 @@ class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
 
     private let loaderQueue = DispatchQueue(label: "resourceLoader")
 
-    init?(m3u8: URL, subtitles: [MovieSubtitles]) {
-        guard let customURL = m3u8.replaceURLScheme(with: mainScheme) else {
+    init?(urls: [URL], subtitles: [MovieSubtitles]) {
+        guard let customURL = urls.first?.replaceURLScheme(with: mainScheme) else {
             return nil
         }
 
-        self.m3u8 = m3u8
+        self.urls = urls
         self.subtitles = subtitles
 
         super.init()
@@ -59,11 +59,33 @@ class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
     }
 
     private func handleMainRequest(_ request: AVAssetResourceLoadingRequest) -> Bool {
-        let request = session.request(m3u8, method: .get, headers: [.userAgent(Const.userAgent)])
+        var currentURL = urls.first!
+
+        let request = session.request(currentURL, method: .get, headers: [.userAgent(Const.userAgent)])
             .validate(statusCode: 200 ..< 400)
+            .adapt(using: .adapter { request, _, completion in
+                var newRequest = request
+                newRequest.url = currentURL
+
+                completion(.success(newRequest))
+            })
+            .retry(using: .retrier { [weak self] request, _, _, completion in
+                guard let self,
+                      request.retryCount < urls.count - 1,
+                      let newUrl = urls.element(after: currentURL)
+                else {
+                    completion(.doNotRetry)
+                    return
+                }
+
+                currentURL = newUrl
+
+                completion(.retry)
+            })
             .responseString { [weak self] response in
                 guard let self,
                       let string = response.value,
+                      let url = response.request?.url,
                       !string.isEmpty,
                       response.error == nil
                 else {
@@ -71,7 +93,7 @@ class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
                     return
                 }
 
-                processPlaylist(string)
+                processPlaylist(string, url)
                 finishRequestWithMainPlaylist(request)
             }
 
@@ -107,7 +129,7 @@ class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
         return true
     }
 
-    private func processPlaylist(_ string: String) {
+    private func processPlaylist(_ string: String, _ url: URL) {
         let lines = string.components(separatedBy: .newlines).filter { !$0.isEmpty }
         var newLines = [String]()
         var iterator = lines.makeIterator()
@@ -119,7 +141,7 @@ class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
 
             if line.hasPrefix(extInfPrefix), let nextLine = iterator.next() {
                 playlistDuration += getDuration(line)
-                newLines.append(URL(string: nextLine, relativeTo: m3u8.pathExtension.isEmpty ? m3u8 : m3u8.deletingLastPathComponent())?.absoluteString ?? nextLine)
+                newLines.append(URL(string: nextLine, relativeTo: url.pathExtension.isEmpty ? url : url.deletingLastPathComponent())?.absoluteString ?? nextLine)
             }
         }
 

@@ -3,7 +3,7 @@ import Foundation
 enum HDrezkaError: Error {
     case mirrorBanned(URL)
     case loginRequired(URL)
-    case skipLink(URL)
+    case skipLinks([URL])
     case parseJson(String, String)
     case null(String, Int, Int)
     case swiftsoup(String, String)
@@ -18,8 +18,8 @@ extension HDrezkaError: LocalizedError {
             String(localized: "key.errors.mirror-\(mirror.host() ?? "")")
         case let .loginRequired(mirror):
             String(localized: "key.errors.login-\(mirror.host() ?? "")")
-        case let .skipLink(link):
-            String(localized: "key.errors.link-\(link.absoluteString)")
+        case let .skipLinks(links):
+            String(localized: "key.errors.links-\(links.map(\.absoluteString).joined(separator: ", "))")
         case let .parseJson(param, function):
             String(localized: "key.errors.parsing-\(param)-\(function)")
         case let .null(functionName, lineNumber, columnNumber):

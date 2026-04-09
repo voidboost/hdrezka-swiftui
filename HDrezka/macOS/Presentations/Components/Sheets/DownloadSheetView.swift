@@ -274,13 +274,15 @@ struct DownloadSheetView: View {
                         HStack {
                             Text("key.quality")
 
-                            if let selectedQuality, let movie, let link = movie.getClosestTo(quality: selectedQuality) {
-                                ShareLink(item: link) {
-                                    Image(systemName: "square.and.arrow.up")
-                                        .foregroundStyle(.secondary)
-                                        .font(.subheadline)
+                            if let selectedQuality, let movie, let links = movie.getClosestTo(quality: selectedQuality) {
+                                ForEach(links, id: \.self) { link in
+                                    ShareLink(item: link) {
+                                        Image(systemName: "square.and.arrow.up")
+                                            .foregroundStyle(.secondary)
+                                            .font(.subheadline)
+                                    }
+                                    .buttonStyle(.plain)
                                 }
-                                .buttonStyle(.plain)
                             }
 
                             Spacer()
@@ -455,14 +457,14 @@ struct DownloadSheetView: View {
                             }
                         }
 
-                        if let selectedQuality, let movie, let movieURL = movie.getClosestTo(quality: selectedQuality), let selectedSubtitles, let subtitlesURL = URL(string: selectedSubtitles.link) {
+                        if let selectedQuality, let movie, let movieURL = movie.getClosestTo(quality: selectedQuality)?.first, let selectedSubtitles, let subtitlesURL = URL(string: selectedSubtitles.link) {
                             openURL(
                                 ExternalDownloaders.folx.url.appending(queryItems: [
                                     .init(name: "urls", value: "\(movieURL.absoluteString)||\(subtitlesURL.absoluteString)"),
                                     .init(name: "urlsCount", value: "2"),
                                 ]),
                             )
-                        } else if let selectedQuality, let movie, let movieURL = movie.getClosestTo(quality: selectedQuality) {
+                        } else if let selectedQuality, let movie, let movieURL = movie.getClosestTo(quality: selectedQuality)?.first {
                             openURL(
                                 ExternalDownloaders.folx.url.appending(queryItems: [
                                     .init(name: "urls", value: movieURL.absoluteString),
@@ -509,13 +511,13 @@ struct DownloadSheetView: View {
                             }
                         }
 
-                        if let selectedQuality, let movie, let movieURL = movie.getClosestTo(quality: selectedQuality), let selectedSubtitles, let subtitlesURL = URL(string: selectedSubtitles.link) {
+                        if let selectedQuality, let movie, let movieURL = movie.getClosestTo(quality: selectedQuality)?.first, let selectedSubtitles, let subtitlesURL = URL(string: selectedSubtitles.link) {
                             openURL(
                                 ExternalDownloaders.motrix.url.appending(queryItems: [
                                     .init(name: "uris", value: "\(movieURL.absoluteString)\n\(subtitlesURL.absoluteString)"),
                                 ]),
                             )
-                        } else if let selectedQuality, let movie, let movieURL = movie.getClosestTo(quality: selectedQuality) {
+                        } else if let selectedQuality, let movie, let movieURL = movie.getClosestTo(quality: selectedQuality)?.first {
                             openURL(
                                 ExternalDownloaders.motrix.url.appending(queryItems: [
                                     .init(name: "uri", value: movieURL.absoluteString),

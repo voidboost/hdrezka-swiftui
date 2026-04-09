@@ -329,13 +329,13 @@ class Downloader {
                                     }
                                 }
 
-                                if let movieUrl = movie.getClosestTo(quality: data.quality) {
+                                if let movieUrls = movie.getClosestTo(quality: data.quality) {
                                     self.callUseCase(
                                         data: Aria2Request(
                                             method: .addUri,
                                             params: AddUriParams(
                                                 token: Const.token,
-                                                uris: [movieUrl.absoluteString],
+                                                uris: movieUrls.map(\.absoluteString),
                                                 options: [
                                                     "dir": movieDestination.path(percentEncoded: false),
                                                     "out": movieFile.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"),
@@ -434,13 +434,13 @@ class Downloader {
                                     }
                                 }
 
-                                if let movieUrl = movie.getClosestTo(quality: data.quality) {
+                                if let movieUrls = movie.getClosestTo(quality: data.quality) {
                                     self.callUseCase(
                                         data: Aria2Request(
                                             method: .addUri,
                                             params: AddUriParams(
                                                 token: Const.token,
-                                                uris: [movieUrl.absoluteString],
+                                                uris: movieUrls.map(\.absoluteString),
                                                 options: [
                                                     "dir": movieDestination.path(percentEncoded: false),
                                                     "out": file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"),

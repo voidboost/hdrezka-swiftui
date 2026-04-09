@@ -2543,24 +2543,24 @@
         }
       }
     },
-    "key.errors.link-%@" : {
+    "key.errors.links-%@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Link is broken (%@)"
+            "value" : "Links are broken (%@)"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ссылка не работает (%@)"
+            "value" : "Ссылки не работают (%@)"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Посилання не працює (%@)"
+            "value" : "Посилання не працюють (%@)"
           }
         }
       }

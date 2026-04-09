@@ -271,13 +271,15 @@ struct WatchSheetView: View {
                         HStack {
                             Text("key.quality")
 
-                            if let selectedQuality, let movie, let link = movie.getClosestTo(quality: selectedQuality) {
-                                ShareLink(item: link) {
-                                    Image(systemName: "square.and.arrow.up")
-                                        .foregroundStyle(.secondary)
-                                        .font(.subheadline)
+                            if let selectedQuality, let movie, let links = movie.getClosestTo(quality: selectedQuality) {
+                                ForEach(links, id: \.self) { link in
+                                    ShareLink(item: link) {
+                                        Image(systemName: "square.and.arrow.up")
+                                            .foregroundStyle(.secondary)
+                                            .font(.subheadline)
+                                    }
+                                    .buttonStyle(.plain)
                                 }
-                                .buttonStyle(.plain)
                             }
 
                             Spacer()

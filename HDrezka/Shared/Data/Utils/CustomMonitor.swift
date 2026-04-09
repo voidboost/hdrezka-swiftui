@@ -6,7 +6,7 @@ import Foundation
 final class CustomMonitor: EventMonitor {
     func request(_: DataRequest, didParseResponse response: DataResponse<some Any, AFError>) {
         #if DEBUG
-            print(response.customDebugDescription)
+//            print(response.customDebugDescription)
         #else
             Crashlytics.crashlytics().log(response.customDebugDescription)
         #endif

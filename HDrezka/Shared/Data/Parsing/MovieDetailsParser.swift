@@ -783,22 +783,16 @@ private extension String {
 
         let streams = decrypt(encrypted: url)
 
-        let videoMap = try streams.components(separatedBy: ",").filter { !$0.isEmpty }.reduce(into: OrderedDictionary<String, URL?>()) { videoMap, stream in
+        let videoMap = try streams.components(separatedBy: ",").filter { !$0.isEmpty }.reduce(into: OrderedDictionary<String, [URL]>()) { videoMap, stream in
             let name = try SwiftSoup.parse(stream.substringAfter("[").substringBefore("]")).text()
             let videos = stream.substringAfter("]").components(separatedBy: " or ").filter { !$0.isEmpty }
-            let link = videos.first?.substringBeforeLast(".mp4", includeSeparator: true)
+            let links = videos.map { $0.substringBeforeLast(".mp4", includeSeparator: true) }.uniqued().filter { $0 != "null" }.compactMap { URL(string: $0) }
 
-            let url: URL? = if let link, !link.isEmpty, link != "null" {
-                URL(string: link)
-            } else {
-                nil
+            if links.contains(where: { $0.pathExtension != "mp4" || $0.isFileURL }) {
+                throw HDrezkaError.skipLinks(links)
             }
 
-            if let url, url.pathExtension != "mp4" || url.isFileURL {
-                throw HDrezkaError.skipLink(url)
-            }
-
-            videoMap[name] = url
+            videoMap[name] = links
         }
 
         let subtitles: [MovieSubtitles] = if let subtitles = (jsonObject["subtitle"] as? String), let subtitlesLns = (jsonObject["subtitle_lns"] as? [String: Any]) {

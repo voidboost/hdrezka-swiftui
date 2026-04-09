@@ -129,10 +129,6 @@
 				macOS/Presentations/Components/LoadingPaginationStateView.swift = (macos, );
 				macOS/Presentations/Components/LoadingStateView.swift = (macos, );
 				macOS/Presentations/Components/OnPressButtonStyle.swift = (macos, );
-				macOS/Presentations/Components/Player/CustomAVPlayer.swift = (macos, );
-				macOS/Presentations/Components/Player/PlayerView.swift = (macos, );
-				macOS/Presentations/Components/Player/SliderWithText.swift = (macos, );
-				macOS/Presentations/Components/Player/SliderWithoutText.swift = (macos, );
 				macOS/Presentations/Components/SettingsView.swift = (macos, );
 				macOS/Presentations/Components/Sheets/BookmarksSheetView.swift = (macos, );
 				macOS/Presentations/Components/Sheets/CommentReportSheet.swift = (macos, );
@@ -155,6 +151,10 @@
 				macOS/Presentations/HomeView.swift = (macos, );
 				macOS/Presentations/ListView.swift = (macos, );
 				macOS/Presentations/PersonView.swift = (macos, );
+				macOS/Presentations/Player/CustomAVPlayer.swift = (macos, );
+				macOS/Presentations/Player/PlayerView.swift = (macos, );
+				macOS/Presentations/Player/SliderWithText.swift = (macos, );
+				macOS/Presentations/Player/SliderWithoutText.swift = (macos, );
 				macOS/Presentations/SearchView.swift = (macos, );
 				macOS/Presentations/WatchingLaterView.swift = (macos, );
 				macOS/Resources/Assets.xcassets = (macos, );
