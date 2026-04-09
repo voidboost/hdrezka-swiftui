@@ -285,9 +285,9 @@ struct WatchSheetView: View {
                             Spacer()
 
                             Menu {
-                                if !(movie?.getLockedQualities() ?? []).isEmpty {
+                                if !(movie?.getAccountQualities() ?? []).isEmpty {
                                     Section {
-                                        ForEach(movie?.getLockedQualities() ?? [], id: \.self) { quality in
+                                        ForEach(movie?.getAccountQualities() ?? [], id: \.self) { quality in
                                             Button {
                                                 if isLoggedIn {
                                                     withAnimation(.easeInOut) {
@@ -302,6 +302,56 @@ struct WatchSheetView: View {
                                         }
                                     } header: {
                                         Text("key.sign_in.access")
+                                    }
+
+                                    Divider()
+                                }
+
+                                if !(movie?.getPremiumQualities() ?? []).isEmpty {
+                                    Section {
+                                        ForEach(movie?.getPremiumQualities() ?? [], id: \.self) { quality in
+                                            Button {
+                                                if isUserPremium != nil {
+                                                    withAnimation(.easeInOut) {
+                                                        selectedQuality = quality
+                                                    }
+                                                } else {
+                                                    dismiss()
+
+                                                    appState.isPremiumPresented = true
+                                                }
+                                            } label: {
+                                                Text(quality)
+                                            }
+                                        }
+                                    } header: {
+                                        Text("key.premium")
+                                    }
+
+                                    Divider()
+                                }
+
+                                if !(movie?.getLockedQualities() ?? []).isEmpty {
+                                    Section {
+                                        ForEach(movie?.getLockedQualities() ?? [], id: \.self) { quality in
+                                            Button {
+                                                if isUserPremium != nil, isLoggedIn {
+                                                    withAnimation(.easeInOut) {
+                                                        selectedQuality = quality
+                                                    }
+                                                } else if isLoggedIn {
+                                                    dismiss()
+
+                                                    appState.isPremiumPresented = true
+                                                } else if isUserPremium != nil {
+                                                    isLoginPresented = true
+                                                }
+                                            } label: {
+                                                Text(quality)
+                                            }
+                                        }
+                                    } header: {
+                                        Text("key.locked")
                                     }
 
                                     Divider()
@@ -332,7 +382,7 @@ struct WatchSheetView: View {
                             .menuStyle(.button)
                             .menuIndicator(.hidden)
                             .buttonStyle(.plain)
-                            .labelStyle(CustomLabelStyle(iconVisible: ((movie?.getAvailableQualities().count ?? 0) + (movie?.getLockedQualities().count ?? 0)) > 1))
+                            .labelStyle(CustomLabelStyle(iconVisible: ((movie?.getAvailableQualities().count ?? 0) + (movie?.getAccountQualities().count ?? 0) + (movie?.getPremiumQualities().count ?? 0) + (movie?.getLockedQualities().count ?? 0)) > 1))
                             .disabled(movie?.getAvailableQualities().isEmpty != false)
                         }
                         .padding(.horizontal, 15)

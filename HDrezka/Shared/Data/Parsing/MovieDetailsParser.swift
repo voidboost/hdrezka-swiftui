@@ -783,8 +783,9 @@ private extension String {
 
         let streams = decrypt(encrypted: url)
 
-        let videoMap = try streams.components(separatedBy: ",").filter { !$0.isEmpty }.reduce(into: OrderedDictionary<String, [URL]>()) { videoMap, stream in
-            let name = try SwiftSoup.parse(stream.substringAfter("[").substringBefore("]")).text()
+        let videos = try streams.components(separatedBy: ",").filter { !$0.isEmpty }.map { stream in
+            let nameElement = try SwiftSoup.parse(stream.substringAfter("[").substringBefore("]"))
+            let name = try nameElement.text()
             let videos = stream.substringAfter("]").components(separatedBy: " or ").filter { !$0.isEmpty }
             let links = videos.map { $0.substringBeforeLast(".mp4", includeSeparator: true) }.uniqued().filter { $0 != "null" }.compactMap { URL(string: $0) }
 
@@ -792,7 +793,7 @@ private extension String {
                 throw HDrezkaError.skipLinks(links)
             }
 
-            videoMap[name] = links
+            return try MovieVideo.Video(quality: name, urls: links, needAccount: links.isEmpty, needPremium: !nameElement.select("img").isEmpty())
         }
 
         let subtitles: [MovieSubtitles] = if let subtitles = (jsonObject["subtitle"] as? String), let subtitlesLns = (jsonObject["subtitle_lns"] as? [String: Any]) {
@@ -816,7 +817,7 @@ private extension String {
         }
 
         return MovieVideo(
-            videoMap: videoMap,
+            videos: videos,
             subtitles: subtitles,
             needPremium: (jsonObject["premium_content"] as? Int ?? 0) == 1,
             thumbnails: jsonObject["thumbnails"] as? String,

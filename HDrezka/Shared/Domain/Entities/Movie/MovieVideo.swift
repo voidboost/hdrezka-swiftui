@@ -2,14 +2,14 @@ import Foundation
 import OrderedCollections
 
 struct MovieVideo: Identifiable, Codable, Hashable {
-    let videoMap: OrderedDictionary<String, [URL]>
+    let videos: [Video]
     let subtitles: [MovieSubtitles]
     let needPremium: Bool
     let thumbnails: String?
     let id: UUID
 
-    init(videoMap: OrderedDictionary<String, [URL]>, subtitles: [MovieSubtitles], needPremium: Bool, thumbnails: String?, id: UUID = .init()) {
-        self.videoMap = videoMap
+    init(videos: [Video], subtitles: [MovieSubtitles], needPremium: Bool, thumbnails: String?, id: UUID = .init()) {
+        self.videos = videos
         self.subtitles = subtitles
         self.needPremium = needPremium
         self.thumbnails = thumbnails
@@ -17,18 +17,42 @@ struct MovieVideo: Identifiable, Codable, Hashable {
     }
 
     func getMaxQuality() -> [URL]? {
-        videoMap.compactMapValues { $0 }.values.last
+        videos.last(where: { !$0.needAccount && !$0.needPremium })?.urls
     }
 
     func getClosestTo(quality: String) -> [URL]? {
-        videoMap[quality] ?? getMaxQuality()
+        videos.first(where: { $0.quality == quality })?.urls ?? getMaxQuality()
     }
 
     func getAvailableQualities() -> [String] {
-        Array(videoMap.compactMapValues { $0 }.keys)
+        videos.filter { !$0.needAccount && !$0.needPremium }.map(\.quality)
+    }
+
+    func getAccountQualities() -> [String] {
+        videos.filter { $0.needAccount && !$0.needPremium }.map(\.quality)
+    }
+
+    func getPremiumQualities() -> [String] {
+        videos.filter { !$0.needAccount && $0.needPremium }.map(\.quality)
     }
 
     func getLockedQualities() -> [String] {
-        Array(videoMap.filter { $1.isEmpty }.keys)
+        videos.filter { $0.needAccount && $0.needPremium }.map(\.quality)
+    }
+
+    struct Video: Identifiable, Codable, Hashable {
+        let quality: String
+        let urls: [URL]
+        let needAccount: Bool
+        let needPremium: Bool
+        let id: UUID
+
+        init(quality: String, urls: [URL], needAccount: Bool, needPremium: Bool, id: UUID = .init()) {
+            self.quality = quality
+            self.urls = urls
+            self.needAccount = needAccount
+            self.needPremium = needPremium
+            self.id = id
+        }
     }
 }

@@ -4161,6 +4161,28 @@
         }
       }
     },
+    "key.locked" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in or buy premium to access them"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Войдите или приобретите премиум, чтобы получить к ним доступ"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Увійдіть або придбайте преміум, щоб отримати до них доступ"
+          }
+        }
+      }
+    },
     "key.login_description" : {
       "localizations" : {
         "en" : {
