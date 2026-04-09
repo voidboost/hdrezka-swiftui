@@ -1,3 +1,4 @@
+import Alamofire
 import AVFoundation
 import Defaults
 import FactoryKit
@@ -61,37 +62,7 @@ class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
     private func handleMainRequest(_ request: AVAssetResourceLoadingRequest) -> Bool {
         let request = session.request(urls.first!, method: .get, headers: [.userAgent(Const.userAgent)])
             .validate(statusCode: 200 ..< 400)
-            .adapt(using: .adapter { [weak self] request, _, completion in
-                guard let self else {
-                    completion(.failure(URLError(.cancelled)))
-                    return
-                }
-
-                var newRequest = request
-
-                guard let currentURL = request.url,
-                      let newUrl = urls.element(after: currentURL)
-                else {
-                    completion(.failure(URLError(.badURL)))
-                    return
-                }
-
-                newRequest.url = newUrl
-
-                completion(.success(newRequest))
-            })
-            .retry(using: .retrier { [weak self] request, _, _, completion in
-                guard let self else {
-                    completion(.doNotRetry)
-                    return
-                }
-
-                if request.retryCount < urls.count - 1 {
-                    completion(.retry)
-                } else {
-                    completion(.doNotRetry)
-                }
-            })
+            .interceptor(FallbackInterceptor(urls: urls))
             .responseString { [weak self] response in
                 guard let self,
                       let string = response.value,
@@ -208,5 +179,41 @@ private extension URL {
         urlComponents.scheme = scheme
 
         return urlComponents.url
+    }
+}
+
+private final class FallbackInterceptor: RequestInterceptor {
+    private let urls: [URL]
+    private let lock = NSLock()
+    private var currentIndex = 0
+
+    init(urls: [URL]) {
+        self.urls = urls
+    }
+
+    func adapt(_ urlRequest: URLRequest, for _: Session, completion: @escaping (Result<URLRequest, Error>) -> Void) {
+        lock.lock()
+        let url = urls[currentIndex]
+        lock.unlock()
+
+        var request = urlRequest
+        request.url = url
+
+        completion(.success(request))
+    }
+
+    func retry(_: Request, for _: Session, dueTo _: Error, completion: @escaping (RetryResult) -> Void) {
+        lock.lock()
+        defer { lock.unlock() }
+
+        let nextIndex = currentIndex + 1
+
+        guard nextIndex < urls.count else {
+            completion(.doNotRetry)
+            return
+        }
+
+        currentIndex = nextIndex
+        completion(.retry)
     }
 }

@@ -64,10 +64,6 @@
 				iOS/Presentations/Components/LoadingStateView.swift = (ios, );
 				iOS/Presentations/Components/OnPressButtonStyle.swift = (ios, );
 				iOS/Presentations/Components/OrientationView.swift = (ios, );
-				iOS/Presentations/Components/Player/CustomAVPlayer.swift = (ios, );
-				iOS/Presentations/Components/Player/PlayerView.swift = (ios, );
-				iOS/Presentations/Components/Player/SliderWithText.swift = (ios, );
-				iOS/Presentations/Components/Player/SliderWithoutText.swift = (ios, );
 				iOS/Presentations/Components/SettingsView.swift = (ios, );
 				iOS/Presentations/Components/Sheets/BookmarksSheetView.swift = (ios, );
 				iOS/Presentations/Components/Sheets/CommentReportSheet.swift = (ios, );
@@ -89,6 +85,10 @@
 				iOS/Presentations/HomeView.swift = (ios, );
 				iOS/Presentations/ListView.swift = (ios, );
 				iOS/Presentations/PersonView.swift = (ios, );
+				iOS/Presentations/Player/CustomAVPlayer.swift = (ios, );
+				iOS/Presentations/Player/PlayerView.swift = (ios, );
+				iOS/Presentations/Player/SliderWithText.swift = (ios, );
+				iOS/Presentations/Player/SliderWithoutText.swift = (ios, );
 				iOS/Presentations/ProfileView.swift = (ios, );
 				iOS/Presentations/SearchView.swift = (ios, );
 				iOS/Presentations/WatchingLaterView.swift = (ios, );
