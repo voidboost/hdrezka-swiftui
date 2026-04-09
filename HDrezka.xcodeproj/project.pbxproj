@@ -85,10 +85,10 @@
 				iOS/Presentations/HomeView.swift = (ios, );
 				iOS/Presentations/ListView.swift = (ios, );
 				iOS/Presentations/PersonView.swift = (ios, );
-				iOS/Presentations/Player/CustomAVPlayer.swift = (ios, );
+				iOS/Presentations/Player/Components/CustomAVPlayer.swift = (ios, );
+				iOS/Presentations/Player/Components/SliderWithTextView.swift = (ios, );
+				iOS/Presentations/Player/Components/SliderWithoutTextView.swift = (ios, );
 				iOS/Presentations/Player/PlayerView.swift = (ios, );
-				iOS/Presentations/Player/SliderWithText.swift = (ios, );
-				iOS/Presentations/Player/SliderWithoutText.swift = (ios, );
 				iOS/Presentations/ProfileView.swift = (ios, );
 				iOS/Presentations/SearchView.swift = (ios, );
 				iOS/Presentations/WatchingLaterView.swift = (ios, );
@@ -169,6 +169,7 @@
 				macOS/Utils/NSImage.swift = (macos, );
 				macOS/Utils/RemoveBackgroundImageProcessor.swift = (macos, );
 				macOS/Utils/WindowAccessor.swift = (macos, );
+				macOS/ViewModels/PlayerViewModel.swift = (macos, );
 			};
 			target = 04B3CA732BA06C9C0039F76E /* HDrezka */;
 		};

@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct SliderWithoutText<T: BinaryFloatingPoint>: View {
+struct SliderWithoutTextView<T: BinaryFloatingPoint>: View {
     @Binding var value: T
     let inRange: ClosedRange<T>
     let activeFillColor: Color

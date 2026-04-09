@@ -201,7 +201,7 @@ struct PlayerView: View {
                         )
                         .overlay(alignment: .topTrailing) {
                             HStack(alignment: .center) {
-                                SliderWithoutText(value: Binding {
+                                SliderWithoutTextView(value: Binding {
                                     volume
                                 } set: { volume in
                                     player.volume = volume
@@ -459,7 +459,7 @@ struct PlayerView: View {
                                     }
                                 }
 
-                                SliderWithText(value: Binding {
+                                SliderWithTextView(value: Binding {
                                     currentTime
                                 } set: { time in
                                     player.seek(to: CMTime(seconds: time, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { success in
@@ -584,9 +584,9 @@ struct PlayerView: View {
     }
 
     private func setupPlayer(seek: CMTime? = nil, isPlaying playing: Bool = true, subtitles: String? = nil) {
-        guard let url = movie.getClosestTo(quality: quality)?.hls else { return }
+        guard let urls = movie.getClosestTo(quality: quality)?.compactMap(\.hls), !urls.isEmpty else { return }
 
-        let player = CustomAVPlayer(m3u8: url, subtitles: movie.subtitles)
+        let player = CustomAVPlayer(urls: urls, subtitles: movie.subtitles)
 
         if let player, let currentItem = player.currentItem {
             nowPlayingInfoCenter.nowPlayingInfo = [:]
@@ -858,7 +858,7 @@ struct PlayerView: View {
                 }
                 .store(in: &playerSubscriptions)
 
-            nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyAssetURL] = url
+            nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyAssetURL] = urls.first
             nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyMediaType] = MPNowPlayingInfoMediaType.video.rawValue
             nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyIsLiveStream] = false
             nowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyTitle] = name

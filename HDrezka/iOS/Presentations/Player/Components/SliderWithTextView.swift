@@ -2,7 +2,7 @@ import AVFoundation
 import Kingfisher
 import SwiftUI
 
-struct SliderWithText<T: BinaryFloatingPoint>: View {
+struct SliderWithTextView<T: BinaryFloatingPoint>: View {
     @Binding var value: T
     let inRange: ClosedRange<T>
     let buffers: [CMTimeRange]
