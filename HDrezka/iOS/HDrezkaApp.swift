@@ -87,16 +87,14 @@ struct HDrezkaApp: App {
     @Injected(\.modelContainer) private var modelContainer
 
     init() {
-        let cache = ImageCache.default
-
         switch Defaults[.cache] {
         case .off:
-            cache.memoryStorage.config.expiration = .expired
-            cache.diskStorage.config.expiration = .expired
+            ImageCache.default.memoryStorage.config.expiration = .expired
+            ImageCache.default.diskStorage.config.expiration = .expired
         case .memory:
-            cache.diskStorage.config.expiration = .expired
+            ImageCache.default.diskStorage.config.expiration = .expired
         case .disk:
-            cache.memoryStorage.config.expiration = .expired
+            ImageCache.default.memoryStorage.config.expiration = .expired
         case .all:
             break
         }
