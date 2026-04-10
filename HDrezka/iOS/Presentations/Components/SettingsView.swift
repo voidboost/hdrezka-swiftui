@@ -242,27 +242,25 @@ struct SettingsView: View {
                     }
                     .frame(height: 40)
                     .onChange(of: cache) {
-                        let defaultCache = ImageCache.default
-
                         switch cache {
                         case .off:
-                            defaultCache.clearCache()
+                            ImageCache.default.clearCache()
 
-                            defaultCache.memoryStorage.config.expiration = .expired
-                            defaultCache.diskStorage.config.expiration = .expired
+                            ImageCache.default.memoryStorage.config.expiration = .expired
+                            ImageCache.default.diskStorage.config.expiration = .expired
                         case .memory:
-                            defaultCache.clearDiskCache()
+                            ImageCache.default.clearDiskCache()
 
-                            defaultCache.memoryStorage.config.expiration = .seconds(300)
-                            defaultCache.diskStorage.config.expiration = .expired
+                            ImageCache.default.memoryStorage.config.expiration = .seconds(300)
+                            ImageCache.default.diskStorage.config.expiration = .expired
                         case .disk:
-                            defaultCache.clearMemoryCache()
+                            ImageCache.default.clearMemoryCache()
 
-                            defaultCache.memoryStorage.config.expiration = .expired
-                            defaultCache.diskStorage.config.expiration = .days(7)
+                            ImageCache.default.memoryStorage.config.expiration = .expired
+                            ImageCache.default.diskStorage.config.expiration = .days(7)
                         case .all:
-                            defaultCache.memoryStorage.config.expiration = .seconds(300)
-                            defaultCache.diskStorage.config.expiration = .days(7)
+                            ImageCache.default.memoryStorage.config.expiration = .seconds(300)
+                            ImageCache.default.diskStorage.config.expiration = .days(7)
                         }
                     }
                 }
