@@ -36,6 +36,7 @@ class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
         let playerItem = AVPlayerItem(asset: asset)
         playerItem.allowedAudioSpatializationFormats = Defaults[.spatialAudio].format
 
+        allowsExternalPlayback = true
         preventsDisplaySleepDuringVideoPlayback = true
         audiovisualBackgroundPlaybackPolicy = .pauses
 

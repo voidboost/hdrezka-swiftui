@@ -90,6 +90,7 @@ class PlayerViewModel {
     var isPlaying: Bool = true
     var isLoading: Bool = true
     var isMaskShow: Bool = true
+    var isMaskLocked: Bool = false
     var delayHide: DispatchWorkItem?
     var subtitlesOptions: [AVMediaSelectionOption] = []
     var thumbnails: WebVTT?
@@ -702,14 +703,16 @@ class PlayerViewModel {
         }
     }
 
-    func setMask(_ newValue: Bool, force: Bool = false) {
+    func setMask(_ newValue: Bool) {
+        guard !isMaskLocked else { return }
+
         withAnimation(.easeInOut) {
             isMaskShow = newValue
         }
 
         delayHide?.cancel()
 
-        if newValue, !isLoading, isPlaying, !force {
+        if newValue, !isLoading, isPlaying {
             delayHide = DispatchWorkItem {
                 self.showCursor(false)
 
@@ -720,6 +723,22 @@ class PlayerViewModel {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: delayHide)
             }
         }
+    }
+
+    func lockMask(_ newValue: Bool) {
+        isMaskLocked = true
+
+        withAnimation(.easeInOut) {
+            isMaskShow = newValue
+        }
+
+        delayHide?.cancel()
+    }
+
+    func unlockMask(_ newValue: Bool) {
+        isMaskLocked = false
+
+        setMask(newValue)
     }
 
     func updateNextTimer() {

@@ -63,7 +63,11 @@ struct BottomControlsView: View {
                         }
                         .buttonStyle(
                             OnPressButtonStyle { isPressed in
-                                viewModel.setMask(true, force: isPressed)
+                                if isPressed {
+                                    viewModel.lockMask(true)
+                                } else {
+                                    viewModel.unlockMask(true)
+                                }
                             },
                         )
                         .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
@@ -151,7 +155,11 @@ struct BottomControlsView: View {
                     .menuIndicator(.hidden)
                     .buttonStyle(
                         OnPressButtonStyle { isPressed in
-                            viewModel.setMask(true, force: isPressed)
+                            if isPressed {
+                                viewModel.lockMask(true)
+                            } else {
+                                viewModel.unlockMask(true)
+                            }
                         },
                     )
                     .shadow(color: .black.opacity(0.5), radius: 4, y: 2)

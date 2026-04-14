@@ -25,6 +25,16 @@ struct TopControlsView: View {
                 .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
             }
 
+            AirPlayButtonView(player: player) { isPressed in
+                if isPressed {
+                    viewModel.lockMask(true)
+                } else {
+                    viewModel.unlockMask(true)
+                }
+            }
+            .frame(width: 36, height: 36)
+            .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+
             Spacer()
 
             SliderWithoutTextView(value: Binding {
