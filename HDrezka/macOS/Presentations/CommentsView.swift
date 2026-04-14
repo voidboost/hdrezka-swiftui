@@ -155,7 +155,7 @@ struct CommentsView: View {
             .frame(maxHeight: 520)
         }
         .sheet(item: $viewModel.reportComment) { comment in
-            CommentReportSheet(comment: comment)
+            CommentReportSheetView(comment: comment)
         }
         .confirmationDialog("key.comment.delete.label", isPresented: Binding {
             viewModel.deleteComment != nil

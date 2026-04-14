@@ -1,9 +1,10 @@
+import Defaults
 import Foundation
 import SwiftSoup
 
 class SearchParser {
     static func parseSearch(from: String) throws -> [MovieSimple] {
-        try SwiftSoup.parse(from)
+        try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString)
             .checker()
             .getMovies()
             .map { movie in
@@ -19,7 +20,7 @@ class SearchParser {
     }
 
     static func parseCategories(from: String) throws -> [MovieType] {
-        try SwiftSoup.parse(from)
+        try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString)
             .checker()
             .getTypes()
             .map { type in

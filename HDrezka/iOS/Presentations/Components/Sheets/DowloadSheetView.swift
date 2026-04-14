@@ -14,7 +14,6 @@ struct DownloadSheetView: View {
     @State private var subscriptions: Set<AnyCancellable> = []
 
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.openURL) private var openURL
     @Environment(\.modelContext) private var modelContext
 
     @Environment(AppState.self) private var appState

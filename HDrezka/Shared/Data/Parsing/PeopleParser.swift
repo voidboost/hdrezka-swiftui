@@ -1,9 +1,10 @@
+import Defaults
 import Foundation
 import SwiftSoup
 
 class PeopleParser {
     static func parse(from: String) throws -> PersonDetailed {
-        let site = try SwiftSoup.parse(from).checker()
+        let site = try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).checker()
 
         let nameRussian = try site.getPeopleNameRussian()
         let nameOriginal = try site.getPeopleNameOriginal()

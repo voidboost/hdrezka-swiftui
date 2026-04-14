@@ -98,7 +98,7 @@ struct ContentView: View {
             Text("key.premium.description")
         }
         .sheet(isPresented: $appState.commentsRulesPresented) {
-            CommentsRulesSheet()
+            CommentsRulesSheetView()
                 .presentationSizing(.fitted)
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)

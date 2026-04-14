@@ -1,9 +1,10 @@
+import Defaults
 import Foundation
 import SwiftSoup
 
 class AccountParser {
     static func parseWatchingLaterMovies(from: String) throws -> [MovieWatchLater] {
-        try SwiftSoup.parse(from)
+        try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString)
             .checker()
             .getWatchingLaterMovies()
             .map { movie in
@@ -22,7 +23,7 @@ class AccountParser {
     }
 
     static func parseSeriesUpdates(from: String) throws -> [SeriesUpdateGroup] {
-        try SwiftSoup.parse(from)
+        try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString)
             .checker()
             .getSeriesUpdateGroups()
             .compactMap { group in
@@ -51,23 +52,23 @@ class AccountParser {
     }
 
     static func checkRegistration(from: String) throws -> Bool {
-        guard let scriptValue = try SwiftSoup.parse(from).select("script").first()?.html() else { return false }
+        guard let scriptValue = try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).select("script").first()?.html() else { return false }
 
         return scriptValue.contains("location") || scriptValue.isEmpty
     }
 
     static func checkRegistrationData(from: String) throws -> Bool {
-        try !SwiftSoup.parse(from).select(".string-ok").isEmpty()
+        try !SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).select(".string-ok").isEmpty()
     }
 
     static func checkRestore(from: String) throws -> String? {
-        guard try SwiftSoup.parse(from).select(".b-info__title").text().contains("Запрос успешно принят") else { return nil }
+        guard try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).select(".b-info__title").text().contains("Запрос успешно принят") else { return nil }
 
-        return try SwiftSoup.parse(from).select(".b-info__message b").first()?.text()
+        return try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).select(".b-info__message b").first()?.text()
     }
 
     static func parseBookmarks(from: String) throws -> [Bookmark] {
-        try SwiftSoup.parse(from)
+        try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString)
             .checker()
             .getBookmarksCategories()
             .map { category in

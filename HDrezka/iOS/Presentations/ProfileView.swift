@@ -6,8 +6,6 @@ struct ProfileView: View {
 
     @Environment(AppState.self) private var appState
 
-    @Environment(\.openURL) private var openURL
-
     @Default(.isLoggedIn) private var isLoggedIn
 
     var body: some View {
@@ -61,9 +59,7 @@ struct ProfileView: View {
         .navigationBarTitleDisplayMode(.large)
         .overlay(alignment: .bottom) {
             VStack(alignment: .center, spacing: 50) {
-                Button {
-                    openURL(Const.helpUkraine)
-                } label: {
+                Link(destination: Const.helpUkraine) {
                     Image(.GS)
                         .resizable()
                         .frame(width: 76, height: 100)

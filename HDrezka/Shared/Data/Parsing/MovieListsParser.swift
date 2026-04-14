@@ -1,9 +1,10 @@
+import Defaults
 import Foundation
 import SwiftSoup
 
 class MovieListsParser {
     static func parse(from: String) throws -> (String, [MovieSimple]) {
-        let site = try SwiftSoup.parse(from)
+        let site = try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString)
             .checker()
 
         return try (
@@ -23,7 +24,7 @@ class MovieListsParser {
     }
 
     static func parseHotMovies(from: String) throws -> [MovieSimple] {
-        try SwiftSoup.parse(from)
+        try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString)
             .getMovies()
             .map { movie in
                 let id = try movie.getId()

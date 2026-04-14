@@ -181,7 +181,7 @@ struct ContentView: View {
             Text("key.premium.description")
         }
         .sheet(isPresented: $appState.commentsRulesPresented) {
-            CommentsRulesSheet()
+            CommentsRulesSheetView()
         }
         .alert("key.disclaimer", isPresented: $isFirstLaunch) {
             Link(destination: (!_mirror.isDefaultValue ? mirror : Const.redirectMirror).appending(path: "rules/", directoryHint: .notDirectory)) {

@@ -7,7 +7,7 @@ import SwiftUI
 
 class MovieDetailsParser {
     static func parseMovieDetails(from: String, movieId: String) throws -> MovieDetailed {
-        let site = try SwiftSoup.parse(from).checker()
+        let site = try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).checker()
         let content = try site.getDetailsContent()
 
         let nameRussian = try content.getDetailsRussianName()
@@ -142,7 +142,7 @@ class MovieDetailsParser {
     }
 
     static func parseBookmarks(from: String) throws -> [Bookmark] {
-        try SwiftSoup.parse(from).checker().getBookmarks()
+        try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).checker().getBookmarks()
     }
 
     static func parseTrailerId(from: String) throws -> String {
@@ -154,18 +154,18 @@ class MovieDetailsParser {
     }
 
     static func parseSeriesSeasons(from: String) throws -> [MovieSeason] {
-        if let seasons = try? SwiftSoup.parse(from).getSeasons() {
+        if let seasons = try? SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).getSeasons() {
             return seasons
         } else {
             guard let json = try? JSONSerialization.jsonObject(with: from.data(using: .utf8).orThrow(), options: .allowFragments) as? [String: Any] else {
                 throw HDrezkaError.parseJson("json", "parseSeriesSeasons")
             }
 
-            guard let seasonsString = json["seasons"] as? String, let seasons = try SwiftSoup.parse(seasonsString).body() else {
+            guard let seasonsString = json["seasons"] as? String, let seasons = try SwiftSoup.parseHTML(seasonsString, Defaults[.mirror].absoluteString).body() else {
                 throw HDrezkaError.parseJson("seasons", "parseSeriesSeasons")
             }
 
-            guard let episodeString = json["episodes"] as? String, let episodes = try SwiftSoup.parse(episodeString).body() else {
+            guard let episodeString = json["episodes"] as? String, let episodes = try SwiftSoup.parseHTML(episodeString, Defaults[.mirror].absoluteString).body() else {
                 throw HDrezkaError.parseJson("episodes", "parseSeriesSeasons")
             }
 
@@ -205,11 +205,11 @@ class MovieDetailsParser {
             return []
         }
 
-        return try SwiftSoup.parse(html).getComments()
+        return try SwiftSoup.parseHTML(html, Defaults[.mirror].absoluteString).getComments()
     }
 
     static func parseLikes(from: String) throws -> [Like] {
-        try SwiftSoup.parse(from).getLikes()
+        try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).getLikes()
     }
 }
 
@@ -483,7 +483,7 @@ private extension Element {
             .components(separatedBy: "<br />")
             .filter { !$0.isEmpty }
             .map {
-                let listItem = try SwiftSoup.parse($0).body().orThrow()
+                let listItem = try SwiftSoup.parseHTML($0, Defaults[.mirror].absoluteString).body().orThrow()
 
                 return try MovieList(
                     name: listItem.select("a").first().orThrow().text(),
@@ -566,7 +566,7 @@ private extension Document {
             return nil
         }
 
-        let items = try SwiftSoup.parse(Parser.unescapeEntities(popup.attr("title"), false)).body().orThrow().select(".inner")
+        let items = try SwiftSoup.parseHTML(Parser.unescapeEntities(popup.attr("title"), false), Defaults[.mirror].absoluteString).body().orThrow().select(".inner")
 
         return try items.map {
             try MovieVoiceActingRating(
@@ -758,7 +758,7 @@ private extension String {
             throw HDrezkaError.parseJson("code", "getTrailerLink")
         }
 
-        return try SwiftSoup.parse(code)
+        return try SwiftSoup.parseHTML(code, Defaults[.mirror].absoluteString)
             .select("iframe").first().orThrow()
             .attr("src")
             .substringAfter("https://www.youtube.com/embed/")
@@ -784,7 +784,7 @@ private extension String {
         let streams = decrypt(encrypted: url)
 
         let videos = try streams.components(separatedBy: ",").filter { !$0.isEmpty }.map { stream in
-            let nameElement = try SwiftSoup.parse(stream.substringAfter("[").substringBefore("]"))
+            let nameElement = try SwiftSoup.parseHTML(stream.substringAfter("[").substringBefore("]"), Defaults[.mirror].absoluteString)
             let name = try nameElement.text()
             let videos = stream.substringAfter("]").components(separatedBy: " or ").filter { !$0.isEmpty }
             let links = videos.map { $0.substringBeforeLast(".mp4", includeSeparator: true) }.uniqued().filter { $0 != "null" }.compactMap { URL(string: $0) }

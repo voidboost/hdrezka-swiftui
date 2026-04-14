@@ -66,8 +66,8 @@
 				iOS/Presentations/Components/OrientationView.swift = (ios, );
 				iOS/Presentations/Components/SettingsView.swift = (ios, );
 				iOS/Presentations/Components/Sheets/BookmarksSheetView.swift = (ios, );
-				iOS/Presentations/Components/Sheets/CommentReportSheet.swift = (ios, );
-				iOS/Presentations/Components/Sheets/CommentsRulesSheet.swift = (ios, );
+				iOS/Presentations/Components/Sheets/CommentReportSheetView.swift = (ios, );
+				iOS/Presentations/Components/Sheets/CommentsRulesSheetView.swift = (ios, );
 				iOS/Presentations/Components/Sheets/CreateBookmarkSheetView.swift = (ios, );
 				iOS/Presentations/Components/Sheets/DowloadSheetView.swift = (ios, );
 				iOS/Presentations/Components/Sheets/OpenExternalPlayerSheetView.swift = (ios, );
@@ -131,8 +131,8 @@
 				macOS/Presentations/Components/OnPressButtonStyle.swift = (macos, );
 				macOS/Presentations/Components/SettingsView.swift = (macos, );
 				macOS/Presentations/Components/Sheets/BookmarksSheetView.swift = (macos, );
-				macOS/Presentations/Components/Sheets/CommentReportSheet.swift = (macos, );
-				macOS/Presentations/Components/Sheets/CommentsRulesSheet.swift = (macos, );
+				macOS/Presentations/Components/Sheets/CommentReportSheetView.swift = (macos, );
+				macOS/Presentations/Components/Sheets/CommentsRulesSheetView.swift = (macos, );
 				macOS/Presentations/Components/Sheets/CreateBookmarkSheetView.swift = (macos, );
 				macOS/Presentations/Components/Sheets/DownloadSheetView.swift = (macos, );
 				macOS/Presentations/Components/Sheets/OpenExternalPlayerSheetView.swift = (macos, );
