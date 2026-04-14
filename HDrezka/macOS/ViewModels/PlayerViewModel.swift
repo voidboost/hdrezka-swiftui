@@ -47,9 +47,7 @@ class PlayerViewModel {
     }
 
     deinit {
-        subscriptions.flush()
-        timerWork?.cancel()
-        delayHide?.cancel()
+        resetPlayer()
     }
 
     var isSeries: Bool {
@@ -74,6 +72,9 @@ class PlayerViewModel {
     @ObservationIgnored let playerLayer: AVPlayerLayer = .init()
     @ObservationIgnored let rates: [Float] = [0.5, 1.0, 1.25, 1.5, 2.0]
 
+    @ObservationIgnored private let routeDetector: AVRouteDetector = .init()
+
+    var routesDetected: Bool = false
     var pipController: AVPictureInPictureController?
     var isPictureInPictureActive: Bool = false
     var isPictureInPicturePossible: Bool = false
@@ -114,6 +115,8 @@ class PlayerViewModel {
             playerLayer.videoGravity = videoGravity
 
             nowPlayingInfoCenter.nowPlayingInfo = [:]
+
+            routeDetector.isRouteDetectionEnabled = true
 
             if let thumbnails = movie.thumbnails {
                 getMovieThumbnailsUseCase(path: thumbnails)
@@ -402,6 +405,15 @@ class PlayerViewModel {
                 }
                 .store(in: &subscriptions)
 
+            NotificationCenter.default.publisher(for: Notification.Name.AVRouteDetectorMultipleRoutesDetectedDidChange)
+                .receive(on: DispatchQueue.main)
+                .sink { _ in
+                    withAnimation(.easeInOut(duration: 0.15)) {
+                        self.routesDetected = self.routeDetector.multipleRoutesDetected
+                    }
+                }
+                .store(in: &subscriptions)
+
             playerLayer.publisher(for: \.videoGravity)
                 .receive(on: DispatchQueue.main)
                 .sink { videoGravity in
@@ -621,6 +633,8 @@ class PlayerViewModel {
         delayHide?.cancel()
 
         thumbnails = nil
+
+        routeDetector.isRouteDetectionEnabled = false
 
         playerLayer.player?.pause()
         playerLayer.player?.replaceCurrentItem(with: nil)

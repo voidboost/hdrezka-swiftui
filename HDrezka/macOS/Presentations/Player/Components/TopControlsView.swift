@@ -25,15 +25,17 @@ struct TopControlsView: View {
                 .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
             }
 
-            AirPlayButtonView(player: player) { isPressed in
-                if isPressed {
-                    viewModel.lockMask(true)
-                } else {
-                    viewModel.unlockMask(true)
+            if viewModel.routesDetected {
+                AirPlayButtonView(player: player) { isPressed in
+                    if isPressed {
+                        viewModel.lockMask(true)
+                    } else {
+                        viewModel.unlockMask(true)
+                    }
                 }
+                .frame(width: 35, height: 35)
+                .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
             }
-            .frame(width: 35, height: 35)
-            .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
 
             Spacer()
 
