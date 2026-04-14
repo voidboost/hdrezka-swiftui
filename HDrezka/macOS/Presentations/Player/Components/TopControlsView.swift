@@ -32,7 +32,7 @@ struct TopControlsView: View {
                     viewModel.unlockMask(true)
                 }
             }
-            .frame(width: 36, height: 36)
+            .frame(width: 35, height: 35)
             .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
 
             Spacer()
