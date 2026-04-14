@@ -5,6 +5,7 @@
    <li>This program is provided <b>"as is"</b>.</li>
    <li>The author does <b>not encourage any illegal activity</b>.</li>
    <li>Use it entirely <b>at your own risk</b>.</li>
+   <li>It is also recommended to read the <a href="https://rezka.ag/rules/"><b>site rules</b></a>.</li>
 </ul>
 <h2>✨ Features</h2>
 <ul>

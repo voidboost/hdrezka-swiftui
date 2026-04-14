@@ -136,6 +136,7 @@ struct HDrezkaApp: App {
 
     @Default(.theme) private var theme
     @Default(.isFirstLaunch) private var isFirstLaunch
+    @Default(.mirror) private var mirror
 
     @Injected(\.modelContainer) private var modelContainer
 
@@ -290,6 +291,10 @@ struct HDrezkaApp: App {
         CommandGroup(replacing: .help) {
             Link(destination: Const.github) {
                 Text("key.github")
+            }
+
+            Link(destination: (!_mirror.isDefaultValue ? mirror : Const.redirectMirror).appending(path: "rules/", directoryHint: .notDirectory)) {
+                Text("key.site.rules")
             }
 
             Button {
