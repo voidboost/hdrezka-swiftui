@@ -405,7 +405,11 @@ class PlayerViewModel {
                 }
                 .store(in: &subscriptions)
 
-            NotificationCenter.default.publisher(for: Notification.Name.AVRouteDetectorMultipleRoutesDetectedDidChange)
+            withAnimation(.easeInOut(duration: 0.15)) {
+                self.routesDetected = self.routeDetector.multipleRoutesDetected
+            }
+
+            NotificationCenter.default.publisher(for: .AVRouteDetectorMultipleRoutesDetectedDidChange)
                 .receive(on: DispatchQueue.main)
                 .sink { _ in
                     withAnimation(.easeInOut(duration: 0.15)) {
