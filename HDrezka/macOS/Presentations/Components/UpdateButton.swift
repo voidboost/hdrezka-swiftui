@@ -23,9 +23,7 @@ struct UpdateButton: View {
         .onAppear {
             updater.publisher(for: \.canCheckForUpdates)
                 .receive(on: DispatchQueue.main)
-                .sink { canCheckForUpdates in
-                    self.canCheckForUpdates = canCheckForUpdates
-                }
+                .assign(to: \.canCheckForUpdates, on: self)
                 .store(in: &subscriptions)
         }
     }
