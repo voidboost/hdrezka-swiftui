@@ -16,19 +16,19 @@ class PlayerViewModel {
 
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
-    @ObservationIgnored let poster: String
+    @ObservationIgnored private let poster: String
     @ObservationIgnored let name: String
-    @ObservationIgnored let favs: String
+    @ObservationIgnored private let favs: String
     @ObservationIgnored let voiceActing: MovieVoiceActing
 
     @ObservationIgnored let hideMainWindow: Bool
 
     @ObservationIgnored let times: [Int]
 
-    var seasons: [MovieSeason]?
-    var season: MovieSeason?
-    var episode: MovieEpisode?
-    var movie: MovieVideo
+    private(set) var seasons: [MovieSeason]?
+    private(set) var season: MovieSeason?
+    private(set) var episode: MovieEpisode?
+    private(set) var movie: MovieVideo
     var quality: String
 
     init(poster: String, name: String, favs: String, voiceActing: MovieVoiceActing, hideMainWindow: Bool, seasons: [MovieSeason]?, season: MovieSeason?, episode: MovieEpisode?, movie: MovieVideo, quality: String) {
@@ -74,33 +74,36 @@ class PlayerViewModel {
 
     @ObservationIgnored private let routeDetector: AVRouteDetector = .init()
 
-    var routesDetected: Bool = false
-    var pipController: AVPictureInPictureController?
-    var isPictureInPictureActive: Bool = false
-    var isPictureInPicturePossible: Bool = false
-    var videoGravity: AVLayerVideoGravity = .resizeAspect
-    var loadedTimeRanges: [CMTimeRange] = []
-    var timeObserverToken: Any?
+    @ObservationIgnored private let videoOutput = AVPlayerItemVideoOutput(pixelBufferAttributes: [kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_32BGRA)])
+    @ObservationIgnored private let ciContext = CIContext(options: [.cacheIntermediates: false])
+
+    private(set) var glowImage: Image?
+    private(set) var routesDetected: Bool = false
+    private(set) var pipController: AVPictureInPictureController?
+    private(set) var isPictureInPictureActive: Bool = false
+    private(set) var isPictureInPicturePossible: Bool = false
+    private(set) var loadedTimeRanges: [CMTimeRange] = []
+    private var timeObserverToken: Any?
     var timer: Int?
-    var timerWork: DispatchWorkItem?
-    var nextTimer: CGFloat?
+    private var timerWork: DispatchWorkItem?
+    private(set) var nextTimer: CGFloat?
     var currentTime: Double = 0.0
-    var duration: Double = .greatestFiniteMagnitude
-    var error: Error?
+    private(set) var duration: Double = .greatestFiniteMagnitude
+    private(set) var error: Error?
     var subtitles: String?
-    var isPlaying: Bool = true
-    var isLoading: Bool = true
-    var isMaskShow: Bool = true
-    var isMaskLocked: Bool = false
-    var delayHide: DispatchWorkItem?
-    var subtitlesOptions: [AVMediaSelectionOption] = []
-    var thumbnails: WebVTT?
+    private(set) var isPlaying: Bool = true
+    private(set) var isLoading: Bool = true
+    private(set) var isMaskShow: Bool = true
+    private var isMaskLocked: Bool = false
+    private var delayHide: DispatchWorkItem?
+    private(set) var subtitlesOptions: [AVMediaSelectionOption] = []
+    private(set) var thumbnails: WebVTT?
     var window: NSWindow?
-    var rate: Float = Defaults[.rate]
-    var isMuted: Bool = Defaults[.isMuted]
-    var volume: Float = Defaults[.volume]
-    var spatialAudio: SpatialAudio = Defaults[.spatialAudio]
-    var playerFullscreen: Bool = Defaults[.playerFullscreen]
+    private(set) var rate: Float = Defaults[.rate]
+    private(set) var isMuted: Bool = Defaults[.isMuted]
+    private(set) var volume: Float = Defaults[.volume]
+    private(set) var videoGravity: VideoGravity = Defaults[.videoGravity]
+    private(set) var playerFullscreen: Bool = Defaults[.playerFullscreen]
     var isFocused = false
     var dismiss: DismissAction?
 
@@ -112,7 +115,11 @@ class PlayerViewModel {
         if let player, let currentItem = player.currentItem {
             let pipController = AVPictureInPictureController(playerLayer: playerLayer)
 
-            playerLayer.videoGravity = videoGravity
+            if videoGravity == .ambient {
+                currentItem.add(videoOutput)
+            }
+
+            playerLayer.videoGravity = videoGravity.gravity
 
             nowPlayingInfoCenter.nowPlayingInfo = [:]
 
@@ -136,6 +143,54 @@ class PlayerViewModel {
                 self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = self.rate
                 self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyCurrentPlaybackDate] = currentItem.currentDate()
                 self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyDefaultPlaybackRate] = player.defaultRate
+
+                let targetTime = CMTime(seconds: time.seconds + 0.1, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+
+                if self.videoGravity == .ambient {
+                    if self.videoOutput.hasNewPixelBuffer(forItemTime: targetTime) {
+                        if #available(macOS 26.0, *), let pixelBuffer = self.videoOutput.pixelBufferAndDisplayTime(forItemTime: targetTime).pixelBuffer {
+                            if let cgImage = pixelBuffer.withUnsafeBuffer({ buffer in
+                                let ciImage = CIImage(cvPixelBuffer: buffer)
+
+                                let scaleTransform = CGAffineTransform(scaleX: 0.25, y: 0.25)
+
+                                let transformed = ciImage
+                                    .transformed(by: scaleTransform, highQualityDownsample: true)
+                                    .clampedToExtent()
+                                    .cropped(to: ciImage.extent.applying(scaleTransform))
+
+                                return self.ciContext.createCGImage(transformed, from: transformed.extent)
+                            }) {
+                                if self.glowImage == nil {
+                                    withAnimation(.easeInOut(duration: 0.15)) {
+                                        self.glowImage = Image(decorative: cgImage, scale: 1.0)
+                                    }
+                                } else {
+                                    self.glowImage = Image(decorative: cgImage, scale: 1.0)
+                                }
+                            }
+                        } else if let pixelBuffer = self.videoOutput.copyPixelBuffer(forItemTime: targetTime, itemTimeForDisplay: nil) {
+                            let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+
+                            let scaleTransform = CGAffineTransform(scaleX: 0.25, y: 0.25)
+
+                            let transformed = ciImage
+                                .transformed(by: scaleTransform, highQualityDownsample: true)
+                                .clampedToExtent()
+                                .cropped(to: ciImage.extent.applying(scaleTransform))
+
+                            if let cgImage = self.ciContext.createCGImage(transformed, from: transformed.extent) {
+                                if self.glowImage == nil {
+                                    withAnimation(.easeInOut(duration: 0.15)) {
+                                        self.glowImage = Image(decorative: cgImage, scale: 1.0)
+                                    }
+                                } else {
+                                    self.glowImage = Image(decorative: cgImage, scale: 1.0)
+                                }
+                            }
+                        }
+                    }
+                }
 
                 Task { @MainActor [weak self] in
                     guard let self else { return }
@@ -359,9 +414,7 @@ class PlayerViewModel {
             currentItem.publisher(for: \.loadedTimeRanges)
                 .compactMap { $0 as? [CMTimeRange] }
                 .receive(on: DispatchQueue.main)
-                .sink { loadedTimeRanges in
-                    self.loadedTimeRanges = loadedTimeRanges
-                }
+                .assign(to: \.loadedTimeRanges, on: self)
                 .store(in: &subscriptions)
 
             currentItem.publisher(for: \.error)
@@ -414,15 +467,6 @@ class PlayerViewModel {
                 .sink { _ in
                     withAnimation(.easeInOut(duration: 0.15)) {
                         self.routesDetected = self.routeDetector.multipleRoutesDetected
-                    }
-                }
-                .store(in: &subscriptions)
-
-            playerLayer.publisher(for: \.videoGravity)
-                .receive(on: DispatchQueue.main)
-                .sink { videoGravity in
-                    withAnimation(.easeInOut(duration: 0.15)) {
-                        self.videoGravity = videoGravity
                     }
                 }
                 .store(in: &subscriptions)
@@ -503,15 +547,35 @@ class PlayerViewModel {
                 .receive(on: DispatchQueue.main)
                 .map(\.newValue)
                 .sink { spatialAudio in
-                    self.spatialAudio = spatialAudio
+                    currentItem.allowedAudioSpatializationFormats = spatialAudio.format
                 }
                 .store(in: &subscriptions)
 
             Defaults.publisher(.playerFullscreen)
                 .receive(on: DispatchQueue.main)
                 .map(\.newValue)
-                .sink { playerFullscreen in
-                    self.playerFullscreen = playerFullscreen
+                .assign(to: \.playerFullscreen, on: self)
+                .store(in: &subscriptions)
+
+            Defaults.publisher(.videoGravity)
+                .receive(on: DispatchQueue.main)
+                .map(\.newValue)
+                .sink { videoGravity in
+                    self.videoGravity = videoGravity
+
+                    if videoGravity == .ambient {
+                        currentItem.add(self.videoOutput)
+                    } else {
+                        for output in currentItem.outputs {
+                            currentItem.remove(output)
+                        }
+
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            self.glowImage = nil
+                        }
+                    }
+
+                    self.playerLayer.videoGravity = videoGravity.gravity
                 }
                 .store(in: &subscriptions)
 
@@ -640,12 +704,19 @@ class PlayerViewModel {
 
         routeDetector.isRouteDetectionEnabled = false
 
+        if let outputs = playerLayer.player?.currentItem?.outputs {
+            for output in outputs {
+                playerLayer.player?.currentItem?.remove(output)
+            }
+        }
+
         playerLayer.player?.pause()
         playerLayer.player?.replaceCurrentItem(with: nil)
 
         withAnimation(.easeInOut) {
             playerLayer.player = nil
             pipController = nil
+            glowImage = nil
             error = nil
             nextTimer = nil
             subtitlesOptions = []

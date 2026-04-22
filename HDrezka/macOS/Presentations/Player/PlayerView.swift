@@ -86,6 +86,9 @@ struct PlayerView: View {
                     .overlay(alignment: .topTrailing) {
                         NextTimerView()
                     }
+                    .background(alignment: .center) {
+                        GlowImageView()
+                    }
             } else if viewModel.isLoading {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -165,16 +168,6 @@ struct PlayerView: View {
                     player.pause()
                 }
             }
-        }
-        .onChange(of: viewModel.spatialAudio) {
-            guard let player = viewModel.playerLayer.player,
-                  player.status == .readyToPlay,
-                  let currentItem = player.currentItem
-            else {
-                return
-            }
-
-            currentItem.allowedAudioSpatializationFormats = viewModel.spatialAudio.format
         }
         .onChange(of: viewModel.isFocused) {
             isFocused = viewModel.isFocused
