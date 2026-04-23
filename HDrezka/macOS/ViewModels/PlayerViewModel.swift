@@ -75,7 +75,7 @@ class PlayerViewModel {
     @ObservationIgnored private let routeDetector: AVRouteDetector = .init()
 
     @ObservationIgnored private let videoOutput = AVPlayerItemVideoOutput(pixelBufferAttributes: [kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_32BGRA)])
-    @ObservationIgnored private let ciContext = CIContext(options: [.cacheIntermediates: false])
+    @ObservationIgnored private let ciContext = CIContext(options: [.useSoftwareRenderer: false, .cacheIntermediates: false])
 
     private(set) var glowImage: Image?
     private(set) var routesDetected: Bool = false
@@ -148,26 +148,27 @@ class PlayerViewModel {
 
                 if self.videoGravity == .ambient {
                     if self.videoOutput.hasNewPixelBuffer(forItemTime: targetTime) {
-                        if #available(macOS 26.0, *), let pixelBuffer = self.videoOutput.pixelBufferAndDisplayTime(forItemTime: targetTime).pixelBuffer {
-                            if let cgImage = pixelBuffer.withUnsafeBuffer({ buffer in
-                                let ciImage = CIImage(cvPixelBuffer: buffer)
+                        if #available(macOS 26.0, *),
+                           let pixelBuffer = self.videoOutput.pixelBufferAndDisplayTime(forItemTime: targetTime).pixelBuffer,
+                           let cgImage = pixelBuffer.withUnsafeBuffer({ buffer in
+                               let ciImage = CIImage(cvPixelBuffer: buffer)
 
-                                let scaleTransform = CGAffineTransform(scaleX: 0.25, y: 0.25)
+                               let scaleTransform = CGAffineTransform(scaleX: 0.25, y: 0.25)
 
-                                let transformed = ciImage
-                                    .transformed(by: scaleTransform, highQualityDownsample: true)
-                                    .clampedToExtent()
-                                    .cropped(to: ciImage.extent.applying(scaleTransform))
+                               let transformed = ciImage
+                                   .transformed(by: scaleTransform, highQualityDownsample: false)
+                                   .clampedToExtent()
+                                   .cropped(to: ciImage.extent.applying(scaleTransform))
 
-                                return self.ciContext.createCGImage(transformed, from: transformed.extent)
-                            }) {
-                                if self.glowImage == nil {
-                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                        self.glowImage = Image(decorative: cgImage, scale: 1.0)
-                                    }
-                                } else {
+                               return self.ciContext.createCGImage(transformed, from: transformed.extent)
+                           })
+                        {
+                            if self.glowImage == nil {
+                                withAnimation(.easeInOut(duration: 0.15)) {
                                     self.glowImage = Image(decorative: cgImage, scale: 1.0)
                                 }
+                            } else {
+                                self.glowImage = Image(decorative: cgImage, scale: 1.0)
                             }
                         } else if let pixelBuffer = self.videoOutput.copyPixelBuffer(forItemTime: targetTime, itemTimeForDisplay: nil) {
                             let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
@@ -175,7 +176,7 @@ class PlayerViewModel {
                             let scaleTransform = CGAffineTransform(scaleX: 0.25, y: 0.25)
 
                             let transformed = ciImage
-                                .transformed(by: scaleTransform, highQualityDownsample: true)
+                                .transformed(by: scaleTransform, highQualityDownsample: false)
                                 .clampedToExtent()
                                 .cropped(to: ciImage.extent.applying(scaleTransform))
 
