@@ -21,7 +21,7 @@ class PlayerViewModel {
     @ObservationIgnored private let favs: String
     @ObservationIgnored let voiceActing: MovieVoiceActing
 
-    @ObservationIgnored let hideMainWindow: Bool
+    @ObservationIgnored let hideMainWindow: Bool = Defaults[.hideMainWindow]
 
     @ObservationIgnored let times: [Int]
 
@@ -31,12 +31,11 @@ class PlayerViewModel {
     private(set) var movie: MovieVideo
     var quality: String
 
-    init(poster: String, name: String, favs: String, voiceActing: MovieVoiceActing, hideMainWindow: Bool, seasons: [MovieSeason]?, season: MovieSeason?, episode: MovieEpisode?, movie: MovieVideo, quality: String) {
+    init(poster: String, name: String, favs: String, voiceActing: MovieVoiceActing, seasons: [MovieSeason]?, season: MovieSeason?, episode: MovieEpisode?, movie: MovieVideo, quality: String) {
         self.poster = poster
         self.name = name
         self.favs = favs
         self.voiceActing = voiceActing
-        self.hideMainWindow = hideMainWindow
         self.seasons = seasons
         self.season = season
         self.episode = episode
@@ -102,7 +101,8 @@ class PlayerViewModel {
     private(set) var rate: Float = Defaults[.rate]
     private(set) var isMuted: Bool = Defaults[.isMuted]
     private(set) var volume: Float = Defaults[.volume]
-    private(set) var videoGravity: VideoGravity = Defaults[.videoGravity]
+    private var videoGravity: VideoGravity = Defaults[.videoGravity]
+    private var ambientLight: Bool = Defaults[.ambientLight]
     private(set) var playerFullscreen: Bool = Defaults[.playerFullscreen]
     var isFocused = false
     var dismiss: DismissAction?
@@ -115,9 +115,7 @@ class PlayerViewModel {
         if let player, let currentItem = player.currentItem {
             let pipController = AVPictureInPictureController(playerLayer: playerLayer)
 
-            if videoGravity == .ambient {
-                currentItem.add(videoOutput)
-            }
+            setAmbientLight(ambientLight && videoGravity == .fit && !isPictureInPictureActive, avPlayerItem: currentItem)
 
             playerLayer.videoGravity = videoGravity.gravity
 
@@ -146,7 +144,7 @@ class PlayerViewModel {
 
                 let targetTime = CMTime(seconds: time.seconds + 0.1, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
 
-                if self.videoGravity == .ambient {
+                if self.ambientLight, self.videoGravity == .fit, !self.isPictureInPictureActive {
                     if self.videoOutput.hasNewPixelBuffer(forItemTime: targetTime) {
                         if #available(macOS 26.0, *),
                            let pixelBuffer = self.videoOutput.pixelBufferAndDisplayTime(forItemTime: targetTime).pixelBuffer,
@@ -490,6 +488,8 @@ class PlayerViewModel {
                             window.makeKeyAndOrderFront(nil)
                         }
 
+                        self.setAmbientLight(self.ambientLight && self.videoGravity == .fit && !isPictureInPictureActive, avPlayerItem: currentItem)
+
 //                        if let window = self.window {
 //                            if isPictureInPictureActive {
 //                                window.miniaturize(nil)
@@ -564,19 +564,19 @@ class PlayerViewModel {
                 .sink { videoGravity in
                     self.videoGravity = videoGravity
 
-                    if videoGravity == .ambient {
-                        currentItem.add(self.videoOutput)
-                    } else {
-                        for output in currentItem.outputs {
-                            currentItem.remove(output)
-                        }
-
-                        withAnimation(.easeInOut(duration: 0.15)) {
-                            self.glowImage = nil
-                        }
-                    }
+                    self.setAmbientLight(self.ambientLight && videoGravity == .fit && !self.isPictureInPictureActive, avPlayerItem: currentItem)
 
                     self.playerLayer.videoGravity = videoGravity.gravity
+                }
+                .store(in: &subscriptions)
+
+            Defaults.publisher(.ambientLight)
+                .receive(on: DispatchQueue.main)
+                .map(\.newValue)
+                .sink { ambientLight in
+                    self.ambientLight = ambientLight
+
+                    self.setAmbientLight(ambientLight && self.videoGravity == .fit && !self.isPictureInPictureActive, avPlayerItem: currentItem)
                 }
                 .store(in: &subscriptions)
 
@@ -973,6 +973,20 @@ class PlayerViewModel {
                         }
                     }
                     .store(in: &self.subscriptions)
+            }
+        }
+    }
+
+    private func setAmbientLight(_ enable: Bool = true, avPlayerItem: AVPlayerItem) {
+        for output in avPlayerItem.outputs {
+            avPlayerItem.remove(output)
+        }
+
+        if enable {
+            avPlayerItem.add(videoOutput)
+        } else {
+            withAnimation(.easeInOut(duration: 0.15)) {
+                self.glowImage = nil
             }
         }
     }

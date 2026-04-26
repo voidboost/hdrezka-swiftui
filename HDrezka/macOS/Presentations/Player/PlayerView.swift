@@ -13,7 +13,6 @@ struct PlayerView: View {
             name: data.details.nameRussian,
             favs: data.details.favs,
             voiceActing: data.selectedActing,
-            hideMainWindow: Defaults[.hideMainWindow],
             seasons: data.seasons,
             season: data.selectedSeason,
             episode: data.selectedEpisode,

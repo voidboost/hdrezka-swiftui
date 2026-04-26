@@ -6,7 +6,6 @@ enum VideoGravity: Int, CaseIterable, Identifiable, Defaults.Serializable {
     case fit = 0
     case fill
     case stretch
-    case ambient
 
     var id: Self {
         self
@@ -20,14 +19,12 @@ enum VideoGravity: Int, CaseIterable, Identifiable, Defaults.Serializable {
             "key.video_gravity.fill"
         case .stretch:
             "key.video_gravity.stretch"
-        case .ambient:
-            "key.video_gravity.ambient"
         }
     }
 
     var gravity: AVLayerVideoGravity {
         switch self {
-        case .fit, .ambient:
+        case .fit:
             .resizeAspect
         case .fill:
             .resizeAspectFill
