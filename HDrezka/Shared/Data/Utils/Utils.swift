@@ -80,10 +80,6 @@ extension String {
         }
     }
 
-    func isNotEqualAndNotEmpty(_ str: String) -> Bool {
-        self != str && !isEmpty
-    }
-
     func page(_ page: Int) -> String {
         if page > 1 {
             appending("page/\(page)/")
