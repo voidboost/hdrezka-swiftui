@@ -11,6 +11,10 @@ struct BottomControlsView: View {
 
     @Environment(PlayerViewModel.self) private var viewModel
 
+    @Default(.videoGravity) private var videoGravity
+    @Default(.ambientLight) private var ambientLight
+    @Default(.rate) private var rate
+
     var body: some View {
         VStack(alignment: .center, spacing: 8) {
             HStack(alignment: .bottom) {
@@ -74,7 +78,7 @@ struct BottomControlsView: View {
                     }
 
                     Menu {
-                        Picker("key.timer", selection: Binding {
+                        Picker("key.timer", systemImage: "timer", selection: Binding {
                             viewModel.timer
                         } set: {
                             viewModel.timer = $0
@@ -104,22 +108,21 @@ struct BottomControlsView: View {
                         }
                         .pickerStyle(.menu)
 
-                        Picker("key.video_gravity", selection: Binding {
-                            viewModel.videoGravity
-                        } set: {
-                            Defaults[.videoGravity] = $0
-                        }) {
+                        Picker("key.video_gravity", systemImage: "arrow.up.left.and.arrow.down.right.rectangle", selection: $videoGravity) {
                             ForEach(VideoGravity.allCases) { videoGravity in
                                 Text(videoGravity.localizedKey).tag(videoGravity)
                             }
                         }
                         .pickerStyle(.menu)
 
-                        Picker("key.speed", selection: Binding {
-                            viewModel.rate
-                        } set: { rate in
-                            Defaults[.rate] = rate
-                        }) {
+                        Picker("key.ambient_light", systemImage: "light.panel", selection: $ambientLight) {
+                            Text("key.on").tag(true)
+
+                            Text("key.off").tag(false)
+                        }
+                        .pickerStyle(.menu)
+
+                        Picker("key.speed", systemImage: "gauge.with.needle", selection: $rate) {
                             ForEach(viewModel.rates, id: \.self) { value in
                                 Text(verbatim: "\(value)x").tag(value)
                             }
@@ -127,7 +130,7 @@ struct BottomControlsView: View {
                         .pickerStyle(.menu)
 
                         if !viewModel.movie.getAvailableQualities().isEmpty {
-                            Picker("key.quality", selection: Binding {
+                            Picker("key.quality", systemImage: "4k.tv", selection: Binding {
                                 viewModel.quality
                             } set: {
                                 viewModel.quality = $0

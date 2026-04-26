@@ -243,6 +243,28 @@
         }
       }
     },
+    "key.ambient_light" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ambient light"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подсветка окружения"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Підсвічування оточення"
+          }
+        }
+      }
+    },
     "key.aria2.error.bencodeParseError" : {
       "localizations" : {
         "en" : {
@@ -4623,6 +4645,28 @@
         }
       }
     },
+    "key.on" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Включить"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Увімкнути"
+          }
+        }
+      }
+    },
     "key.open" : {
       "localizations" : {
         "en" : {
@@ -7677,28 +7721,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Співвідношення сторін відео"
-          }
-        }
-      }
-    },
-    "key.video_gravity.ambient" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fit with ambient light"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вместить с подсветкой окружения"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вмістити з підсвічуванням оточення"
           }
         }
       }
