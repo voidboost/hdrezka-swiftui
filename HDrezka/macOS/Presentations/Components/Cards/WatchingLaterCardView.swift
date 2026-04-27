@@ -57,7 +57,7 @@ struct WatchingLaterCardView: View {
 
                             if let text = movie.buttonText, !text.isEmpty, !movie.watched {
                                 VStack(alignment: .leading, spacing: 0) {
-                                    Text(text.split(separator: " ", maxSplits: 2).dropLast().joined(separator: " ").firstLetterUppercased())
+                                    Text(text.split(separator: " ", maxSplits: 2).dropLast().joined(separator: " ").firstLetterUppercased)
                                         .font(.caption.weight(.medium))
                                         .foregroundStyle(.primary)
 
@@ -92,7 +92,7 @@ struct WatchingLaterCardView: View {
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
 
-                    Text(movie.date.replacingOccurrences(of: "-", with: ".").firstLetterUppercased())
+                    Text(movie.date.replacingOccurrences(of: "-", with: ".").firstLetterUppercased)
                         .font(.subheadline)
                         .foregroundStyle(Color.accentColor)
                 }
