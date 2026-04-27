@@ -61,6 +61,7 @@ private extension Element {
                     genreId: id,
                 )
             }
+            .sorted(by: { $0.name.localizedCompare($1.name) == .orderedAscending })
     }
 
     func getTypeBest() throws -> MovieBest {
