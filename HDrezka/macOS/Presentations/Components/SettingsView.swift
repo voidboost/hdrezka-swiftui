@@ -6,7 +6,7 @@ import SwiftData
 import SwiftUI
 
 struct SettingsView: View {
-    @Default(.mirror) private var currentMirror
+    @Default(.mirror) private var mirror
     @Default(.isLoggedIn) private var isLoggedIn
     @Default(.playerFullscreen) private var playerFullscreen
     @Default(.hideMainWindow) private var hideMainWindow
@@ -26,9 +26,9 @@ struct SettingsView: View {
     @Query(animation: .easeInOut) private var playerPositions: [PlayerPosition]
     @Query(animation: .easeInOut) private var selectPositions: [SelectPosition]
 
-    @State private var mirror: URL?
-    @State private var mirrorValid: Bool?
-    @State private var mirrorCheck: DispatchWorkItem?
+    @State private var host: String = ""
+    @State private var hostValid: Bool?
+    @State private var hostCheck: DispatchWorkItem?
 
     private let updater: SPUUpdater
 
@@ -50,58 +50,58 @@ struct SettingsView: View {
                     HStack(alignment: .center, spacing: 8) {
                         Text("key.mirror")
 
-                        TextField("key.mirror", value: $mirror, format: .url, prompt: Text(currentMirror.absoluteString))
-                            .textFieldStyle(.plain)
-                            .multilineTextAlignment(.trailing)
-                            .autocorrectionDisabled()
-                            .onChange(of: mirror) {
-                                withAnimation(.easeInOut) {
-                                    mirrorValid = nil
-                                }
-
-                                mirrorCheck?.cancel()
-
-                                if mirror != nil {
-                                    mirrorCheck = DispatchWorkItem {
-                                        withAnimation(.easeInOut) {
-                                            mirrorValid = if let mirror,
-                                                             !mirror.isFileURL,
-                                                             let host = mirror.host(),
-                                                             host != currentMirror.host()
-                                            {
-                                                true
-                                            } else {
-                                                false
-                                            }
-                                        }
-                                    }
-
-                                    if let mirrorCheck {
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: mirrorCheck)
-                                    }
-                                }
+                        Group {
+                            if let currentHost = mirror.host() {
+                                TextField("key.mirror", text: $host, prompt: Text(currentHost))
+                            } else {
+                                TextField("key.mirror", text: $host)
                             }
-
-                        Button {
-                            if !_currentMirror.isDefaultValue {
-                                cookiesManager.setMirror(_currentMirror.defaultValue)
-                            }
-
-                            mirrorValid = nil
-                            mirrorCheck?.cancel()
-                        } label: {
-                            Image(systemName: "gobackward")
                         }
-                        .buttonStyle(.accessoryBar)
+                        .textFieldStyle(.plain)
+                        .multilineTextAlignment(.trailing)
+                        .autocorrectionDisabled()
+                        .onChange(of: host) {
+                            withAnimation(.easeInOut) {
+                                hostValid = nil
+                            }
+
+                            hostCheck?.cancel()
+
+                            if !host.isEmpty {
+                                hostCheck = DispatchWorkItem {
+                                    withAnimation(.easeInOut) {
+                                        hostValid = host.isValidHost && host != mirror.host()
+                                    }
+                                }
+
+                                if let hostCheck {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: hostCheck)
+                                }
+                            }
+                        }
+
+                        if !_mirror.isDefaultValue {
+                            Button {
+                                cookiesManager.setMirror(_mirror.defaultValue)
+
+                                hostValid = nil
+                                hostCheck?.cancel()
+                            } label: {
+                                Image(systemName: "gobackward")
+                            }
+                            .buttonStyle(.accessoryBar)
+                        }
                     }
                     .padding(.horizontal, 15)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(.quinary, in: .rect(cornerRadius: 6))
                     .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
 
-                    if mirrorValid == true, let mirror, var urlComponents = URLComponents(url: mirror, resolvingAgainstBaseURL: false) {
+                    if hostValid == true {
                         Button {
+                            var urlComponents = URLComponents()
                             urlComponents.scheme = "https"
+                            urlComponents.host = host
                             urlComponents.path = "/"
                             urlComponents.port = nil
                             urlComponents.query = nil
@@ -109,15 +109,15 @@ struct SettingsView: View {
                             urlComponents.user = nil
                             urlComponents.password = nil
 
-                            if let newMirror = urlComponents.url, currentMirror != newMirror {
+                            if let newMirror = urlComponents.url {
                                 cookiesManager.setMirror(newMirror)
                             }
 
                             withAnimation(.easeInOut) {
-                                mirrorValid = nil
+                                hostValid = nil
                             }
 
-                            mirrorCheck?.cancel()
+                            hostCheck?.cancel()
                         } label: {
                             Image(systemName: "checkmark")
                                 .foregroundStyle(Color.accentColor)
@@ -429,8 +429,8 @@ struct SettingsView: View {
             }
             .padding(25)
             .background(.background)
-            .onChange(of: currentMirror) {
-                mirror = nil
+            .onChange(of: mirror) {
+                host = ""
             }
         }
         .scrollIndicators(.visible, axes: .vertical)
