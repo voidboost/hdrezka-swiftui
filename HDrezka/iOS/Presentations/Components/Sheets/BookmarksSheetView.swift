@@ -145,6 +145,7 @@ struct BookmarksSheetView: View {
                                             value: bookmark.count,
                                         )
                                         .disabled(id.id == nil)
+                                        .flexibility(.natural)
                                     }
                                 }
                             }
