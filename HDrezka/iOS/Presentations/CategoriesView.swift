@@ -120,6 +120,7 @@ struct CategoriesView: View {
                                 .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                         }
                         .buttonStyle(.plain)
+                        .flexibility(.natural)
                     }
                 }
 
