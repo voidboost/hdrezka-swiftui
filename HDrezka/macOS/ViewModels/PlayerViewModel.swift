@@ -82,7 +82,6 @@ class PlayerViewModel {
     private(set) var isPictureInPictureActive: Bool = false
     private(set) var isPictureInPicturePossible: Bool = false
     private(set) var loadedTimeRanges: [CMTimeRange] = []
-    private var timeObserverToken: Any?
     var timer: Int?
     private var timerWork: DispatchWorkItem?
     private(set) var nextTimer: CGFloat?
@@ -132,53 +131,38 @@ class PlayerViewModel {
                     .store(in: &subscriptions)
             }
 
-            timeObserverToken = player.addPeriodicTimeObserver(forInterval: CMTime(seconds: 0.1, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), queue: .main) { time in
-                let currentTime = time.seconds
+            player.periodicTimePublisher(forInterval: CMTime(seconds: 0.1, preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
+                .removeDuplicates()
+                .receive(on: DispatchQueue.main)
+                .sink { time in
+                    let currentTime = time.seconds
 
-                self.currentTime = currentTime
+                    self.currentTime = currentTime
 
-                self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
-                self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = self.rate
-                self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyCurrentPlaybackDate] = currentItem.currentDate()
-                self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyDefaultPlaybackRate] = player.defaultRate
+                    self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
+                    self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = self.rate
+                    self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyCurrentPlaybackDate] = currentItem.currentDate()
+                    self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyDefaultPlaybackRate] = player.defaultRate
 
-                let targetTime = CMTime(seconds: time.seconds + 0.1, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+                    let targetTime = CMTime(seconds: time.seconds + 0.1, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
 
-                if self.ambientLight, self.videoGravity == .fit, !self.isPictureInPictureActive {
-                    if self.videoOutput.hasNewPixelBuffer(forItemTime: targetTime) {
-                        if #available(macOS 26.0, *),
-                           let pixelBuffer = self.videoOutput.pixelBufferAndDisplayTime(forItemTime: targetTime).pixelBuffer,
-                           let cgImage = pixelBuffer.withUnsafeBuffer({ buffer in
-                               let ciImage = CIImage(cvPixelBuffer: buffer)
+                    if self.ambientLight, self.videoGravity == .fit, !self.isPictureInPictureActive {
+                        if self.videoOutput.hasNewPixelBuffer(forItemTime: targetTime) {
+                            if #available(macOS 26.0, *),
+                               let pixelBuffer = self.videoOutput.pixelBufferAndDisplayTime(forItemTime: targetTime).pixelBuffer,
+                               let cgImage = pixelBuffer.withUnsafeBuffer({ buffer in
+                                   let ciImage = CIImage(cvPixelBuffer: buffer)
 
-                               let scaleTransform = CGAffineTransform(scaleX: 0.25, y: 0.25)
+                                   let scaleTransform = CGAffineTransform(scaleX: 0.25, y: 0.25)
 
-                               let transformed = ciImage
-                                   .transformed(by: scaleTransform, highQualityDownsample: false)
-                                   .clampedToExtent()
-                                   .cropped(to: ciImage.extent.applying(scaleTransform))
+                                   let transformed = ciImage
+                                       .transformed(by: scaleTransform, highQualityDownsample: false)
+                                       .clampedToExtent()
+                                       .cropped(to: ciImage.extent.applying(scaleTransform))
 
-                               return self.ciContext.createCGImage(transformed, from: transformed.extent)
-                           })
-                        {
-                            if self.glowImage == nil {
-                                withAnimation(.easeInOut(duration: 0.15)) {
-                                    self.glowImage = Image(decorative: cgImage, scale: 1.0)
-                                }
-                            } else {
-                                self.glowImage = Image(decorative: cgImage, scale: 1.0)
-                            }
-                        } else if let pixelBuffer = self.videoOutput.copyPixelBuffer(forItemTime: targetTime, itemTimeForDisplay: nil) {
-                            let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
-
-                            let scaleTransform = CGAffineTransform(scaleX: 0.25, y: 0.25)
-
-                            let transformed = ciImage
-                                .transformed(by: scaleTransform, highQualityDownsample: false)
-                                .clampedToExtent()
-                                .cropped(to: ciImage.extent.applying(scaleTransform))
-
-                            if let cgImage = self.ciContext.createCGImage(transformed, from: transformed.extent) {
+                                   return self.ciContext.createCGImage(transformed, from: transformed.extent)
+                               })
+                            {
                                 if self.glowImage == nil {
                                     withAnimation(.easeInOut(duration: 0.15)) {
                                         self.glowImage = Image(decorative: cgImage, scale: 1.0)
@@ -186,38 +170,57 @@ class PlayerViewModel {
                                 } else {
                                     self.glowImage = Image(decorative: cgImage, scale: 1.0)
                                 }
+                            } else if let pixelBuffer = self.videoOutput.copyPixelBuffer(forItemTime: targetTime, itemTimeForDisplay: nil) {
+                                let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+
+                                let scaleTransform = CGAffineTransform(scaleX: 0.25, y: 0.25)
+
+                                let transformed = ciImage
+                                    .transformed(by: scaleTransform, highQualityDownsample: false)
+                                    .clampedToExtent()
+                                    .cropped(to: ciImage.extent.applying(scaleTransform))
+
+                                if let cgImage = self.ciContext.createCGImage(transformed, from: transformed.extent) {
+                                    if self.glowImage == nil {
+                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                            self.glowImage = Image(decorative: cgImage, scale: 1.0)
+                                        }
+                                    } else {
+                                        self.glowImage = Image(decorative: cgImage, scale: 1.0)
+                                    }
+                                }
                             }
                         }
                     }
-                }
 
-                Task { @MainActor [weak self] in
-                    guard let self else { return }
+                    Task { @MainActor [weak self] in
+                        guard let self else { return }
 
-                    let modelContext = modelContainer.mainContext
+                        let modelContext = modelContainer.mainContext
 
-                    if let position = try? modelContext.fetch(FetchDescriptor<PlayerPosition>(predicate: nil)).first(where: { position in
-                        position.id == self.voiceActing.voiceId &&
-                            position.acting == self.voiceActing.translatorId &&
-                            position.season == self.season?.seasonId &&
-                            position.episode == self.episode?.episodeId
-                    }) {
-                        position.position = currentTime
-                    } else {
-                        let position = PlayerPosition(
-                            id: voiceActing.voiceId,
-                            acting: voiceActing.translatorId,
-                            season: season?.seasonId,
-                            episode: episode?.episodeId,
-                            position: currentTime,
-                        )
+                        if let position = try? modelContext.fetch(FetchDescriptor<PlayerPosition>(predicate: nil)).first(where: { position in
+                            position.id == self.voiceActing.voiceId &&
+                                position.acting == self.voiceActing.translatorId &&
+                                position.season == self.season?.seasonId &&
+                                position.episode == self.episode?.episodeId
+                        }) {
+                            position.position = currentTime
+                        } else {
+                            let position = PlayerPosition(
+                                id: voiceActing.voiceId,
+                                acting: voiceActing.translatorId,
+                                season: season?.seasonId,
+                                episode: episode?.episodeId,
+                                position: currentTime,
+                            )
 
-                        modelContext.insert(position)
+                            modelContext.insert(position)
+                        }
                     }
-                }
 
-                self.updateNextTimer()
-            }
+                    self.updateNextTimer()
+                }
+                .store(in: &subscriptions)
 
             player.publisher(for: \.status)
                 .receive(on: DispatchQueue.main)
@@ -679,11 +682,6 @@ class PlayerViewModel {
     }
 
     func resetPlayer(completion: (() -> Void)? = nil) {
-        if let timeObserverToken {
-            playerLayer.player?.removeTimeObserver(timeObserverToken)
-            self.timeObserverToken = nil
-        }
-
         subscriptions.flush()
 
         nowPlayingInfoCenter.playbackState = .stopped
