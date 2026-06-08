@@ -293,14 +293,14 @@ class Downloader {
                             guard case let .failure(error) = completion else { return }
 
                             self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
-                        } receiveValue: { movie in
+                        } receiveValue: { [self] movie in
                             if movie.needPremium {
-                                self.notificate(data.notificationId, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(data.name)"), "need_premium")
+                                notificate(data.notificationId, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(data.name)"), "need_premium")
                             } else {
                                 if Defaults[.isLoggedIn] {
-                                    self.saveWatchingStateUseCase(voiceActing: data.acting, season: season, episode: episode)
+                                    saveWatchingStateUseCase(voiceActing: data.acting, season: season, episode: episode)
                                         .sink { _ in } receiveValue: { _ in }
-                                        .store(in: &self.subscriptions)
+                                        .store(in: &subscriptions)
                                 }
 
                                 Task { @MainActor [weak self] in
@@ -329,7 +329,7 @@ class Downloader {
                                 }
 
                                 if let movieUrls = movie.getClosestTo(quality: data.quality) {
-                                    self.callUseCase(
+                                    callUseCase(
                                         data: Aria2Request(
                                             method: .addUri,
                                             params: AddUriParams(
@@ -361,13 +361,13 @@ class Downloader {
                                                 "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
                                         }
                                     }
-                                    .store(in: &self.subscriptions)
+                                    .store(in: &subscriptions)
 
                                     if let subtitles = data.subtitles,
                                        let sub = movie.subtitles.first(where: { $0.name == subtitles.name }),
                                        let subtitlesUrl = URL(string: sub.link)
                                     {
-                                        self.callUseCase(
+                                        callUseCase(
                                             data: Aria2Request(
                                                 method: .addUri,
                                                 params: AddUriParams(
@@ -381,7 +381,7 @@ class Downloader {
                                             ),
                                         )
                                         .sink { _ in } receiveValue: { (_: Aria2Response<String>) in }
-                                        .store(in: &self.subscriptions)
+                                        .store(in: &subscriptions)
                                     }
                                 }
                             }
@@ -406,14 +406,14 @@ class Downloader {
 
                             self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized:
                                 "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
-                        } receiveValue: { movie in
+                        } receiveValue: { [self] movie in
                             if movie.needPremium {
-                                self.notificate(data.notificationId, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(data.name)"), "need_premium")
+                                notificate(data.notificationId, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(data.name)"), "need_premium")
                             } else {
                                 if Defaults[.isLoggedIn] {
-                                    self.saveWatchingStateUseCase(voiceActing: data.acting, season: nil, episode: nil)
+                                    saveWatchingStateUseCase(voiceActing: data.acting, season: nil, episode: nil)
                                         .sink { _ in } receiveValue: { _ in }
-                                        .store(in: &self.subscriptions)
+                                        .store(in: &subscriptions)
                                 }
 
                                 Task { @MainActor [weak self] in
@@ -438,7 +438,7 @@ class Downloader {
                                 }
 
                                 if let movieUrls = movie.getClosestTo(quality: data.quality) {
-                                    self.callUseCase(
+                                    callUseCase(
                                         data: Aria2Request(
                                             method: .addUri,
                                             params: AddUriParams(
@@ -470,13 +470,13 @@ class Downloader {
                                             self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
                                         }
                                     }
-                                    .store(in: &self.subscriptions)
+                                    .store(in: &subscriptions)
 
                                     if let subtitles = data.subtitles,
                                        let sub = movie.subtitles.first(where: { $0.name == subtitles.name }),
                                        let subtitlesUrl = URL(string: sub.link)
                                     {
-                                        self.callUseCase(
+                                        callUseCase(
                                             data: Aria2Request(
                                                 method: .addUri,
                                                 params: AddUriParams(
@@ -490,7 +490,7 @@ class Downloader {
                                             ),
                                         )
                                         .sink { _ in } receiveValue: { (_: Aria2Response<String>) in }
-                                        .store(in: &self.subscriptions)
+                                        .store(in: &subscriptions)
                                     }
                                 }
                             }
