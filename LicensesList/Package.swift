@@ -9,7 +9,6 @@ let swiftSettings: [SwiftSetting] = [
 let package = Package(
     name: "LicensesList",
     platforms: [
-        .iOS(.v18),
         .macOS(.v15),
     ],
     products: [
