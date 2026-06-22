@@ -4,11 +4,9 @@ import Foundation
 
 enum AccountService {
     case signIn(login: String, password: String)
-    case signUp(email: String, login: String, password: String)
+    case signUp(email: String, login: String, password: String, verifyCode: String, step: Int)
     case restore(login: String)
     case logout
-    case checkEmail(email: String)
-    case checkUsername(username: String)
     case getWatchingLaterMovies
     case sendWatching(postId: String, translatorId: String, season: String?, episode: String?, currentTime: Int?, duration: Int?)
     case switchWatchedItem(id: String)
@@ -41,13 +39,11 @@ extension AccountService: URLRequestConvertible {
         case .signIn:
             "ajax/login/"
         case .signUp:
-            "engine/ajax/quick_register.php"
+            "ajax/registration/"
         case .restore:
             "index.php"
         case .logout:
             "logout/"
-        case .checkEmail, .checkUsername:
-            "engine/ajax/registration.php"
         case .getWatchingLaterMovies:
             "continue/"
         case .sendWatching:
@@ -71,7 +67,7 @@ extension AccountService: URLRequestConvertible {
 
     var method: HTTPMethod {
         switch self {
-        case .signIn, .signUp, .restore, .checkEmail, .checkUsername, .sendWatching, .switchWatchedItem, .removeWatchingItem, .createBookmarkCategory, .changeBookmarkCategoryName, .deleteBookmarkCategory, .addToBookmarks, .reorderBookmarksCategories, .removeFromBookmarks, .moveBetweenBookmarks:
+        case .signIn, .signUp, .restore, .sendWatching, .switchWatchedItem, .removeWatchingItem, .createBookmarkCategory, .changeBookmarkCategoryName, .deleteBookmarkCategory, .addToBookmarks, .reorderBookmarksCategories, .removeFromBookmarks, .moveBetweenBookmarks:
             .post
         default:
             .get
@@ -87,15 +83,11 @@ extension AccountService: URLRequestConvertible {
 
         switch self {
         case let .signIn(login, password):
-            return try URLEncoding.httpBody.encode(request, with: ["login_name": login, "login_password": password, "login_not_save": "0"])
-        case let .signUp(email, login, password):
-            return try URLEncoding.httpBody.encode(request, with: ["data": ["email": email, "prevent_autofill_name": "", "name": login, "prevent_autofill_password1": "", "password1": password, "rules": "1", "submit_reg": "submit_reg", "do": "register"].map { "\($0)=\($1)" }.joined(separator: "&")])
+            return try URLEncoding.httpBody.encode(request, with: ["login_name": login, "login_password": password, "login_not_save": 0])
+        case let .signUp(email, login, password, verifyCode, step):
+            return try URLEncoding.httpBody.encode(request, with: ["email": email, "login": login, "password": password, "rules": 1, "verify_code": verifyCode, "step": step])
         case let .restore(login):
-            return try URLEncoding.httpBody.encode(URLEncoding.queryString.encode(request, with: ["do": "lostpassword"]), with: ["lostname": login, "sumbit": "1", "submit_lost": "submit_lost"])
-        case let .checkEmail(email):
-            return try URLEncoding.httpBody.encode(request, with: ["email": email])
-        case let .checkUsername(username):
-            return try URLEncoding.httpBody.encode(request, with: ["name": username])
+            return try URLEncoding.httpBody.encode(URLEncoding.queryString.encode(request, with: ["do": "lostpassword"]), with: ["lostname": login, "sumbit": 1, "submit_lost": "submit_lost"])
         case let .sendWatching(postId, translatorId, season, episode, currentTime, duration):
             var params: [String: Any] = [:]
             params["post_id"] = postId

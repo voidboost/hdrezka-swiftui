@@ -1,6 +1,28 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "ket.verify.code-%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attention! A verification code will be sent to your email address: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Внимание! На вашу почту %@ будет отправлено письмо с проверочным кодом"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Увага! На вашу електронну адресу %@ буде надіслано лист із кодом підтвердження"
+          }
+        }
+      }
+    },
     "key.2k" : {
       "localizations" : {
         "en" : {
@@ -1673,6 +1695,28 @@
         }
       }
     },
+    "key.continue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Продолжить"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Продовжити"
+          }
+        }
+      }
+    },
     "key.create" : {
       "localizations" : {
         "en" : {
@@ -2367,29 +2411,6 @@
         }
       }
     },
-    "key.downloads" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Downloads"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Загрузки"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Завантаження"
-          }
-        }
-      }
-    },
     "key.downloads.empty" : {
       "localizations" : {
         "en" : {
@@ -2430,28 +2451,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Email"
-          }
-        }
-      }
-    },
-    "key.email.error" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This email cannot be used for registration"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Этот email не может быть использован для регистрации"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Цей email не може бути використаний для реєстрації"
           }
         }
       }
@@ -2672,28 +2671,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Не вдалося проаналізувати \"%1$@\" в %2$@"
-          }
-        }
-      }
-    },
-    "key.errors.photosDenied" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You have denied access to your photo library"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вы запретили доступ к своей фотобиблиотеке"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ви заборонили доступ до своєї фотобібліотеки"
           }
         }
       }
@@ -4206,29 +4183,6 @@
         }
       }
     },
-    "key.login_description" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Authorize to synchronize your series viewing status and track the release of new episodes"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Авторизуйтесь для синхронизации состояния просмотра сериалов и отслеживания выхода новых серий"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Авторизуйтеся для синхронізації стану перегляду серіалів та відстежування виходу нових серій"
-          }
-        }
-      }
-    },
     "key.mark.unwatched" : {
       "localizations" : {
         "en" : {
@@ -4559,29 +4513,6 @@
         }
       }
     },
-    "key.not_logged_in" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You are not logged in"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вы не вошли"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ви не увійшли"
-          }
-        }
-      }
-    },
     "key.nothing_found" : {
       "localizations" : {
         "en" : {
@@ -4758,29 +4689,6 @@
         }
       }
     },
-    "key.open.gallery" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open gallery"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Открыть галерею"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Відкрити галерею"
-          }
-        }
-      }
-    },
     "key.open.iina" : {
       "localizations" : {
         "en" : {
@@ -4953,28 +4861,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Паролі не збігаються"
-          }
-        }
-      }
-    },
-    "key.password.error" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Password has to be at least 6 symbols long"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пароль должен быть длиной не менее 6 символов"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пароль має бути довжиною не менше 6 символів"
           }
         }
       }
@@ -5481,29 +5367,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Щоб його подивитися, вам доведеться підписатись на Преміум на HDrezka"
-          }
-        }
-      }
-    },
-    "key.profile" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Profile"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Профиль"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Профіль"
           }
         }
       }
@@ -6718,28 +6581,6 @@
         }
       }
     },
-    "key.sign_in.error" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The entered username or password is incorrect"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Введенное имя пользователя или пароль неверны"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Введене ім'я користувача або пароль неправильні"
-          }
-        }
-      }
-    },
     "key.sign_in.label" : {
       "localizations" : {
         "en" : {
@@ -6872,160 +6713,6 @@
         }
       }
     },
-    "key.sign_up_info_tutorial_step_1" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Send any email to mirror@hdrezka.org"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Отправьте любое письмо на почту mirror@hdrezka.org"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Надішліть будь-який електронний лист на mirror@hdrezka.org"
-          }
-        }
-      }
-    },
-    "key.sign_up_info_tutorial_step_2" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "In the reply you will find created account's login and password"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "В ответном письме будут данные от созданного аккаунта"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "У відповіді ви знайдете логін та пароль створеного облікового запису"
-          }
-        }
-      }
-    },
-    "key.sign_up_info_tutorial_step_2_1" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "If you didn't receive any reply, check the «Spam» folder"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Если письмо не пришло, проверьте папку «Спам»"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Якщо ви не отримали відповіді, перевірте папку «Спам»"
-          }
-        }
-      }
-    },
-    "key.sign_up_info_tutorial_step_2_2" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "If there's no credentials in the email, recover your password on pswd@hdrezka.org"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Если в письме нет данных от аккаунта, восстановите пароль через pswd@hdrezka.org"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Якщо в електронному листі немає даних для входу, відновіть свій пароль відправивши електронного листа на pswd@hdrezka.org"
-          }
-        }
-      }
-    },
-    "key.sign_up_info_tutorial_step_3" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Use the credentials from email to sign in to the app"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Используйте данные из письма для входа в приложении"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Використовуйте дані з електронного листа для входу в додаток"
-          }
-        }
-      }
-    },
-    "key.sign_up_info_tutorial_title" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "To create an account"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Для создания аккаунта"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Для створення облікового запису"
-          }
-        }
-      }
-    },
-    "key.sign_up_temporarily_unavailable" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Classic registration is temporarily disabled"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Классическая регистрация временно отключена"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Звичайна реєстрація тимчасово недоступна"
-          }
-        }
-      }
-    },
     "key.sign_up.description" : {
       "localizations" : {
         "en" : {
@@ -7070,28 +6757,6 @@
         }
       }
     },
-    "key.sign_up.error" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The entered data is incorrect"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Введенные данные неверны"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Введені дані неправильні"
-          }
-        }
-      }
-    },
     "key.sign_up.label" : {
       "localizations" : {
         "en" : {
@@ -7110,6 +6775,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Реєстрація"
+          }
+        }
+      }
+    },
+    "key.sign_up.premium" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creating a Premium account"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создание Premium аккаунта"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Створення Premium акаунту"
+          }
+        }
+      }
+    },
+    "key.sign_up.premium.description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Currently, registration only allows you to create premium accounts"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В настоящее время регистрация позволяет создавать только премиум аккаунты"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В даний час реєстрація дозволяє створювати лише преміум акаунти"
           }
         }
       }
@@ -7510,28 +7219,6 @@
         }
       }
     },
-    "key.try_anyway" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Try anyway"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Попробовать"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Спробувати все одно"
-          }
-        }
-      }
-    },
     "key.unavailable" : {
       "localizations" : {
         "en" : {
@@ -7664,28 +7351,6 @@
         }
       }
     },
-    "key.username.error" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Username is already taken or is less than 3 characters long"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Имя пользователя уже занято или имеет длину менее 3 символов"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ім'я користувача вже зайняте або має довжину менше 3 символів"
-          }
-        }
-      }
-    },
     "key.username.full" : {
       "localizations" : {
         "en" : {
@@ -7704,6 +7369,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ім'я користувача або email"
+          }
+        }
+      }
+    },
+    "key.verify.code" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verification code"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проверочный код"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Код підтвердження"
           }
         }
       }

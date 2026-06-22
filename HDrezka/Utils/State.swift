@@ -1,16 +1,12 @@
 import Foundation
 
-enum DataState<T: Hashable>: Hashable {
+enum DataState<T: Equatable>: Equatable {
     case data(T)
     case loading
-    case nsError(NSError)
+    case error(Error)
 }
 
 extension DataState {
-    static func error(_ error: Error) -> DataState {
-        .nsError(error as NSError)
-    }
-
     var data: T? {
         guard case let .data(data) = self else { return nil }
 
@@ -18,9 +14,25 @@ extension DataState {
     }
 
     var error: Error? {
-        guard case let .nsError(error) = self else { return nil }
+        guard case let .error(error) = self else { return nil }
 
         return error
+    }
+
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        switch (lhs, rhs) {
+        case let (.data(lhsData), .data(rhsData)):
+            return lhsData == rhsData
+        case (.loading, .loading):
+            return true
+        case let (.error(lhsError), .error(rhsError)):
+            let lhsNSError = lhsError as NSError?
+            let rhsNSError = rhsError as NSError?
+
+            return lhsNSError == rhsNSError
+        default:
+            return false
+        }
     }
 }
 
@@ -34,26 +46,66 @@ extension DataState where T: RangeReplaceableCollection {
     }
 }
 
-enum DataPaginationState: Hashable {
+enum DataPaginationState: Equatable {
     case idle
     case loading
-    case nsError(NSError)
+    case error(Error)
 }
 
 extension DataPaginationState {
-    static func error(_ error: Error) -> DataPaginationState {
-        .nsError(error as NSError)
-    }
-
     var error: Error? {
-        guard case let .nsError(error) = self else { return nil }
+        guard case let .error(error) = self else { return nil }
 
         return error
     }
+
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        switch (lhs, rhs) {
+        case (.idle, .idle),
+             (.loading, .loading):
+            return true
+        case let (.error(lhsError), .error(rhsError)):
+            let lhsNSError = lhsError as NSError?
+            let rhsNSError = rhsError as NSError?
+
+            return lhsNSError == rhsNSError
+        default:
+            return false
+        }
+    }
 }
 
-enum EmptyState: Hashable {
+enum EmptyState: Equatable {
     case data
     case loading
-    case error
+    case error(Error)
+}
+
+extension EmptyState {
+    var error: Error? {
+        guard case let .error(error) = self else { return nil }
+
+        return error
+    }
+
+    var isLoading: Bool {
+        guard case .loading = self else { return false }
+
+        return true
+    }
+
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        switch (lhs, rhs) {
+        case (.data, .data),
+             (.loading, .loading):
+            return true
+        case let (.error(lhsError), .error(rhsError)):
+            let lhsNSError = lhsError as NSError?
+            let rhsNSError = rhsError as NSError?
+
+            return lhsNSError == rhsNSError
+        default:
+            return false
+        }
+    }
 }

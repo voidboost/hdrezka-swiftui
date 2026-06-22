@@ -191,11 +191,11 @@ struct RenameBookmarkSheetView: View {
         changeBookmarksCategoryNameUseCase(id: bookmark.bookmarkId, newName: name.trim())
             .receive(on: DispatchQueue.main)
             .sink { completion in
-                guard case .failure = completion else { return }
+                guard case let .failure(error) = completion else { return }
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation(.easeInOut) {
-                        state = .error
+                        state = .error(error)
                     }
                 }
             } receiveValue: { success in
@@ -205,7 +205,7 @@ struct RenameBookmarkSheetView: View {
                     }
                 } else {
                     withAnimation(.easeInOut) {
-                        state = .error
+                        state = .error(NSError())
                     }
                 }
             }

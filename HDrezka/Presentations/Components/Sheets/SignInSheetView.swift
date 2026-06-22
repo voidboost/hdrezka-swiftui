@@ -28,8 +28,41 @@ struct SignInSheetView: View {
 
     var body: some View {
         Group {
-            switch state {
-            case .data:
+            if state.isLoading {
+                VStack(alignment: .center, spacing: 25) {
+                    VStack(alignment: .center, spacing: 5) {
+                        Image(systemName: "person.circle")
+                            .font(.largeTitle)
+                            .foregroundStyle(Color.accentColor)
+
+                        Text("key.sign_in.enter")
+                            .font(.largeTitle.weight(.semibold))
+
+                        Text("key.request.wait")
+                            .font(.title3)
+                            .lineLimit(1, reservesSpace: true)
+                            .multilineTextAlignment(.center)
+                    }
+
+                    Spacer()
+
+                    VStack(alignment: .center, spacing: 10) {
+                        Button {
+                            subscriptions.flush()
+
+                            withAnimation(.easeInOut) {
+                                state = .data
+                            }
+                        } label: {
+                            Text("key.cancel")
+                                .frame(width: 250, height: 30)
+                                .contentShape(.rect(cornerRadius: 6))
+                                .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            } else {
                 VStack(alignment: .center, spacing: 25) {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "person.circle")
@@ -179,83 +212,6 @@ struct SignInSheetView: View {
                 .onAppear {
                     focusedField = .username
                 }
-            case .loading:
-                VStack(alignment: .center, spacing: 25) {
-                    VStack(alignment: .center, spacing: 5) {
-                        Image(systemName: "person.circle")
-                            .font(.largeTitle)
-                            .foregroundStyle(Color.accentColor)
-
-                        Text("key.sign_in.enter")
-                            .font(.largeTitle.weight(.semibold))
-
-                        Text("key.request.wait")
-                            .font(.title3)
-                            .lineLimit(1, reservesSpace: true)
-                            .multilineTextAlignment(.center)
-                    }
-
-                    Spacer()
-
-                    VStack(alignment: .center, spacing: 10) {
-                        Button {
-                            subscriptions.flush()
-
-                            withAnimation(.easeInOut) {
-                                state = .data
-                            }
-                        } label: {
-                            Text("key.cancel")
-                                .frame(width: 250, height: 30)
-                                .contentShape(.rect(cornerRadius: 6))
-                                .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-            case .error:
-                VStack(alignment: .center, spacing: 25) {
-                    VStack(alignment: .center, spacing: 5) {
-                        Image(systemName: "person.circle")
-                            .font(.largeTitle)
-                            .foregroundStyle(Color.accentColor)
-
-                        Text("key.ops")
-                            .font(.largeTitle.weight(.semibold))
-
-                        Text("key.sign_in.error")
-                            .font(.title3)
-                            .lineLimit(1, reservesSpace: true)
-                            .multilineTextAlignment(.center)
-                    }
-
-                    Spacer()
-
-                    VStack(alignment: .center, spacing: 10) {
-                        Button {
-                            withAnimation(.easeInOut) {
-                                state = .data
-                            }
-                        } label: {
-                            Text("key.retry")
-                                .frame(width: 250, height: 30)
-                                .foregroundStyle(.white)
-                                .contentShape(.rect(cornerRadius: 6))
-                                .background(Color.accentColor, in: .rect(cornerRadius: 6))
-                        }
-                        .buttonStyle(.plain)
-
-                        Button {
-                            dismiss()
-                        } label: {
-                            Text("key.cancel")
-                                .frame(width: 250, height: 30)
-                                .contentShape(.rect(cornerRadius: 6))
-                                .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
             }
         }
         .padding(.horizontal, 35)
@@ -264,6 +220,26 @@ struct SignInSheetView: View {
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
         .analyticsScreen(name: "sign_in_sheet", class: "SignInSheetView")
+        .alert("key.ops", isPresented: Binding { state.error != nil } set: { _ in }) {
+            Button {
+                withAnimation(.easeInOut) {
+                    state = .data
+                }
+            } label: {
+                Text("key.retry")
+            }
+
+            Button(role: .cancel) {
+                dismiss()
+            } label: {
+                Text("key.cancel")
+            }
+        } message: {
+            if let error = state.error {
+                Text(error.localizedDescription)
+            }
+        }
+        .dialogSeverity(.critical)
     }
 
     private func load() {
@@ -274,23 +250,13 @@ struct SignInSheetView: View {
         signInUseCase(login: username, password: password)
             .receive(on: DispatchQueue.main)
             .sink { completion in
-                guard case .failure = completion else { return }
+                guard case let .failure(error) = completion else { return }
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    withAnimation(.easeInOut) {
-                        state = .error
-                    }
+                withAnimation(.easeInOut) {
+                    state = .error(error)
                 }
-            } receiveValue: { success in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    if success {
-                        dismiss()
-                    } else {
-                        withAnimation(.easeInOut) {
-                            state = .error
-                        }
-                    }
-                }
+            } receiveValue: { _ in
+                dismiss()
             }
             .store(in: &subscriptions)
     }
