@@ -19,9 +19,6 @@ struct SignUpSheetView: View {
     @State private var verifyCode: String = ""
     @State private var state: EmptyState = .data
 
-    @State private var isErrorsPresented: Bool = false
-    @State private var errors: [String]?
-
     private enum FocusedField {
         case email, username, password1, password2, verifyCode
     }
