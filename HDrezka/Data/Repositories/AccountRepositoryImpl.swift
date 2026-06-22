@@ -3,34 +3,69 @@ import Combine
 import Defaults
 import FactoryKit
 import Foundation
+import SwiftSoup
 
 struct AccountRepositoryImpl: AccountRepository {
     @Injected(\.session) private var session
 
-    func signIn(login: String, password: String) -> AnyPublisher<Bool, Error> {
-        session.request(AccountService.signIn(login: login.trim(), password: password.trim()))
+    func signIn(login: String, password: String) -> AnyPublisher<Void, Error> {
+        session.request(AccountService.signIn(login: login, password: password))
             .validate(statusCode: 200 ..< 400)
             .publishData()
             .value()
-            .tryMap { res in
-                guard let json = try? JSONSerialization.jsonObject(with: res, options: .fragmentsAllowed) as? [String: Any],
+            .tryMap { data in
+                guard let json = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as? [String: Any],
                       let success = json["success"] as? Bool
                 else {
                     throw HDrezkaError.parseJson("success", "signIn")
                 }
 
-                return success
+                guard success else {
+                    guard let message = json["message"] as? String else {
+                        throw HDrezkaError.parseJson("message", "signIn")
+                    }
+
+                    let document = try SwiftSoup.parseHTML(
+                        message,
+                        Defaults[.mirror].absoluteString,
+                    )
+
+                    let messages = try document.select("ul").first()?.select("li").map { li in try li.text() } ?? message.split(whereSeparator: \.isNewline).map(String.init)
+
+                    throw HDrezkaError.site(messages)
+                }
             }
             .handleError()
             .eraseToAnyPublisher()
     }
 
-    func signUp(email: String, login: String, password: String) -> AnyPublisher<Bool, Error> {
-        session.request(AccountService.signUp(email: email.trim(), login: login.trim(), password: password.trim()))
+    func signUp(email: String, login: String, password: String, verifyCode: String, step: Int) -> AnyPublisher<Void, Error> {
+        session.request(AccountService.signUp(email: email, login: login, password: password, verifyCode: verifyCode, step: step))
             .validate(statusCode: 200 ..< 400)
-            .publishString()
+            .publishData()
             .value()
-            .tryMap(AccountParser.checkRegistration)
+            .tryMap { data in
+                guard let json = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as? [String: Any],
+                      let success = json["success"] as? Bool
+                else {
+                    throw HDrezkaError.parseJson("success", "signIn")
+                }
+
+                guard success else {
+                    guard let message = json["message"] as? String else {
+                        throw HDrezkaError.parseJson("message", "signIn")
+                    }
+
+                    let document = try SwiftSoup.parseHTML(
+                        message,
+                        Defaults[.mirror].absoluteString,
+                    )
+
+                    let messages = try document.select("ul").first()?.select("li").map { li in try li.text() } ?? document.text().split(whereSeparator: \.isNewline).map(String.init)
+
+                    throw HDrezkaError.site(messages)
+                }
+            }
             .handleError()
             .eraseToAnyPublisher()
     }
@@ -51,26 +86,6 @@ struct AccountRepositoryImpl: AccountRepository {
             .publishUnserialized()
             .value()
             .tryMap { _ in true }
-            .handleError()
-            .eraseToAnyPublisher()
-    }
-
-    func checkEmail(email: String) -> AnyPublisher<Bool, Error> {
-        session.request(AccountService.checkEmail(email: email.trim()))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(AccountParser.checkRegistrationData)
-            .handleError()
-            .eraseToAnyPublisher()
-    }
-
-    func checkUsername(username: String) -> AnyPublisher<Bool, Error> {
-        session.request(AccountService.checkUsername(username: username.trim()))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(AccountParser.checkRegistrationData)
             .handleError()
             .eraseToAnyPublisher()
     }

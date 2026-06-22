@@ -60,12 +60,7 @@ class Snowflakes {
 
                 context.translateBy(x: rectWidth * Const.offsetFactor * (CGFloat(rect) + Const.baseOffset), y: 0)
                 context.rotate(by: Const.rectRotation)
-
-                #if os(macOS)
-                    context.setFillColor(NSColor.systemBlue.withAlphaComponent(Const.opacity).cgColor)
-                #else
-                    context.setFillColor(UIColor.systemBlue.withAlphaComponent(Const.opacity).cgColor)
-                #endif
+                context.setFillColor(NSColor.systemBlue.withAlphaComponent(Const.opacity).cgColor)
 
                 context.fill(
                     CGRect(

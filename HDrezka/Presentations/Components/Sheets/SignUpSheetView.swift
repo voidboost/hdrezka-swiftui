@@ -3,11 +3,10 @@ import Defaults
 import FactoryKit
 import FirebaseAnalytics
 import SwiftUI
+import ValidatorCore
 
 struct SignUpSheetView: View {
     @Injected(\.signUpUseCase) private var signUpUseCase
-    @Injected(\.checkEmailUseCase) private var checkEmailUseCase
-    @Injected(\.checkUsernameUseCase) private var checkUsernameUseCase
 
     @Environment(\.dismiss) private var dismiss
 
@@ -17,173 +16,106 @@ struct SignUpSheetView: View {
     @State private var username: String = ""
     @State private var password1: String = ""
     @State private var password2: String = ""
+    @State private var verifyCode: String = ""
     @State private var state: EmptyState = .data
 
+    @State private var isErrorsPresented: Bool = false
+    @State private var errors: [String]?
+
     private enum FocusedField {
-        case email, username, password1, password2
+        case email, username, password1, password2, verifyCode
     }
 
     @FocusState private var focusedField: FocusedField?
 
-    @State private var emailValid: Bool?
-    @State private var usernameValid: Bool?
-    @State private var passwordValid: Bool?
-    @State private var confirmPasswordValid: Bool?
+    private let validator = Validator()
 
-    @State private var emailCheck: DispatchWorkItem?
-    @State private var usernameCheck: DispatchWorkItem?
-    @State private var passwordCheck: DispatchWorkItem?
+    @State private var confirmPasswordValidResult: ValidationResult?
     @State private var confirmPasswordCheck: DispatchWorkItem?
+    private var confirmPasswordValid: Bool {
+        if case .valid = confirmPasswordValidResult {
+            true
+        } else {
+            false
+        }
+    }
 
     @State private var showPassword: Bool = false
     @State private var passwordIsEmpty: Bool = true
     @State private var showConfirmPassword: Bool = false
     @State private var confirmPasswordIsEmpty: Bool = true
 
-    @State private var showSignUpWarning: Bool = true
+    private enum Step: Int, CaseIterable, Identifiable {
+        case first = 1
+        case second
+        case third
+
+        var id: Self {
+            self
+        }
+    }
+
+    @State private var step: Step = .first
+
+    @State private var showPremiumWarning: Bool = true
 
     @State private var subscriptions: Set<AnyCancellable> = []
 
     var body: some View {
-        if showSignUpWarning {
-            VStack(alignment: .center, spacing: 25) {
-                VStack(alignment: .center, spacing: 5) {
-                    Image(systemName: "person.crop.circle.badge.plus")
-                        .font(.largeTitle)
-                        .foregroundStyle(Color.accentColor)
+        Group {
+            if state.isLoading {
+                VStack(alignment: .center, spacing: 25) {
+                    VStack(alignment: .center, spacing: 5) {
+                        Image(systemName: "person.crop.circle.badge.plus")
+                            .font(.largeTitle)
+                            .foregroundStyle(Color.accentColor)
 
-                    Text("key.sign_up.label")
-                        .font(.largeTitle.weight(.semibold))
+                        Text("key.sign_up.enter")
+                            .font(.largeTitle.weight(.semibold))
 
-                    Text("key.sign_up.description")
-                        .font(.title3)
-                        .lineLimit(2, reservesSpace: true)
-                        .multilineTextAlignment(.center)
-                }
+                        Text("key.request.wait")
+                            .font(.title3)
+                            .lineLimit(1, reservesSpace: true)
+                            .multilineTextAlignment(.center)
+                    }
 
-                VStack(alignment: .center, spacing: 8) {
-                    VStack(spacing: 6) {
-                        HStack(alignment: .center) {
-                            Image(systemName: "info.circle")
-                            Text("key.sign_up_temporarily_unavailable")
-                        }
+                    Spacer()
 
+                    VStack(alignment: .center, spacing: 10) {
                         Button {
+                            subscriptions.flush()
+
                             withAnimation(.easeInOut) {
-                                showSignUpWarning = false
+                                state = .data
                             }
                         } label: {
-                            Text("key.try_anyway")
-                                .frame(height: 30)
-                                .frame(maxWidth: .infinity)
+                            Text("key.cancel")
+                                .frame(width: 250, height: 30)
                                 .contentShape(.rect(cornerRadius: 6))
                                 .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
                     }
-                    .padding(15)
-                    .overlay(Color.accentColor, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
-
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("key.sign_up_info_tutorial_title")
-                            .font(.headline)
-                            .multilineTextAlignment(.leading)
-
-                        HStack(alignment: .top, spacing: 6) {
-                            Text(verbatim: "1").monospacedDigit()
-
-                            Text("key.sign_up_info_tutorial_step_1")
-                                .multilineTextAlignment(.leading)
-                        }
-
-                        HStack(alignment: .top, spacing: 6) {
-                            Text(verbatim: "2").monospacedDigit()
-
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text("key.sign_up_info_tutorial_step_2")
-                                    .multilineTextAlignment(.leading)
-
-                                HStack(alignment: .top, spacing: 6) {
-                                    Image(systemName: "info.circle")
-
-                                    Text("key.sign_up_info_tutorial_step_2_1")
-                                        .multilineTextAlignment(.leading)
-                                }
-
-                                HStack(alignment: .top, spacing: 6) {
-                                    Image(systemName: "info.circle")
-
-                                    Text("key.sign_up_info_tutorial_step_2_2")
-                                        .multilineTextAlignment(.leading)
-                                }
-                            }
-                        }
-
-                        VStack(alignment: .leading, spacing: 6) {
-                            HStack(alignment: .top, spacing: 6) {
-                                Text(verbatim: "3").monospacedDigit()
-
-                                Text("key.sign_up_info_tutorial_step_3")
-                                    .multilineTextAlignment(.leading)
-                            }
-
-                            Button {
-                                dismiss()
-
-                                appState.isSignInPresented = true
-                            } label: {
-                                Text("key.sign_in")
-                                    .frame(height: 30)
-                                    .frame(maxWidth: .infinity)
-                                    .foregroundStyle(.white)
-                                    .contentShape(.rect(cornerRadius: 6))
-                                    .background(Color.accentColor, in: .rect(cornerRadius: 6))
-                            }
-                            .buttonStyle(.plain)
-
-                            Button {
-                                dismiss()
-                            } label: {
-                                Text("key.cancel")
-                                    .frame(height: 30)
-                                    .frame(maxWidth: .infinity)
-                                    .contentShape(.rect(cornerRadius: 6))
-                                    .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .padding(15)
-                    .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                 }
-            }
-            .padding(.horizontal, 35)
-            .padding(.top, 35)
-            .padding(.bottom, 25)
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(width: 520)
-            .analyticsScreen(name: "sign_up_sheet", class: "SignUpSheetView")
-        } else {
-            Group {
-                switch state {
-                case .data:
-                    VStack(alignment: .center, spacing: 25) {
-                        VStack(alignment: .center, spacing: 5) {
-                            Image(systemName: "person.crop.circle.badge.plus")
-                                .font(.largeTitle)
-                                .foregroundStyle(Color.accentColor)
+            } else {
+                VStack(alignment: .center, spacing: 25) {
+                    VStack(alignment: .center, spacing: 5) {
+                        Image(systemName: "person.crop.circle.badge.plus")
+                            .font(.largeTitle)
+                            .foregroundStyle(Color.accentColor)
 
-                            Text("key.sign_up.label")
-                                .font(.largeTitle.weight(.semibold))
+                        Text("key.sign_up.label")
+                            .font(.largeTitle.weight(.semibold))
 
-                            Text("key.sign_up.description")
-                                .font(.title3)
-                                .lineLimit(2, reservesSpace: true)
-                                .multilineTextAlignment(.center)
-                        }
+                        Text("key.sign_up.description")
+                            .font(.title3)
+                            .lineLimit(2, reservesSpace: true)
+                            .multilineTextAlignment(.center)
+                    }
 
-                        VStack(alignment: .center, spacing: 8) {
-                            VStack(spacing: 2.5) {
+                    VStack(alignment: .center, spacing: 8) {
+                        VStack(spacing: 2.5) {
+                            if step == .first {
                                 HStack(alignment: .center, spacing: 8) {
                                     Text("key.email")
 
@@ -191,41 +123,11 @@ struct SignUpSheetView: View {
                                         .textFieldStyle(.plain)
                                         .multilineTextAlignment(.trailing)
                                         .focused($focusedField, equals: FocusedField.email)
-                                        .onChange(of: email) {
-                                            emailValid = nil
-
-                                            emailCheck?.cancel()
-
-                                            if !email.isEmpty {
-                                                emailCheck = DispatchWorkItem {
-                                                    checkEmailUseCase(email: email)
-                                                        .receive(on: DispatchQueue.main)
-                                                        .sink { completion in
-                                                            guard case .failure = completion else { return }
-
-                                                            emailValid = false
-                                                        } receiveValue: { valid in
-                                                            emailValid = valid
-                                                        }
-                                                        .store(in: &subscriptions)
-                                                }
-
-                                                if let emailCheck {
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: emailCheck)
-                                                }
-                                            }
-                                        }
                                         .onSubmit {
                                             focusedField = .username
                                         }
                                 }
                                 .padding(.vertical, 10)
-                                .overlay(alignment: .bottomLeading) {
-                                    Text(String(localized: "key.email.error").lowercased())
-                                        .font(.caption)
-                                        .foregroundStyle(emailValid == false ? Color.accentColor : Color.clear)
-                                        .animation(.easeInOut, value: emailValid == false)
-                                }
 
                                 Divider()
 
@@ -236,41 +138,11 @@ struct SignUpSheetView: View {
                                         .textFieldStyle(.plain)
                                         .multilineTextAlignment(.trailing)
                                         .focused($focusedField, equals: .username)
-                                        .onChange(of: username) {
-                                            usernameValid = nil
-
-                                            usernameCheck?.cancel()
-
-                                            if !username.isEmpty {
-                                                usernameCheck = DispatchWorkItem {
-                                                    checkUsernameUseCase(username: username)
-                                                        .receive(on: DispatchQueue.main)
-                                                        .sink { completion in
-                                                            guard case .failure = completion else { return }
-
-                                                            usernameValid = false
-                                                        } receiveValue: { valid in
-                                                            usernameValid = valid
-                                                        }
-                                                        .store(in: &subscriptions)
-                                                }
-
-                                                if let usernameCheck {
-                                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: usernameCheck)
-                                                }
-                                            }
-                                        }
                                         .onSubmit {
                                             focusedField = .password1
                                         }
                                 }
                                 .padding(.vertical, 10)
-                                .overlay(alignment: .bottomLeading) {
-                                    Text(String(localized: "key.username.error").lowercased())
-                                        .font(.caption)
-                                        .foregroundStyle(usernameValid == false ? Color.accentColor : Color.clear)
-                                        .animation(.easeInOut, value: usernameValid == false)
-                                }
 
                                 Divider()
 
@@ -287,21 +159,21 @@ struct SignUpSheetView: View {
                                                     passwordIsEmpty = password1.isEmpty
                                                 }
 
-                                                passwordValid = nil
+                                                withAnimation(.easeInOut) {
+                                                    confirmPasswordValidResult = nil
+                                                }
 
-                                                passwordCheck?.cancel()
+                                                confirmPasswordCheck?.cancel()
 
-                                                if !password1.isEmpty {
-                                                    passwordCheck = DispatchWorkItem {
-                                                        passwordValid = password1.count >= 6
-
-                                                        if !password2.isEmpty {
-                                                            confirmPasswordValid = password1 == password2
+                                                if !password1.isEmpty, !password2.isEmpty {
+                                                    confirmPasswordCheck = DispatchWorkItem {
+                                                        withAnimation(.easeInOut) {
+                                                            confirmPasswordValidResult = validator.validate(input: password2, rule: EqualityValidationRule(compareTo: password1, error: String(localized: "key.password.confirm.error")))
                                                         }
                                                     }
 
-                                                    if let passwordCheck {
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: passwordCheck)
+                                                    if let confirmPasswordCheck {
+                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: confirmPasswordCheck)
                                                     }
                                                 }
                                             }
@@ -318,21 +190,21 @@ struct SignUpSheetView: View {
                                                     passwordIsEmpty = password1.isEmpty
                                                 }
 
-                                                passwordValid = nil
+                                                withAnimation(.easeInOut) {
+                                                    confirmPasswordValidResult = nil
+                                                }
 
-                                                passwordCheck?.cancel()
+                                                confirmPasswordCheck?.cancel()
 
-                                                if !password1.isEmpty {
-                                                    passwordCheck = DispatchWorkItem {
-                                                        passwordValid = password1.count >= 6
-
-                                                        if !password2.isEmpty {
-                                                            confirmPasswordValid = password1 == password2
+                                                if !password1.isEmpty, !password2.isEmpty {
+                                                    confirmPasswordCheck = DispatchWorkItem {
+                                                        withAnimation(.easeInOut) {
+                                                            confirmPasswordValidResult = validator.validate(input: password2, rule: EqualityValidationRule(compareTo: password1, error: String(localized: "key.password.confirm.error")))
                                                         }
                                                     }
 
-                                                    if let passwordCheck {
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: passwordCheck)
+                                                    if let confirmPasswordCheck {
+                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: confirmPasswordCheck)
                                                     }
                                                 }
                                             }
@@ -362,12 +234,6 @@ struct SignUpSheetView: View {
                                     }
                                 }
                                 .padding(.vertical, 10)
-                                .overlay(alignment: .bottomLeading) {
-                                    Text(String(localized: "key.password.error").lowercased())
-                                        .font(.caption)
-                                        .foregroundStyle(passwordValid == false ? Color.accentColor : Color.clear)
-                                        .animation(.easeInOut, value: passwordValid == false)
-                                }
 
                                 Divider()
 
@@ -384,13 +250,17 @@ struct SignUpSheetView: View {
                                                     confirmPasswordIsEmpty = password2.isEmpty
                                                 }
 
-                                                confirmPasswordValid = nil
+                                                withAnimation(.easeInOut) {
+                                                    confirmPasswordValidResult = nil
+                                                }
 
                                                 confirmPasswordCheck?.cancel()
 
-                                                if !password2.isEmpty {
+                                                if !password1.isEmpty, !password2.isEmpty {
                                                     confirmPasswordCheck = DispatchWorkItem {
-                                                        confirmPasswordValid = password1 == password2
+                                                        withAnimation(.easeInOut) {
+                                                            confirmPasswordValidResult = validator.validate(input: password2, rule: EqualityValidationRule(compareTo: password1, error: String(localized: "key.password.confirm.error")))
+                                                        }
                                                     }
 
                                                     if let confirmPasswordCheck {
@@ -399,7 +269,7 @@ struct SignUpSheetView: View {
                                                 }
                                             }
                                             .onSubmit {
-                                                if emailValid == true, usernameValid == true, passwordValid == true, confirmPasswordValid == true {
+                                                if confirmPasswordValid {
                                                     load()
                                                 }
                                             }
@@ -413,13 +283,17 @@ struct SignUpSheetView: View {
                                                     confirmPasswordIsEmpty = password2.isEmpty
                                                 }
 
-                                                confirmPasswordValid = nil
+                                                withAnimation(.easeInOut) {
+                                                    confirmPasswordValidResult = nil
+                                                }
 
                                                 confirmPasswordCheck?.cancel()
 
-                                                if !password2.isEmpty {
+                                                if !password1.isEmpty, !password2.isEmpty {
                                                     confirmPasswordCheck = DispatchWorkItem {
-                                                        confirmPasswordValid = password1 == password2
+                                                        withAnimation(.easeInOut) {
+                                                            confirmPasswordValidResult = validator.validate(input: password2, rule: EqualityValidationRule(compareTo: password1, error: String(localized: "key.password.confirm.error")))
+                                                        }
                                                     }
 
                                                     if let confirmPasswordCheck {
@@ -428,7 +302,7 @@ struct SignUpSheetView: View {
                                                 }
                                             }
                                             .onSubmit {
-                                                if emailValid == true, usernameValid == true, passwordValid == true, confirmPasswordValid == true {
+                                                if confirmPasswordValid {
                                                     load()
                                                 }
                                             }
@@ -456,147 +330,133 @@ struct SignUpSheetView: View {
                                 }
                                 .padding(.vertical, 10)
                                 .overlay(alignment: .bottomLeading) {
-                                    Text(String(localized: "key.password.confirm.error").lowercased())
-                                        .font(.caption)
-                                        .foregroundStyle(confirmPasswordValid == false ? Color.accentColor : Color.clear)
-                                        .animation(.easeInOut, value: confirmPasswordValid == false)
+                                    if case let .invalid(errors) = confirmPasswordValidResult,
+                                       let error = errors.first
+                                    {
+                                        Text(error.message.lowercased())
+                                            .font(.caption)
+                                            .foregroundStyle(Color.accentColor)
+                                    }
+                                }
+                                .onAppear {
+                                    focusedField = .email
+                                }
+                            } else if step == .third {
+                                HStack(alignment: .center, spacing: 8) {
+                                    Text("key.verify.code")
+
+                                    TextField("key.verify.code", text: $verifyCode, prompt: Text(String(localized: "key.verify.code").lowercased()))
+                                        .textFieldStyle(.plain)
+                                        .multilineTextAlignment(.trailing)
+                                        .focused($focusedField, equals: .verifyCode)
+                                        .onSubmit {
+                                            load()
+                                        }
+                                }
+                                .padding(.vertical, 10)
+                                .onAppear {
+                                    focusedField = .verifyCode
                                 }
                             }
-                            .padding(.horizontal, 15)
-                            .padding(.vertical, 5)
-                            .background(.quinary, in: .rect(cornerRadius: 6))
-                            .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                         }
-
-                        VStack(alignment: .center, spacing: 10) {
-                            Button {
-                                load()
-                            } label: {
-                                Text("key.sign_up")
-                                    .frame(width: 250, height: 30)
-                                    .foregroundStyle(.white)
-                                    .contentShape(.rect(cornerRadius: 6))
-                                    .background(emailValid == true && usernameValid == true && passwordValid == true && confirmPasswordValid == true ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
-                            }
-                            .buttonStyle(.plain)
-                            .disabled(emailValid != true || usernameValid != true || passwordValid != true || confirmPasswordValid != true)
-                            .animation(.easeInOut, value: emailValid == true && usernameValid == true && passwordValid == true && confirmPasswordValid == true)
-
-                            Button {
-                                dismiss()
-                            } label: {
-                                Text("key.cancel")
-                                    .frame(width: 250, height: 30)
-                                    .contentShape(.rect(cornerRadius: 6))
-                                    .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
-                            }
-                            .buttonStyle(.plain)
-                        }
-
-                        HStack(alignment: .center, spacing: 8) {
-                            Text("key.sign_up.sign_in.q").font(.caption)
-
-                            Button {
-                                dismiss()
-
-                                appState.isSignInPresented = true
-                            } label: {
-                                Text(verbatim: "\(String(localized: "key.sign_in"))!")
-                                    .font(.caption)
-                                    .foregroundStyle(Color.accentColor)
-                            }
-                            .buttonStyle(.plain)
-                        }
+                        .padding(.horizontal, 15)
+                        .padding(.vertical, 5)
+                        .background(.quinary, in: .rect(cornerRadius: 6))
+                        .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                     }
-                    .onAppear {
-                        focusedField = .email
+
+                    VStack(alignment: .center, spacing: 10) {
+                        Button {
+                            load()
+                        } label: {
+                            Text("key.sign_up")
+                                .frame(width: 250, height: 30)
+                                .foregroundStyle(.white)
+                                .contentShape(.rect(cornerRadius: 6))
+                                .background(confirmPasswordValid ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(!confirmPasswordValid)
+
+                        Button {
+                            dismiss()
+                        } label: {
+                            Text("key.cancel")
+                                .frame(width: 250, height: 30)
+                                .contentShape(.rect(cornerRadius: 6))
+                                .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
+                        }
+                        .buttonStyle(.plain)
                     }
-                case .loading:
-                    VStack(alignment: .center, spacing: 25) {
-                        VStack(alignment: .center, spacing: 5) {
-                            Image(systemName: "person.crop.circle.badge.plus")
-                                .font(.largeTitle)
+
+                    HStack(alignment: .center, spacing: 8) {
+                        Text("key.sign_up.sign_in.q").font(.caption)
+
+                        Button {
+                            dismiss()
+
+                            appState.isSignInPresented = true
+                        } label: {
+                            Text(verbatim: "\(String(localized: "key.sign_in"))!")
+                                .font(.caption)
                                 .foregroundStyle(Color.accentColor)
-
-                            Text("key.sign_up.enter")
-                                .font(.largeTitle.weight(.semibold))
-
-                            Text("key.request.wait")
-                                .font(.title3)
-                                .lineLimit(1, reservesSpace: true)
-                                .multilineTextAlignment(.center)
                         }
-
-                        Spacer()
-
-                        VStack(alignment: .center, spacing: 10) {
-                            Button {
-                                subscriptions.flush()
-
-                                withAnimation(.easeInOut) {
-                                    state = .data
-                                }
-                            } label: {
-                                Text("key.cancel")
-                                    .frame(width: 250, height: 30)
-                                    .contentShape(.rect(cornerRadius: 6))
-                                    .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                case .error:
-                    VStack(alignment: .center, spacing: 25) {
-                        VStack(alignment: .center, spacing: 5) {
-                            Image(systemName: "person.crop.circle.badge.plus")
-                                .font(.largeTitle)
-                                .foregroundStyle(Color.accentColor)
-
-                            Text("key.ops")
-                                .font(.largeTitle.weight(.semibold))
-
-                            Text("key.sign_up.error")
-                                .font(.title3)
-                                .lineLimit(1, reservesSpace: true)
-                                .multilineTextAlignment(.center)
-                        }
-
-                        Spacer()
-
-                        VStack(alignment: .center, spacing: 10) {
-                            Button {
-                                withAnimation(.easeInOut) {
-                                    state = .data
-                                }
-                            } label: {
-                                Text("key.retry")
-                                    .frame(width: 250, height: 30)
-                                    .foregroundStyle(.white)
-                                    .contentShape(.rect(cornerRadius: 6))
-                                    .background(Color.accentColor, in: .rect(cornerRadius: 6))
-                            }
-                            .buttonStyle(.plain)
-
-                            Button {
-                                dismiss()
-                            } label: {
-                                Text("key.cancel")
-                                    .frame(width: 250, height: 30)
-                                    .contentShape(.rect(cornerRadius: 6))
-                                    .background(.quinary.opacity(0.5), in: .rect(cornerRadius: 6))
-                            }
-                            .buttonStyle(.plain)
-                        }
+                        .buttonStyle(.plain)
                     }
                 }
             }
-            .padding(.horizontal, 35)
-            .padding(.top, 35)
-            .padding(.bottom, 25)
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(width: 520)
-            .analyticsScreen(name: "sign_up_sheet", class: "SignUpSheetView")
         }
+        .padding(.horizontal, 35)
+        .padding(.top, 35)
+        .padding(.bottom, 25)
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(width: 520)
+        .analyticsScreen(name: "sign_up_sheet", class: "SignUpSheetView")
+        .alert("key.ops", isPresented: Binding { state.error != nil } set: { _ in }) {
+            Button {
+                withAnimation(.easeInOut) {
+                    state = .data
+                }
+            } label: {
+                Text("key.retry")
+            }
+
+            Button(role: .cancel) {
+                dismiss()
+            } label: {
+                Text("key.cancel")
+            }
+        } message: {
+            if let error = state.error {
+                Text(error.localizedDescription)
+            }
+        }
+        .dialogSeverity(.critical)
+        .confirmationDialog("key.verify.code", isPresented: Binding { step == .second && state.error == nil } set: { _ in }) {
+            Button {
+                load()
+            } label: {
+                Text("key.continue")
+            }
+
+            Button(role: .cancel) {
+                withAnimation(.easeInOut) {
+                    step = .first
+                }
+            } label: {
+                Text("key.cancel")
+            }
+        } message: {
+            Text("ket.verify.code-\(email)")
+        }
+        .alert("key.sign_up.premium", isPresented: $showPremiumWarning) {
+            Button(role: .cancel) {} label: {
+                Text("key.ok")
+            }
+        } message: {
+            Text("key.sign_up.premium.description")
+        }
+        .dialogSeverity(.critical)
     }
 
     private func load() {
@@ -604,24 +464,21 @@ struct SignUpSheetView: View {
             state = .loading
         }
 
-        signUpUseCase(email: email, login: username, password: password1)
+        signUpUseCase(email: email, login: username, password: password1, verifyCode: verifyCode, step: step.rawValue)
             .receive(on: DispatchQueue.main)
             .sink { completion in
-                guard case .failure = completion else { return }
+                guard case let .failure(error) = completion else { return }
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    withAnimation(.easeInOut) {
-                        state = .error
-                    }
+                withAnimation(.easeInOut) {
+                    state = .error(error)
                 }
-            } receiveValue: { success in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    if success {
-                        dismiss()
-                    } else {
-                        withAnimation(.easeInOut) {
-                            state = .error
-                        }
+            } receiveValue: { _ in
+                if step == Step.allCases.last {
+                    dismiss()
+                } else {
+                    withAnimation(.easeInOut) {
+                        step = Step.allCases.element(after: step) ?? .first
+                        state = .data
                     }
                 }
             }

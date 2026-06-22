@@ -68,14 +68,6 @@ extension Container {
         self { ChangeBookmarksCategoryNameUseCase(repository: self.accountRepository()) }.singleton
     }
 
-    var checkEmailUseCase: Factory<CheckEmailUseCase> {
-        self { CheckEmailUseCase(repository: self.accountRepository()) }.singleton
-    }
-
-    var checkUsernameUseCase: Factory<CheckUsernameUseCase> {
-        self { CheckUsernameUseCase(repository: self.accountRepository()) }.singleton
-    }
-
     var createBookmarksCategoryUseCase: Factory<CreateBookmarksCategoryUseCase> {
         self { CreateBookmarksCategoryUseCase(repository: self.accountRepository()) }.singleton
     }

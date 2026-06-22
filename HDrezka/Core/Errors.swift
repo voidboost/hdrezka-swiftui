@@ -8,7 +8,7 @@ enum HDrezkaError: Error {
     case null(String, Int, Int)
     case swiftsoup(String, String)
     case unknown
-    case photosDenied
+    case site([String])
 }
 
 extension HDrezkaError: LocalizedError {
@@ -28,8 +28,8 @@ extension HDrezkaError: LocalizedError {
             String(localized: "key.errors.swiftsoup-\(type)-\(message)")
         case .unknown:
             String(localized: "key.errors.unknown")
-        case .photosDenied:
-            String(localized: "key.errors.photosDenied")
+        case let .site(messages):
+            messages.joined(separator: "\n")
         }
     }
 }

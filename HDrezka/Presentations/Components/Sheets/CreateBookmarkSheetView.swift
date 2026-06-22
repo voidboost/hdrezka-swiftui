@@ -184,11 +184,11 @@ struct CreateBookmarkSheetView: View {
         createBookmarksCategoryUseCase(name: name.trim())
             .receive(on: DispatchQueue.main)
             .sink { completion in
-                guard case .failure = completion else { return }
+                guard case let .failure(error) = completion else { return }
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation(.easeInOut) {
-                        state = .error
+                        state = .error(error)
                     }
                 }
             } receiveValue: { _ in

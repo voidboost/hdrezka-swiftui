@@ -51,16 +51,6 @@ class AccountParser {
             }
     }
 
-    static func checkRegistration(from: String) throws -> Bool {
-        guard let scriptValue = try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).select("script").first()?.html() else { return false }
-
-        return scriptValue.contains("location") || scriptValue.isEmpty
-    }
-
-    static func checkRegistrationData(from: String) throws -> Bool {
-        try !SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).select(".string-ok").isEmpty()
-    }
-
     static func checkRestore(from: String) throws -> String? {
         guard try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).select(".b-info__title").text().contains("Запрос успешно принят") else { return nil }
 

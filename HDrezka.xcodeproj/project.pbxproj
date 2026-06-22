@@ -21,6 +21,7 @@
 		DEB035B52C89E1DB004ABFA1 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B42C89E1DB004ABFA1 /* FirebaseAnalytics */; };
 		DEB035B72C89E1DB004ABFA1 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B62C89E1DB004ABFA1 /* FirebaseCrashlytics */; };
 		DEB035BA2C89E57A004ABFA1 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B92C89E57A004ABFA1 /* Defaults */; };
+		DEC561242FE04C3B00753E04 /* ValidatorCore in Frameworks */ = {isa = PBXBuildFile; productRef = DEC561232FE04C3B00753E04 /* ValidatorCore */; };
 		DEE64D0B2C8869D0002C2F2F /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = DEE64D0A2C8869D0002C2F2F /* Sparkle */; };
 		DEF920382DD5CAF20087C32C /* FactoryKit in Frameworks */ = {isa = PBXBuildFile; productRef = DEF920372DD5CAF20087C32C /* FactoryKit */; };
 /* End PBXBuildFile section */
@@ -45,6 +46,7 @@
 			files = (
 				DEB035BA2C89E57A004ABFA1 /* Defaults in Frameworks */,
 				DE3DCCE62DFB92050062CF81 /* SwiftFormat in Frameworks */,
+				DEC561242FE04C3B00753E04 /* ValidatorCore in Frameworks */,
 				043A2B722C036C7C0057721E /* OrderedCollections in Frameworks */,
 				04E9EB462C047F19001CBBCA /* YouTubePlayerKit in Frameworks */,
 				04B25FD82BA46F9C00200341 /* Algorithms in Frameworks */,
@@ -120,6 +122,7 @@
 				DE3DCCE52DFB92050062CF81 /* SwiftFormat */,
 				DE4AD63D2EAA4A7200CE7AB3 /* Kingfisher */,
 				DE7608D92EB4231600C4A23E /* LRUCache */,
+				DEC561232FE04C3B00753E04 /* ValidatorCore */,
 			);
 			productName = HDRezka;
 			productReference = 04B3CA742BA06C9C0039F76E /* HDrezka.app */;
@@ -165,6 +168,7 @@
 				DE3DCCE42DFB92050062CF81 /* XCRemoteSwiftPackageReference "SwiftFormat" */,
 				DE4AD63C2EAA4A7200CE7AB3 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				DE7608D82EB4231600C4A23E /* XCRemoteSwiftPackageReference "LRUCache" */,
+				DEC561222FE04C3B00753E04 /* XCRemoteSwiftPackageReference "validator" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 04B3CA752BA06C9C0039F76E /* Products */;
@@ -631,6 +635,15 @@
 				minimumVersion = 0.0.1;
 			};
 		};
+		DEC561222FE04C3B00753E04 /* XCRemoteSwiftPackageReference "validator" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/space-code/validator.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 999.0.0;
+				minimumVersion = 0.0.1;
+			};
+		};
 		DEE64D092C8869D0002C2F2F /* XCRemoteSwiftPackageReference "Sparkle" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sparkle-project/Sparkle.git";
@@ -720,6 +733,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DEB035B82C89E57A004ABFA1 /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
+		};
+		DEC561232FE04C3B00753E04 /* ValidatorCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEC561222FE04C3B00753E04 /* XCRemoteSwiftPackageReference "validator" */;
+			productName = ValidatorCore;
 		};
 		DEE64D0A2C8869D0002C2F2F /* Sparkle */ = {
 			isa = XCSwiftPackageProductDependency;

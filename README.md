@@ -35,7 +35,7 @@
 <ul>
     <li>
         <span> 💻 </span>
-        <a href="https://voidboost.github.io/hdrezka-releases/HDrezka 1.0.36.dmg" target="_blank">Скачать последнюю версию (macOS 15 Sequoia или новее)</a>
+        <a href="https://voidboost.github.io/hdrezka-releases/HDrezka.dmg" target="_blank">Скачать последнюю версию (macOS 15 Sequoia или новее)</a>
     </li>
 </ul>
 <h2>💖 Поддержка проекта</h2>

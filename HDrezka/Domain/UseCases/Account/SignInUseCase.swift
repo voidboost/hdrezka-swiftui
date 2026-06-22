@@ -7,7 +7,7 @@ struct SignInUseCase {
         self.repository = repository
     }
 
-    func callAsFunction(login: String, password: String) -> AnyPublisher<Bool, Error> {
+    func callAsFunction(login: String, password: String) -> AnyPublisher<Void, Error> {
         repository.signIn(login: login, password: password)
     }
 }

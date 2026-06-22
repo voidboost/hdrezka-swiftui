@@ -52,12 +52,6 @@ struct RestoreSheetView: View {
                                     .textFieldStyle(.plain)
                                     .multilineTextAlignment(.trailing)
                                     .focused($focusedField, equals: .login)
-                                    .onChange(of: login) {
-                                        let newValue = String(login.unicodeScalars.filter { CharacterSet.whitespacesAndNewlines.inverted.contains($0) })
-                                        if newValue != login {
-                                            login = newValue
-                                        }
-                                    }
                                     .onSubmit {
                                         if !login.isEmpty {
                                             load()
@@ -210,11 +204,11 @@ struct RestoreSheetView: View {
         restoreUseCase(login: login)
             .receive(on: DispatchQueue.main)
             .sink { completion in
-                guard case .failure = completion else { return }
+                guard case let .failure(error) = completion else { return }
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation(.easeInOut) {
-                        state = .error
+                        state = .error(error)
                     }
                 }
             } receiveValue: { email in
@@ -224,7 +218,7 @@ struct RestoreSheetView: View {
                         isSuccessPresented = true
                     } else {
                         withAnimation(.easeInOut) {
-                            state = .error
+                            state = .error(NSError())
                         }
                     }
                 }

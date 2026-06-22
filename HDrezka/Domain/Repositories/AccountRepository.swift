@@ -1,17 +1,13 @@
 import Combine
 
 protocol AccountRepository {
-    func signIn(login: String, password: String) -> AnyPublisher<Bool, Error>
+    func signIn(login: String, password: String) -> AnyPublisher<Void, Error>
 
-    func signUp(email: String, login: String, password: String) -> AnyPublisher<Bool, Error>
+    func signUp(email: String, login: String, password: String, verifyCode: String, step: Int) -> AnyPublisher<Void, Error>
 
     func restore(login: String) -> AnyPublisher<String?, Error>
 
     func logout() -> AnyPublisher<Bool, Error>
-
-    func checkEmail(email: String) -> AnyPublisher<Bool, Error>
-
-    func checkUsername(username: String) -> AnyPublisher<Bool, Error>
 
     func getWatchingLaterMovies() -> AnyPublisher<[MovieWatchLater], Error>
 
