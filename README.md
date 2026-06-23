@@ -31,6 +31,8 @@
 <p>
     <i>И многое другое!</i>
 </p>
+<h2>📦 Установка одной командой с помощью <a href="https://brew.sh/">Homebrew</a></h2>
+<pre><code>brew tap voidboost/hdrezka && brew install --cask hdrezka</code></pre>
 <h2>🚀 Релизы</h2>
 <ul>
     <li>
@@ -43,7 +45,7 @@
 <h2>🧰 Решение проблем</h2>
 <h3>Ошибка при установке или запуске на macOS</h3>
 <p>Если приложение не запускается, выполните эти команды в Терминале:</p>
-<pre><code>sudo xattr -cr /Applications/HDrezka.app</code></pre>
+<pre><code>sudo xattr -dr com.apple.quarantine /Applications/HDrezka.app</code></pre>
 <p>Затем:</p>
 <pre><code>sudo codesign --force --deep --sign - /Applications/HDrezka.app</code></pre>
 <h2>🖼 Скриншоты</h2>

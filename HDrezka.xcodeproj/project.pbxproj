@@ -14,7 +14,6 @@
 		04E9EB462C047F19001CBBCA /* YouTubePlayerKit in Frameworks */ = {isa = PBXBuildFile; productRef = 04E9EB452C047F19001CBBCA /* YouTubePlayerKit */; };
 		DE188EE52CA6AB3100E7B1AE /* Pow in Frameworks */ = {isa = PBXBuildFile; productRef = DE188EE42CA6AB3100E7B1AE /* Pow */; };
 		DE2D67382DC3D5E900A9187C /* LicensesList in Frameworks */ = {isa = PBXBuildFile; productRef = DE2D67372DC3D5E900A9187C /* LicensesList */; };
-		DE3DCCE62DFB92050062CF81 /* SwiftFormat in Frameworks */ = {isa = PBXBuildFile; productRef = DE3DCCE52DFB92050062CF81 /* SwiftFormat */; };
 		DE3EF0392CFF04CA0022C311 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DE3EF0382CFF04CA0022C311 /* Alamofire */; };
 		DE4AD63E2EAA4A7200CE7AB3 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = DE4AD63D2EAA4A7200CE7AB3 /* Kingfisher */; };
 		DE7608DA2EB4231600C4A23E /* LRUCache in Frameworks */ = {isa = PBXBuildFile; productRef = DE7608D92EB4231600C4A23E /* LRUCache */; };
@@ -31,9 +30,22 @@
 		DE2D67352DC3D13700A9187C /* LicensesList */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = LicensesList; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		DEF82E2E2FEAB284007591E8 /* Exceptions for "HDrezka" folder in "HDrezka" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Resources/Info.plist,
+			);
+			target = 04B3CA732BA06C9C0039F76E /* HDrezka */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		DE92A9F62E9D275B00252B87 /* HDrezka */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				DEF82E2E2FEAB284007591E8 /* Exceptions for "HDrezka" folder in "HDrezka" target */,
+			);
 			path = HDrezka;
 			sourceTree = "<group>";
 		};
@@ -45,7 +57,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				DEB035BA2C89E57A004ABFA1 /* Defaults in Frameworks */,
-				DE3DCCE62DFB92050062CF81 /* SwiftFormat in Frameworks */,
 				DEC561242FE04C3B00753E04 /* ValidatorCore in Frameworks */,
 				043A2B722C036C7C0057721E /* OrderedCollections in Frameworks */,
 				04E9EB462C047F19001CBBCA /* YouTubePlayerKit in Frameworks */,
@@ -91,7 +102,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 04B3CA852BA06C9D0039F76E /* Build configuration list for PBXNativeTarget "HDrezka" */;
 			buildPhases = (
-				DE40DA882DFB8C9000A2B190 /* ShellScript */,
 				04B3CA702BA06C9C0039F76E /* Sources */,
 				04B3CA712BA06C9C0039F76E /* Frameworks */,
 				04B3CA722BA06C9C0039F76E /* Resources */,
@@ -119,7 +129,6 @@
 				DE3EF0382CFF04CA0022C311 /* Alamofire */,
 				DE2D67372DC3D5E900A9187C /* LicensesList */,
 				DEF920372DD5CAF20087C32C /* FactoryKit */,
-				DE3DCCE52DFB92050062CF81 /* SwiftFormat */,
 				DE4AD63D2EAA4A7200CE7AB3 /* Kingfisher */,
 				DE7608D92EB4231600C4A23E /* LRUCache */,
 				DEC561232FE04C3B00753E04 /* ValidatorCore */,
@@ -136,7 +145,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1530;
-				LastUpgradeCheck = 2610;
+				LastUpgradeCheck = 2700;
 				TargetAttributes = {
 					04B3CA732BA06C9C0039F76E = {
 						CreatedOnToolsVersion = 15.3;
@@ -165,7 +174,6 @@
 				DE188EE32CA6AB3100E7B1AE /* XCRemoteSwiftPackageReference "Pow" */,
 				DE3EF0372CFF04CA0022C311 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				DEF920362DD5CAF20087C32C /* XCRemoteSwiftPackageReference "Factory" */,
-				DE3DCCE42DFB92050062CF81 /* XCRemoteSwiftPackageReference "SwiftFormat" */,
 				DE4AD63C2EAA4A7200CE7AB3 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				DE7608D82EB4231600C4A23E /* XCRemoteSwiftPackageReference "LRUCache" */,
 				DEC561222FE04C3B00753E04 /* XCRemoteSwiftPackageReference "validator" */,
@@ -213,23 +221,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "CRASHLYTICS_CMD=\"${BUILD_DIR%Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n\nif test -f \"$CRASHLYTICS_CMD\" 2>&1\nthen\n    \"$CRASHLYTICS_CMD\"\nelse\n    echo \"warning: Firebase not installed, download from https://github.com/firebase/firebase-ios-sdk\"\nfi\n";
-		};
-		DE40DA882DFB8C9000A2B190 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "SWIFTFROMAT_CMD=\"${BUILD_DIR%Build/*}SourcePackages/checkouts/SwiftFormat/CommandLineTool/swiftformat\"\n\nif test -f \"$SWIFTFROMAT_CMD\" 2>&1\nthen\n    \"$SWIFTFROMAT_CMD\" --swiftversion 6.2 .\nelse\n    echo \"warning: SwiftFormat not installed, download from https://github.com/nicklockwood/SwiftFormat\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -415,16 +406,11 @@
 				INFOPLIST_KEY_CFBundleDisplayName = HDrezka;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphone*]" = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = NO;
-				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphone*]" = YES;
-				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphone*]" = YES;
-				"INFOPLIST_KEY_UILaunchStoryboardName[sdk=iphone*]" = "Launch Screen";
 				INFOPLIST_KEY_UIStatusBarStyle = "";
-				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphone*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = "$(RECOMMENDED_IPHONEOS_DEPLOYMENT_TARGET)";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
@@ -478,16 +464,11 @@
 				INFOPLIST_KEY_CFBundleDisplayName = HDrezka;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphone*]" = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = NO;
-				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphone*]" = YES;
-				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphone*]" = YES;
-				"INFOPLIST_KEY_UILaunchStoryboardName[sdk=iphone*]" = "Launch Screen";
 				INFOPLIST_KEY_UIStatusBarStyle = "";
-				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphone*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = "$(RECOMMENDED_IPHONEOS_DEPLOYMENT_TARGET)";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
@@ -579,15 +560,6 @@
 				kind = versionRange;
 				maximumVersion = 999.0.0;
 				minimumVersion = 0.0.1;
-			};
-		};
-		DE3DCCE42DFB92050062CF81 /* XCRemoteSwiftPackageReference "SwiftFormat" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/nicklockwood/SwiftFormat.git";
-			requirement = {
-				kind = versionRange;
-				maximumVersion = 999.0.0;
-				minimumVersion = 0.0.0;
 			};
 		};
 		DE3EF0372CFF04CA0022C311 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
@@ -698,11 +670,6 @@
 		DE2D67372DC3D5E900A9187C /* LicensesList */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = LicensesList;
-		};
-		DE3DCCE52DFB92050062CF81 /* SwiftFormat */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = DE3DCCE42DFB92050062CF81 /* XCRemoteSwiftPackageReference "SwiftFormat" */;
-			productName = SwiftFormat;
 		};
 		DE3EF0382CFF04CA0022C311 /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;

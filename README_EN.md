@@ -20,6 +20,8 @@
     <li>⬇️ Video download capability</li>
 </ul>
 <p><i>...and much more!</i></p>
+<h2>📦 One-command installation with <a href="https://brew.sh/">Homebrew</a></h2>
+<pre><code>brew tap voidboost/hdrezka && brew install --cask hdrezka</code></pre>
 <h2>🚀 Releases</h2>
 <ul>
     <li>
@@ -32,7 +34,7 @@
 <h2>🧰 Troubleshooting</h2>
 <h3>Error during installation or launch on macOS</h3>
 <p>If the app won’t start, run these commands in Terminal:</p>
-<pre><code>sudo xattr -cr /Applications/HDrezka.app</code></pre>
+<pre><code>sudo xattr -dr com.apple.quarantine /Applications/HDrezka.app</code></pre>
 <p>Then:</p>
 <pre><code>sudo codesign --force --deep --sign - /Applications/HDrezka.app</code></pre>
 <h2>🖼 Screenshots</h2>
