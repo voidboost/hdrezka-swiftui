@@ -7,8 +7,8 @@ import Foundation
 import SwiftSoup
 import SwiftUI
 
-extension Document {
-    func checker() throws -> Document {
+extension SwiftSoup.Document {
+    func checker() throws -> SwiftSoup.Document {
         let body = try body().orThrow()
 
         guard try body.select("#check-form").isEmpty() else {
