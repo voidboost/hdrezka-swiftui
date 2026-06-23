@@ -509,7 +509,7 @@ private extension Element {
     }
 }
 
-private extension Document {
+private extension SwiftSoup.Document {
     func getLikes() throws -> [Like] {
         try select(".b-comment__likescontent_inner li").map {
             let img = try $0.select("img").first().orThrow()
