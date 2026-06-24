@@ -6,11 +6,18 @@ on:
       - main
   workflow_dispatch:
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   release:
     if: github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'bump'
-   
+
     runs-on: macos-26
+
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout source
@@ -19,7 +26,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-            node-version: lts/*
+          node-version: lts/*
 
       - name: Inject Firebase config
         run: |
@@ -42,8 +49,7 @@ jobs:
           cp -R build/HDrezka.xcarchive/Products/Applications/HDrezka.app release/
 
       - name: Sign app
-        run: |
-          codesign --force --deep --sign - release/HDrezka.app
+        run: codesign --force --deep --sign - release/HDrezka.app
 
       - name: Read version
         id: version
@@ -51,7 +57,6 @@ jobs:
           VERSION=$(/usr/libexec/PlistBuddy \
             -c "Print :CFBundleShortVersionString" \
             "release/HDrezka.app/Contents/Info.plist")
-
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Create DMG
@@ -76,10 +81,7 @@ jobs:
             https://x-access-token:${TOKEN}@github.com/${{ github.repository_owner }}/hdrezka-releases.git
 
       - name: Copy DMG
-        run: |
-          cp \
-            release/HDrezka.dmg \
-            hdrezka-releases/
+        run: cp release/HDrezka.dmg hdrezka-releases/
 
       - name: Download Sparkle
         uses: robinraju/release-downloader@v1
@@ -93,18 +95,20 @@ jobs:
           mkdir -p Sparkle
           tar -xf Sparkle*.tar.xz -C Sparkle --strip-components=1
 
-      - name: Write Sparkle key
-        run: |
-          echo "${{ secrets.SPARKLE_PRIVATE_KEY }}" > private-key-file
-
       - name: Generate Sparkle appcast
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
         run: |
+          KEY_FILE=$(mktemp)
+          trap 'rm -f "$KEY_FILE"' EXIT
+          echo "$SPARKLE_PRIVATE_KEY" > "$KEY_FILE"
+
           rm -f hdrezka-releases/appcast.xml
           ./Sparkle/bin/generate_appcast \
-            --ed-key-file private-key-file \
+            --ed-key-file "$KEY_FILE" \
             hdrezka-releases/
 
-      - name: Push release
+      - name: Push releases
         working-directory: hdrezka-releases
         run: |
           git config user.name "github-actions[bot]"
@@ -116,7 +120,7 @@ jobs:
             git commit -m "${{ steps.version.outputs.version }}"
             git push
           else
-            echo "No changes detected in DMG. Skipping deployment."
+            echo "No changes detected. Skipping deployment."
           fi
 
       - name: Clone homebrew repository
@@ -131,52 +135,51 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           SHA256="${{ steps.sha256.outputs.sha256 }}"
 
-          rm -f homebrew-hdrezka/Casks/hdrezka.rb
           mkdir -p homebrew-hdrezka/Casks
 
           cat > homebrew-hdrezka/Casks/hdrezka.rb <<EOF
           cask "hdrezka" do
             version "${VERSION}"
             sha256 "${SHA256}"
-          
+
             url "https://${{ github.repository_owner }}.github.io/hdrezka-releases/HDrezka.dmg"
             name "HDrezka"
             desc "Unofficial macOS client for HDrezka"
             homepage "https://github.com/${{ github.repository }}"
-          
+
             livecheck do
               url "https://${{ github.repository_owner }}.github.io/hdrezka-releases/appcast.xml"
-                strategy :sparkle do |items|
-                  items.map(&:short_version)
-                end
+              strategy :sparkle do |items|
+                items.map(&:short_version)
+              end
             end
 
             auto_updates true
             depends_on macos: :sequoia
-          
+
             app "HDrezka.app"
-          
+
             postflight do
               system_command "/usr/bin/xattr",
                              args: ["-dr", "com.apple.quarantine", "#{appdir}/HDrezka.app"],
                              sudo: false
             end
-          
+
             zap trash: [
               "~/Library/Application Support/HDrezka",
               "~/Library/Caches/io.silentsea.hdrezka",
               "~/Library/Preferences/io.silentsea.hdrezka.plist",
               "~/Library/Saved Application State/io.silentsea.hdrezka.savedState",
             ]
-          
+
             caveats <<~EOS
               Unofficial macOS client for HDrezka.
-          
+
               This cask automatically removes the quarantine flag during install.
-          
+
               If Gatekeeper blocks launch, run:
-          
-              xattr -dr com.apple.quarantine "/Applications/HDrezka.app"
+
+                xattr -dr com.apple.quarantine "/Applications/HDrezka.app"
             EOS
           end
           EOF
@@ -186,12 +189,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
+         
           git add .
-
+         
           if ! git diff --cached --quiet; then
             git commit -m "${{ steps.version.outputs.version }}"
             git push
           else
-            echo "No changes detected in DMG. Skipping deployment."
+            echo "No changes detected. Skipping deployment."
           fi
