@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'HDrezka.xcodeproj/project.pbxproj'
+      - "HDrezka.xcodeproj/project.pbxproj"
   workflow_dispatch:
 
 concurrency:
@@ -14,6 +14,8 @@ concurrency:
 
 jobs:
   build:
+    if: github.event_name == "workflow_dispatch" || github.event.head_commit.message == "bump"
+
     runs-on: macos-26
 
     permissions:
