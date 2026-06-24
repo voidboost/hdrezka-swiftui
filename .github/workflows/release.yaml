@@ -13,13 +13,15 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  release:
-    if: github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'bump'
-
+  build:
     runs-on: macos-26
 
     permissions:
       contents: read
+
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      sha256: ${{ steps.sha256.outputs.sha256 }}
 
     steps:
       - name: Checkout source
@@ -75,11 +77,36 @@ jobs:
         run: |
           echo "sha256=$(shasum -a 256 release/HDrezka.dmg | awk '{print $1}')" >> "$GITHUB_OUTPUT"
 
+      - name: Upload DMG
+        uses: actions/upload-artifact@v7
+        with:
+          name: HDrezka-dmg
+          path: release/HDrezka.dmg
+          retention-days: 1
+
+  publish:
+    needs: build
+    runs-on: macos-26
+
+    permissions:
+      contents: read
+
+    env:
+      VERSION: ${{ needs.build.outputs.version }}
+      SHA256: ${{ needs.build.outputs.sha256 }}
+
+    steps:
+      - name: Download DMG
+        uses: actions/download-artifact@v8
+        with:
+          name: HDrezka-dmg
+          path: release/
+
       - name: Clone releases repository
         env:
           TOKEN: ${{ secrets.RELEASES_TOKEN }}
         run: |
-          git clone \
+          git clone --depth 1 \
             https://x-access-token:${TOKEN}@github.com/${{ github.repository_owner }}/hdrezka-releases.git
 
       - name: Copy DMG
@@ -119,7 +146,7 @@ jobs:
           git add .
 
           if ! git diff --cached --quiet; then
-            git commit -m "${{ steps.version.outputs.version }}"
+            git commit -m "${VERSION}"
             git push
           else
             echo "No changes detected. Skipping deployment."
@@ -129,14 +156,11 @@ jobs:
         env:
           TOKEN: ${{ secrets.HOMEBREW_TOKEN }}
         run: |
-          git clone \
+          git clone --depth 1 \
             https://x-access-token:${TOKEN}@github.com/${{ github.repository_owner }}/homebrew-hdrezka.git
 
       - name: Generate Homebrew Cask
         run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          SHA256="${{ steps.sha256.outputs.sha256 }}"
-
           mkdir -p homebrew-hdrezka/Casks
 
           cat > homebrew-hdrezka/Casks/hdrezka.rb <<EOF
@@ -191,11 +215,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-         
+
           git add .
-         
+
           if ! git diff --cached --quiet; then
-            git commit -m "${{ steps.version.outputs.version }}"
+            git commit -m "${VERSION}"
             git push
           else
             echo "No changes detected. Skipping deployment."
