@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'HDrezka.xcodeproj/project.pbxproj'
   workflow_dispatch:
 
 concurrency:
