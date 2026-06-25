@@ -31,7 +31,7 @@
 <p>
     <i>И многое другое!</i>
 </p>
-<h2>📦 Установка с помощью <a href="https://brew.sh/">Homebrew</a></h2>
+<h2>📦 Установка с помощью <a href="https://brew.sh/ru/">Homebrew</a></h2>
 <p><strong>Homebrew 5.x и более ранние версии</strong></p>
 <pre><code>brew tap voidboost/hdrezka && brew install --cask hdrezka</code></pre>
 <p><strong>Homebrew 6.x и более новые версии</strong></p>
