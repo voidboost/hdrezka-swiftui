@@ -226,3 +226,46 @@ jobs:
           else
             echo "No changes detected. Skipping deployment."
           fi
+
+      - name: Send Telegram Message
+        uses: cbrgm/telegram-github-action@v1
+        with:
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          parse-mode: html
+          disable-web-page-preview: true
+          message: |
+            <b>HDrezka v${VERSION}</b>
+
+            <b>🇷🇺 Русский</b>
+
+            <b>Установка через <a href="https://brew.sh/ru/">Homebrew 📦</a></b>
+
+            <b>Homebrew 5.x и более ранние версии</b>
+            <pre><code>brew tap voidboost/hdrezka && brew install --cask hdrezka</code></pre>
+
+            <b>Homebrew 6.x и более новые версии</b>
+            <pre><code>brew tap voidboost/hdrezka && brew trust voidboost/hdrezka && brew install --cask hdrezka</code></pre>
+
+            <i>В Homebrew 6.x необходимо явно доверять сторонним tap-репозиторям перед установкой пакетов из них.</i>
+
+            <b>Или скачайте <a href="https://voidboost.github.io/hdrezka-releases/HDrezka.dmg">последний релиз 🚀</a></b>
+
+            <a href="https://github.com/voidboost/hdrezka-swiftui#installation-troubleshooting">Проблемы с установкой?</a>
+
+
+            <b>🇺🇸 English</b>
+
+            <b>Install with <a href="https://brew.sh/">Homebrew 📦</a></b>
+
+            <b>Homebrew 5.x and earlier</b>
+            <pre><code>brew tap voidboost/hdrezka && brew install --cask hdrezka</code></pre>
+
+            <b>Homebrew 6.x and later</b>
+            <pre><code>brew tap voidboost/hdrezka && brew trust voidboost/hdrezka && brew install --cask hdrezka</code></pre>
+
+            <i>Homebrew 6.x requires explicitly trusting third-party taps before installing packages from them.</i>
+
+            <b>Or download <a href="https://voidboost.github.io/hdrezka-releases/HDrezka.dmg">latest release 🚀</a></b>
+
+            <a href="https://github.com/voidboost/hdrezka-swiftui/blob/main/README_EN.md#installation-troubleshooting">Problems with installation?</a>
