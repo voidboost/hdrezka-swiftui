@@ -232,8 +232,8 @@ jobs:
         with:
           token: ${{ secrets.TELEGRAM_TOKEN }}
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          parse-mode: html
-          disable-web-page-preview: true
+          parse-mode: "html"
+          disable-web-page-preview: "true"
           message: |
             <b>HDrezka v${VERSION}</b>
 
