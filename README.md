@@ -47,7 +47,7 @@
 <h2>💖 Поддержка проекта</h2>
 <p>Чтобы приложение оставалось актуальным, вы можете поддержать его спонсорством на GitHub. <br>Если вам нужна помощь с установкой или настройкой, свяжитесь со мной в Telegram: <a href="https://t.me/voidboost" target="_blank">@voidboost</a>.</p>
 <h2>🧰 Решение проблем</h2>
-<h3>Ошибка при установке или запуске на macOS</h3>
+<h3 id="installation-troubleshooting">Ошибка при установке или запуске на macOS</h3>
 <p>Если приложение не запускается, выполните эти команды в Терминале:</p>
 <pre><code>sudo xattr -dr com.apple.quarantine /Applications/HDrezka.app</code></pre>
 <p>Затем:</p>
