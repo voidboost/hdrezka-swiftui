@@ -20,8 +20,12 @@
     <li>⬇️ Можливість завантаження відео</li>
 </ul>
 <p><i>І багато іншого!</i></p>
-<h2>📦 Встановлення однією командою за допомогою <a href="https://brew.sh/">Homebrew</a></h2>
+<h2>📦 Встановлення за допомогою <a href="https://brew.sh/">Homebrew</a></h2>
+<p><strong>Homebrew 5.x та старіші версії</strong></p>
 <pre><code>brew tap voidboost/hdrezka && brew install --cask hdrezka</code></pre>
+<p><strong>Homebrew 6.x та новіші версії</strong></p>
+<pre><code>brew tap voidboost/hdrezka && brew trust voidboost/hdrezka && brew install --cask hdrezka</code></pre>
+<p><em>У Homebrew 6.x необхідно явно довіряти стороннім tap-репозиторіям перед встановленням пакетів із них.</em></p>
 <h2>🚀 Релізи</h2>
 <ul>
     <li>

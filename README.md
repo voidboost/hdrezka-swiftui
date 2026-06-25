@@ -31,8 +31,12 @@
 <p>
     <i>И многое другое!</i>
 </p>
-<h2>📦 Установка одной командой с помощью <a href="https://brew.sh/">Homebrew</a></h2>
+<h2>📦 Установка с помощью <a href="https://brew.sh/">Homebrew</a></h2>
+<p><strong>Homebrew 5.x и более ранние версии</strong></p>
 <pre><code>brew tap voidboost/hdrezka && brew install --cask hdrezka</code></pre>
+<p><strong>Homebrew 6.x и более новые версии</strong></p>
+<pre><code>brew tap voidboost/hdrezka && brew trust voidboost/hdrezka && brew install --cask hdrezka</code></pre>
+<p><em>В Homebrew 6.x необходимо явно доверять сторонним tap-репозиторям перед установкой пакетов из них.</em></p>
 <h2>🚀 Релизы</h2>
 <ul>
     <li>
