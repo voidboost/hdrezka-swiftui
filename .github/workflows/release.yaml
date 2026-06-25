@@ -228,12 +228,12 @@ jobs:
           fi
 
       - name: Send Telegram Message
-        uses: cbrgm/telegram-github-action@v1
+        uses: appleboy/telegram-action@master
         with:
           token: ${{ secrets.TELEGRAM_TOKEN }}
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          parse-mode: "html"
-          disable-web-page-preview: "true"
+          format: html
+          disable_web_page_preview: true
           message: |
             <b>HDrezka v${VERSION}</b>
 
