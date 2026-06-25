@@ -20,8 +20,12 @@
     <li>⬇️ Video download capability</li>
 </ul>
 <p><i>...and much more!</i></p>
-<h2>📦 One-command installation with <a href="https://brew.sh/">Homebrew</a></h2>
+<h2>📦 Install with <a href="https://brew.sh/">Homebrew</a></h2>
+<p><strong>Homebrew 5.x and earlier</strong></p>
 <pre><code>brew tap voidboost/hdrezka && brew install --cask hdrezka</code></pre>
+<p><strong>Homebrew 6.x and later</strong></p>
+<pre><code>brew tap voidboost/hdrezka && brew trust voidboost/hdrezka && brew install --cask hdrezka</code></pre>
+<p><em>Homebrew 6.x requires explicitly trusting third-party taps before installing packages from them.</em></p>
 <h2>🚀 Releases</h2>
 <ul>
     <li>
