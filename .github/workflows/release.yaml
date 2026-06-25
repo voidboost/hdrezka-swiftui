@@ -227,6 +227,23 @@ jobs:
             echo "No changes detected. Skipping deployment."
           fi
 
+  notify:
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    env:
+      VERSION: ${{ needs.build.outputs.version }}
+
+    steps:
+      - name: Download DMG
+        uses: actions/download-artifact@v8
+        with:
+          name: HDrezka-dmg
+          path: release/
+          
       - name: Send Telegram Message
         uses: appleboy/telegram-action@master
         with:
@@ -234,6 +251,7 @@ jobs:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           format: html
           disable_web_page_preview: true
+          document: release/HDrezka.dmg
           message: |
             <b>HDrezka v${VERSION}</b>
 
@@ -249,8 +267,6 @@ jobs:
 
             <i>В Homebrew 6.x необходимо явно доверять сторонним tap-репозиторям перед установкой пакетов из них.</i>
 
-            <b>Или скачайте <a href="https://voidboost.github.io/hdrezka-releases/HDrezka.dmg">последний релиз 🚀</a></b>
-
             <a href="https://github.com/voidboost/hdrezka-swiftui#installation-troubleshooting">Проблемы с установкой?</a>
 
 
@@ -265,7 +281,5 @@ jobs:
             <pre><code>brew tap voidboost/hdrezka && brew trust voidboost/hdrezka && brew install --cask hdrezka</code></pre>
 
             <i>Homebrew 6.x requires explicitly trusting third-party taps before installing packages from them.</i>
-
-            <b>Or download <a href="https://voidboost.github.io/hdrezka-releases/HDrezka.dmg">latest release 🚀</a></b>
 
             <a href="https://github.com/voidboost/hdrezka-swiftui/blob/main/README_EN.md#installation-troubleshooting">Problems with installation?</a>
