@@ -165,7 +165,7 @@ jobs:
         run: |
           mkdir -p homebrew-hdrezka/Casks
 
-          cat > homebrew-hdrezka/Casks/hdrezka.rb <<EOF
+          cat > homebrew-hdrezka/Casks/hdrezka.rb << EOF
           cask "hdrezka" do
             version "${VERSION}"
             sha256 "${SHA256}"
@@ -227,56 +227,25 @@ jobs:
             echo "No changes detected. Skipping deployment."
           fi
 
-  notify:
-    needs: build
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-
-    env:
-      VERSION: ${{ needs.build.outputs.version }}
-
-    steps:
       - name: Send Telegram Message
-        uses: appleboy/telegram-action@master
-        with:
-          token: ${{ secrets.TELEGRAM_TOKEN }}
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          format: html
-          disable_web_page_preview: true
-          message: |
-            <b>HDrezka v${{ env.VERSION }}</b>
+        run: |
+          HTML_PAYLOAD=$(cat << EOF
+          <h2>HDrezka v${VERSION}</h2><br><details open><summary><b>🇷🇺 Русский</b></summary><b>Установка через <a href="https://brew.sh/ru/">Homebrew 📦</a></b><br><b>Homebrew 5.x и более ранние версии</b><pre><code class="language-shell">brew tap voidboost/hdrezka && brew install --cask hdrezka</code></pre><br><b>Homebrew 6.x и более новые версии</b><pre><code class="language-shell">brew tap voidboost/hdrezka && brew trust voidboost/hdrezka && brew install --cask hdrezka</code></pre><br><i>В Homebrew 6.x необходимо явно доверять сторонним tap-репозиторям перед установкой пакетов из них.</i><br><b>Или скачайте <a href="https://voidboost.github.io/hdrezka-releases/HDrezka.dmg">последний релиз 🚀</a></b><br><a href="https://github.com/voidboost/hdrezka-swiftui#installation-troubleshooting">Проблемы с установкой?</a></details><br><details><summary><b>🇺🇸 English</b></summary><b>Install with <a href="https://brew.sh/">Homebrew 📦</a></b><br><b>Homebrew 5.x and earlier</b><pre><code class="language-shell">brew tap voidboost/hdrezka && brew install --cask hdrezka</code></pre><br><b>Homebrew 6.x and later</b><pre><code class="language-shell">brew tap voidboost/hdrezka && brew trust voidboost/hdrezka && brew install --cask hdrezka</code></pre><br><i>Homebrew 6.x requires explicitly trusting third-party taps before installing packages from them.</i><br><b>Or download <a href="https://voidboost.github.io/hdrezka-releases/HDrezka.dmg">latest release 🚀</a></b><br><a href="https://github.com/voidboost/hdrezka-swiftui/blob/main/README_EN.md#installation-troubleshooting">Problems with installation?</a></details><br><details><summary><b>🇺🇦 Українська</b></summary><b>Встановлення через <a href="https://brew.sh/ru/">Homebrew 📦</a></b><br><b>Homebrew 5.x та старіші версії</b><pre><code class="language-shell">brew tap voidboost/hdrezka && brew install --cask hdrezka</code></pre><br><b>Homebrew 6.x та новіші версії</b><pre><code class="language-shell">brew tap voidboost/hdrezka && brew trust voidboost/hdrezka && brew install --cask hdrezka</code></pre><br><i>У Homebrew 6.x необхідно явно довіряти стороннім tap-репозиторіям перед встановленням пакетів із них.</i><br><b>Чи завантажте <a href="https://voidboost.github.io/hdrezka-releases/HDrezka.dmg">останній реліз 🚀</a></b><br><a href="https://github.com/voidboost/hdrezka-swiftui/blob/main/README_UA.md#installation-troubleshooting">Проблеми зі встановленням?</a></details>
+          EOF
+          )
 
-            <b>🇷🇺 Русский</b>
+          JSON_PAYLOAD=$(jq -n \
+          --arg chat_id "${{ secrets.TELEGRAM_CHAT_ID }}" \
+          --arg html "$HTML_PAYLOAD" \
+          '{
+            chat_id: $chat_id,
+            rich_message: {
+              html: $html,
+              is_rtl: false,
+              skip_entity_detection: true
+            }
+          }')
 
-            <b>Установка через <a href="https://brew.sh/ru/">Homebrew 📦</a></b>
-
-            <b>Homebrew 5.x и более ранние версии</b>
-            <pre><code>brew tap voidboost/hdrezka && brew install --cask hdrezka</code></pre>
-
-            <b>Homebrew 6.x и более новые версии</b>
-            <pre><code>brew tap voidboost/hdrezka && brew trust voidboost/hdrezka && brew install --cask hdrezka</code></pre>
-
-            <i>В Homebrew 6.x необходимо явно доверять сторонним tap-репозиторям перед установкой пакетов из них.</i>
-
-            <b>Или скачайте <a href="https://voidboost.github.io/hdrezka-releases/HDrezka.dmg">последний релиз 🚀</a></b>
-
-            <a href="https://github.com/voidboost/hdrezka-swiftui#installation-troubleshooting">Проблемы с установкой?</a>
-
-
-            <b>🇺🇸 English</b>
-
-            <b>Install with <a href="https://brew.sh/">Homebrew 📦</a></b>
-
-            <b>Homebrew 5.x and earlier</b>
-            <pre><code>brew tap voidboost/hdrezka && brew install --cask hdrezka</code></pre>
-
-            <b>Homebrew 6.x and later</b>
-            <pre><code>brew tap voidboost/hdrezka && brew trust voidboost/hdrezka && brew install --cask hdrezka</code></pre>
-
-            <i>Homebrew 6.x requires explicitly trusting third-party taps before installing packages from them.</i>
-
-            <b>Or download <a href="https://voidboost.github.io/hdrezka-releases/HDrezka.dmg">latest release 🚀</a></b>
-
-            <a href="https://github.com/voidboost/hdrezka-swiftui/blob/main/README_EN.md#installation-troubleshooting">Problems with installation?</a>
+          curl -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendRichMessage" \
+            -H "Content-Type: application/json" \
+            -d "$JSON_PAYLOAD"
