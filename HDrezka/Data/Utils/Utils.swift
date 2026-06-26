@@ -141,7 +141,7 @@ extension Optional {
     func orThrow(
         functionName: String = #function,
         lineNumber: Int = #line,
-        columnNumber: Int = #column,
+        columnNumber: Int = #column
     ) throws -> Wrapped {
         guard let self else {
             let error = HDrezkaError.null(functionName, lineNumber, columnNumber)
@@ -161,7 +161,7 @@ class AttributedTextStyle {
         italic: Bool = false,
         underline: Bool = false,
         strikethrough: Bool = false,
-        link: String? = nil,
+        link: String? = nil
     ) {
         var font = NSFont.systemFont(ofSize: 13)
         let fontManager = NSFontManager.shared
@@ -250,6 +250,8 @@ private extension Publisher {
             } else if case .loginRequired = hdrezkaError {
                 AppState.shared.isSignInPresented = true
 
+                return hdrezkaError
+            } else if case .site = hdrezkaError {
                 return hdrezkaError
             }
 
