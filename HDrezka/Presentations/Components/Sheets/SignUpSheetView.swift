@@ -3,7 +3,6 @@ import Defaults
 import FactoryKit
 import FirebaseAnalytics
 import SwiftUI
-import ValidatorCore
 
 struct SignUpSheetView: View {
     @Injected(\.signUpUseCase) private var signUpUseCase
@@ -25,16 +24,7 @@ struct SignUpSheetView: View {
 
     @FocusState private var focusedField: FocusedField?
 
-    private let validator = Validator()
-
-    @State private var confirmPasswordValidResult: ValidationResult?
-    private var confirmPasswordValid: Bool {
-        if case .valid = confirmPasswordValidResult {
-            true
-        } else {
-            false
-        }
-    }
+    @State private var confirmPasswordValid: Bool?
 
     @State private var showPassword: Bool = false
     @State private var passwordIsEmpty: Bool = true
@@ -151,25 +141,6 @@ struct SignUpSheetView: View {
                                                 .textFieldStyle(.plain)
                                                 .multilineTextAlignment(.trailing)
                                                 .focused($focusedField, equals: .password1)
-                                                .task(id: password1) {
-                                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                                        passwordIsEmpty = password1.isEmpty
-                                                    }
-
-                                                    withAnimation(.easeInOut) {
-                                                        confirmPasswordValidResult = nil
-                                                    }
-
-                                                    guard !password1.isEmpty, !password2.isEmpty else { return }
-
-                                                    try? await Task.sleep(for: .milliseconds(500))
-
-                                                    guard !Task.isCancelled else { return }
-
-                                                    withAnimation(.easeInOut) {
-                                                        confirmPasswordValidResult = validator.validate(input: password2, rule: EqualityValidationRule(compareTo: password1, error: String(localized: "key.password.confirm.error")))
-                                                    }
-                                                }
                                                 .onSubmit {
                                                     focusedField = .password2
                                                 }
@@ -189,7 +160,7 @@ struct SignUpSheetView: View {
                                         }
 
                                         withAnimation(.easeInOut) {
-                                            confirmPasswordValidResult = nil
+                                            confirmPasswordValid = nil
                                         }
 
                                         guard !password1.isEmpty, !password2.isEmpty else { return }
@@ -199,7 +170,7 @@ struct SignUpSheetView: View {
                                         guard !Task.isCancelled else { return }
 
                                         withAnimation(.easeInOut) {
-                                            confirmPasswordValidResult = validator.validate(input: password2, rule: EqualityValidationRule(compareTo: password1, error: String(localized: "key.password.confirm.error")))
+                                            confirmPasswordValid = password2 == password1
                                         }
                                     }
 
@@ -237,7 +208,7 @@ struct SignUpSheetView: View {
                                                 .multilineTextAlignment(.trailing)
                                                 .focused($focusedField, equals: .password2)
                                                 .onSubmit {
-                                                    if confirmPasswordValid {
+                                                    if confirmPasswordValid == true {
                                                         load()
                                                     }
                                                 }
@@ -247,7 +218,7 @@ struct SignUpSheetView: View {
                                                 .multilineTextAlignment(.trailing)
                                                 .focused($focusedField, equals: .password2)
                                                 .onSubmit {
-                                                    if confirmPasswordValid {
+                                                    if confirmPasswordValid == true {
                                                         load()
                                                     }
                                                 }
@@ -259,7 +230,7 @@ struct SignUpSheetView: View {
                                         }
 
                                         withAnimation(.easeInOut) {
-                                            confirmPasswordValidResult = nil
+                                            confirmPasswordValid = nil
                                         }
 
                                         guard !password1.isEmpty, !password2.isEmpty else { return }
@@ -269,7 +240,7 @@ struct SignUpSheetView: View {
                                         guard !Task.isCancelled else { return }
 
                                         withAnimation(.easeInOut) {
-                                            confirmPasswordValidResult = validator.validate(input: password2, rule: EqualityValidationRule(compareTo: password1, error: String(localized: "key.password.confirm.error")))
+                                            confirmPasswordValid = password2 == password1
                                         }
                                     }
 
@@ -295,10 +266,8 @@ struct SignUpSheetView: View {
                                 }
                                 .padding(.vertical, 10)
                                 .overlay(alignment: .bottomLeading) {
-                                    if case let .invalid(errors) = confirmPasswordValidResult,
-                                       let error = errors.first
-                                    {
-                                        Text(error.message.lowercased())
+                                    if confirmPasswordValid == false {
+                                        Text(String(localized: "key.password.confirm.error").lowercased())
                                             .font(.caption)
                                             .foregroundStyle(Color.accentColor)
                                     }
@@ -338,10 +307,10 @@ struct SignUpSheetView: View {
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
                                 .contentShape(.rect(cornerRadius: 6))
-                                .background(confirmPasswordValid ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
+                                .background(confirmPasswordValid == true ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
-                        .disabled(!confirmPasswordValid)
+                        .disabled(confirmPasswordValid != true)
 
                         Button {
                             dismiss()

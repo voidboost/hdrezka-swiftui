@@ -11,7 +11,7 @@ class SearchViewModel {
 
     private(set) var title: String = .init(localized: "key.search")
 
-    @ObservationIgnored private var searchWork: DispatchWorkItem?
+    @ObservationIgnored private var searchTask: Task<Void, Never>?
 
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
@@ -52,49 +52,31 @@ class SearchViewModel {
     }
 
     func load(force: Bool = false) {
-        searchWork?.cancel()
+        searchTask?.cancel()
 
-        if force {
-            paginationState = .idle
-            page = 1
-            subscriptions.flush()
+        searchTask = Task { [weak self] in
+            if !force {
+                try? await Task.sleep(for: .milliseconds(500))
+            }
 
-            if !query.trim().isEmpty {
+            guard !Task.isCancelled, let self else { return }
+
+            self.paginationState = .idle
+            self.page = 1
+            self.subscriptions.flush()
+
+            if !self.query.trim().isEmpty {
                 withAnimation(.easeInOut) {
-                    state = .loading
-                    title = .init(localized: "key.search.result-\(query.trim())")
+                    self.state = .loading
+                    self.title = .init(localized: "key.search.result-\(self.query.trim())")
                 }
 
-                getData(query: query.trim())
+                self.getData(query: self.query.trim())
             } else {
                 withAnimation(.easeInOut) {
-                    title = .init(localized: "key.search")
-                    state = .data([])
+                    self.title = .init(localized: "key.search")
+                    self.state = .data([])
                 }
-            }
-        } else {
-            searchWork = DispatchWorkItem {
-                self.paginationState = .idle
-                self.page = 1
-                self.subscriptions.flush()
-
-                if !self.query.trim().isEmpty {
-                    withAnimation(.easeInOut) {
-                        self.state = .loading
-                        self.title = .init(localized: "key.search.result-\(self.query.trim())")
-                    }
-
-                    self.getData(query: self.query.trim())
-                } else {
-                    withAnimation(.easeInOut) {
-                        self.title = .init(localized: "key.search")
-                        self.state = .data([])
-                    }
-                }
-            }
-
-            if let searchWork {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: searchWork)
             }
         }
     }

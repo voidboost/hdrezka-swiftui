@@ -83,7 +83,7 @@ class PlayerViewModel {
     private(set) var isPictureInPicturePossible: Bool = false
     private(set) var loadedTimeRanges: [CMTimeRange] = []
     var timer: Int?
-    private var timerWork: DispatchWorkItem?
+    private var timerTask: Task<Void, Never>?
     private(set) var nextTimer: CGFloat?
     var currentTime: Double = 0.0
     private(set) var duration: Double = .greatestFiniteMagnitude
@@ -93,7 +93,7 @@ class PlayerViewModel {
     private(set) var isLoading: Bool = true
     private(set) var isMaskShow: Bool = true
     private var isMaskLocked: Bool = false
-    private var delayHide: DispatchWorkItem?
+    private var hideMaskTask: Task<Void, Never>?
     private(set) var subtitlesOptions: [AVMediaSelectionOption] = []
     private(set) var thumbnails: WebVTT?
     var window: NSWindow?
@@ -211,7 +211,7 @@ class PlayerViewModel {
                                 acting: voiceActing.translatorId,
                                 season: season?.seasonId,
                                 episode: episode?.episodeId,
-                                position: currentTime,
+                                position: currentTime
                             )
 
                             modelContext.insert(position)
@@ -251,7 +251,7 @@ class PlayerViewModel {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: season?.seasonId,
-                                    episode: episode?.episodeId,
+                                    episode: episode?.episodeId
                                 )
 
                                 modelContext.insert(position)
@@ -696,8 +696,8 @@ class PlayerViewModel {
         remoteCommandCenter.previousTrackCommand.removeTarget(nil)
         remoteCommandCenter.nextTrackCommand.removeTarget(nil)
 
-        timerWork?.cancel()
-        delayHide?.cancel()
+        timerTask?.cancel()
+        hideMaskTask?.cancel()
 
         thumbnails = nil
 
@@ -753,7 +753,7 @@ class PlayerViewModel {
                         acting: voiceActing.translatorId,
                         season: season?.seasonId,
                         episode: episode?.episodeId,
-                        subtitles: language,
+                        subtitles: language
                     )
 
                     modelContext.insert(position)
@@ -763,7 +763,7 @@ class PlayerViewModel {
     }
 
     func resetTimer() {
-        timerWork?.cancel()
+        timerTask?.cancel()
 
         updateNextTimer()
 
@@ -774,18 +774,18 @@ class PlayerViewModel {
             return
         }
 
-        timerWork = DispatchWorkItem {
-            guard let player = self.playerLayer.player,
+        timerTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(timer))
+
+            guard !Task.isCancelled,
+                  let self,
+                  let player = self.playerLayer.player,
                   player.status == .readyToPlay
             else {
                 return
             }
 
             player.pause()
-        }
-
-        if let timerWork {
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(timer), execute: timerWork)
         }
     }
 
@@ -796,18 +796,18 @@ class PlayerViewModel {
             isMaskShow = newValue
         }
 
-        delayHide?.cancel()
+        hideMaskTask?.cancel()
 
-        if newValue, !isLoading, isPlaying {
-            delayHide = DispatchWorkItem {
-                self.showCursor(false)
+        guard newValue, !isLoading, isPlaying else { return }
 
-                self.setMask(false)
-            }
+        hideMaskTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(3))
 
-            if let delayHide {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: delayHide)
-            }
+            guard !Task.isCancelled, let self else { return }
+
+            self.showCursor(false)
+
+            self.setMask(false)
         }
     }
 
@@ -818,7 +818,7 @@ class PlayerViewModel {
             isMaskShow = newValue
         }
 
-        delayHide?.cancel()
+        hideMaskTask?.cancel()
     }
 
     func unlockMask(_ newValue: Bool) {
