@@ -41,7 +41,7 @@ struct DetailsView: View {
                         genreDestination: $genreDestination,
                         personDestination: $personDestination,
                         listDestination: $listDestination,
-                        collectionDestination: $collectionDestination,
+                        collectionDestination: $collectionDestination
                     )
                     .environment(viewModel)
                 }
@@ -400,7 +400,7 @@ struct DetailsView: View {
                                             genreDestination: $genreDestination,
                                             personDestination: $personDestination,
                                             listDestination: $listDestination,
-                                            collectionDestination: $collectionDestination,
+                                            collectionDestination: $collectionDestination
                                         )
                                     }
 
@@ -417,7 +417,7 @@ struct DetailsView: View {
                                             genreDestination: $genreDestination,
                                             personDestination: $personDestination,
                                             listDestination: $listDestination,
-                                            collectionDestination: $collectionDestination,
+                                            collectionDestination: $collectionDestination
                                         )
                                     }
 
@@ -434,7 +434,7 @@ struct DetailsView: View {
                                             genreDestination: $genreDestination,
                                             personDestination: $personDestination,
                                             listDestination: $listDestination,
-                                            collectionDestination: $collectionDestination,
+                                            collectionDestination: $collectionDestination
                                         )
                                     }
 
@@ -451,7 +451,7 @@ struct DetailsView: View {
                                             genreDestination: $genreDestination,
                                             personDestination: $personDestination,
                                             listDestination: $listDestination,
-                                            collectionDestination: $collectionDestination,
+                                            collectionDestination: $collectionDestination
                                         )
                                     }
 
@@ -468,7 +468,7 @@ struct DetailsView: View {
                                             genreDestination: $genreDestination,
                                             personDestination: $personDestination,
                                             listDestination: $listDestination,
-                                            collectionDestination: $collectionDestination,
+                                            collectionDestination: $collectionDestination
                                         )
                                     }
 
@@ -485,7 +485,7 @@ struct DetailsView: View {
                                             genreDestination: $genreDestination,
                                             personDestination: $personDestination,
                                             listDestination: $listDestination,
-                                            collectionDestination: $collectionDestination,
+                                            collectionDestination: $collectionDestination
                                         )
                                     }
 
@@ -612,14 +612,14 @@ struct DetailsView: View {
                             autoPlay: false,
                             loopEnabled: true,
                             showControls: true,
-                            showFullscreenButton: true,
+                            showFullscreenButton: true
                         ),
                         configuration: .init(
                             openURLAction: .init { url, _ in
                                 openURL(url)
-                            },
+                            }
                         ),
-                        isLoggingEnabled: isLoggingEnabled,
+                        isLoggingEnabled: isLoggingEnabled
                     )
 
                     YouTubePlayerView(trailer, transaction: .init(animation: .easeInOut)) { state in
@@ -641,7 +641,7 @@ struct DetailsView: View {
                     .clipShape(.rect(cornerRadius: 6))
                     .onScrollVisibilityChange { isVisible in
                         if !isVisible, trailer.isPlaying {
-                            Task {
+                            Task { @MainActor in
                                 try? await trailer.pause()
                             }
                         }

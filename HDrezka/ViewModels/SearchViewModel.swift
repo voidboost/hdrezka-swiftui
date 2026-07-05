@@ -54,7 +54,7 @@ class SearchViewModel {
     func load(force: Bool = false) {
         searchTask?.cancel()
 
-        searchTask = Task { [weak self] in
+        searchTask = Task { @MainActor [weak self] in
             if !force {
                 try? await Task.sleep(for: .milliseconds(500))
             }
