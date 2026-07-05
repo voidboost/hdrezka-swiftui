@@ -206,20 +206,16 @@ struct RestoreSheetView: View {
             .sink { completion in
                 guard case let .failure(error) = completion else { return }
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    withAnimation(.easeInOut) {
-                        state = .error(error)
-                    }
+                withAnimation(.easeInOut) {
+                    state = .error(error)
                 }
             } receiveValue: { email in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    if let email, !email.isEmpty {
-                        self.email = email
-                        isSuccessPresented = true
-                    } else {
-                        withAnimation(.easeInOut) {
-                            state = .error(NSError())
-                        }
+                if let email, !email.isEmpty {
+                    self.email = email
+                    isSuccessPresented = true
+                } else {
+                    withAnimation(.easeInOut) {
+                        state = .error(NSError())
                     }
                 }
             }

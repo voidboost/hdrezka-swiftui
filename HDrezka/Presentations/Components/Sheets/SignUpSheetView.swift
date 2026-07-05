@@ -28,7 +28,6 @@ struct SignUpSheetView: View {
     private let validator = Validator()
 
     @State private var confirmPasswordValidResult: ValidationResult?
-    @State private var confirmPasswordCheck: DispatchWorkItem?
     private var confirmPasswordValid: Bool {
         if case .valid = confirmPasswordValidResult {
             true
@@ -146,68 +145,62 @@ struct SignUpSheetView: View {
                                 HStack(alignment: .center, spacing: 8) {
                                     Text("key.password")
 
-                                    if showPassword {
-                                        TextField("key.password", text: $password1, prompt: Text(String(localized: "key.password").lowercased()))
-                                            .textFieldStyle(.plain)
-                                            .multilineTextAlignment(.trailing)
-                                            .focused($focusedField, equals: .password1)
-                                            .onChange(of: password1) {
-                                                withAnimation(.easeInOut(duration: 0.15)) {
-                                                    passwordIsEmpty = password1.isEmpty
-                                                }
-
-                                                withAnimation(.easeInOut) {
-                                                    confirmPasswordValidResult = nil
-                                                }
-
-                                                confirmPasswordCheck?.cancel()
-
-                                                if !password1.isEmpty, !password2.isEmpty {
-                                                    confirmPasswordCheck = DispatchWorkItem {
-                                                        withAnimation(.easeInOut) {
-                                                            confirmPasswordValidResult = validator.validate(input: password2, rule: EqualityValidationRule(compareTo: password1, error: String(localized: "key.password.confirm.error")))
-                                                        }
+                                    Group {
+                                        if showPassword {
+                                            TextField("key.password", text: $password1, prompt: Text(String(localized: "key.password").lowercased()))
+                                                .textFieldStyle(.plain)
+                                                .multilineTextAlignment(.trailing)
+                                                .focused($focusedField, equals: .password1)
+                                                .task(id: password1) {
+                                                    withAnimation(.easeInOut(duration: 0.15)) {
+                                                        passwordIsEmpty = password1.isEmpty
                                                     }
 
-                                                    if let confirmPasswordCheck {
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: confirmPasswordCheck)
-                                                    }
-                                                }
-                                            }
-                                            .onSubmit {
-                                                focusedField = .password2
-                                            }
-                                    } else {
-                                        SecureField("key.password", text: $password1, prompt: Text(String(localized: "key.password").lowercased()))
-                                            .textFieldStyle(.plain)
-                                            .multilineTextAlignment(.trailing)
-                                            .focused($focusedField, equals: .password1)
-                                            .onChange(of: password1) {
-                                                withAnimation(.easeInOut(duration: 0.15)) {
-                                                    passwordIsEmpty = password1.isEmpty
-                                                }
-
-                                                withAnimation(.easeInOut) {
-                                                    confirmPasswordValidResult = nil
-                                                }
-
-                                                confirmPasswordCheck?.cancel()
-
-                                                if !password1.isEmpty, !password2.isEmpty {
-                                                    confirmPasswordCheck = DispatchWorkItem {
-                                                        withAnimation(.easeInOut) {
-                                                            confirmPasswordValidResult = validator.validate(input: password2, rule: EqualityValidationRule(compareTo: password1, error: String(localized: "key.password.confirm.error")))
-                                                        }
+                                                    withAnimation(.easeInOut) {
+                                                        confirmPasswordValidResult = nil
                                                     }
 
-                                                    if let confirmPasswordCheck {
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: confirmPasswordCheck)
+                                                    guard !password1.isEmpty, !password2.isEmpty else { return }
+
+                                                    try? await Task.sleep(for: .milliseconds(500))
+
+                                                    guard !Task.isCancelled else { return }
+
+                                                    withAnimation(.easeInOut) {
+                                                        confirmPasswordValidResult = validator.validate(input: password2, rule: EqualityValidationRule(compareTo: password1, error: String(localized: "key.password.confirm.error")))
                                                     }
                                                 }
-                                            }
-                                            .onSubmit {
-                                                focusedField = .password2
-                                            }
+                                                .onSubmit {
+                                                    focusedField = .password2
+                                                }
+                                        } else {
+                                            SecureField("key.password", text: $password1, prompt: Text(String(localized: "key.password").lowercased()))
+                                                .textFieldStyle(.plain)
+                                                .multilineTextAlignment(.trailing)
+                                                .focused($focusedField, equals: .password1)
+                                                .onSubmit {
+                                                    focusedField = .password2
+                                                }
+                                        }
+                                    }
+                                    .task(id: password1) {
+                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                            passwordIsEmpty = password1.isEmpty
+                                        }
+
+                                        withAnimation(.easeInOut) {
+                                            confirmPasswordValidResult = nil
+                                        }
+
+                                        guard !password1.isEmpty, !password2.isEmpty else { return }
+
+                                        try? await Task.sleep(for: .milliseconds(500))
+
+                                        guard !Task.isCancelled else { return }
+
+                                        withAnimation(.easeInOut) {
+                                            confirmPasswordValidResult = validator.validate(input: password2, rule: EqualityValidationRule(compareTo: password1, error: String(localized: "key.password.confirm.error")))
+                                        }
                                     }
 
                                     if !passwordIsEmpty {
@@ -226,7 +219,7 @@ struct SignUpSheetView: View {
                                                         } completion: {
                                                             focusedField = .password1
                                                         }
-                                                    },
+                                                    }
                                             )
                                     }
                                 }
@@ -237,72 +230,47 @@ struct SignUpSheetView: View {
                                 HStack(alignment: .center, spacing: 8) {
                                     Text("key.password.confirm")
 
-                                    if showConfirmPassword {
-                                        TextField("key.password.confirm", text: $password2, prompt: Text(String(localized: "key.password.confirm").lowercased()))
-                                            .textFieldStyle(.plain)
-                                            .multilineTextAlignment(.trailing)
-                                            .focused($focusedField, equals: .password2)
-                                            .onChange(of: password2) {
-                                                withAnimation(.easeInOut(duration: 0.15)) {
-                                                    confirmPasswordIsEmpty = password2.isEmpty
-                                                }
-
-                                                withAnimation(.easeInOut) {
-                                                    confirmPasswordValidResult = nil
-                                                }
-
-                                                confirmPasswordCheck?.cancel()
-
-                                                if !password1.isEmpty, !password2.isEmpty {
-                                                    confirmPasswordCheck = DispatchWorkItem {
-                                                        withAnimation(.easeInOut) {
-                                                            confirmPasswordValidResult = validator.validate(input: password2, rule: EqualityValidationRule(compareTo: password1, error: String(localized: "key.password.confirm.error")))
-                                                        }
-                                                    }
-
-                                                    if let confirmPasswordCheck {
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: confirmPasswordCheck)
+                                    Group {
+                                        if showConfirmPassword {
+                                            TextField("key.password.confirm", text: $password2, prompt: Text(String(localized: "key.password.confirm").lowercased()))
+                                                .textFieldStyle(.plain)
+                                                .multilineTextAlignment(.trailing)
+                                                .focused($focusedField, equals: .password2)
+                                                .onSubmit {
+                                                    if confirmPasswordValid {
+                                                        load()
                                                     }
                                                 }
-                                            }
-                                            .onSubmit {
-                                                if confirmPasswordValid {
-                                                    load()
-                                                }
-                                            }
-                                    } else {
-                                        SecureField("key.password.confirm", text: $password2, prompt: Text(String(localized: "key.password.confirm").lowercased()))
-                                            .textFieldStyle(.plain)
-                                            .multilineTextAlignment(.trailing)
-                                            .focused($focusedField, equals: .password2)
-                                            .onChange(of: password2) {
-                                                withAnimation(.easeInOut(duration: 0.15)) {
-                                                    confirmPasswordIsEmpty = password2.isEmpty
-                                                }
-
-                                                withAnimation(.easeInOut) {
-                                                    confirmPasswordValidResult = nil
-                                                }
-
-                                                confirmPasswordCheck?.cancel()
-
-                                                if !password1.isEmpty, !password2.isEmpty {
-                                                    confirmPasswordCheck = DispatchWorkItem {
-                                                        withAnimation(.easeInOut) {
-                                                            confirmPasswordValidResult = validator.validate(input: password2, rule: EqualityValidationRule(compareTo: password1, error: String(localized: "key.password.confirm.error")))
-                                                        }
-                                                    }
-
-                                                    if let confirmPasswordCheck {
-                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: confirmPasswordCheck)
+                                        } else {
+                                            SecureField("key.password.confirm", text: $password2, prompt: Text(String(localized: "key.password.confirm").lowercased()))
+                                                .textFieldStyle(.plain)
+                                                .multilineTextAlignment(.trailing)
+                                                .focused($focusedField, equals: .password2)
+                                                .onSubmit {
+                                                    if confirmPasswordValid {
+                                                        load()
                                                     }
                                                 }
-                                            }
-                                            .onSubmit {
-                                                if confirmPasswordValid {
-                                                    load()
-                                                }
-                                            }
+                                        }
+                                    }
+                                    .task(id: password2) {
+                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                            confirmPasswordIsEmpty = password2.isEmpty
+                                        }
+
+                                        withAnimation(.easeInOut) {
+                                            confirmPasswordValidResult = nil
+                                        }
+
+                                        guard !password1.isEmpty, !password2.isEmpty else { return }
+
+                                        try? await Task.sleep(for: .milliseconds(500))
+
+                                        guard !Task.isCancelled else { return }
+
+                                        withAnimation(.easeInOut) {
+                                            confirmPasswordValidResult = validator.validate(input: password2, rule: EqualityValidationRule(compareTo: password1, error: String(localized: "key.password.confirm.error")))
+                                        }
                                     }
 
                                     if !confirmPasswordIsEmpty {
@@ -321,7 +289,7 @@ struct SignUpSheetView: View {
                                                         } completion: {
                                                             focusedField = .password2
                                                         }
-                                                    },
+                                                    }
                                             )
                                     }
                                 }

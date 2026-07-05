@@ -28,7 +28,6 @@ struct SettingsView: View {
 
     @State private var host: String = ""
     @State private var hostValid: Bool?
-    @State private var hostCheck: DispatchWorkItem?
 
     private let updater: SPUUpdater
 
@@ -60,23 +59,19 @@ struct SettingsView: View {
                         .textFieldStyle(.plain)
                         .multilineTextAlignment(.trailing)
                         .autocorrectionDisabled()
-                        .onChange(of: host) {
+                        .task(id: host) {
                             withAnimation(.easeInOut) {
                                 hostValid = nil
                             }
 
-                            hostCheck?.cancel()
+                            guard !host.isEmpty else { return }
 
-                            if !host.isEmpty {
-                                hostCheck = DispatchWorkItem {
-                                    withAnimation(.easeInOut) {
-                                        hostValid = host.isValidHost && host != mirror.host()
-                                    }
-                                }
+                            try? await Task.sleep(for: .milliseconds(500))
 
-                                if let hostCheck {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: hostCheck)
-                                }
+                            guard !Task.isCancelled else { return }
+
+                            withAnimation(.easeInOut) {
+                                hostValid = host.isValidHost && host != mirror.host()
                             }
                         }
 
@@ -84,8 +79,9 @@ struct SettingsView: View {
                             Button {
                                 cookiesManager.setMirror(_mirror.defaultValue)
 
-                                hostValid = nil
-                                hostCheck?.cancel()
+                                withAnimation(.easeInOut) {
+                                    hostValid = nil
+                                }
                             } label: {
                                 Image(systemName: "gobackward")
                             }
@@ -116,8 +112,6 @@ struct SettingsView: View {
                             withAnimation(.easeInOut) {
                                 hostValid = nil
                             }
-
-                            hostCheck?.cancel()
                         } label: {
                             Image(systemName: "checkmark")
                                 .foregroundStyle(Color.accentColor)

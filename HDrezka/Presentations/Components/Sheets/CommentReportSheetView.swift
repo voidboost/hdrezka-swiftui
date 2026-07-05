@@ -67,16 +67,12 @@ struct CommentReportSheetView: View {
                                 .sink { completion in
                                     guard case let .failure(error) = completion else { return }
 
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                        withAnimation(.easeInOut) {
-                                            state = .error(error)
-                                        }
+                                    withAnimation(.easeInOut) {
+                                        state = .error(error)
                                     }
                                 } receiveValue: { success in
                                     if success {
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                            dismiss()
-                                        }
+                                        dismiss()
                                     } else {
                                         withAnimation(.easeInOut) {
                                             state = .error(NSError())
@@ -203,7 +199,7 @@ struct CommentReportSheetView: View {
         init(tag: Reports, selection: Binding<Reports?>, message: Binding<String>, label: LocalizedStringKey) {
             _isSelected = Binding(
                 get: { selection.wrappedValue == tag },
-                set: { _ in selection.wrappedValue = tag },
+                set: { _ in selection.wrappedValue = tag }
             )
             _message = message
             self.tag = tag

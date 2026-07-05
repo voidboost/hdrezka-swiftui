@@ -190,7 +190,7 @@ struct CommentsView: View {
             _movieDestination = movieDestination
         }
 
-        @State private var delayShow: DispatchWorkItem?
+        @State private var isHovering = false
 
         @Default(.isLoggedIn) private var isLoggedIn
 
@@ -261,18 +261,17 @@ struct CommentsView: View {
                         }
                         .buttonStyle(.plain)
                         .disabled(comment.selfComment)
-                        .onHover { hovering in
-                            delayShow?.cancel()
+                        .onHover { isHovering in
+                            self.isHovering = isHovering
+                        }
+                        .task(id: isHovering) {
+                            guard isHovering else { return }
 
-                            if hovering {
-                                delayShow = DispatchWorkItem {
-                                    viewModel.getLikes(comment: comment)
-                                }
+                            try? await Task.sleep(for: .milliseconds(500))
 
-                                if let delayShow {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: delayShow)
-                                }
-                            }
+                            guard !Task.isCancelled else { return }
+
+                            viewModel.getLikes(comment: comment)
                         }
                         .popover(item: $viewModel.likes[comment.commentId], attachmentAnchor: .rect(.bounds), arrowEdge: .top) { like in
                             VStack(alignment: .center, spacing: 10) {
@@ -533,7 +532,7 @@ struct CommentsView: View {
                 selection: Binding<TextSelection?>,
                 prefix: String,
                 suffix: String,
-                icon: String? = nil,
+                icon: String? = nil
             ) {
                 _feedback = feedback
                 _selection = selection
