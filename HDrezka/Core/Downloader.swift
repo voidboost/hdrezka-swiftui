@@ -69,8 +69,10 @@ class Downloader {
             "--user-agent=\(Const.userAgent)",
         ]
 
-        process.terminationHandler = { _ in
-            DispatchQueue.main.async {
+        process.terminationHandler = { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+
                 self.subscriptions.flush()
 
                 withAnimation(.easeInOut) {
@@ -95,8 +97,8 @@ class Downloader {
                     Aria2Request(
                         method: .getGlobalStat,
                         params: EmptyTokenParams(
-                            token: Const.token,
-                        ),
+                            token: Const.token
+                        )
                     ))
                     .catch { _ in Empty<Aria2Response<GlobalStatusResult>, Error>() }
             }
@@ -124,9 +126,9 @@ class Downloader {
                             method: .tellActive,
                             params: OffsetParams(
                                 token: Const.token,
-                                keys: keys,
-                            ),
-                        ),
+                                keys: keys
+                            )
+                        )
                     )
                 }
 
@@ -138,9 +140,9 @@ class Downloader {
                                 token: Const.token,
                                 offset: 0,
                                 num: result.numWaiting,
-                                keys: keys,
-                            ),
-                        ),
+                                keys: keys
+                            )
+                        )
                     )
                 }
 
@@ -152,9 +154,9 @@ class Downloader {
                                 token: Const.token,
                                 offset: 0,
                                 num: result.numStopped,
-                                keys: keys,
-                            ),
-                        ),
+                                keys: keys
+                            )
+                        )
                     )
                 }
 
@@ -207,9 +209,9 @@ class Downloader {
                                         method: .removeDownloadResult,
                                         params: GidParams(
                                             token: Const.token,
-                                            gid: status.gid,
-                                        ),
-                                    ),
+                                            gid: status.gid
+                                        )
+                                    )
                                 )
                                 .sink { _ in } receiveValue: { (_: Aria2Response<String>) in }
                                 .store(in: &self.subscriptions)
@@ -273,13 +275,13 @@ class Downloader {
             if let season = data.season, let episode = data.episode {
                 let (seasonName, episodeName) = (
                     String(localized: "key.season-\(season.name.contains(/^\d/) ? season.name : season.seasonId)"),
-                    String(localized: "key.episode-\(episode.name.contains(/^\d/) ? episode.name : episode.episodeId)"),
+                    String(localized: "key.episode-\(episode.name.contains(/^\d/) ? episode.name : episode.episodeId)")
                 )
 
                 let (movieFolder, seasonFolder, movieFile) = (
                     name.count > 255 - actingName.count - qualityName.count ? "\(name.prefix(255 - actingName.count - qualityName.count - 4))... \(qualityName)\(actingName)" : "\(name)\(qualityName)\(actingName)",
                     seasonName.count > 255 ? "\(seasonName.prefix(255 - 3))..." : "\(seasonName)",
-                    episodeName.count > 255 - 4 ? "\(episodeName.prefix(255 - 8))... .mp4" : "\(episodeName).mp4",
+                    episodeName.count > 255 - 4 ? "\(episodeName.prefix(255 - 8))... .mp4" : "\(episodeName).mp4"
                 )
 
                 if let movieDestination = fileManager.urls(for: .downloadsDirectory, in: .userDomainMask).first?
@@ -321,7 +323,7 @@ class Downloader {
                                             acting: data.acting.translatorId,
                                             season: season.seasonId,
                                             episode: episode.episodeId,
-                                            subtitles: data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk"),
+                                            subtitles: data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
                                         )
 
                                         modelContext.insert(position)
@@ -338,9 +340,9 @@ class Downloader {
                                                 options: [
                                                     "dir": movieDestination.path(percentEncoded: false),
                                                     "out": movieFile.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"),
-                                                ],
-                                            ),
-                                        ),
+                                                ]
+                                            )
+                                        )
                                     )
                                     .receive(on: DispatchQueue.main)
                                     .sink { _ in } receiveValue: { (response: Aria2Response<String>) in
@@ -349,8 +351,8 @@ class Downloader {
                                                 .init(
                                                     gid: gid,
                                                     data: data,
-                                                    fileURL: movieDestination.appending(path: movieFile.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .notDirectory),
-                                                ),
+                                                    fileURL: movieDestination.appending(path: movieFile.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .notDirectory)
+                                                )
                                             )
 
                                             self.notificate(data.notificationId, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(data.name)"), "cancel", ["gid": gid])
@@ -376,9 +378,9 @@ class Downloader {
                                                     options: [
                                                         "dir": movieDestination.path(percentEncoded: false),
                                                         "out": movieFile.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":").replacingOccurrences(of: ".mp4", with: " [\(sub.name)].\(subtitlesUrl.pathExtension)"),
-                                                    ],
-                                                ),
-                                            ),
+                                                    ]
+                                                )
+                                            )
                                         )
                                         .sink { _ in } receiveValue: { (_: Aria2Response<String>) in }
                                         .store(in: &subscriptions)
@@ -430,7 +432,7 @@ class Downloader {
                                         let position = SelectPosition(
                                             id: data.acting.voiceId,
                                             acting: data.acting.translatorId,
-                                            subtitles: data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk"),
+                                            subtitles: data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
                                         )
 
                                         modelContext.insert(position)
@@ -447,9 +449,9 @@ class Downloader {
                                                 options: [
                                                     "dir": movieDestination.path(percentEncoded: false),
                                                     "out": file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"),
-                                                ],
-                                            ),
-                                        ),
+                                                ]
+                                            )
+                                        )
                                     )
                                     .receive(on: DispatchQueue.main)
                                     .sink { _ in } receiveValue: { (response: Aria2Response<String>) in
@@ -458,8 +460,8 @@ class Downloader {
                                                 .init(
                                                     gid: gid,
                                                     data: data,
-                                                    fileURL: movieDestination.appending(path: file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .notDirectory),
-                                                ),
+                                                    fileURL: movieDestination.appending(path: file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .notDirectory)
+                                                )
                                             )
 
                                             self.notificate(data.notificationId, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(data.name)"), "cancel", ["gid": gid])
@@ -485,9 +487,9 @@ class Downloader {
                                                     options: [
                                                         "dir": movieDestination.path(percentEncoded: false),
                                                         "out": file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":").replacingOccurrences(of: ".mp4", with: " [\(sub.name)].\(subtitlesUrl.pathExtension)"),
-                                                    ],
-                                                ),
-                                            ),
+                                                    ]
+                                                )
+                                            )
                                         )
                                         .sink { _ in } receiveValue: { (_: Aria2Response<String>) in }
                                         .store(in: &subscriptions)
@@ -513,9 +515,9 @@ class Downloader {
                     token: Const.token,
                     options: [
                         "max-concurrent-downloads": Defaults[.maxConcurrentDownloads],
-                    ],
-                ),
-            ),
+                    ]
+                )
+            )
         )
         .sink { _ in } receiveValue: { (_: Aria2Response<String>) in }
         .store(in: &subscriptions)
@@ -527,9 +529,9 @@ class Downloader {
                 method: .remove,
                 params: GidParams(
                     token: Const.token,
-                    gid: gid,
-                ),
-            ),
+                    gid: gid
+                )
+            )
         )
         .receive(on: DispatchQueue.main)
         .sink { _ in } receiveValue: { (response: Aria2Response<String>) in
@@ -551,9 +553,9 @@ class Downloader {
                         method: .removeDownloadResult,
                         params: GidParams(
                             token: Const.token,
-                            gid: gid,
-                        ),
-                    ),
+                            gid: gid
+                        )
+                    )
                 )
                 .sink { _ in } receiveValue: { (_: Aria2Response<String>) in }
                 .store(in: &self.subscriptions)
@@ -568,9 +570,9 @@ class Downloader {
                 method: .pause,
                 params: GidParams(
                     token: Const.token,
-                    gid: gid,
-                ),
-            ),
+                    gid: gid
+                )
+            )
         )
         .receive(on: DispatchQueue.main)
         .sink { _ in } receiveValue: { (response: Aria2Response<String>) in
@@ -611,9 +613,9 @@ class Downloader {
                 method: .unpause,
                 params: GidParams(
                     token: Const.token,
-                    gid: gid,
-                ),
-            ),
+                    gid: gid
+                )
+            )
         )
         .receive(on: DispatchQueue.main)
         .sink { _ in } receiveValue: { (response: Aria2Response<String>) in

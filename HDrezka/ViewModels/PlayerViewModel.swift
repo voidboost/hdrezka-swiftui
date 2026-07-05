@@ -774,7 +774,7 @@ class PlayerViewModel {
             return
         }
 
-        timerTask = Task { [weak self] in
+        timerTask = Task { @MainActor [weak self] in
             try? await Task.sleep(for: .seconds(timer))
 
             guard !Task.isCancelled,
@@ -800,7 +800,7 @@ class PlayerViewModel {
 
         guard newValue, !isLoading, isPlaying else { return }
 
-        hideMaskTask = Task { [weak self] in
+        hideMaskTask = Task { @MainActor [weak self] in
             try? await Task.sleep(for: .seconds(3))
 
             guard !Task.isCancelled, let self else { return }
