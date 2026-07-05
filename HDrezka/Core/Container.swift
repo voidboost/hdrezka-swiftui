@@ -13,7 +13,7 @@ extension Container {
     var session: Factory<Session> {
         self {
             Session(
-                rootQueue: .main,
+                rootQueue: .init(label: "io.silentsea.hdrezka.rootQueue", qos: .userInitiated),
                 startRequestsImmediately: false,
                 interceptor: Interceptor(interceptors: [CustomInterceptor(), OfflineRetrier()]),
                 redirectHandler: .modify { task, request, _ in
@@ -22,7 +22,7 @@ extension Container {
 
                     return newRequest
                 },
-                eventMonitors: [CustomMonitor()],
+                eventMonitors: [CustomMonitor()]
             )
         }
         .singleton
