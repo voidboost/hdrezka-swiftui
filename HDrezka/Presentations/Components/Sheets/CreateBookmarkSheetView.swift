@@ -186,15 +186,11 @@ struct CreateBookmarkSheetView: View {
             .sink { completion in
                 guard case let .failure(error) = completion else { return }
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    withAnimation(.easeInOut) {
-                        state = .error(error)
-                    }
+                withAnimation(.easeInOut) {
+                    state = .error(error)
                 }
             } receiveValue: { _ in
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    dismiss()
-                }
+                dismiss()
             }
             .store(in: &subscriptions)
     }

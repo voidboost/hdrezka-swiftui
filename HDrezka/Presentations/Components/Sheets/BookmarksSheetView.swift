@@ -142,7 +142,7 @@ struct BookmarksSheetView: View {
                                                 Text(verbatim: bookmarks[index].firstState != true ? "+1" : "-1")
                                                 Text(verbatim: bookmarks[index].firstState != true ? "-1" : "+1")
                                             },
-                                            value: bookmark.count,
+                                            value: bookmark.count
                                         )
                                         .disabled(id.id == nil)
                                         .flexibility(.natural)
@@ -228,10 +228,8 @@ struct BookmarksSheetView: View {
             .sink { completion in
                 guard case let .failure(error) = completion else { return }
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    withAnimation(.easeInOut) {
-                        state = .error(error)
-                    }
+                withAnimation(.easeInOut) {
+                    state = .error(error)
                 }
             } receiveValue: { bookmarks in
                 withAnimation(.easeInOut) {
