@@ -30,7 +30,7 @@ struct DetailsInfoRowWithButtonsView<T: Named>: View {
                             if let person = item as? PersonSimple, !person.photo.isEmpty {
                                 DetailsPersonTextWithPhotoView(person: person)
                                     .contentShape(.rect)
-                            } else if let list = item as? MovieList, let position = list.moviePosition?.toNumeral() {
+                            } else if let list = item as? MovieList, let position = list.moviePosition?.ordinal {
                                 let place = Text("key.place-\(position)").foregroundStyle(.tertiary)
 
                                 Text("key.list-\(list.name)-\(place)")
@@ -119,7 +119,7 @@ struct DetailsInfoRowWithButtonsView<T: Named>: View {
                                                     .multilineTextAlignment(.center)
                                             }
                                             .contentShape(.rect)
-                                        } else if let list = item as? MovieList, let position = list.moviePosition?.toNumeral() {
+                                        } else if let list = item as? MovieList, let position = list.moviePosition?.ordinal {
                                             let place = Text("key.place-\(position)").foregroundStyle(.secondary)
 
                                             Text("key.list-\(list.name)-\(place)")
