@@ -75,18 +75,23 @@ struct PlayerView: View {
                     )
                     .overlay(alignment: .top) {
                         TopControlsView(player: player)
+                            .environment(viewModel)
                     }
                     .overlay(alignment: .center) {
                         MiddleControlsView(player: player)
+                            .environment(viewModel)
                     }
                     .overlay(alignment: .bottom) {
                         BottomControlsView(player: player)
+                            .environment(viewModel)
                     }
                     .overlay(alignment: .topTrailing) {
                         NextTimerView()
+                            .environment(viewModel)
                     }
                     .background(alignment: .center) {
                         GlowImageView()
+                            .environment(viewModel)
                     }
             } else if viewModel.isLoading {
                 ProgressView()
@@ -105,7 +110,6 @@ struct PlayerView: View {
         .preferredColorScheme(.dark)
         .tint(.primary)
         .contentShape(.rect)
-        .environment(viewModel)
         .onAppear {
             viewModel.dismiss = dismiss
 

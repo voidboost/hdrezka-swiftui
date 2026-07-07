@@ -45,3 +45,9 @@ struct CollectionCardView: View {
         .buttonStyle(.plain)
     }
 }
+
+extension CollectionCardView: Equatable {
+    static func == (lhs: CollectionCardView, rhs: CollectionCardView) -> Bool {
+        return lhs.collection.id == rhs.collection.id
+    }
+}
