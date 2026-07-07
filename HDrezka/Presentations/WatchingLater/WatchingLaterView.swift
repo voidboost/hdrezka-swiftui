@@ -23,6 +23,7 @@ struct WatchingLaterView: View {
                 if let movies = viewModel.state.data, !movies.isEmpty {
                     ForEach(movies) { movie in
                         WatchingLaterCardView(movie: movie)
+                            .equatable()
                             .contextMenu {
                                 Button {
                                     viewModel.switchWatchedItem(movie: movie)

@@ -104,3 +104,9 @@ struct WatchingLaterCardView: View {
         .disabled(movie.watchLaterId.id == nil)
     }
 }
+
+extension WatchingLaterCardView: Equatable {
+    static func == (lhs: WatchingLaterCardView, rhs: WatchingLaterCardView) -> Bool {
+        return lhs.movie.id == rhs.movie.id
+    }
+}

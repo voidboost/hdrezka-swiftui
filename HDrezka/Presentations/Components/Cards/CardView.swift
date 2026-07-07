@@ -104,3 +104,9 @@ struct CardView: View {
         .buttonStyle(.plain)
     }
 }
+
+extension CardView: Equatable {
+    static func == (lhs: CardView, rhs: CardView) -> Bool {
+        return lhs.movie.id == rhs.movie.id
+    }
+}

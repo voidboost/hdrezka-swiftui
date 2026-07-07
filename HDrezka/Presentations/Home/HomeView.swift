@@ -1,39 +1,44 @@
-import Defaults
 import SwiftUI
 
-struct CollectionsView: View {
-    private let title = String(localized: "key.collections")
+struct HomeView: View {
+    private let title = String(localized: "key.home")
 
-    @State private var viewModel = CollectionsViewModel()
+    @State private var viewModel = HomeViewModel()
 
-    private let columns = [
-        GridItem(.adaptive(minimum: 250, maximum: .infinity), spacing: 18, alignment: .topLeading),
-    ]
+    @State private var movieDestination: MovieSimple?
 
     var body: some View {
         ScrollView(.vertical) {
-            LazyVGrid(columns: columns, alignment: .leading, spacing: 18) {
-                if let collections = viewModel.state.data, !collections.isEmpty {
-                    ForEach(collections) { collection in
-                        CollectionCardView(collection: collection)
+            LazyVStack(alignment: .leading, spacing: 18) {
+                if let categories = viewModel.state.data, !categories.isEmpty {
+                    ForEach(categories) { category in
+                        HomeSectionView(category: category)
+                            .equatable()
+
+                        if category.category != Categories.allCases.last {
+                            Divider().padding(.horizontal, 36)
+                        }
                     }
                 }
             }
             .scrollTargetLayout()
             .padding(.vertical, 18)
-            .padding(.horizontal, 36)
 
-            if viewModel.paginationState == .loading {
+            if let error = viewModel.paginationState.error {
+                ErrorPaginationStateView(error) {
+                    viewModel.loadMore(reset: true)
+                }
+            } else if viewModel.paginationState == .loading {
                 LoadingPaginationStateView()
             }
         }
         .scrollIndicators(.visible, axes: .vertical)
-        .onScrollTargetVisibilityChange(idType: MoviesCollection.ID.self) { onScreenCards in
+        .onScrollTargetVisibilityChange(idType: Category.ID.self) { onScreenCategories in
             if viewModel.paginationState == .idle,
-               let collections = viewModel.state.data,
-               !collections.isEmpty,
-               let last = collections.last,
-               onScreenCards.contains(where: { $0 == last.id })
+               let categories = viewModel.state.data,
+               !categories.isEmpty,
+               let last = categories.last,
+               onScreenCategories.contains(where: { $0 == last.id })
             {
                 viewModel.loadMore()
             }
@@ -52,8 +57,8 @@ struct CollectionsView: View {
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if let collections = viewModel.state.data, collections.isEmpty {
-                EmptyStateView(String(localized: "key.collections.empty")) {
+            } else if let categories = viewModel.state.data, categories.isEmpty {
+                EmptyStateView(String(localized: "key.home.empty")) {
                     viewModel.load()
                 }
                 .padding(.vertical, 18)
@@ -76,6 +81,15 @@ struct CollectionsView: View {
                 .keyboardShortcut("r", modifiers: .command)
                 .disabled(viewModel.state.data?.isEmpty != false)
             }
+
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    viewModel.isSeriesUpdatesPresented = true
+                } label: {
+                    Image(systemName: "bell")
+                }
+                .disabled(viewModel.state.data == nil)
+            }
         }
         .onAppear {
             switch viewModel.state {
@@ -86,5 +100,11 @@ struct CollectionsView: View {
             }
         }
         .background(.background)
+        .sheet(isPresented: $viewModel.isSeriesUpdatesPresented) {
+            SeriesUpdatesSheetView(movieDestination: $movieDestination)
+        }
+        .navigationDestination(item: $movieDestination) {
+            DetailsView(movie: $0)
+        }
     }
 }

@@ -20,6 +20,12 @@ class DetailsViewModel {
     private(set) var state: DataState<MovieDetailed> = .loading
     private(set) var trailerId: String?
 
+    var countryDestination: MovieCountry?
+    var genreDestination: MovieGenre?
+    var personDestination: PersonSimple?
+    var listDestination: MovieList?
+    var collectionDestination: MoviesCollection?
+
     func load() {
         state = .loading
 

@@ -36,6 +36,7 @@ class CommentsViewModel {
     var isOnModerationPresented: Bool = false
     private(set) var message: String?
     var likes: [String: Likes] = [:]
+    var movieDestination: MovieSimple?
 
     @ObservationIgnored private var page = 1
 

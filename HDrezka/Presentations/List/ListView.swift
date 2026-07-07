@@ -36,6 +36,7 @@ struct ListView: View {
                 if let movies = viewModel.state.data, !movies.isEmpty {
                     ForEach(movies) { movie in
                         CardView(movie: movie)
+                            .equatable()
                     }
                 }
             }

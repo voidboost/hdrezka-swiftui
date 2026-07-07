@@ -75,9 +75,9 @@ struct ContentView: View {
                     .conditionalEffect(
                         .repeat(
                             .glow(color: .init(red: 138.0 / 255.0, green: 0.0, blue: 173.0 / 255.0), radius: 10),
-                            every: 5,
+                            every: 5
                         ),
-                        condition: isUserPremium <= 3,
+                        condition: isUserPremium <= 3
                     )
                 }
                 .buttonStyle(.plain)
