@@ -11,7 +11,7 @@ extension View {
     }
 
     func viewModifier(
-        @ViewBuilder body: (_ content: Self) -> some View,
+        @ContentBuilder body: (_ content: Self) -> some View,
     ) -> some View {
         body(self)
     }

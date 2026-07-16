@@ -25,7 +25,7 @@ struct Shimmer: ViewModifier {
 }
 
 extension View {
-    @ViewBuilder func shimmering(active: Bool = true) -> some View {
+    @ContentBuilder func shimmering(active: Bool = true) -> some View {
         if active {
             modifier(Shimmer())
         } else {
