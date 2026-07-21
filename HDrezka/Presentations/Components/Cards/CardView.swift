@@ -22,7 +22,7 @@ struct CardView: View {
                             Color.gray.shimmering()
                         }
                         .resizable()
-                        .loadTransition(.blurReplace, animation: .easeInOut)
+                        .loadTransition(.blurReplace(.downUp), animation: .bouncy)
                         .cancelOnDisappear(true)
                         .retry(NetworkRetryStrategy())
                         .imageFill(2 / 3)

@@ -27,7 +27,7 @@ struct CommentView: View {
                             Color.gray.shimmering()
                         }
                         .resizable()
-                        .loadTransition(.blurReplace, animation: .easeInOut)
+                        .loadTransition(.blurReplace(.downUp), animation: .bouncy)
                         .cancelOnDisappear(true)
                         .retry(NetworkRetryStrategy())
                         .scaledToFill()
@@ -110,7 +110,7 @@ struct CommentView: View {
                                                         Color.gray.shimmering()
                                                     }
                                                     .resizable()
-                                                    .loadTransition(.blurReplace, animation: .easeInOut)
+                                                    .loadTransition(.blurReplace(.downUp), animation: .bouncy)
                                                     .cancelOnDisappear(true)
                                                     .retry(NetworkRetryStrategy())
                                                     .scaledToFill()

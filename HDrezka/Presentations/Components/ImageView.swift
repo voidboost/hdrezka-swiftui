@@ -19,7 +19,7 @@ struct ImageView: View {
                 ProgressView()
             }
             .resizable()
-            .loadTransition(.blurReplace, animation: .easeInOut)
+            .loadTransition(.blurReplace(.downUp), animation: .bouncy)
             .cancelOnDisappear(true)
             .retry(NetworkRetryStrategy())
             .scaledToFit()
@@ -51,7 +51,7 @@ struct ImageView: View {
                         Color.gray
                     }
                     .resizable()
-                    .loadTransition(.opacity, animation: .easeInOut)
+                    .loadTransition(.blurReplace(.downUp), animation: .bouncy)
                     .cancelOnDisappear(true)
                     .retry(NetworkRetryStrategy())
                     .scaledToFill()
