@@ -103,6 +103,7 @@ class PlayerViewModel {
     private var videoGravity: VideoGravity = Defaults[.videoGravity]
     private var ambientLight: Bool = Defaults[.ambientLight]
     private(set) var playerFullscreen: Bool = Defaults[.playerFullscreen]
+    private var mediaControlButtonIsSeeking: Bool = Defaults[.mediaControlButtonIsSeeking]
     var isFocused = false
     var dismiss: DismissAction?
 
@@ -125,8 +126,8 @@ class PlayerViewModel {
             if let thumbnails = movie.thumbnails {
                 getMovieThumbnailsUseCase(path: thumbnails)
                     .receive(on: DispatchQueue.main)
-                    .sink { _ in } receiveValue: { thumbnails in
-                        self.thumbnails = thumbnails
+                    .sink { _ in } receiveValue: { [weak self] thumbnails in
+                        self?.thumbnails = thumbnails
                     }
                     .store(in: &subscriptions)
             }
@@ -134,22 +135,24 @@ class PlayerViewModel {
             player.periodicTimePublisher(forInterval: CMTime(seconds: 0.1, preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
                 .removeDuplicates()
                 .receive(on: DispatchQueue.main)
-                .sink { [self] time in
+                .sink { [weak self] time in
+                    guard let self else { return }
+
                     let currentTime = time.seconds
 
                     self.currentTime = currentTime
 
-                    nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
-                    nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = rate
-                    nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyCurrentPlaybackDate] = currentItem.currentDate()
-                    nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyDefaultPlaybackRate] = player.defaultRate
+                    self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
+                    self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = self.rate
+                    self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyCurrentPlaybackDate] = currentItem.currentDate()
+                    self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyDefaultPlaybackRate] = player.defaultRate
 
                     let targetTime = CMTime(seconds: time.seconds + 0.1, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
 
-                    if ambientLight, videoGravity == .fit, !isPictureInPictureActive {
-                        if videoOutput.hasNewPixelBuffer(forItemTime: targetTime) {
+                    if self.ambientLight, self.videoGravity == .fit, !self.isPictureInPictureActive {
+                        if self.videoOutput.hasNewPixelBuffer(forItemTime: targetTime) {
                             if #available(macOS 26.0, *),
-                               let pixelBuffer = videoOutput.pixelBufferAndDisplayTime(forItemTime: targetTime).pixelBuffer,
+                               let pixelBuffer = self.videoOutput.pixelBufferAndDisplayTime(forItemTime: targetTime).pixelBuffer,
                                let cgImage = pixelBuffer.withUnsafeBuffer({ buffer in
                                    let ciImage = CIImage(cvPixelBuffer: buffer)
 
@@ -163,14 +166,14 @@ class PlayerViewModel {
                                    return self.ciContext.createCGImage(transformed, from: transformed.extent)
                                })
                             {
-                                if glowImage == nil {
+                                if self.glowImage == nil {
                                     withAnimation(.easeInOut(duration: 0.15)) {
                                         self.glowImage = Image(decorative: cgImage, scale: 1.0)
                                     }
                                 } else {
-                                    glowImage = Image(decorative: cgImage, scale: 1.0)
+                                    self.glowImage = Image(decorative: cgImage, scale: 1.0)
                                 }
-                            } else if let pixelBuffer = videoOutput.copyPixelBuffer(forItemTime: targetTime, itemTimeForDisplay: nil) {
+                            } else if let pixelBuffer = self.videoOutput.copyPixelBuffer(forItemTime: targetTime, itemTimeForDisplay: nil) {
                                 let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
 
                                 let scaleTransform = CGAffineTransform(scaleX: 0.25, y: 0.25)
@@ -180,13 +183,13 @@ class PlayerViewModel {
                                     .clampedToExtent()
                                     .cropped(to: ciImage.extent.applying(scaleTransform))
 
-                                if let cgImage = ciContext.createCGImage(transformed, from: transformed.extent) {
-                                    if glowImage == nil {
+                                if let cgImage = self.ciContext.createCGImage(transformed, from: transformed.extent) {
+                                    if self.glowImage == nil {
                                         withAnimation(.easeInOut(duration: 0.15)) {
                                             self.glowImage = Image(decorative: cgImage, scale: 1.0)
                                         }
                                     } else {
-                                        glowImage = Image(decorative: cgImage, scale: 1.0)
+                                        self.glowImage = Image(decorative: cgImage, scale: 1.0)
                                     }
                                 }
                             }
@@ -218,21 +221,23 @@ class PlayerViewModel {
                         }
                     }
 
-                    updateNextTimer()
+                    self.updateNextTimer()
                 }
                 .store(in: &subscriptions)
 
             player.publisher(for: \.status)
                 .receive(on: DispatchQueue.main)
-                .sink { [self] status in
+                .sink { [weak self] status in
+                    guard let self else { return }
+
                     switch status {
                     case .readyToPlay:
-                        isFocused = true
+                        self.isFocused = true
 
                         if Defaults[.isLoggedIn] {
-                            saveWatchingStateUseCase(voiceActing: voiceActing, season: season, episode: episode)
+                            self.saveWatchingStateUseCase(voiceActing: self.voiceActing, season: self.season, episode: self.episode)
                                 .sink { _ in } receiveValue: { _ in }
-                                .store(in: &subscriptions)
+                                .store(in: &self.subscriptions)
                         }
 
                         Task { @MainActor [weak self] in
@@ -258,7 +263,9 @@ class PlayerViewModel {
                             }
                         }
 
-                        currentItem.asset.loadMediaSelectionGroup(for: .legible) { mediaSelectionGroup, _ in
+                        currentItem.asset.loadMediaSelectionGroup(for: .legible) { [weak self] mediaSelectionGroup, _ in
+                            guard let self else { return }
+
                             if let mediaSelectionGroup {
                                 currentItem.select(mediaSelectionGroup.options.filter { $0.extendedLanguageTag != nil }.first(where: { $0.extendedLanguageTag == subtitles }), in: mediaSelectionGroup)
 
@@ -270,27 +277,71 @@ class PlayerViewModel {
                             }
                         }
 
-                        if isSeries {
-                            remoteCommandCenter.previousTrackCommand.addTarget { _ in
+                        self.remoteCommandCenter.previousTrackCommand.removeTarget(nil)
+                        self.remoteCommandCenter.nextTrackCommand.removeTarget(nil)
+
+                        if self.isSeries, !self.mediaControlButtonIsSeeking {
+                            self.remoteCommandCenter.previousTrackCommand.addTarget { [weak self] _ in
+                                guard let self else { return .commandFailed }
+
                                 self.prevTrack()
 
                                 return .success
                             }
 
-                            remoteCommandCenter.nextTrackCommand.addTarget { _ in
+                            self.remoteCommandCenter.nextTrackCommand.addTarget { [weak self] _ in
+                                guard let self else { return .commandFailed }
+
                                 self.nextTrack()
 
                                 return .success
                             }
 
-                            remoteCommandCenter.previousTrackCommand.isEnabled = hasPrevoiusEpisode
-                            remoteCommandCenter.nextTrackCommand.isEnabled = hasNextEpisode
+                            self.remoteCommandCenter.previousTrackCommand.isEnabled = self.hasPrevoiusEpisode
+                            self.remoteCommandCenter.nextTrackCommand.isEnabled = self.hasNextEpisode
+                        } else if self.mediaControlButtonIsSeeking {
+                            self.remoteCommandCenter.previousTrackCommand.addTarget { [weak self] _ in
+                                guard let self else { return .commandFailed }
+
+                                player.seek(to: CMTime(seconds: max(self.currentTime - 10.0, 0.0), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] complete in
+                                    guard let self else { return }
+
+                                    if self.isPlaying, complete {
+                                        player.playImmediately(atRate: self.rate)
+                                    }
+                                }
+
+                                self.currentTime = max(self.currentTime - 10.0, 0.0)
+
+                                return .success
+                            }
+
+                            self.remoteCommandCenter.nextTrackCommand.addTarget { [weak self] _ in
+                                guard let self else { return .commandFailed }
+
+                                player.seek(to: CMTime(seconds: min(self.currentTime + 10.0, self.duration), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] complete in
+                                    guard let self else { return }
+
+                                    if self.isPlaying, complete {
+                                        player.playImmediately(atRate: self.rate)
+                                    }
+                                }
+
+                                self.currentTime = min(self.currentTime + 10.0, self.duration)
+
+                                return .success
+                            }
+
+                            self.remoteCommandCenter.previousTrackCommand.isEnabled = true
+                            self.remoteCommandCenter.nextTrackCommand.isEnabled = true
                         }
 
-                        updateNextTimer()
+                        self.updateNextTimer()
 
                         if let seek {
-                            player.seek(to: seek, toleranceBefore: .zero, toleranceAfter: .zero) { _ in
+                            player.seek(to: seek, toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] _ in
+                                guard let self else { return }
+
                                 if playing {
                                     player.playImmediately(atRate: self.rate)
                                 }
@@ -325,7 +376,9 @@ class PlayerViewModel {
 
             player.publisher(for: \.timeControlStatus)
                 .receive(on: DispatchQueue.main)
-                .sink { status in
+                .sink { [weak self] status in
+                    guard let self else { return }
+
                     withAnimation(.easeInOut(duration: 0.15)) {
                         switch status {
                         case .playing:
@@ -361,7 +414,9 @@ class PlayerViewModel {
 
             player.publisher(for: \.isMuted)
                 .receive(on: DispatchQueue.main)
-                .sink { isMuted in
+                .sink { [weak self] isMuted in
+                    guard let self else { return }
+
                     Defaults[.isMuted] = isMuted
 
                     self.showCursor()
@@ -374,7 +429,9 @@ class PlayerViewModel {
 
             player.publisher(for: \.volume)
                 .receive(on: DispatchQueue.main)
-                .sink { volume in
+                .sink { [weak self] volume in
+                    guard let self else { return }
+
                     Defaults[.volume] = volume
 
                     player.isMuted = Defaults[.isMuted]
@@ -391,8 +448,12 @@ class PlayerViewModel {
                 .compactMap(\.self)
                 .handleError()
                 .receive(on: DispatchQueue.main)
-                .sink { error in
-                    self.resetPlayer {
+                .sink { [weak self] error in
+                    guard let self else { return }
+
+                    self.resetPlayer { [weak self] in
+                        guard let self else { return }
+
                         withAnimation(.easeInOut) {
                             self.error = error
                         }
@@ -404,7 +465,9 @@ class PlayerViewModel {
                 .compactMap(\.self)
                 .filter { $0.isValid && !$0.isIndefinite && !$0.isNegativeInfinity && !$0.isPositiveInfinity && $0.seconds > 0 }
                 .receive(on: DispatchQueue.main)
-                .sink { duration in
+                .sink { [weak self] duration in
+                    guard let self else { return }
+
                     self.duration = duration.seconds
 
                     self.nowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyPlaybackDuration] = duration.seconds
@@ -423,8 +486,12 @@ class PlayerViewModel {
                 .compactMap(\.self)
                 .handleError()
                 .receive(on: DispatchQueue.main)
-                .sink { error in
-                    self.resetPlayer {
+                .sink { [weak self] error in
+                    guard let self else { return }
+
+                    self.resetPlayer { [weak self] in
+                        guard let self else { return }
+
                         withAnimation(.easeInOut) {
                             self.error = error
                         }
@@ -434,8 +501,12 @@ class PlayerViewModel {
 
             NotificationCenter.default.publisher(for: AVPlayerItem.didPlayToEndTimeNotification, object: currentItem)
                 .receive(on: DispatchQueue.main)
-                .sink { _ in
-                    player.seek(to: CMTime(seconds: 0, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { _ in
+                .sink { [weak self] _ in
+                    guard let self else { return }
+
+                    player.seek(to: CMTime(seconds: 0, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] _ in
+                        guard let self else { return }
+
                         if self.isPictureInPictureActive, let pipController = self.pipController {
                             pipController.stopPictureInPicture()
                         } else if self.timer != -1, self.hasNextEpisode {
@@ -451,8 +522,12 @@ class PlayerViewModel {
                 .compactMap { $0.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? Error }
                 .handleError()
                 .receive(on: DispatchQueue.main)
-                .sink { error in
-                    self.resetPlayer {
+                .sink { [weak self] error in
+                    guard let self else { return }
+
+                    self.resetPlayer { [weak self] in
+                        guard let self else { return }
+
                         withAnimation(.easeInOut) {
                             self.error = error
                         }
@@ -466,7 +541,9 @@ class PlayerViewModel {
 
             NotificationCenter.default.publisher(for: .AVRouteDetectorMultipleRoutesDetectedDidChange)
                 .receive(on: DispatchQueue.main)
-                .sink { _ in
+                .sink { [weak self] _ in
+                    guard let self else { return }
+
                     withAnimation(.easeInOut(duration: 0.15)) {
                         self.routesDetected = self.routeDetector.multipleRoutesDetected
                     }
@@ -476,7 +553,9 @@ class PlayerViewModel {
             if let pipController {
                 pipController.publisher(for: \.isPictureInPictureActive)
                     .receive(on: DispatchQueue.main)
-                    .sink { isPictureInPictureActive in
+                    .sink { [weak self] isPictureInPictureActive in
+                        guard let self else { return }
+
                         withAnimation(.easeInOut) {
                             self.isPictureInPictureActive = isPictureInPictureActive
                         }
@@ -505,7 +584,9 @@ class PlayerViewModel {
 
                 pipController.publisher(for: \.isPictureInPicturePossible)
                     .receive(on: DispatchQueue.main)
-                    .sink { isPictureInPicturePossible in
+                    .sink { [weak self] isPictureInPicturePossible in
+                        guard let self else { return }
+
                         withAnimation(.easeInOut(duration: 0.15)) {
                             self.isPictureInPicturePossible = isPictureInPicturePossible
                         }
@@ -516,7 +597,9 @@ class PlayerViewModel {
             Defaults.publisher(.rate)
                 .receive(on: DispatchQueue.main)
                 .map(\.newValue)
-                .sink { rate in
+                .sink { [weak self] rate in
+                    guard let self else { return }
+
                     self.rate = rate
 
                     self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = rate
@@ -530,7 +613,9 @@ class PlayerViewModel {
             Defaults.publisher(.isMuted)
                 .receive(on: DispatchQueue.main)
                 .map(\.newValue)
-                .sink { isMuted in
+                .sink { [weak self] isMuted in
+                    guard let self else { return }
+
                     withAnimation(.easeInOut(duration: 0.15)) {
                         self.isMuted = isMuted
                     }
@@ -540,7 +625,9 @@ class PlayerViewModel {
             Defaults.publisher(.volume)
                 .receive(on: DispatchQueue.main)
                 .map(\.newValue)
-                .sink { volume in
+                .sink { [weak self] volume in
+                    guard let self else { return }
+
                     withAnimation(.easeInOut(duration: 0.15)) {
                         self.volume = volume
                     }
@@ -564,7 +651,9 @@ class PlayerViewModel {
             Defaults.publisher(.videoGravity)
                 .receive(on: DispatchQueue.main)
                 .map(\.newValue)
-                .sink { videoGravity in
+                .sink { [weak self] videoGravity in
+                    guard let self else { return }
+
                     self.videoGravity = videoGravity
 
                     self.setAmbientLight(self.ambientLight && videoGravity == .fit && !self.isPictureInPictureActive, avPlayerItem: currentItem)
@@ -576,10 +665,81 @@ class PlayerViewModel {
             Defaults.publisher(.ambientLight)
                 .receive(on: DispatchQueue.main)
                 .map(\.newValue)
-                .sink { ambientLight in
+                .sink { [weak self] ambientLight in
+                    guard let self else { return }
+
                     self.ambientLight = ambientLight
 
                     self.setAmbientLight(ambientLight && self.videoGravity == .fit && !self.isPictureInPictureActive, avPlayerItem: currentItem)
+                }
+                .store(in: &subscriptions)
+
+            Defaults.publisher(.mediaControlButtonIsSeeking)
+                .receive(on: DispatchQueue.main)
+                .map(\.newValue)
+                .sink { [weak self] mediaControlButtonIsSeeking in
+                    guard let self else { return }
+
+                    self.mediaControlButtonIsSeeking = mediaControlButtonIsSeeking
+
+                    self.remoteCommandCenter.previousTrackCommand.removeTarget(nil)
+                    self.remoteCommandCenter.nextTrackCommand.removeTarget(nil)
+
+                    if self.isSeries, player.status == .readyToPlay, !mediaControlButtonIsSeeking {
+                        self.remoteCommandCenter.previousTrackCommand.addTarget { [weak self] _ in
+                            guard let self else { return .commandFailed }
+
+                            self.prevTrack()
+
+                            return .success
+                        }
+
+                        self.remoteCommandCenter.nextTrackCommand.addTarget { [weak self] _ in
+                            guard let self else { return .commandFailed }
+
+                            self.nextTrack()
+
+                            return .success
+                        }
+
+                        self.remoteCommandCenter.previousTrackCommand.isEnabled = self.hasPrevoiusEpisode
+                        self.remoteCommandCenter.nextTrackCommand.isEnabled = self.hasNextEpisode
+                    } else if player.status == .readyToPlay, mediaControlButtonIsSeeking {
+                        self.remoteCommandCenter.previousTrackCommand.addTarget { [weak self] _ in
+                            guard let self else { return .commandFailed }
+
+                            player.seek(to: CMTime(seconds: max(self.currentTime - 10.0, 0.0), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] complete in
+                                guard let self else { return }
+
+                                if self.isPlaying, complete {
+                                    player.playImmediately(atRate: self.rate)
+                                }
+                            }
+
+                            self.currentTime = max(self.currentTime - 10.0, 0.0)
+
+                            return .success
+                        }
+
+                        self.remoteCommandCenter.nextTrackCommand.addTarget { [weak self] _ in
+                            guard let self else { return .commandFailed }
+
+                            player.seek(to: CMTime(seconds: min(self.currentTime + 10.0, self.duration), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] complete in
+                                guard let self else { return }
+
+                                if self.isPlaying, complete {
+                                    player.playImmediately(atRate: self.rate)
+                                }
+                            }
+
+                            self.currentTime = min(self.currentTime + 10.0, self.duration)
+
+                            return .success
+                        }
+
+                        self.remoteCommandCenter.previousTrackCommand.isEnabled = true
+                        self.remoteCommandCenter.nextTrackCommand.isEnabled = true
+                    }
                 }
                 .store(in: &subscriptions)
 
@@ -601,7 +761,9 @@ class PlayerViewModel {
                 }
             }
 
-            remoteCommandCenter.playCommand.addTarget { _ in
+            remoteCommandCenter.playCommand.addTarget { [weak self] _ in
+                guard let self else { return .commandFailed }
+
                 player.playImmediately(atRate: self.rate)
 
                 return .success
@@ -613,7 +775,9 @@ class PlayerViewModel {
                 return .success
             }
 
-            remoteCommandCenter.togglePlayPauseCommand.addTarget { _ in
+            remoteCommandCenter.togglePlayPauseCommand.addTarget { [weak self] _ in
+                guard let self else { return .commandFailed }
+
                 if self.isPlaying {
                     player.pause()
                 } else {
@@ -623,10 +787,16 @@ class PlayerViewModel {
                 return .success
             }
 
-            remoteCommandCenter.changePlaybackPositionCommand.addTarget { event in
-                guard let effectiveEvent = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
+            remoteCommandCenter.changePlaybackPositionCommand.addTarget { [weak self] event in
+                guard let self,
+                      let effectiveEvent = event as? MPChangePlaybackPositionCommandEvent
+                else {
+                    return .commandFailed
+                }
 
-                player.seek(to: CMTime(seconds: effectiveEvent.positionTime, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { success in
+                player.seek(to: CMTime(seconds: effectiveEvent.positionTime, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] success in
+                    guard let self else { return }
+
                     if success {
                         self.updateNextTimer()
                     }
@@ -635,8 +805,12 @@ class PlayerViewModel {
                 return .success
             }
 
-            remoteCommandCenter.changePlaybackRateCommand.addTarget { event in
-                guard let effectiveEvent = event as? MPChangePlaybackRateCommandEvent else { return .commandFailed }
+            remoteCommandCenter.changePlaybackRateCommand.addTarget { [weak self] event in
+                guard let self,
+                      let effectiveEvent = event as? MPChangePlaybackRateCommandEvent
+                else {
+                    return .commandFailed
+                }
 
                 Defaults[.rate] = effectiveEvent.playbackRate
                 self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = effectiveEvent.playbackRate
@@ -648,12 +822,56 @@ class PlayerViewModel {
                 return .success
             }
 
+            remoteCommandCenter.skipBackwardCommand.addTarget { [weak self] event in
+                guard let self,
+                      let event = event as? MPSkipIntervalCommandEvent
+                else {
+                    return .commandFailed
+                }
+
+                player.seek(to: CMTime(seconds: max(self.currentTime - event.interval, 0.0), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] complete in
+                    guard let self else { return }
+
+                    if self.isPlaying, complete {
+                        player.playImmediately(atRate: self.rate)
+                    }
+                }
+
+                self.currentTime = max(self.currentTime - event.interval, 0.0)
+
+                return .success
+            }
+
+            remoteCommandCenter.skipForwardCommand.addTarget { [weak self] event in
+                guard let self,
+                      let event = event as? MPSkipIntervalCommandEvent
+                else {
+                    return .commandFailed
+                }
+
+                player.seek(to: CMTime(seconds: min(self.currentTime + event.interval, self.duration), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] complete in
+                    guard let self else { return }
+
+                    if self.isPlaying, complete {
+                        player.playImmediately(atRate: self.rate)
+                    }
+                }
+
+                self.currentTime = min(self.currentTime + event.interval, self.duration)
+
+                return .success
+            }
+
             remoteCommandCenter.pauseCommand.isEnabled = true
             remoteCommandCenter.playCommand.isEnabled = true
             remoteCommandCenter.togglePlayPauseCommand.isEnabled = true
             remoteCommandCenter.changePlaybackPositionCommand.isEnabled = true
             remoteCommandCenter.changePlaybackRateCommand.isEnabled = true
             remoteCommandCenter.changePlaybackRateCommand.supportedPlaybackRates = rates.map { NSNumber(value: $0) }
+            remoteCommandCenter.skipBackwardCommand.isEnabled = true
+            remoteCommandCenter.skipBackwardCommand.preferredIntervals = [10]
+            remoteCommandCenter.skipForwardCommand.isEnabled = true
+            remoteCommandCenter.skipForwardCommand.preferredIntervals = [10]
 
             remoteCommandCenter.previousTrackCommand.isEnabled = false
             remoteCommandCenter.nextTrackCommand.isEnabled = false
@@ -661,8 +879,6 @@ class PlayerViewModel {
             remoteCommandCenter.changeRepeatModeCommand.isEnabled = false
             remoteCommandCenter.enableLanguageOptionCommand.isEnabled = false
             remoteCommandCenter.changeShuffleModeCommand.isEnabled = false
-            remoteCommandCenter.skipForwardCommand.isEnabled = false
-            remoteCommandCenter.skipBackwardCommand.isEnabled = false
             remoteCommandCenter.ratingCommand.isEnabled = false
             remoteCommandCenter.likeCommand.isEnabled = false
             remoteCommandCenter.dislikeCommand.isEnabled = false
@@ -695,6 +911,8 @@ class PlayerViewModel {
         remoteCommandCenter.stopCommand.removeTarget(nil)
         remoteCommandCenter.previousTrackCommand.removeTarget(nil)
         remoteCommandCenter.nextTrackCommand.removeTarget(nil)
+        remoteCommandCenter.skipBackwardCommand.removeTarget(nil)
+        remoteCommandCenter.skipForwardCommand.removeTarget(nil)
 
         timerTask?.cancel()
         hideMaskTask?.cancel()
@@ -855,16 +1073,24 @@ class PlayerViewModel {
                 isLoading = true
             }
 
-            resetPlayer {
+            resetPlayer { [weak self] in
+                guard let self else { return }
+
                 self.getMovieVideoUseCase(voiceActing: self.voiceActing, season: season, episode: prevEpisode, favs: self.favs)
                     .receive(on: DispatchQueue.main)
-                    .sink { completion in
-                        guard case let .failure(error) = completion else { return }
+                    .sink { [weak self] completion in
+                        guard let self,
+                              case let .failure(error) = completion
+                        else {
+                            return
+                        }
 
                         withAnimation(.easeInOut) {
                             self.error = error
                         }
-                    } receiveValue: { movie in
+                    } receiveValue: { [weak self] movie in
+                        guard let self else { return }
+
                         if movie.needPremium {
                             self.dismiss?()
 
@@ -883,16 +1109,24 @@ class PlayerViewModel {
                 isLoading = true
             }
 
-            resetPlayer {
+            resetPlayer { [weak self] in
+                guard let self else { return }
+
                 self.getMovieVideoUseCase(voiceActing: self.voiceActing, season: prevSeason, episode: prevEpisode, favs: self.favs)
                     .receive(on: DispatchQueue.main)
-                    .sink { completion in
-                        guard case let .failure(error) = completion else { return }
+                    .sink { [weak self] completion in
+                        guard let self,
+                              case let .failure(error) = completion
+                        else {
+                            return
+                        }
 
                         withAnimation(.easeInOut) {
                             self.error = error
                         }
-                    } receiveValue: { movie in
+                    } receiveValue: { [weak self] movie in
+                        guard let self else { return }
+
                         if movie.needPremium {
                             self.dismiss?()
 
@@ -918,16 +1152,24 @@ class PlayerViewModel {
                 isLoading = true
             }
 
-            resetPlayer {
+            resetPlayer { [weak self] in
+                guard let self else { return }
+
                 self.getMovieVideoUseCase(voiceActing: self.voiceActing, season: season, episode: nextEpisode, favs: self.favs)
                     .receive(on: DispatchQueue.main)
-                    .sink { completion in
-                        guard case let .failure(error) = completion else { return }
+                    .sink { [weak self] completion in
+                        guard let self,
+                              case let .failure(error) = completion
+                        else {
+                            return
+                        }
 
                         withAnimation(.easeInOut) {
                             self.error = error
                         }
-                    } receiveValue: { movie in
+                    } receiveValue: { [weak self] movie in
+                        guard let self else { return }
+
                         if movie.needPremium {
                             self.dismiss?()
 
@@ -946,16 +1188,24 @@ class PlayerViewModel {
                 isLoading = true
             }
 
-            resetPlayer {
+            resetPlayer { [weak self] in
+                guard let self else { return }
+
                 self.getMovieVideoUseCase(voiceActing: self.voiceActing, season: nextSeason, episode: nextEpisode, favs: self.favs)
                     .receive(on: DispatchQueue.main)
-                    .sink { completion in
-                        guard case let .failure(error) = completion else { return }
+                    .sink { [weak self] completion in
+                        guard let self,
+                              case let .failure(error) = completion
+                        else {
+                            return
+                        }
 
                         withAnimation(.easeInOut) {
                             self.error = error
                         }
-                    } receiveValue: { movie in
+                    } receiveValue: { [weak self] movie in
+                        guard let self else { return }
+
                         if movie.needPremium {
                             self.dismiss?()
 

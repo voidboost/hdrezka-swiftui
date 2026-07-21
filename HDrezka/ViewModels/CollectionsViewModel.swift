@@ -16,8 +16,12 @@ class CollectionsViewModel {
     private func getData(isInitial: Bool = true) {
         getCollectionsUseCase(page: page)
             .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
+            .sink { [weak self] completion in
+                guard let self,
+                      case let .failure(error) = completion
+                else {
+                    return
+                }
 
                 withAnimation(.easeInOut) {
                     if isInitial {
@@ -26,7 +30,9 @@ class CollectionsViewModel {
                         self.paginationState = .error(error)
                     }
                 }
-            } receiveValue: { result in
+            } receiveValue: { [weak self] result in
+                guard let self else { return }
+
                 self.page += 1
 
                 withAnimation(.easeInOut) {

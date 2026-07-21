@@ -13,6 +13,7 @@ extension Defaults.Keys {
     static let videoGravity = Key<VideoGravity>("video_gravity", default: .fit)
     static let ambientLight = Key<Bool>("ambient_light", default: false)
     static let maxConcurrentDownloads = Key<Int>("max_concurrent_downloads", default: 5)
+    static let mediaControlButtonIsSeeking = Key<Bool>("media_control_button_is_seeking", default: false)
     static let rate = Key<Float>("rate", default: 1.0)
     static let volume = Key<Float>("volume", default: 1.0)
     static let isMuted = Key<Bool>("is_muted", default: false)

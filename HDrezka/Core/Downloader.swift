@@ -70,6 +70,8 @@ class Downloader {
         ]
 
         process.terminationHandler = { [weak self] _ in
+            guard let self else { return }
+
             Task { @MainActor [weak self] in
                 guard let self else { return }
 
@@ -165,7 +167,9 @@ class Downloader {
                     .eraseToAnyPublisher()
             }
             .receive(on: DispatchQueue.main)
-            .sink { _ in } receiveValue: { (responses: [Aria2Response<[StatusResult]>]) in
+            .sink { _ in } receiveValue: { [weak self] (responses: [Aria2Response<[StatusResult]>]) in
+                guard let self else { return }
+
                 for response in responses {
                     if let statuses = response.result {
                         for status in statuses {
@@ -291,18 +295,24 @@ class Downloader {
                 {
                     getMovieVideoUseCase(voiceActing: data.acting, season: season, episode: episode, favs: data.details.favs)
                         .receive(on: DispatchQueue.main)
-                        .sink { completion in
-                            guard case let .failure(error) = completion else { return }
+                        .sink { [weak self] completion in
+                            guard let self,
+                                  case let .failure(error) = completion
+                            else {
+                                return
+                            }
 
                             self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
-                        } receiveValue: { [self] movie in
+                        } receiveValue: { [weak self] movie in
+                            guard let self else { return }
+
                             if movie.needPremium {
-                                notificate(data.notificationId, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(data.name)"), "need_premium")
+                                self.notificate(data.notificationId, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(data.name)"), "need_premium")
                             } else {
                                 if Defaults[.isLoggedIn] {
-                                    saveWatchingStateUseCase(voiceActing: data.acting, season: season, episode: episode)
+                                    self.saveWatchingStateUseCase(voiceActing: data.acting, season: season, episode: episode)
                                         .sink { _ in } receiveValue: { _ in }
-                                        .store(in: &subscriptions)
+                                        .store(in: &self.subscriptions)
                                 }
 
                                 Task { @MainActor [weak self] in
@@ -331,7 +341,7 @@ class Downloader {
                                 }
 
                                 if let movieUrls = movie.getClosestTo(quality: data.quality) {
-                                    callUseCase(
+                                    self.callUseCase(
                                         data: Aria2Request(
                                             method: .addUri,
                                             params: AddUriParams(
@@ -345,7 +355,9 @@ class Downloader {
                                         )
                                     )
                                     .receive(on: DispatchQueue.main)
-                                    .sink { _ in } receiveValue: { (response: Aria2Response<String>) in
+                                    .sink { _ in } receiveValue: { [weak self] (response: Aria2Response<String>) in
+                                        guard let self else { return }
+
                                         if let gid = response.result {
                                             self.downloads.append(
                                                 .init(
@@ -363,13 +375,13 @@ class Downloader {
                                                 "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
                                         }
                                     }
-                                    .store(in: &subscriptions)
+                                    .store(in: &self.subscriptions)
 
                                     if let subtitles = data.subtitles,
                                        let sub = movie.subtitles.first(where: { $0.name == subtitles.name }),
                                        let subtitlesUrl = URL(string: sub.link)
                                     {
-                                        callUseCase(
+                                        self.callUseCase(
                                             data: Aria2Request(
                                                 method: .addUri,
                                                 params: AddUriParams(
@@ -383,7 +395,7 @@ class Downloader {
                                             )
                                         )
                                         .sink { _ in } receiveValue: { (_: Aria2Response<String>) in }
-                                        .store(in: &subscriptions)
+                                        .store(in: &self.subscriptions)
                                     }
                                 }
                             }
@@ -403,19 +415,25 @@ class Downloader {
                 {
                     getMovieVideoUseCase(voiceActing: data.acting, season: nil, episode: nil, favs: data.details.favs)
                         .receive(on: DispatchQueue.main)
-                        .sink { completion in
-                            guard case let .failure(error) = completion else { return }
+                        .sink { [weak self] completion in
+                            guard let self,
+                                  case let .failure(error) = completion
+                            else {
+                                return
+                            }
 
                             self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized:
                                 "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
-                        } receiveValue: { [self] movie in
+                        } receiveValue: { [weak self] movie in
+                            guard let self else { return }
+
                             if movie.needPremium {
-                                notificate(data.notificationId, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(data.name)"), "need_premium")
+                                self.notificate(data.notificationId, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(data.name)"), "need_premium")
                             } else {
                                 if Defaults[.isLoggedIn] {
-                                    saveWatchingStateUseCase(voiceActing: data.acting, season: nil, episode: nil)
+                                    self.saveWatchingStateUseCase(voiceActing: data.acting, season: nil, episode: nil)
                                         .sink { _ in } receiveValue: { _ in }
-                                        .store(in: &subscriptions)
+                                        .store(in: &self.subscriptions)
                                 }
 
                                 Task { @MainActor [weak self] in
@@ -440,7 +458,7 @@ class Downloader {
                                 }
 
                                 if let movieUrls = movie.getClosestTo(quality: data.quality) {
-                                    callUseCase(
+                                    self.callUseCase(
                                         data: Aria2Request(
                                             method: .addUri,
                                             params: AddUriParams(
@@ -454,7 +472,9 @@ class Downloader {
                                         )
                                     )
                                     .receive(on: DispatchQueue.main)
-                                    .sink { _ in } receiveValue: { (response: Aria2Response<String>) in
+                                    .sink { _ in } receiveValue: { [weak self] (response: Aria2Response<String>) in
+                                        guard let self else { return }
+
                                         if let gid = response.result {
                                             self.downloads.append(
                                                 .init(
@@ -472,13 +492,13 @@ class Downloader {
                                             self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
                                         }
                                     }
-                                    .store(in: &subscriptions)
+                                    .store(in: &self.subscriptions)
 
                                     if let subtitles = data.subtitles,
                                        let sub = movie.subtitles.first(where: { $0.name == subtitles.name }),
                                        let subtitlesUrl = URL(string: sub.link)
                                     {
-                                        callUseCase(
+                                        self.callUseCase(
                                             data: Aria2Request(
                                                 method: .addUri,
                                                 params: AddUriParams(
@@ -492,7 +512,7 @@ class Downloader {
                                             )
                                         )
                                         .sink { _ in } receiveValue: { (_: Aria2Response<String>) in }
-                                        .store(in: &subscriptions)
+                                        .store(in: &self.subscriptions)
                                     }
                                 }
                             }
@@ -534,7 +554,9 @@ class Downloader {
             )
         )
         .receive(on: DispatchQueue.main)
-        .sink { _ in } receiveValue: { (response: Aria2Response<String>) in
+        .sink { _ in } receiveValue: { [weak self] (response: Aria2Response<String>) in
+            guard let self else { return }
+
             if let gid = response.result {
                 if let download = self.downloads.first(where: { download in
                     download.gid == gid
@@ -575,7 +597,9 @@ class Downloader {
             )
         )
         .receive(on: DispatchQueue.main)
-        .sink { _ in } receiveValue: { (response: Aria2Response<String>) in
+        .sink { _ in } receiveValue: { [weak self] (response: Aria2Response<String>) in
+            guard let self else { return }
+
             if let gid = response.result,
                let index = self.downloads.firstIndex(where: { download in
                    download.gid == gid
@@ -592,12 +616,14 @@ class Downloader {
 //            data: Aria2Request(
 //                method: .pauseAll,
 //                params: EmptyTokenParams(
-//                    token: Const.token,
-//                ),
-//            ),
+//                    token: Const.token
+//                )
+//            )
 //        )
 //        .receive(on: DispatchQueue.main)
-//        .sink { _ in } receiveValue: { (response: Aria2Response<String>) in
+//        .sink { _ in } receiveValue: { [weak self] (response: Aria2Response<String>) in
+//            guard let self else { return }
+//
 //            if response.result == "OK" {
 //                for index in self.downloads.indices {
 //                    self.downloads[index].pause()
@@ -618,7 +644,9 @@ class Downloader {
             )
         )
         .receive(on: DispatchQueue.main)
-        .sink { _ in } receiveValue: { (response: Aria2Response<String>) in
+        .sink { _ in } receiveValue: { [weak self] (response: Aria2Response<String>) in
+            guard let self else { return }
+
             if let gid = response.result,
                let index = self.downloads.firstIndex(where: { download in
                    download.gid == gid
@@ -635,12 +663,14 @@ class Downloader {
 //            data: Aria2Request(
 //                method: .unpauseAll,
 //                params: EmptyTokenParams(
-//                    token: Const.token,
-//                ),
-//            ),
+//                    token: Const.token
+//                )
+//            )
 //        )
 //        .receive(on: DispatchQueue.main)
-//        .sink { _ in } receiveValue: { (response: Aria2Response<String>) in
+//        .sink { _ in } receiveValue: { [weak self] (response: Aria2Response<String>) in
+//            guard let self else { return }
+//
 //            if response.result == "OK" {
 //                for index in self.downloads.indices {
 //                    self.downloads[index].unpause()

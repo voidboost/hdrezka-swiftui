@@ -17,6 +17,7 @@ struct SettingsView: View {
     @Default(.cache) private var cache
     @Default(.snow) private var snow
     @Default(.forceSnow) private var forceSnow
+    @Default(.mediaControlButtonIsSeeking) private var mediaControlButtonIsSeeking
 
     @Environment(Downloader.self) private var downloader
     @Environment(CookiesManager.self) private var cookiesManager
@@ -227,6 +228,19 @@ struct SettingsView: View {
                         }
                         .labelsHidden()
                         .controlSize(.large)
+                    }
+                    .frame(height: 40)
+
+                    Divider()
+
+                    HStack(alignment: .center, spacing: 8) {
+                        Text("key.media_control_button_change")
+
+                        Spacer()
+
+                        Toggle("key.media_control_button_change", isOn: $mediaControlButtonIsSeeking)
+                            .toggleStyle(.switch)
+                            .labelsHidden()
                     }
                     .frame(height: 40)
 
