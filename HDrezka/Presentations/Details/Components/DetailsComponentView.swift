@@ -54,12 +54,12 @@ struct DetailsComponentView: View {
                                         Color.gray.shimmering()
                                     }
                                     .resizable()
-                                    .loadTransition(.blurReplace, animation: .easeInOut)
+                                    .loadTransition(.blurReplace(.downUp), animation: .bouncy)
                                     .cancelOnDisappear(true)
                                     .retry(NetworkRetryStrategy())
                             }
                             .resizable()
-                            .loadTransition(.blurReplace, animation: .easeInOut)
+                            .loadTransition(.blurReplace(.downUp), animation: .bouncy)
                             .cancelOnDisappear(true)
                             .retry(NetworkRetryStrategy())
                             .imageFill(2 / 3)
@@ -191,7 +191,7 @@ struct DetailsComponentView: View {
                         Color.gray
                     }
                     .resizable()
-                    .loadTransition(.opacity, animation: .easeInOut)
+                    .loadTransition(.blurReplace(.downUp), animation: .bouncy)
                     .cancelOnDisappear(true)
                     .retry(NetworkRetryStrategy())
                     .scaledToFill()

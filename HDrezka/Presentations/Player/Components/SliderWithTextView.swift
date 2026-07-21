@@ -123,7 +123,7 @@ struct SliderWithTextView<T: BinaryFloatingPoint>: View {
                                 }
                                 .resizable()
                                 .cropping(rect: frame)
-                                .loadTransition(.blurReplace, animation: .easeInOut)
+                                .loadTransition(.blurReplace(.downUp), animation: .bouncy)
                                 .cancelOnDisappear(true)
                                 .retry(NetworkRetryStrategy())
                                 .scaledToFill()
