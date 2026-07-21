@@ -13,8 +13,8 @@ struct Shimmer: ViewModifier {
                         .black.opacity(0.3),
                     ],
                     startPoint: isInitialState ? UnitPoint(x: -0.3, y: -0.3) : UnitPoint(x: 1, y: 1),
-                    endPoint: isInitialState ? UnitPoint(x: 0, y: 0) : UnitPoint(x: 1.3, y: 1.3),
-                ),
+                    endPoint: isInitialState ? UnitPoint(x: 0, y: 0) : UnitPoint(x: 1.3, y: 1.3)
+                )
             )
             .onAppear {
                 withAnimation(.linear(duration: 1.5).delay(0.25).repeatForever(autoreverses: false)) {
@@ -25,7 +25,7 @@ struct Shimmer: ViewModifier {
 }
 
 extension View {
-    @ContentBuilder func shimmering(active: Bool = true) -> some View {
+    @ViewBuilder func shimmering(active: Bool = true) -> some View {
         if active {
             modifier(Shimmer())
         } else {
