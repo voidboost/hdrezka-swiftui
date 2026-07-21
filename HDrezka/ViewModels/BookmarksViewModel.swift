@@ -43,13 +43,19 @@ class BookmarksViewModel {
 
         getBookmarksUseCase()
             .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
+            .sink { [weak self] completion in
+                guard let self,
+                      case let .failure(error) = completion
+                else {
+                    return
+                }
 
                 withAnimation(.easeInOut) {
                     self.bookmarksState = .error(error)
                 }
-            } receiveValue: { result in
+            } receiveValue: { [weak self] result in
+                guard let self else { return }
+
                 withAnimation(.easeInOut) {
                     self.bookmarksState = .data(result)
                 }
@@ -63,8 +69,12 @@ class BookmarksViewModel {
         if let selectedBookmark {
             getPublisher(id: selectedBookmark, filter: filter, genre: genre)
                 .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
+                .sink { [weak self] completion in
+                    guard let self,
+                          case let .failure(error) = completion
+                    else {
+                        return
+                    }
 
                     withAnimation(.easeInOut) {
                         if isInitial {
@@ -73,7 +83,9 @@ class BookmarksViewModel {
                             self.paginationState = .error(error)
                         }
                     }
-                } receiveValue: { result in
+                } receiveValue: { [weak self] result in
+                    guard let self else { return }
+
                     self.page += 1
 
                     withAnimation(.easeInOut) {
@@ -125,12 +137,18 @@ class BookmarksViewModel {
     func deleteBookmarksCategory(bookmark: Bookmark) {
         deleteBookmarksCategoryUseCase(id: bookmark.bookmarkId)
             .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
+            .sink { [weak self] completion in
+                guard let self,
+                      case let .failure(error) = completion
+                else {
+                    return
+                }
 
                 self.error = error
                 self.isErrorPresented = true
-            } receiveValue: { delete in
+            } receiveValue: { [weak self] delete in
+                guard let self else { return }
+
                 if delete, var bookmarks = self.bookmarksState.data {
                     bookmarks.removeAll(where: {
                         $0.bookmarkId == bookmark.bookmarkId
@@ -153,12 +171,18 @@ class BookmarksViewModel {
         if let fromBookmark = selectedBookmark {
             moveBetweenBookmarksUseCase(movies: movies.compactMap(\.movieId.id), fromBookmarkUserCategory: fromBookmark, toBookmarkUserCategory: toBookmark.bookmarkId)
                 .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
+                .sink { [weak self] completion in
+                    guard let self,
+                          case let .failure(error) = completion
+                    else {
+                        return
+                    }
 
                     self.error = error
                     self.isErrorPresented = true
-                } receiveValue: { moved in
+                } receiveValue: { [weak self] moved in
+                    guard let self else { return }
+
                     withAnimation(.easeInOut) {
                         if var data = self.bookmarkState.data {
                             data.removeAll(where: { movie in
@@ -195,12 +219,18 @@ class BookmarksViewModel {
             if newOrder != bookmarks {
                 reorderBookmarksCategoriesUseCase(newOrder: newOrder)
                     .receive(on: DispatchQueue.main)
-                    .sink { completion in
-                        guard case let .failure(error) = completion else { return }
+                    .sink { [weak self] completion in
+                        guard let self,
+                              case let .failure(error) = completion
+                        else {
+                            return
+                        }
 
                         self.error = error
                         self.isErrorPresented = true
-                    } receiveValue: { reorder in
+                    } receiveValue: { [weak self] reorder in
+                        guard let self else { return }
+
                         if reorder {
                             bookmarks.move(fromOffsets: fromOffsets, toOffset: toOffset)
 
@@ -218,12 +248,18 @@ class BookmarksViewModel {
         if let selectedBookmark {
             removeFromBookmarksUseCase(movies: ids, bookmarkUserCategory: selectedBookmark)
                 .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
+                .sink { [weak self] completion in
+                    guard let self,
+                          case let .failure(error) = completion
+                    else {
+                        return
+                    }
 
                     self.error = error
                     self.isErrorPresented = true
-                } receiveValue: { delete in
+                } receiveValue: { [weak self] delete in
+                    guard let self else { return }
+
                     if delete, var movies = self.bookmarkState.data {
                         movies.removeAll(where: {
                             if let movieId = $0.movieId.id {

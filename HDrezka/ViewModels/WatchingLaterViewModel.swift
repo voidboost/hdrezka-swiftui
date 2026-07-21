@@ -20,13 +20,19 @@ class WatchingLaterViewModel {
 
         getWatchingLaterMoviesUseCase()
             .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
+            .sink { [weak self] completion in
+                guard let self,
+                      case let .failure(error) = completion
+                else {
+                    return
+                }
 
                 withAnimation(.easeInOut) {
                     self.state = .error(error)
                 }
-            } receiveValue: { result in
+            } receiveValue: { [weak self] result in
+                guard let self else { return }
+
                 withAnimation(.easeInOut) {
                     self.state = .data(result)
                 }
@@ -37,12 +43,18 @@ class WatchingLaterViewModel {
     func switchWatchedItem(movie: MovieWatchLater) {
         switchWatchedItemUseCase(item: movie)
             .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
+            .sink { [weak self] completion in
+                guard let self,
+                      case let .failure(error) = completion
+                else {
+                    return
+                }
 
                 self.error = error
                 self.isErrorPresented = true
-            } receiveValue: { result in
+            } receiveValue: { [weak self] result in
+                guard let self else { return }
+
                 if result, var movies = self.state.data {
                     if let index = movies.firstIndex(of: movie) {
                         movies[index].watched.toggle()
@@ -50,7 +62,7 @@ class WatchingLaterViewModel {
                         if !movie.watched {
                             movies.move(
                                 fromOffsets: IndexSet(integer: index),
-                                toOffset: movies.count,
+                                toOffset: movies.count
                             )
                         }
 
@@ -66,12 +78,18 @@ class WatchingLaterViewModel {
     func removeWatchingItem(movie: MovieWatchLater) {
         removeWatchingItemUseCase(item: movie)
             .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
+            .sink { [weak self] completion in
+                guard let self,
+                      case let .failure(error) = completion
+                else {
+                    return
+                }
 
                 self.error = error
                 self.isErrorPresented = true
-            } receiveValue: { delete in
+            } receiveValue: { [weak self] delete in
+                guard let self else { return }
+
                 if delete, var movies = self.state.data {
                     movies.removeAll(where: {
                         $0.id == movie.id

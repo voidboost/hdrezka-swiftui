@@ -24,17 +24,23 @@ class HomeViewModel {
     private func getData(category: Categories, isInitial: Bool = true) {
         getPublisher(category: category)
             .receive(on: DispatchQueue.main)
-            .sink { completion in
-                if case let .failure(error) = completion {
-                    withAnimation(.easeInOut) {
-                        if isInitial {
-                            self.state = .error(error)
-                        } else {
-                            self.paginationState = .error(error)
-                        }
+            .sink { [weak self] completion in
+                guard let self,
+                      case let .failure(error) = completion
+                else {
+                    return
+                }
+
+                withAnimation(.easeInOut) {
+                    if isInitial {
+                        self.state = .error(error)
+                    } else {
+                        self.paginationState = .error(error)
                     }
                 }
-            } receiveValue: { movies in
+            } receiveValue: { [weak self] movies in
+                guard let self else { return }
+
                 self.page = Categories.allCases.element(after: category)
                 let newCategory = Category(category: category, title: category.localized, movies: movies)
 

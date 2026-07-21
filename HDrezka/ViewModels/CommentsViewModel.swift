@@ -43,8 +43,12 @@ class CommentsViewModel {
     func getData(movieId: String, isInitial: Bool = true) {
         getCommentsPageUseCase(movieId: movieId, page: page)
             .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
+            .sink { [weak self] completion in
+                guard let self,
+                      case let .failure(error) = completion
+                else {
+                    return
+                }
 
                 withAnimation(.easeInOut) {
                     if isInitial {
@@ -53,7 +57,9 @@ class CommentsViewModel {
                         self.paginationState = .error(error)
                     }
                 }
-            } receiveValue: { comments in
+            } receiveValue: { [weak self] comments in
+                guard let self else { return }
+
                 self.page += 1
 
                 withAnimation(.easeInOut) {
@@ -109,13 +115,19 @@ class CommentsViewModel {
         if let movieId = movieId.id {
             getCommentUseCase(movieId: movieId, commentId: commentId)
                 .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
+                .sink { [weak self] completion in
+                    guard let self,
+                          case let .failure(error) = completion
+                    else {
+                        return
+                    }
 
                     self.isCommentPresented = false
                     self.error = error
                     self.isErrorPresented = true
-                } receiveValue: { comment in
+                } receiveValue: { [weak self] comment in
+                    guard let self else { return }
+
                     withAnimation(.easeInOut) {
                         self.comment = comment
                     }
@@ -130,12 +142,18 @@ class CommentsViewModel {
     func like(comment: Comment) {
         toggleLikeCommentUseCase(id: comment.commentId)
             .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
+            .sink { [weak self] completion in
+                guard let self,
+                      case let .failure(error) = completion
+                else {
+                    return
+                }
 
                 self.error = error
                 self.isErrorPresented = true
-            } receiveValue: { count, isLiked in
+            } receiveValue: { [weak self] count, isLiked in
+                guard let self else { return }
+
                 withAnimation(.easeInOut) {
                     if var comments = self.state.data {
                         for index in comments.indices {
@@ -155,12 +173,18 @@ class CommentsViewModel {
         if let id = id.id {
             sendCommentUseCase(id: reply, postId: id, name: name, text: text, adb: adb, type: type)
                 .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
+                .sink { [weak self] completion in
+                    guard let self,
+                          case let .failure(error) = completion
+                    else {
+                        return
+                    }
 
                     self.error = error
                     self.isErrorPresented = true
-                } receiveValue: { result in
+                } receiveValue: { [weak self] result in
+                    guard let self else { return }
+
                     if result.success {
                         self.isOnModerationPresented = true
                         self.message = nil
@@ -187,14 +211,20 @@ class CommentsViewModel {
 
                 getLikesUseCase(id: comment.commentId)
                     .receive(on: DispatchQueue.main)
-                    .sink { completion in
-                        guard case let .failure(error) = completion else { return }
+                    .sink { [weak self] completion in
+                        guard let self,
+                              case let .failure(error) = completion
+                        else {
+                            return
+                        }
 
                         self.likes[comment.commentId] = nil
                         self.error = error
                         self.message = nil
                         self.isErrorPresented = true
-                    } receiveValue: { likes in
+                    } receiveValue: { [weak self] likes in
+                        guard let self else { return }
+
                         if likes.isEmpty {
                             self.likes = [:]
                             self.error = nil
@@ -215,12 +245,18 @@ class CommentsViewModel {
         if let hash = comment.deleteHash {
             deleteCommentUseCase(id: comment.commentId, hash: hash)
                 .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
+                .sink { [weak self] completion in
+                    guard let self,
+                          case let .failure(error) = completion
+                    else {
+                        return
+                    }
 
                     self.error = error
                     self.isErrorPresented = true
-                } receiveValue: { success, message in
+                } receiveValue: { [weak self] success, message in
+                    guard let self else { return }
+
                     if success {
                         withAnimation(.easeInOut) {
                             if var comments = self.state.data {

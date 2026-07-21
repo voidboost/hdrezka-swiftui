@@ -31,26 +31,38 @@ class DetailsViewModel {
 
         getMovieDetailsUseCase(movieId: id)
             .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
+            .sink { [weak self] completion in
+                guard let self,
+                      case let .failure(error) = completion
+                else {
+                    return
+                }
 
                 withAnimation(.easeInOut) {
                     self.state = .error(error)
                 }
-            } receiveValue: { detail in
+            } receiveValue: { [weak self] detail in
+                guard let self else { return }
+
                 withAnimation(.easeInOut) {
                     self.state = .data(detail)
-                } completion: {
-                    if let movieId = detail.movieId.id {
-                        self.getMovieTrailerIdUseCase(movieId: movieId)
-                            .receive(on: DispatchQueue.main)
-                            .sink { _ in } receiveValue: { trailerId in
-                                withAnimation(.easeInOut) {
-                                    self.trailerId = trailerId
-                                }
-                            }
-                            .store(in: &self.subscriptions)
+                } completion: { [weak self] in
+                    guard let self,
+                          let movieId = detail.movieId.id
+                    else {
+                        return
                     }
+
+                    self.getMovieTrailerIdUseCase(movieId: movieId)
+                        .receive(on: DispatchQueue.main)
+                        .sink { _ in } receiveValue: { [weak self] trailerId in
+                            guard let self else { return }
+
+                            withAnimation(.easeInOut) {
+                                self.trailerId = trailerId
+                            }
+                        }
+                        .store(in: &self.subscriptions)
                 }
             }
             .store(in: &subscriptions)
@@ -63,12 +75,18 @@ class DetailsViewModel {
         if let id = id.id {
             rateUseCase(id: id, rating: rating)
                 .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
+                .sink { [weak self] completion in
+                    guard let self,
+                          case let .failure(error) = completion
+                    else {
+                        return
+                    }
 
                     self.error = error
                     self.isErrorPresented = true
-                } receiveValue: { rating in
+                } receiveValue: { [weak self] rating in
+                    guard let self else { return }
+
                     if let rating, case var .data(details) = self.state {
                         details.rate(rating.0, rating.1)
 

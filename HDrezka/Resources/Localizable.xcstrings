@@ -4249,6 +4249,28 @@
         }
       }
     },
+    "key.media_control_button_change" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change the media control button function from episode switching to seeking (useful for headphones)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изменить функцию кнопки управления медиа с переключения серий на перемотку (удобно для наушников)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Змінити функцію кнопки керування медіа з перемикання серій на перемотування (зручно для навушників)."
+          }
+        }
+      }
+    },
     "key.message" : {
       "localizations" : {
         "en" : {

@@ -21,13 +21,19 @@ class PersonViewModel {
 
         getPersonDetailsUseCase(id: id)
             .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
+            .sink { [weak self] completion in
+                guard let self,
+                      case let .failure(error) = completion
+                else {
+                    return
+                }
 
                 withAnimation(.easeInOut) {
                     self.state = .error(error)
                 }
-            } receiveValue: { detail in
+            } receiveValue: { [weak self] detail in
+                guard let self else { return }
+
                 withAnimation(.easeInOut) {
                     self.state = .data(detail)
                 }

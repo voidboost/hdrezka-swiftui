@@ -15,13 +15,19 @@ class CategoriesViewModel {
 
         categoriesUseCase()
             .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
+            .sink { [weak self] completion in
+                guard let self,
+                      case let .failure(error) = completion
+                else {
+                    return
+                }
 
                 withAnimation(.easeInOut) {
                     self.state = .error(error)
                 }
-            } receiveValue: { types in
+            } receiveValue: { [weak self] types in
+                guard let self else { return }
+
                 withAnimation(.easeInOut) {
                     self.state = .data(types)
                 }

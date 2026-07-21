@@ -105,8 +105,12 @@ class ListViewModel {
         if let list {
             getMovieListUseCase(listId: list.listId, page: page)
                 .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
+                .sink { [weak self] completion in
+                    guard let self,
+                          case let .failure(error) = completion
+                    else {
+                        return
+                    }
 
                     withAnimation(.easeInOut) {
                         if isInitial {
@@ -115,7 +119,9 @@ class ListViewModel {
                             self.paginationState = .error(error)
                         }
                     }
-                } receiveValue: { result in
+                } receiveValue: { [weak self] result in
+                    guard let self else { return }
+
                     self.page += 1
 
                     withAnimation(.easeInOut) {
@@ -138,8 +144,12 @@ class ListViewModel {
         } else if let country {
             getPublisher(country: country)
                 .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
+                .sink { [weak self] completion in
+                    guard let self,
+                          case let .failure(error) = completion
+                    else {
+                        return
+                    }
 
                     withAnimation(.easeInOut) {
                         if isInitial {
@@ -148,7 +158,9 @@ class ListViewModel {
                             self.paginationState = .error(error)
                         }
                     }
-                } receiveValue: { result in
+                } receiveValue: { [weak self] result in
+                    guard let self else { return }
+
                     self.page += 1
 
                     withAnimation(.easeInOut) {
@@ -164,8 +176,12 @@ class ListViewModel {
         } else if let genre {
             getPublisher(genre: genre)
                 .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
+                .sink { [weak self] completion in
+                    guard let self,
+                          case let .failure(error) = completion
+                    else {
+                        return
+                    }
 
                     withAnimation(.easeInOut) {
                         if isInitial {
@@ -174,7 +190,9 @@ class ListViewModel {
                             self.paginationState = .error(error)
                         }
                     }
-                } receiveValue: { result in
+                } receiveValue: { [weak self] result in
+                    guard let self else { return }
+
                     self.page += 1
 
                     withAnimation(.easeInOut) {
@@ -190,8 +208,12 @@ class ListViewModel {
         } else if let category {
             getPublisher(category: category)
                 .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
+                .sink { [weak self] completion in
+                    guard let self,
+                          case let .failure(error) = completion
+                    else {
+                        return
+                    }
 
                     withAnimation(.easeInOut) {
                         if isInitial {
@@ -200,7 +222,9 @@ class ListViewModel {
                             self.paginationState = .error(error)
                         }
                     }
-                } receiveValue: { result in
+                } receiveValue: { [weak self] result in
+                    guard let self else { return }
+
                     self.page += 1
 
                     withAnimation(.easeInOut) {
@@ -216,8 +240,12 @@ class ListViewModel {
         } else if let collection {
             getPublisher(collection: collection, filter: filter)
                 .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
+                .sink { [weak self] completion in
+                    guard let self,
+                          case let .failure(error) = completion
+                    else {
+                        return
+                    }
 
                     withAnimation(.easeInOut) {
                         if isInitial {
@@ -226,7 +254,9 @@ class ListViewModel {
                             self.paginationState = .error(error)
                         }
                     }
-                } receiveValue: { result in
+                } receiveValue: { [weak self] result in
+                    guard let self else { return }
+
                     self.page += 1
 
                     withAnimation(.easeInOut) {
