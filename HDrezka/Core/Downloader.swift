@@ -315,10 +315,8 @@ class Downloader {
                                         .store(in: &self.subscriptions)
                                 }
 
-                                Task { @MainActor [weak self] in
-                                    guard let self else { return }
-
-                                    let modelContext = modelContainer.mainContext
+                                MainActor.assumeIsolated {
+                                    let modelContext = self.modelContainer.mainContext
 
                                     if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: nil)).first(where: { position in
                                         position.id == data.acting.voiceId
@@ -436,10 +434,8 @@ class Downloader {
                                         .store(in: &self.subscriptions)
                                 }
 
-                                Task { @MainActor [weak self] in
-                                    guard let self else { return }
-
-                                    let modelContext = modelContainer.mainContext
+                                MainActor.assumeIsolated {
+                                    let modelContext = self.modelContainer.mainContext
 
                                     if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: nil)).first(where: { position in
                                         position.id == data.acting.voiceId

@@ -196,10 +196,8 @@ class PlayerViewModel {
                         }
                     }
 
-                    Task { @MainActor [weak self] in
-                        guard let self else { return }
-
-                        let modelContext = modelContainer.mainContext
+                    MainActor.assumeIsolated {
+                        let modelContext = self.modelContainer.mainContext
 
                         if let position = try? modelContext.fetch(FetchDescriptor<PlayerPosition>(predicate: nil)).first(where: { position in
                             position.id == self.voiceActing.voiceId &&
@@ -210,10 +208,10 @@ class PlayerViewModel {
                             position.position = currentTime
                         } else {
                             let position = PlayerPosition(
-                                id: voiceActing.voiceId,
-                                acting: voiceActing.translatorId,
-                                season: season?.seasonId,
-                                episode: episode?.episodeId,
+                                id: self.voiceActing.voiceId,
+                                acting: self.voiceActing.translatorId,
+                                season: self.season?.seasonId,
+                                episode: self.episode?.episodeId,
                                 position: currentTime
                             )
 
@@ -240,23 +238,21 @@ class PlayerViewModel {
                                 .store(in: &self.subscriptions)
                         }
 
-                        Task { @MainActor [weak self] in
-                            guard let self else { return }
-
-                            let modelContext = modelContainer.mainContext
+                        MainActor.assumeIsolated {
+                            let modelContext = self.modelContainer.mainContext
 
                             if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: nil)).first(where: { position in
                                 position.id == self.voiceActing.voiceId
                             }) {
-                                position.acting = voiceActing.translatorId
-                                position.season = season?.seasonId
-                                position.episode = episode?.episodeId
+                                position.acting = self.voiceActing.translatorId
+                                position.season = self.season?.seasonId
+                                position.episode = self.episode?.episodeId
                             } else {
                                 let position = SelectPosition(
-                                    id: voiceActing.voiceId,
-                                    acting: voiceActing.translatorId,
-                                    season: season?.seasonId,
-                                    episode: episode?.episodeId
+                                    id: self.voiceActing.voiceId,
+                                    acting: self.voiceActing.translatorId,
+                                    season: self.season?.seasonId,
+                                    episode: self.episode?.episodeId
                                 )
 
                                 modelContext.insert(position)
@@ -347,10 +343,8 @@ class PlayerViewModel {
                                 }
                             }
                         } else {
-                            Task { @MainActor [weak self] in
-                                guard let self else { return }
-
-                                let modelContext = modelContainer.mainContext
+                            MainActor.assumeIsolated {
+                                let modelContext = self.modelContainer.mainContext
 
                                 if let position = try? modelContext.fetch(FetchDescriptor<PlayerPosition>(predicate: nil)).first(where: { position in
                                     position.id == self.voiceActing.voiceId &&
@@ -358,13 +352,15 @@ class PlayerViewModel {
                                         position.season == self.season?.seasonId &&
                                         position.episode == self.episode?.episodeId
                                 }) {
-                                    await player.seek(to: CMTime(seconds: position.position, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero)
+                                    player.seek(to: CMTime(seconds: position.position, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] complete in
+                                        guard let self else { return }
 
-                                    if playing {
-                                        player.playImmediately(atRate: rate)
+                                        if playing, complete {
+                                            player.playImmediately(atRate: rate)
+                                        }
                                     }
                                 } else if playing {
-                                    player.playImmediately(atRate: rate)
+                                    player.playImmediately(atRate: self.rate)
                                 }
                             }
                         }
