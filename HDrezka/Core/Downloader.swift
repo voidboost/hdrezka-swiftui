@@ -318,20 +318,28 @@ class Downloader {
                                 MainActor.assumeIsolated {
                                     let modelContext = self.modelContainer.mainContext
 
-                                    if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: nil)).first(where: { position in
-                                        position.id == data.acting.voiceId
-                                    }) {
-                                        position.acting = data.acting.translatorId
-                                        position.season = season.seasonId
-                                        position.episode = episode.episodeId
-                                        position.subtitles = data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
+                                    let voiceId = data.acting.voiceId
+                                    let translatorId = data.acting.translatorId
+                                    let seasonId = season.seasonId
+                                    let episodeId = episode.episodeId
+                                    let subtitles = data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
+
+                                    let predicate = #Predicate<SelectPosition> { position in
+                                        position.id == voiceId
+                                    }
+
+                                    if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: predicate)).first {
+                                        position.acting = translatorId
+                                        position.season = seasonId
+                                        position.episode = episodeId
+                                        position.subtitles = subtitles
                                     } else {
                                         let position = SelectPosition(
-                                            id: data.acting.voiceId,
-                                            acting: data.acting.translatorId,
-                                            season: season.seasonId,
-                                            episode: episode.episodeId,
-                                            subtitles: data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
+                                            id: voiceId,
+                                            acting: translatorId,
+                                            season: seasonId,
+                                            episode: episodeId,
+                                            subtitles: subtitles
                                         )
 
                                         modelContext.insert(position)
@@ -437,16 +445,22 @@ class Downloader {
                                 MainActor.assumeIsolated {
                                     let modelContext = self.modelContainer.mainContext
 
-                                    if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: nil)).first(where: { position in
-                                        position.id == data.acting.voiceId
-                                    }) {
-                                        position.acting = data.acting.translatorId
-                                        position.subtitles = data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
+                                    let voiceId = data.acting.voiceId
+                                    let translatorId = data.acting.translatorId
+                                    let subtitles = data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
+
+                                    let predicate = #Predicate<SelectPosition> { position in
+                                        position.id == voiceId
+                                    }
+
+                                    if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: predicate)).first {
+                                        position.acting = translatorId
+                                        position.subtitles = subtitles
                                     } else {
                                         let position = SelectPosition(
-                                            id: data.acting.voiceId,
-                                            acting: data.acting.translatorId,
-                                            subtitles: data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
+                                            id: voiceId,
+                                            acting: translatorId,
+                                            subtitles: subtitles
                                         )
 
                                         modelContext.insert(position)
