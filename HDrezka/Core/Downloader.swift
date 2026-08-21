@@ -17,6 +17,8 @@ class Downloader {
     @ObservationIgnored @LazyInjected(\.multicallUseCase) private var multicallUseCase
     @ObservationIgnored @LazyInjected(\.modelContainer) private var modelContainer
 
+    @ObservationIgnored private var selectPosition: SelectPosition?
+
     @ObservationIgnored private let fileManager = FileManager.default
 
     @ObservationIgnored private let process: Process
@@ -328,11 +330,18 @@ class Downloader {
                                         position.id == voiceId
                                     }
 
-                                    if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: predicate)).first {
+                                    if let position = self.selectPosition, position.id == voiceId {
                                         position.acting = translatorId
                                         position.season = seasonId
                                         position.episode = episodeId
                                         position.subtitles = subtitles
+                                    } else if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: predicate)).first {
+                                        position.acting = translatorId
+                                        position.season = seasonId
+                                        position.episode = episodeId
+                                        position.subtitles = subtitles
+
+                                        self.selectPosition = position
                                     } else {
                                         let position = SelectPosition(
                                             id: voiceId,
@@ -343,6 +352,8 @@ class Downloader {
                                         )
 
                                         modelContext.insert(position)
+
+                                        self.selectPosition = position
                                     }
                                 }
 
@@ -453,9 +464,14 @@ class Downloader {
                                         position.id == voiceId
                                     }
 
-                                    if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: predicate)).first {
+                                    if let position = self.selectPosition, position.id == voiceId {
                                         position.acting = translatorId
                                         position.subtitles = subtitles
+                                    } else if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: predicate)).first {
+                                        position.acting = translatorId
+                                        position.subtitles = subtitles
+
+                                        self.selectPosition = position
                                     } else {
                                         let position = SelectPosition(
                                             id: voiceId,
@@ -464,6 +480,8 @@ class Downloader {
                                         )
 
                                         modelContext.insert(position)
+
+                                        self.selectPosition = position
                                     }
                                 }
 
