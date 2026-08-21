@@ -14,6 +14,9 @@ class PlayerViewModel {
     @ObservationIgnored @LazyInjected(\.getMovieVideoUseCase) private var getMovieVideoUseCase
     @ObservationIgnored @LazyInjected(\.modelContainer) private var modelContainer
 
+    @ObservationIgnored private var selectPosition: SelectPosition?
+    @ObservationIgnored private var playerPosition: PlayerPosition?
+
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
     @ObservationIgnored private let poster: String
@@ -225,8 +228,17 @@ class PlayerViewModel {
                                 position.episode == episodeId
                         }
 
-                        if let position = try? modelContext.fetch(FetchDescriptor<PlayerPosition>(predicate: predicate)).first {
+                        if let position = self.playerPosition,
+                           position.id == voiceId,
+                           position.acting == translatorId,
+                           position.season == seasonId,
+                           position.episode == episodeId
+                        {
                             position.position = currentTime
+                        } else if let position = try? modelContext.fetch(FetchDescriptor<PlayerPosition>(predicate: predicate)).first {
+                            position.position = currentTime
+
+                            self.playerPosition = position
                         } else {
                             let position = PlayerPosition(
                                 id: voiceId,
@@ -237,6 +249,8 @@ class PlayerViewModel {
                             )
 
                             modelContext.insert(position)
+
+                            self.playerPosition = position
                         }
                     }
                 }
@@ -269,10 +283,16 @@ class PlayerViewModel {
                                 position.id == voiceId
                             }
 
-                            if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: predicate)).first {
+                            if let position = self.selectPosition, position.id == voiceId {
                                 position.acting = translatorId
                                 position.season = seasonId
                                 position.episode = episodeId
+                            } else if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: predicate)).first {
+                                position.acting = translatorId
+                                position.season = seasonId
+                                position.episode = episodeId
+
+                                self.selectPosition = position
                             } else {
                                 let position = SelectPosition(
                                     id: voiceId,
@@ -282,6 +302,8 @@ class PlayerViewModel {
                                 )
 
                                 modelContext.insert(position)
+
+                                self.selectPosition = position
                             }
                         }
 
@@ -384,7 +406,12 @@ class PlayerViewModel {
                                         position.episode == episodeId
                                 }
 
-                                if let position = try? modelContext.fetch(FetchDescriptor<PlayerPosition>(predicate: predicate)).first {
+                                if let position = self.playerPosition,
+                                   position.id == voiceId,
+                                   position.acting == translatorId,
+                                   position.season == seasonId,
+                                   position.episode == episodeId
+                                {
                                     player.seek(to: CMTime(seconds: position.position, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] complete in
                                         guard let self else { return }
 
@@ -392,6 +419,16 @@ class PlayerViewModel {
                                             player.playImmediately(atRate: rate)
                                         }
                                     }
+                                } else if let position = try? modelContext.fetch(FetchDescriptor<PlayerPosition>(predicate: predicate)).first {
+                                    player.seek(to: CMTime(seconds: position.position, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] complete in
+                                        guard let self else { return }
+
+                                        if playing, complete {
+                                            player.playImmediately(atRate: rate)
+                                        }
+                                    }
+
+                                    self.playerPosition = position
                                 } else if playing {
                                     player.playImmediately(atRate: self.rate)
                                 }
@@ -999,8 +1036,12 @@ class PlayerViewModel {
                     position.id == voiceId
                 }
 
-                if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: predicate)).first {
+                if let position = self.selectPosition, position.id == voiceId {
                     position.subtitles = language
+                } else if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: predicate)).first {
+                    position.subtitles = language
+
+                    self.selectPosition = position
                 } else {
                     let position = SelectPosition(
                         id: voiceId,
@@ -1011,6 +1052,8 @@ class PlayerViewModel {
                     )
 
                     modelContext.insert(position)
+
+                    self.selectPosition = position
                 }
             }
         }
