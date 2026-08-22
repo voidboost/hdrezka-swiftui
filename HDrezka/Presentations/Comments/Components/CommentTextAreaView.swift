@@ -45,6 +45,7 @@ struct CommentTextAreaView: View {
 
                     name = ""
                     feedback = ""
+                    selection = nil
                 } label: {
                     Text("key.send")
                         .font(.system(.title3, weight: .bold))

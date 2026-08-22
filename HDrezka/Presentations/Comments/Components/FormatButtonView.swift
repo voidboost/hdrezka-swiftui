@@ -20,11 +20,22 @@ struct FormatButtonView: View {
         self.suffix = suffix
         self.icon = icon
     }
+    
+    private func isValid(_ range: Range<String.Index>, in text: String) -> Bool {
+        range.lowerBound >= text.startIndex &&
+        range.upperBound <= text.endIndex &&
+        range.lowerBound <= range.upperBound
+    }
 
     var body: some View {
         Button {
             switch selection?.indices {
             case let .selection(range):
+                guard isValid(range, in: feedback) else {
+                    selection = nil
+                    return
+                }
+
                 let lowerOffset = range.lowerBound.utf16Offset(in: feedback)
                 let upperOffset = range.upperBound.utf16Offset(in: feedback)
 
@@ -47,6 +58,11 @@ struct FormatButtonView: View {
                     selection = nil
                 }
             case let .multiSelection(rangeSet):
+                guard rangeSet.ranges.allSatisfy({ isValid($0, in: feedback) }) else {
+                    selection = nil
+                    return
+                }
+
                 let sortedRanges = rangeSet.ranges
                     .map { $0.lowerBound.utf16Offset(in: feedback) ..< $0.upperBound.utf16Offset(in: feedback) }
                     .sorted(by: { $0.lowerBound > $1.lowerBound })
