@@ -6,7 +6,7 @@ import FirebaseCore
 import FirebaseCrashlytics
 import Kingfisher
 import Sparkle
-import SwiftData
+import SQLiteData
 import SwiftUI
 import UserNotifications
 
@@ -26,7 +26,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSWindow.allowsAutomaticWindowTabbing = false
 
         UserDefaults.standard.register(
-            defaults: ["NSApplicationCrashOnExceptions": true],
+            defaults: ["NSApplicationCrashOnExceptions": true]
         )
 
         FirebaseApp.configure()
@@ -138,9 +138,11 @@ struct HDrezkaApp: App {
     @Default(.isFirstLaunch) private var isFirstLaunch
     @Default(.mirror) private var mirror
 
-    @Injected(\.modelContainer) private var modelContainer
-
     init() {
+        prepareDependencies {
+            $0.defaultDatabase = try! appDatabase()
+        }
+
         switch Defaults[.cache] {
         case .off:
             ImageCache.default.memoryStorage.config.expiration = .expired
@@ -163,7 +165,6 @@ struct HDrezkaApp: App {
                 .background(WindowAccessor(window: $appState.window))
                 .preferredColorScheme(theme.scheme)
         }
-        .modelContainer(modelContainer)
         .windowResizability(.contentMinSize)
         .defaultPosition(.center)
         .restorationBehavior(.disabled)
@@ -177,7 +178,6 @@ struct HDrezkaApp: App {
                     .analyticsScreen(name: "player", class: "PlayerView")
             }
         }
-        .modelContainer(modelContainer)
         .defaultPosition(.center)
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentMinSize)
@@ -217,7 +217,6 @@ struct HDrezkaApp: App {
                 .preferredColorScheme(theme.scheme)
                 .analyticsScreen(name: "settings", class: "SettingsView")
         }
-        .modelContainer(modelContainer)
         .windowResizability(.contentMinSize)
         .defaultPosition(.center)
         .restorationBehavior(.disabled)
@@ -322,5 +321,41 @@ struct HDrezkaApp: App {
         var body: some View {
             Image(nsImage: NSImage(resource: .barIcon).resized(to: CGSize(width: 18, height: 18)))
         }
+    }
+
+    private func appDatabase() throws -> any DatabaseWriter {
+        let configuration = Configuration()
+
+        let database = try defaultDatabase(path: Const.dbPath, configuration: configuration)
+
+        var migrator = DatabaseMigrator()
+
+        #if DEBUG
+            migrator.eraseDatabaseOnSchemaChange = true
+        #endif
+
+        migrator.registerMigration("Create tables") { db in
+            try db.create(table: "player_positions", options: [.ifNotExists, .strict]) { t in
+                t.column("id", .text).notNull()
+                t.column("acting", .text).notNull()
+                t.column("season", .text).notNull()
+                t.column("episode", .text).notNull()
+                t.column("position", .real).notNull()
+                t.primaryKey(["id", "acting", "season", "episode"])
+            }
+
+            try db.create(table: "select_positions", options: [.ifNotExists, .strict]) { t in
+                t.column("id", .text).notNull()
+                t.column("acting", .text).notNull()
+                t.column("season", .text)
+                t.column("episode", .text)
+                t.column("subtitles", .text)
+                t.primaryKey(["id"])
+            }
+        }
+
+        try migrator.migrate(database)
+
+        return database
     }
 }

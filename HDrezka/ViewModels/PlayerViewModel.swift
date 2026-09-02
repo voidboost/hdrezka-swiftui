@@ -4,7 +4,7 @@ import Defaults
 import FactoryKit
 import Kingfisher
 import MediaPlayer
-import SwiftData
+import SQLiteData
 import SwiftUI
 
 @Observable
@@ -12,10 +12,9 @@ class PlayerViewModel {
     @ObservationIgnored @LazyInjected(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
     @ObservationIgnored @LazyInjected(\.getMovieThumbnailsUseCase) private var getMovieThumbnailsUseCase
     @ObservationIgnored @LazyInjected(\.getMovieVideoUseCase) private var getMovieVideoUseCase
-    @ObservationIgnored @LazyInjected(\.modelContainer) private var modelContainer
 
-    @ObservationIgnored private var selectPosition: SelectPosition?
-    @ObservationIgnored private var playerPosition: PlayerPosition?
+    @ObservationIgnored @Dependency(\.defaultDatabase) private var database
+    @ObservationIgnored @FetchOne private var playerPosition: PlayerPosition?
 
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
@@ -213,44 +212,28 @@ class PlayerViewModel {
 
                     let currentTime = time.seconds
 
-                    MainActor.assumeIsolated {
-                        let modelContext = self.modelContainer.mainContext
+                    let voiceId = self.voiceActing.voiceId
+                    let translatorId = self.voiceActing.translatorId
+                    let seasonId = self.season?.seasonId
+                    let episodeId = self.episode?.episodeId
 
-                        let voiceId = self.voiceActing.voiceId
-                        let translatorId = self.voiceActing.translatorId
-                        let seasonId = self.season?.seasonId
-                        let episodeId = self.episode?.episodeId
+                    Task.detached(priority: .utility) { [weak self] in
+                        guard let self else { return }
 
-                        let predicate = #Predicate<PlayerPosition> { position in
-                            position.id == voiceId &&
-                                position.acting == translatorId &&
-                                position.season == seasonId &&
-                                position.episode == episodeId
-                        }
-
-                        if let position = self.playerPosition,
-                           position.id == voiceId,
-                           position.acting == translatorId,
-                           position.season == seasonId,
-                           position.episode == episodeId
-                        {
-                            position.position = currentTime
-                        } else if let position = try? modelContext.fetch(FetchDescriptor<PlayerPosition>(predicate: predicate)).first {
-                            position.position = currentTime
-
-                            self.playerPosition = position
-                        } else {
-                            let position = PlayerPosition(
-                                id: voiceId,
-                                acting: translatorId,
-                                season: seasonId,
-                                episode: episodeId,
-                                position: currentTime
-                            )
-
-                            modelContext.insert(position)
-
-                            self.playerPosition = position
+                        try? await self.database.write { db in
+                            try PlayerPosition
+                                .upsert {
+                                    PlayerPosition.Draft(
+                                        id: PlayerPosition.ID(
+                                            id: voiceId,
+                                            acting: translatorId,
+                                            season: seasonId,
+                                            episode: episodeId
+                                        ),
+                                        position: currentTime
+                                    )
+                                }
+                                .execute(db)
                         }
                     }
                 }
@@ -271,39 +254,25 @@ class PlayerViewModel {
                                 .store(in: &self.subscriptions)
                         }
 
-                        MainActor.assumeIsolated {
-                            let modelContext = self.modelContainer.mainContext
+                        let voiceId = self.voiceActing.voiceId
+                        let translatorId = self.voiceActing.translatorId
+                        let seasonId = self.season?.seasonId
+                        let episodeId = self.episode?.episodeId
 
-                            let voiceId = self.voiceActing.voiceId
-                            let translatorId = self.voiceActing.translatorId
-                            let seasonId = self.season?.seasonId
-                            let episodeId = self.episode?.episodeId
+                        Task.detached(priority: .utility) { [weak self] in
+                            guard let self else { return }
 
-                            let predicate = #Predicate<SelectPosition> { position in
-                                position.id == voiceId
-                            }
-
-                            if let position = self.selectPosition, position.id == voiceId {
-                                position.acting = translatorId
-                                position.season = seasonId
-                                position.episode = episodeId
-                            } else if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: predicate)).first {
-                                position.acting = translatorId
-                                position.season = seasonId
-                                position.episode = episodeId
-
-                                self.selectPosition = position
-                            } else {
-                                let position = SelectPosition(
-                                    id: voiceId,
-                                    acting: translatorId,
-                                    season: seasonId,
-                                    episode: episodeId
-                                )
-
-                                modelContext.insert(position)
-
-                                self.selectPosition = position
+                            try? await self.database.write { db in
+                                try SelectPosition
+                                    .upsert {
+                                        SelectPosition.Draft(
+                                            id: voiceId,
+                                            acting: translatorId,
+                                            season: seasonId,
+                                            episode: episodeId
+                                        )
+                                    }
+                                    .execute(db)
                             }
                         }
 
@@ -391,27 +360,20 @@ class PlayerViewModel {
                                 }
                             }
                         } else {
-                            MainActor.assumeIsolated {
-                                let modelContext = self.modelContainer.mainContext
+                            Task { @MainActor [weak self] in
+                                guard let self else { return }
 
-                                let voiceId = self.voiceActing.voiceId
-                                let translatorId = self.voiceActing.translatorId
-                                let seasonId = self.season?.seasonId
-                                let episodeId = self.episode?.episodeId
+                                try? await self.$playerPosition.load(
+                                    PlayerPosition
+                                        .where {
+                                            $0.id.id.eq(voiceId) &&
+                                                $0.id.acting.eq(translatorId) &&
+                                                $0.id.season.eq(seasonId ?? "") &&
+                                                $0.id.episode.eq(episodeId ?? "")
+                                        }
+                                )
 
-                                let predicate = #Predicate<PlayerPosition> { position in
-                                    position.id == voiceId &&
-                                        position.acting == translatorId &&
-                                        position.season == seasonId &&
-                                        position.episode == episodeId
-                                }
-
-                                if let position = self.playerPosition,
-                                   position.id == voiceId,
-                                   position.acting == translatorId,
-                                   position.season == seasonId,
-                                   position.episode == episodeId
-                                {
+                                if let position = self.playerPosition {
                                     player.seek(to: CMTime(seconds: position.position, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] complete in
                                         guard let self else { return }
 
@@ -419,16 +381,6 @@ class PlayerViewModel {
                                             player.playImmediately(atRate: rate)
                                         }
                                     }
-                                } else if let position = try? modelContext.fetch(FetchDescriptor<PlayerPosition>(predicate: predicate)).first {
-                                    player.seek(to: CMTime(seconds: position.position, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] complete in
-                                        guard let self else { return }
-
-                                        if playing, complete {
-                                            player.playImmediately(atRate: rate)
-                                        }
-                                    }
-
-                                    self.playerPosition = position
                                 } else if playing {
                                     player.playImmediately(atRate: self.rate)
                                 }
@@ -1025,35 +977,27 @@ class PlayerViewModel {
             if let mediaSelectionGroup = try? await currentItem.asset.loadMediaSelectionGroup(for: .legible) {
                 currentItem.select(mediaSelectionGroup.options.filter { $0.extendedLanguageTag != nil }.first(where: { $0.extendedLanguageTag == language }), in: mediaSelectionGroup)
 
-                let modelContext = modelContainer.mainContext
-
                 let voiceId = self.voiceActing.voiceId
                 let translatorId = self.voiceActing.translatorId
                 let seasonId = self.season?.seasonId
                 let episodeId = self.episode?.episodeId
 
-                let predicate = #Predicate<SelectPosition> { position in
-                    position.id == voiceId
-                }
+                Task.detached(priority: .utility) { [weak self] in
+                    guard let self else { return }
 
-                if let position = self.selectPosition, position.id == voiceId {
-                    position.subtitles = language
-                } else if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: predicate)).first {
-                    position.subtitles = language
-
-                    self.selectPosition = position
-                } else {
-                    let position = SelectPosition(
-                        id: voiceId,
-                        acting: translatorId,
-                        season: seasonId,
-                        episode: episodeId,
-                        subtitles: language
-                    )
-
-                    modelContext.insert(position)
-
-                    self.selectPosition = position
+                    try? await self.database.write { db in
+                        try SelectPosition
+                            .upsert {
+                                SelectPosition.Draft(
+                                    id: voiceId,
+                                    acting: translatorId,
+                                    season: seasonId,
+                                    episode: episodeId,
+                                    subtitles: language
+                                )
+                            }
+                            .execute(db)
+                    }
                 }
             }
         }

@@ -1,19 +1,28 @@
 import Foundation
-import SwiftData
+import SQLiteData
 
-@Model
-class PlayerPosition {
-    var id: String
-    var acting: String
-    var season: String?
-    var episode: String?
-    var position: Double
+@Table("player_positions")
+struct PlayerPosition: Identifiable, Hashable {
+    @Selection
+    struct ID: Hashable {
+        let id: String
 
-    init(id: String, acting: String, season: String? = nil, episode: String? = nil, position: Double) {
-        self.id = id
-        self.acting = acting
-        self.season = season
-        self.episode = episode
-        self.position = position
+        let acting: String
+
+        let season: String
+
+        let episode: String
+
+        init(id: String, acting: String, season: String? = nil, episode: String? = nil) {
+            self.id = id
+            self.acting = acting
+            self.season = season ?? ""
+            self.episode = episode ?? ""
+        }
     }
+
+    @Column(primaryKey: true)
+    let id: ID
+
+    let position: Double
 }

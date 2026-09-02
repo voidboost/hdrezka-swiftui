@@ -2,7 +2,7 @@ import Combine
 import Defaults
 import FactoryKit
 import FirebaseAnalytics
-import SwiftData
+import SQLiteData
 import SwiftUI
 
 struct OpenExternalPlayerSheetView: View {
@@ -15,11 +15,11 @@ struct OpenExternalPlayerSheetView: View {
 
     @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) private var modelContext
 
     @Environment(AppState.self) private var appState
 
-    @Query private var selectPositions: [SelectPosition]
+    @Dependency(\.defaultDatabase) private var database
+    @FetchOne private var selectPosition: SelectPosition?
 
     @Default(.isUserPremium) private var isUserPremium
     @Default(.isLoggedIn) private var isLoggedIn
@@ -65,9 +65,9 @@ struct OpenExternalPlayerSheetView: View {
 
             if let details {
                 VStack(spacing: 18) {
-                    if details.series != nil || !(details.voiceActing ?? []).filter({ !$0.name.isEmpty }).isEmpty {
+                    if details.series != nil || (details.voiceActing ?? []).contains(where: { !$0.name.isEmpty }) {
                         VStack(spacing: 2.5) {
-                            if let acting = details.voiceActing, !acting.filter({ !$0.name.isEmpty }).isEmpty {
+                            if let acting = details.voiceActing, acting.contains(where: { !$0.name.isEmpty }) {
                                 HStack {
                                     Text("key.acting")
 
@@ -170,7 +170,7 @@ struct OpenExternalPlayerSheetView: View {
                             }
 
                             if details.series != nil, selectedActing != nil {
-                                if !(details.voiceActing ?? []).filter({ !$0.name.isEmpty }).isEmpty {
+                                if (details.voiceActing ?? []).contains(where: { !$0.name.isEmpty }) {
                                     Divider()
                                 }
 
@@ -472,21 +472,24 @@ struct OpenExternalPlayerSheetView: View {
                                         .store(in: &subscriptions)
                                 }
 
-                                if let position = selectPositions.first(where: { position in
-                                    position.id == selectedActing.voiceId
-                                }) {
-                                    position.acting = selectedActing.translatorId
-                                    position.season = selectedSeason?.seasonId
-                                    position.episode = selectedEpisode?.episodeId
-                                } else {
-                                    let position = SelectPosition(
-                                        id: selectedActing.voiceId,
-                                        acting: selectedActing.translatorId,
-                                        season: selectedSeason?.seasonId,
-                                        episode: selectedEpisode?.episodeId,
-                                    )
+                                let voiceId = selectedActing.voiceId
+                                let translatorId = selectedActing.translatorId
+                                let seasonId = selectedSeason?.seasonId
+                                let episodeId = selectedEpisode?.episodeId
 
-                                    modelContext.insert(position)
+                                Task.detached(priority: .utility) {
+                                    try? await database.write { db in
+                                        try SelectPosition
+                                            .upsert {
+                                                SelectPosition.Draft(
+                                                    id: voiceId,
+                                                    acting: translatorId,
+                                                    season: seasonId,
+                                                    episode: episodeId
+                                                )
+                                            }
+                                            .execute(db)
+                                    }
                                 }
                             }
 
@@ -496,14 +499,14 @@ struct OpenExternalPlayerSheetView: View {
                                         .init(name: "url", value: movieURL.absoluteString),
                                         .init(name: "mpv_sub-files", value: subtitlesURL.absoluteString.replacingOccurrences(of: ":", with: "\\:")),
                                         .init(name: "new_window", value: "1"),
-                                    ]),
+                                    ])
                                 )
                             } else if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality)?.first?.hls {
                                 openURL(
                                     ExternalPlayers.iina.url.appending(queryItems: [
                                         .init(name: "url", value: movieURL.absoluteString),
                                         .init(name: "new_window", value: "1"),
-                                    ]),
+                                    ])
                                 )
                             }
                         } label: {
@@ -526,21 +529,24 @@ struct OpenExternalPlayerSheetView: View {
                                         .store(in: &subscriptions)
                                 }
 
-                                if let position = selectPositions.first(where: { position in
-                                    position.id == selectedActing.voiceId
-                                }) {
-                                    position.acting = selectedActing.translatorId
-                                    position.season = selectedSeason?.seasonId
-                                    position.episode = selectedEpisode?.episodeId
-                                } else {
-                                    let position = SelectPosition(
-                                        id: selectedActing.voiceId,
-                                        acting: selectedActing.translatorId,
-                                        season: selectedSeason?.seasonId,
-                                        episode: selectedEpisode?.episodeId,
-                                    )
+                                let voiceId = selectedActing.voiceId
+                                let translatorId = selectedActing.translatorId
+                                let seasonId = selectedSeason?.seasonId
+                                let episodeId = selectedEpisode?.episodeId
 
-                                    modelContext.insert(position)
+                                Task.detached(priority: .utility) {
+                                    try? await database.write { db in
+                                        try SelectPosition
+                                            .upsert {
+                                                SelectPosition.Draft(
+                                                    id: voiceId,
+                                                    acting: translatorId,
+                                                    season: seasonId,
+                                                    episode: episodeId
+                                                )
+                                            }
+                                            .execute(db)
+                                    }
                                 }
                             }
 
@@ -549,13 +555,13 @@ struct OpenExternalPlayerSheetView: View {
                                     ExternalPlayers.infuse.url.appending(queryItems: [
                                         .init(name: "url", value: movieURL.absoluteString),
                                         .init(name: "sub", value: subtitlesURL.absoluteString),
-                                    ]),
+                                    ])
                                 )
                             } else if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality)?.first {
                                 openURL(
                                     ExternalPlayers.infuse.url.appending(queryItems: [
                                         .init(name: "url", value: movieURL.absoluteString),
-                                    ]),
+                                    ])
                                 )
                             }
                         } label: {
@@ -578,21 +584,24 @@ struct OpenExternalPlayerSheetView: View {
                                         .store(in: &subscriptions)
                                 }
 
-                                if let position = selectPositions.first(where: { position in
-                                    position.id == selectedActing.voiceId
-                                }) {
-                                    position.acting = selectedActing.translatorId
-                                    position.season = selectedSeason?.seasonId
-                                    position.episode = selectedEpisode?.episodeId
-                                } else {
-                                    let position = SelectPosition(
-                                        id: selectedActing.voiceId,
-                                        acting: selectedActing.translatorId,
-                                        season: selectedSeason?.seasonId,
-                                        episode: selectedEpisode?.episodeId,
-                                    )
+                                let voiceId = selectedActing.voiceId
+                                let translatorId = selectedActing.translatorId
+                                let seasonId = selectedSeason?.seasonId
+                                let episodeId = selectedEpisode?.episodeId
 
-                                    modelContext.insert(position)
+                                Task.detached(priority: .utility) {
+                                    try? await database.write { db in
+                                        try SelectPosition
+                                            .upsert {
+                                                SelectPosition.Draft(
+                                                    id: voiceId,
+                                                    acting: translatorId,
+                                                    season: seasonId,
+                                                    episode: episodeId
+                                                )
+                                            }
+                                            .execute(db)
+                                    }
                                 }
                             }
 
@@ -603,7 +612,7 @@ struct OpenExternalPlayerSheetView: View {
                                         arguments: [
                                             "--sub-files=\(subtitlesURL.absoluteString.replacingOccurrences(of: ":", with: "\\:"))",
                                             movieURL.absoluteString,
-                                        ],
+                                        ]
                                     )
                                 } catch {
                                     self.error = error
@@ -615,7 +624,7 @@ struct OpenExternalPlayerSheetView: View {
                                         appURL.appending(path: "Contents", directoryHint: .isDirectory).appending(path: "MacOS", directoryHint: .isDirectory).appending(path: appURL.deletingPathExtension().lastPathComponent, directoryHint: .notDirectory),
                                         arguments: [
                                             movieURL.absoluteString,
-                                        ],
+                                        ]
                                     )
                                 } catch {
                                     self.error = error
@@ -642,21 +651,24 @@ struct OpenExternalPlayerSheetView: View {
                                         .store(in: &subscriptions)
                                 }
 
-                                if let position = selectPositions.first(where: { position in
-                                    position.id == selectedActing.voiceId
-                                }) {
-                                    position.acting = selectedActing.translatorId
-                                    position.season = selectedSeason?.seasonId
-                                    position.episode = selectedEpisode?.episodeId
-                                } else {
-                                    let position = SelectPosition(
-                                        id: selectedActing.voiceId,
-                                        acting: selectedActing.translatorId,
-                                        season: selectedSeason?.seasonId,
-                                        episode: selectedEpisode?.episodeId,
-                                    )
+                                let voiceId = selectedActing.voiceId
+                                let translatorId = selectedActing.translatorId
+                                let seasonId = selectedSeason?.seasonId
+                                let episodeId = selectedEpisode?.episodeId
 
-                                    modelContext.insert(position)
+                                Task.detached(priority: .utility) {
+                                    try? await database.write { db in
+                                        try SelectPosition
+                                            .upsert {
+                                                SelectPosition.Draft(
+                                                    id: voiceId,
+                                                    acting: translatorId,
+                                                    season: seasonId,
+                                                    episode: episodeId
+                                                )
+                                            }
+                                            .execute(db)
+                                    }
                                 }
                             }
 
@@ -667,7 +679,7 @@ struct OpenExternalPlayerSheetView: View {
                                         arguments: [
                                             "--sub-file=\(subtitlesURL.absoluteString)",
                                             movieURL.absoluteString,
-                                        ],
+                                        ]
                                     )
                                 } catch {
                                     self.error = error
@@ -679,7 +691,7 @@ struct OpenExternalPlayerSheetView: View {
                                         appURL.appending(path: "Contents", directoryHint: .isDirectory).appending(path: "MacOS", directoryHint: .isDirectory).appending(path: appURL.deletingPathExtension().lastPathComponent, directoryHint: .notDirectory),
                                         arguments: [
                                             movieURL.absoluteString,
-                                        ],
+                                        ]
                                     )
                                 } catch {
                                     self.error = error
@@ -762,8 +774,16 @@ struct OpenExternalPlayerSheetView: View {
                     self.error = error
                     isErrorPresented = true
                 } receiveValue: { details in
-                    withAnimation(.easeInOut) {
-                        self.details = details
+                    Task { @MainActor in
+                        if let movieId = details.movieId.id {
+                            try? await self.$selectPosition.load(
+                                SelectPosition.where { $0.id.eq(movieId) }
+                            )
+                        }
+
+                        withAnimation(.easeInOut) {
+                            self.details = details
+                        }
                     }
                 }
                 .store(in: &subscriptions)
@@ -772,7 +792,7 @@ struct OpenExternalPlayerSheetView: View {
             if let details, let acting = details.voiceActing {
                 withAnimation(.easeInOut) {
                     selectedActing = if !isLoggedIn,
-                                        let position = selectPositions.first(where: { $0.id == details.movieId.id }),
+                                        let position = selectPosition,
                                         let first = acting.filter({ isUserPremium != nil || !$0.isPremium }).first(where: { $0.translatorId == position.acting })
                     {
                         first
@@ -782,7 +802,7 @@ struct OpenExternalPlayerSheetView: View {
                         first
                     } else if let first = acting.filter({ isUserPremium != nil || !$0.isPremium }).first(where: { $0.isSelected }) {
                         first
-                    } else if let first = acting.filter({ isUserPremium != nil || !$0.isPremium }).first {
+                    } else if let first = acting.first(where: { isUserPremium != nil || !$0.isPremium }) {
                         first
                     } else if let first = acting.first {
                         first
@@ -816,7 +836,7 @@ struct OpenExternalPlayerSheetView: View {
                                     self.seasons = seasons
 
                                     selectedSeason = if !isLoggedIn,
-                                                        let position = selectPositions.first(where: { $0.id == selectedActing.voiceId }),
+                                                        let position = selectPosition,
                                                         let first = seasons.first(where: { $0.seasonId == position.season })
                                     {
                                         first
@@ -867,7 +887,7 @@ struct OpenExternalPlayerSheetView: View {
                                         selectedQuality = highest
                                     }
 
-                                    selectedSubtitles = movie.subtitles.first(where: { $0.lang == selectPositions.first(where: { position in position.id == selectedActing.voiceId })?.subtitles?.replacingOccurrences(of: "uk", with: "ua") })
+                                    selectedSubtitles = movie.subtitles.first(where: { $0.lang == selectPosition?.subtitles?.replacingOccurrences(of: "uk", with: "ua") })
                                 }
                             }
                         }
@@ -881,7 +901,7 @@ struct OpenExternalPlayerSheetView: View {
                 movie = nil
 
                 selectedEpisode = if !isLoggedIn,
-                                     let position = selectPositions.first(where: { $0.id == selectedActing?.voiceId }),
+                                     let position = selectPosition,
                                      let first = selectedSeason?.episodes.first(where: { $0.episodeId == position.episode })
                 {
                     first
@@ -932,7 +952,7 @@ struct OpenExternalPlayerSheetView: View {
                                     selectedQuality = highest
                                 }
 
-                                selectedSubtitles = movie.subtitles.first(where: { $0.lang == selectPositions.first(where: { position in position.id == selectedActing.voiceId })?.subtitles?.replacingOccurrences(of: "uk", with: "ua") })
+                                selectedSubtitles = movie.subtitles.first(where: { $0.lang == selectPosition?.subtitles?.replacingOccurrences(of: "uk", with: "ua") })
                             }
                         }
                     }
@@ -949,7 +969,7 @@ struct OpenExternalPlayerSheetView: View {
             self.iconVisible = iconVisible
         }
 
-        func makeBody(configuration: Configuration) -> some View {
+        func makeBody(configuration: LabelStyle.Configuration) -> some View {
             HStack(alignment: .center, spacing: 8) {
                 configuration.title
 
