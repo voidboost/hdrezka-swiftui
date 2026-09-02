@@ -334,7 +334,7 @@ struct HDrezkaApp: App {
             migrator.eraseDatabaseOnSchemaChange = true
         #endif
 
-        migrator.registerMigration("Create tables") { db in
+        migrator.registerMigration("v1") { db in
             try db.create(table: "player_positions", options: [.ifNotExists, .strict]) { t in
                 t.column("id", .text).notNull()
                 t.column("acting", .text).notNull()
