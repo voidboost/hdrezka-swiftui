@@ -53,7 +53,7 @@ extension String {
                                                 .init(threshold: 1_000_000.0, divisor: 1_000_000.0, suffix: "M"),
                                                 .init(threshold: 1_000_000_000.0, divisor: 1_000_000_000.0, suffix: "B")]
 
-            let startValue = Double(abs(number))
+            let startValue = Double(Swift.abs(number))
             var abbreviation: Abbrevation {
                 var prevAbbreviation: Abbrevation = .init(threshold: 0, divisor: 1, suffix: "")
                 for tmpAbbreviation in abbreviations {

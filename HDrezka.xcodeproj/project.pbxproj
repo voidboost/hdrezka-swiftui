@@ -17,6 +17,7 @@
 		DE3EF0392CFF04CA0022C311 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DE3EF0382CFF04CA0022C311 /* Alamofire */; };
 		DE4AD63E2EAA4A7200CE7AB3 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = DE4AD63D2EAA4A7200CE7AB3 /* Kingfisher */; };
 		DE7608DA2EB4231600C4A23E /* LRUCache in Frameworks */ = {isa = PBXBuildFile; productRef = DE7608D92EB4231600C4A23E /* LRUCache */; };
+		DE99F0C830471C6C0072416C /* SQLiteData in Frameworks */ = {isa = PBXBuildFile; productRef = DE99F0C730471C6C0072416C /* SQLiteData */; };
 		DEB035B52C89E1DB004ABFA1 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B42C89E1DB004ABFA1 /* FirebaseAnalytics */; };
 		DEB035B72C89E1DB004ABFA1 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B62C89E1DB004ABFA1 /* FirebaseCrashlytics */; };
 		DEB035BA2C89E57A004ABFA1 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B92C89E57A004ABFA1 /* Defaults */; };
@@ -61,6 +62,7 @@
 				04B25FD82BA46F9C00200341 /* Algorithms in Frameworks */,
 				DEB035B52C89E1DB004ABFA1 /* FirebaseAnalytics in Frameworks */,
 				04B3CA8A2BA06CAC0039F76E /* SwiftSoup in Frameworks */,
+				DE99F0C830471C6C0072416C /* SQLiteData in Frameworks */,
 				DE3EF0392CFF04CA0022C311 /* Alamofire in Frameworks */,
 				DEE64D0B2C8869D0002C2F2F /* Sparkle in Frameworks */,
 				DE4AD63E2EAA4A7200CE7AB3 /* Kingfisher in Frameworks */,
@@ -129,6 +131,7 @@
 				DEF920372DD5CAF20087C32C /* FactoryKit */,
 				DE4AD63D2EAA4A7200CE7AB3 /* Kingfisher */,
 				DE7608D92EB4231600C4A23E /* LRUCache */,
+				DE99F0C730471C6C0072416C /* SQLiteData */,
 			);
 			productName = HDRezka;
 			productReference = 04B3CA742BA06C9C0039F76E /* HDrezka.app */;
@@ -173,6 +176,7 @@
 				DEF920362DD5CAF20087C32C /* XCRemoteSwiftPackageReference "Factory" */,
 				DE4AD63C2EAA4A7200CE7AB3 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				DE7608D82EB4231600C4A23E /* XCRemoteSwiftPackageReference "LRUCache" */,
+				DE99F0C630471C6C0072416C /* XCRemoteSwiftPackageReference "sqlite-data" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 04B3CA752BA06C9C0039F76E /* Products */;
@@ -588,6 +592,15 @@
 				minimumVersion = 0.0.1;
 			};
 		};
+		DE99F0C630471C6C0072416C /* XCRemoteSwiftPackageReference "sqlite-data" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/sqlite-data.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 999.0.0;
+				minimumVersion = 0.0.1;
+			};
+		};
 		DEB035B32C89E1DB004ABFA1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
@@ -675,6 +688,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DE7608D82EB4231600C4A23E /* XCRemoteSwiftPackageReference "LRUCache" */;
 			productName = LRUCache;
+		};
+		DE99F0C730471C6C0072416C /* SQLiteData */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DE99F0C630471C6C0072416C /* XCRemoteSwiftPackageReference "sqlite-data" */;
+			productName = SQLiteData;
 		};
 		DEB035B42C89E1DB004ABFA1 /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;

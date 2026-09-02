@@ -1,7 +1,7 @@
 import Combine
 import Defaults
 import FactoryKit
-import SwiftData
+import SQLiteData
 import SwiftUI
 import UserNotifications
 
@@ -15,9 +15,8 @@ class Downloader {
     @ObservationIgnored @LazyInjected(\.getMovieVideoUseCase) private var getMovieVideoUseCase
     @ObservationIgnored @LazyInjected(\.callUseCase) private var callUseCase
     @ObservationIgnored @LazyInjected(\.multicallUseCase) private var multicallUseCase
-    @ObservationIgnored @LazyInjected(\.modelContainer) private var modelContainer
 
-    @ObservationIgnored private var selectPosition: SelectPosition?
+    @ObservationIgnored @Dependency(\.defaultDatabase) private var database
 
     @ObservationIgnored private let fileManager = FileManager.default
 
@@ -317,43 +316,27 @@ class Downloader {
                                         .store(in: &self.subscriptions)
                                 }
 
-                                MainActor.assumeIsolated {
-                                    let modelContext = self.modelContainer.mainContext
+                                let voiceId = data.acting.voiceId
+                                let translatorId = data.acting.translatorId
+                                let seasonId = season.seasonId
+                                let episodeId = episode.episodeId
+                                let subtitles = data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
 
-                                    let voiceId = data.acting.voiceId
-                                    let translatorId = data.acting.translatorId
-                                    let seasonId = season.seasonId
-                                    let episodeId = episode.episodeId
-                                    let subtitles = data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
+                                Task.detached(priority: .utility) { [weak self] in
+                                    guard let self else { return }
 
-                                    let predicate = #Predicate<SelectPosition> { position in
-                                        position.id == voiceId
-                                    }
-
-                                    if let position = self.selectPosition, position.id == voiceId {
-                                        position.acting = translatorId
-                                        position.season = seasonId
-                                        position.episode = episodeId
-                                        position.subtitles = subtitles
-                                    } else if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: predicate)).first {
-                                        position.acting = translatorId
-                                        position.season = seasonId
-                                        position.episode = episodeId
-                                        position.subtitles = subtitles
-
-                                        self.selectPosition = position
-                                    } else {
-                                        let position = SelectPosition(
-                                            id: voiceId,
-                                            acting: translatorId,
-                                            season: seasonId,
-                                            episode: episodeId,
-                                            subtitles: subtitles
-                                        )
-
-                                        modelContext.insert(position)
-
-                                        self.selectPosition = position
+                                    try? await self.database.write { db in
+                                        try SelectPosition
+                                            .upsert {
+                                                SelectPosition.Draft(
+                                                    id: voiceId,
+                                                    acting: translatorId,
+                                                    season: seasonId,
+                                                    episode: episodeId,
+                                                    subtitles: subtitles
+                                                )
+                                            }
+                                            .execute(db)
                                     }
                                 }
 
@@ -453,35 +436,23 @@ class Downloader {
                                         .store(in: &self.subscriptions)
                                 }
 
-                                MainActor.assumeIsolated {
-                                    let modelContext = self.modelContainer.mainContext
+                                let voiceId = data.acting.voiceId
+                                let translatorId = data.acting.translatorId
+                                let subtitles = data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
 
-                                    let voiceId = data.acting.voiceId
-                                    let translatorId = data.acting.translatorId
-                                    let subtitles = data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
+                                Task.detached(priority: .utility) { [weak self] in
+                                    guard let self else { return }
 
-                                    let predicate = #Predicate<SelectPosition> { position in
-                                        position.id == voiceId
-                                    }
-
-                                    if let position = self.selectPosition, position.id == voiceId {
-                                        position.acting = translatorId
-                                        position.subtitles = subtitles
-                                    } else if let position = try? modelContext.fetch(FetchDescriptor<SelectPosition>(predicate: predicate)).first {
-                                        position.acting = translatorId
-                                        position.subtitles = subtitles
-
-                                        self.selectPosition = position
-                                    } else {
-                                        let position = SelectPosition(
-                                            id: voiceId,
-                                            acting: translatorId,
-                                            subtitles: subtitles
-                                        )
-
-                                        modelContext.insert(position)
-
-                                        self.selectPosition = position
+                                    try? await self.database.write { db in
+                                        try SelectPosition
+                                            .upsert {
+                                                SelectPosition.Draft(
+                                                    id: voiceId,
+                                                    acting: translatorId,
+                                                    subtitles: subtitles
+                                                )
+                                            }
+                                            .execute(db)
                                     }
                                 }
 

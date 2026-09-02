@@ -1,7 +1,7 @@
 import Combine
 import Defaults
 import FactoryKit
-import SwiftData
+import SQLiteData
 import SwiftUI
 
 struct WatchingLaterView: View {
@@ -13,9 +13,7 @@ struct WatchingLaterView: View {
         GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading),
     ]
 
-    @Environment(\.modelContext) private var modelContext
-
-    @Query private var playerPositions: [PlayerPosition]
+    @Dependency(\.defaultDatabase) private var database
 
     var body: some View {
         ScrollView(.vertical) {
@@ -34,9 +32,16 @@ struct WatchingLaterView: View {
                                 Button {
                                     viewModel.removeWatchingItem(movie: movie)
 
-                                    playerPositions
-                                        .filter { $0.id == movie.watchLaterId.id }
-                                        .forEach { modelContext.delete($0) }
+                                    if let watchLaterId = movie.watchLaterId.id {
+                                        Task.detached(priority: .utility) {
+                                            try? await database.write { db in
+                                                try PlayerPosition
+                                                    .where { $0.id.id.eq(watchLaterId) }
+                                                    .delete()
+                                                    .execute(db)
+                                            }
+                                        }
+                                    }
                                 } label: {
                                     Text("key.delete")
                                 }

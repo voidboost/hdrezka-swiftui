@@ -2,7 +2,7 @@ import AVFoundation
 import Defaults
 import Kingfisher
 import Sparkle
-import SwiftData
+import SQLiteData
 import SwiftUI
 
 struct SettingsView: View {
@@ -22,10 +22,9 @@ struct SettingsView: View {
     @Environment(Downloader.self) private var downloader
     @Environment(CookiesManager.self) private var cookiesManager
 
-    @Environment(\.modelContext) private var modelContext
-
-    @Query(animation: .easeInOut) private var playerPositions: [PlayerPosition]
-    @Query(animation: .easeInOut) private var selectPositions: [SelectPosition]
+    @Dependency(\.defaultDatabase) private var database
+    @FetchOne(PlayerPosition.count(), animation: .easeInOut) private var playerPositionsCount: Int = 0
+    @FetchOne(SelectPosition.count(), animation: .easeInOut) private var selectPositionsCount: Int = 0
 
     @State private var host: String = ""
     @State private var hostValid: Bool?
@@ -247,15 +246,17 @@ struct SettingsView: View {
                     Divider()
 
                     HStack(alignment: .center, spacing: 8) {
-                        Text("key.playerPositions-\(playerPositions.count)")
+                        Text("key.playerPositions-\(playerPositionsCount)")
                             .monospacedDigit()
-                            .contentTransition(.numericText(value: Double(playerPositions.count)))
+                            .contentTransition(.numericText(value: Double(playerPositionsCount)))
 
                         Spacer()
 
                         Button {
-                            for position in playerPositions {
-                                modelContext.delete(position)
+                            Task.detached(priority: .utility) {
+                                try? await database.write { db in
+                                    try PlayerPosition.delete().execute(db)
+                                }
                             }
                         } label: {
                             Image(systemName: "trash")
@@ -267,7 +268,7 @@ struct SettingsView: View {
                                 .overlay(Color.accentColor, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                         }
                         .buttonStyle(.plain)
-                        .disabled(playerPositions.isEmpty)
+                        .disabled(playerPositionsCount == 0)
                     }
                     .frame(height: 40)
 
@@ -275,15 +276,17 @@ struct SettingsView: View {
                         Divider()
 
                         HStack(alignment: .center, spacing: 8) {
-                            Text("key.selectPositions-\(selectPositions.count)")
+                            Text("key.selectPositions-\(selectPositionsCount)")
                                 .monospacedDigit()
-                                .contentTransition(.numericText(value: Double(selectPositions.count)))
+                                .contentTransition(.numericText(value: Double(selectPositionsCount)))
 
                             Spacer()
 
                             Button {
-                                for position in selectPositions {
-                                    modelContext.delete(position)
+                                Task.detached(priority: .utility) {
+                                    try? await database.write { db in
+                                        try SelectPosition.delete().execute(db)
+                                    }
                                 }
                             } label: {
                                 Image(systemName: "trash")
@@ -295,7 +298,7 @@ struct SettingsView: View {
                                     .overlay(Color.accentColor, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                             }
                             .buttonStyle(.plain)
-                            .disabled(selectPositions.isEmpty)
+                            .disabled(selectPositionsCount == 0)
                         }
                         .frame(height: 40)
                     }

@@ -66,7 +66,20 @@ class Const {
                 .init(name: "X-Hdrezka-Android-App", value: "1"),
                 .init(name: "X-Hdrezka-Android-App-Version", value: Defaults[.lastHdrezkaAppVersion]),
                 .userAgent(userAgent),
-            ] : [.userAgent(userAgent)],
+            ] : [.userAgent(userAgent)]
         )
+    }
+
+    static var dbPath: String {
+        get throws {
+            let applicationSupportDirectory = try FileManager.default.url(
+                for: .applicationSupportDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: true
+            )
+
+            return applicationSupportDirectory.appending(path: "HDrezka.db", directoryHint: .notDirectory).absoluteString
+        }
     }
 }
