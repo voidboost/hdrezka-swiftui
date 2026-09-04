@@ -1,13 +1,13 @@
 import Combine
-import FactoryKit
+import Dependencies
 import SwiftUI
 import YouTubePlayerKit
 
 @Observable
 class DetailsViewModel {
-    @ObservationIgnored @LazyInjected(\.getMovieDetailsUseCase) private var getMovieDetailsUseCase
-    @ObservationIgnored @LazyInjected(\.getMovieTrailerIdUseCase) private var getMovieTrailerIdUseCase
-    @ObservationIgnored @LazyInjected(\.rateUseCase) private var rateUseCase
+    @ObservationIgnored @Dependency(\.getMovieDetailsUseCase) private var getMovieDetailsUseCase
+    @ObservationIgnored @Dependency(\.getMovieTrailerIdUseCase) private var getMovieTrailerIdUseCase
+    @ObservationIgnored @Dependency(\.rateUseCase) private var rateUseCase
 
     @ObservationIgnored let id: String
 

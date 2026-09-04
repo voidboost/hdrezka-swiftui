@@ -1,14 +1,14 @@
 import Alamofire
 import Combine
 import Defaults
-import FactoryKit
+import Dependencies
 import Pow
 import SwiftSoup
 import SwiftUI
 
 struct ContentView: View {
-    @Injected(\.logoutUseCase) private var logoutUseCase
-    @Injected(\.getVersionUseCase) private var getVersionUseCase
+    @Dependency(\.logoutUseCase) private var logoutUseCase
+    @Dependency(\.getVersionUseCase) private var getVersionUseCase
 
     @Default(.isLoggedIn) private var isLoggedIn
     @Default(.mirror) private var mirror

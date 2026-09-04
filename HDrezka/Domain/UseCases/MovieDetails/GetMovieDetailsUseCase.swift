@@ -1,13 +1,21 @@
 import Combine
+import Dependencies
 
 struct GetMovieDetailsUseCase {
-    private let repository: MovieDetailsRepository
-
-    init(repository: MovieDetailsRepository) {
-        self.repository = repository
-    }
+    @Dependency(\.movieDetailsRepository) private var repository
 
     func callAsFunction(movieId: String) -> AnyPublisher<MovieDetailed, Error> {
         repository.getMovieDetails(movieId: movieId)
+    }
+}
+
+extension GetMovieDetailsUseCase: DependencyKey {
+    static var liveValue = Self()
+}
+
+extension DependencyValues {
+    var getMovieDetailsUseCase: GetMovieDetailsUseCase {
+        get { self[GetMovieDetailsUseCase.self] }
+        set { self[GetMovieDetailsUseCase.self] = newValue }
     }
 }

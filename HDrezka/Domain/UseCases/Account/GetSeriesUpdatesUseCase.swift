@@ -1,13 +1,21 @@
 import Combine
+import Dependencies
 
 struct GetSeriesUpdatesUseCase {
-    private let repository: AccountRepository
-
-    init(repository: AccountRepository) {
-        self.repository = repository
-    }
+    @Dependency(\.accountRepository) private var repository
 
     func callAsFunction() -> AnyPublisher<[SeriesUpdateGroup], Error> {
         repository.getSeriesUpdates()
+    }
+}
+
+extension GetSeriesUpdatesUseCase: DependencyKey {
+    static var liveValue = Self()
+}
+
+extension DependencyValues {
+    var getSeriesUpdatesUseCase: GetSeriesUpdatesUseCase {
+        get { self[GetSeriesUpdatesUseCase.self] }
+        set { self[GetSeriesUpdatesUseCase.self] = newValue }
     }
 }

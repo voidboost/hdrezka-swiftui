@@ -1,5 +1,5 @@
 import Combine
-import FactoryKit
+import Dependencies
 import FirebaseAnalytics
 import SwiftUI
 
@@ -10,7 +10,7 @@ struct CommentReportSheetView: View {
         self.comment = comment
     }
 
-    @Injected(\.reportCommentUseCase) private var reportCommentUseCase
+    @Dependency(\.reportCommentUseCase) private var reportCommentUseCase
 
     @State private var subscriptions: Set<AnyCancellable> = []
 

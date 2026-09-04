@@ -1,5 +1,5 @@
 import Combine
-import FactoryKit
+import Dependencies
 import FirebaseAnalytics
 import Flow
 import Pow
@@ -15,9 +15,9 @@ struct BookmarksSheetView: View {
         _isCreateBookmarkPresented = isCreateBookmarkPresented
     }
 
-    @Injected(\.addToBookmarksUseCase) private var addToBookmarksUseCase
-    @Injected(\.removeFromBookmarksUseCase) private var removeFromBookmarksUseCase
-    @Injected(\.getMovieBookmarksUseCase) private var getMovieBookmarksUseCase
+    @Dependency(\.addToBookmarksUseCase) private var addToBookmarksUseCase
+    @Dependency(\.removeFromBookmarksUseCase) private var removeFromBookmarksUseCase
+    @Dependency(\.getMovieBookmarksUseCase) private var getMovieBookmarksUseCase
 
     @State private var subscriptions: Set<AnyCancellable> = []
 

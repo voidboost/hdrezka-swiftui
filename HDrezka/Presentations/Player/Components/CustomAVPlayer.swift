@@ -1,11 +1,11 @@
 import Alamofire
 import AVFoundation
 import Defaults
-import FactoryKit
+import Dependencies
 import Foundation
 
 class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
-    @LazyInjected(\.session) private var session
+    @Dependency(\.session) private var session
 
     private let mainScheme = "mainm3u8"
     private let fragmentsScheme = "fragmentsm3u8"

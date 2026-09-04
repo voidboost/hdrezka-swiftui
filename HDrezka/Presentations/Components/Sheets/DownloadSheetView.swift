@@ -1,15 +1,15 @@
 import Combine
 import Defaults
-import FactoryKit
+import Dependencies
 import FirebaseAnalytics
 import SQLiteData
 import SwiftUI
 
 struct DownloadSheetView: View {
-    @Injected(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
-    @Injected(\.getMovieDetailsUseCase) private var getMovieDetailsUseCase
-    @Injected(\.getMovieVideoUseCase) private var getMovieVideoUseCase
-    @Injected(\.getSeriesSeasonsUseCase) private var getSeriesSeasonsUseCase
+    @Dependency(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
+    @Dependency(\.getMovieDetailsUseCase) private var getMovieDetailsUseCase
+    @Dependency(\.getMovieVideoUseCase) private var getMovieVideoUseCase
+    @Dependency(\.getSeriesSeasonsUseCase) private var getSeriesSeasonsUseCase
 
     @State private var subscriptions: Set<AnyCancellable> = []
 

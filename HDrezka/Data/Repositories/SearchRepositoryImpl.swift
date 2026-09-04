@@ -1,10 +1,10 @@
 import Alamofire
 import Combine
-import FactoryKit
+import Dependencies
 import Foundation
 
 struct SearchRepositoryImpl: SearchRepository {
-    @Injected(\.session) private var session
+    @Dependency(\.session) private var session
 
     func search(query: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
         session.request(SearchService.search(query: query, page: page))

@@ -1,11 +1,11 @@
 import Combine
 import Defaults
-import FactoryKit
+import Dependencies
 import FirebaseAnalytics
 import SwiftUI
 
 struct SignUpSheetView: View {
-    @Injected(\.signUpUseCase) private var signUpUseCase
+    @Dependency(\.signUpUseCase) private var signUpUseCase
 
     @Environment(\.dismiss) private var dismiss
 

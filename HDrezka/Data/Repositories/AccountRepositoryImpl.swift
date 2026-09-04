@@ -1,12 +1,12 @@
 import Alamofire
 import Combine
 import Defaults
-import FactoryKit
+import Dependencies
 import Foundation
 import SwiftSoup
 
 struct AccountRepositoryImpl: AccountRepository {
-    @Injected(\.session) private var session
+    @Dependency(\.session) private var session
 
     func signIn(login: String, password: String) -> AnyPublisher<Void, Error> {
         session.request(AccountService.signIn(login: login, password: password))

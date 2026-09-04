@@ -1,4 +1,5 @@
 import Combine
+import Dependencies
 
 protocol MovieListsRepository {
     func getPopularMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
@@ -36,4 +37,15 @@ protocol MovieListsRepository {
     func getPopularNewestMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
 
     func getWatchingNowNewestMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
+}
+
+private enum MovieListsRepositoryKey: DependencyKey {
+    static var liveValue: any MovieListsRepository = MovieListsRepositoryImpl()
+}
+
+extension DependencyValues {
+    var movieListsRepository: any MovieListsRepository {
+        get { self[MovieListsRepositoryKey.self] }
+        set { self[MovieListsRepositoryKey.self] = newValue }
+    }
 }

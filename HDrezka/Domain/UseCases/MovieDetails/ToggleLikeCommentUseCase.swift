@@ -1,13 +1,21 @@
 import Combine
+import Dependencies
 
 struct ToggleLikeCommentUseCase {
-    private let repository: MovieDetailsRepository
-
-    init(repository: MovieDetailsRepository) {
-        self.repository = repository
-    }
+    @Dependency(\.movieDetailsRepository) private var repository
 
     func callAsFunction(id: String) -> AnyPublisher<(Int, Bool), Error> {
         repository.toggleLikeComment(id: id)
+    }
+}
+
+extension ToggleLikeCommentUseCase: DependencyKey {
+    static var liveValue = Self()
+}
+
+extension DependencyValues {
+    var toggleLikeCommentUseCase: ToggleLikeCommentUseCase {
+        get { self[ToggleLikeCommentUseCase.self] }
+        set { self[ToggleLikeCommentUseCase.self] = newValue }
     }
 }

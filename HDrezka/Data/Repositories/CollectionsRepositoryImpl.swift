@@ -1,10 +1,10 @@
 import Alamofire
 import Combine
-import FactoryKit
+import Dependencies
 import Foundation
 
 struct CollectionsRepositoryImpl: CollectionsRepository {
-    @Injected(\.session) private var session
+    @Dependency(\.session) private var session
 
     func getCollections(page: Int) -> AnyPublisher<[MoviesCollection], Error> {
         session.request(CollectionsService.getCollections(page: page))

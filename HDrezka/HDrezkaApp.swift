@@ -1,6 +1,6 @@
 import Combine
 import Defaults
-import FactoryKit
+import Dependencies
 import FirebaseAnalytics
 import FirebaseCore
 import FirebaseCrashlytics
@@ -46,14 +46,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_: Notification) {
         if !Downloader.shared.downloads.isEmpty {
-            let notificationCenter = UNUserNotificationCenter.current()
-
-            notificationCenter.getPendingNotificationRequests { requests in
-                notificationCenter.removePendingNotificationRequests(withIdentifiers: requests.filter { $0.content.categoryIdentifier == "cancel" }.map(\.identifier))
+            UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
+                UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: requests.filter { $0.content.categoryIdentifier == "cancel" }.map(\.identifier))
             }
 
-            notificationCenter.getDeliveredNotifications { notifications in
-                notificationCenter.removeDeliveredNotifications(withIdentifiers: notifications.filter { $0.request.content.categoryIdentifier == "cancel" }.map(\.request.identifier))
+            UNUserNotificationCenter.current().getDeliveredNotifications { notifications in
+                UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: notifications.filter { $0.request.content.categoryIdentifier == "cancel" }.map(\.request.identifier))
             }
         }
 

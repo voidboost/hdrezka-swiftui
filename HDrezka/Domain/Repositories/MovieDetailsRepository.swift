@@ -1,4 +1,5 @@
 import Combine
+import Dependencies
 
 protocol MovieDetailsRepository {
     func getMovieDetails(movieId: String) -> AnyPublisher<MovieDetailed, Error>
@@ -28,4 +29,15 @@ protocol MovieDetailsRepository {
     func getLikes(id: String) -> AnyPublisher<[Like], Error>
 
     func rate(id: String, rating: Int) -> AnyPublisher<(Float?, String?)?, Error>
+}
+
+private enum MovieDetailsRepositoryKey: DependencyKey {
+    static var liveValue: any MovieDetailsRepository = MovieDetailsRepositoryImpl()
+}
+
+extension DependencyValues {
+    var movieDetailsRepository: any MovieDetailsRepository {
+        get { self[MovieDetailsRepositoryKey.self] }
+        set { self[MovieDetailsRepositoryKey.self] = newValue }
+    }
 }

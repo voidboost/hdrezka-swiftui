@@ -1,10 +1,10 @@
 import Combine
-import FactoryKit
+import Dependencies
 import SwiftUI
 
 @Observable
 class CollectionsViewModel {
-    @ObservationIgnored @LazyInjected(\.getCollectionsUseCase) private var getCollectionsUseCase
+    @ObservationIgnored @Dependency(\.getCollectionsUseCase) private var getCollectionsUseCase
 
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 

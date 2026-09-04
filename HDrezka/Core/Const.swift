@@ -1,5 +1,6 @@
 import Alamofire
 import Defaults
+import Dependencies
 import Foundation
 import SwiftUI
 

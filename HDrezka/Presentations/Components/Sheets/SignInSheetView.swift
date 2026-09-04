@@ -1,11 +1,11 @@
 import Combine
 import Defaults
-import FactoryKit
+import Dependencies
 import FirebaseAnalytics
 import SwiftUI
 
 struct SignInSheetView: View {
-    @Injected(\.signInUseCase) private var signInUseCase
+    @Dependency(\.signInUseCase) private var signInUseCase
 
     @Environment(\.dismiss) private var dismiss
 

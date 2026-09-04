@@ -1,10 +1,10 @@
 import Combine
-import FactoryKit
+import Dependencies
 import FirebaseAnalytics
 import SwiftUI
 
 struct RestoreSheetView: View {
-    @Injected(\.restoreUseCase) private var restoreUseCase
+    @Dependency(\.restoreUseCase) private var restoreUseCase
 
     @State private var subscriptions: Set<AnyCancellable> = []
 

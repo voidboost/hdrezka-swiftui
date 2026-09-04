@@ -1,12 +1,12 @@
 import Combine
-import FactoryKit
+import Dependencies
 import FirebaseAnalytics
 import SwiftUI
 
 struct RenameBookmarkSheetView: View {
     private let bookmark: Bookmark
 
-    @Injected(\.changeBookmarksCategoryNameUseCase) private var changeBookmarksCategoryNameUseCase
+    @Dependency(\.changeBookmarksCategoryNameUseCase) private var changeBookmarksCategoryNameUseCase
 
     @State private var subscriptions: Set<AnyCancellable> = []
 

@@ -1,6 +1,6 @@
 import Combine
 import Defaults
-import FactoryKit
+import Dependencies
 import SQLiteData
 import SwiftUI
 

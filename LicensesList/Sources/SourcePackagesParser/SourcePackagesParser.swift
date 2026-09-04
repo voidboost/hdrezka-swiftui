@@ -48,8 +48,7 @@ final class SourcePackagesParser {
     }
 
     private func extractLicenseBody(_ directoryURL: URL) -> String? {
-        let fileManager = FileManager.default
-        let contents = (try? fileManager.contentsOfDirectory(atPath: directoryURL.path())) ?? []
+        let contents = (try? FileManager.default.contentsOfDirectory(atPath: directoryURL.path())) ?? []
         let licenseURL = contents
             .map { directoryURL.appending(path: $0) }
             .filter { contentURL in
@@ -58,7 +57,7 @@ final class SourcePackagesParser {
                     return false
                 }
                 var isDirectory: ObjCBool = false
-                fileManager.fileExists(atPath: contentURL.path(), isDirectory: &isDirectory)
+                FileManager.default.fileExists(atPath: contentURL.path(), isDirectory: &isDirectory)
                 return isDirectory.boolValue == false
             }
             .first

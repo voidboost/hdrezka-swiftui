@@ -1,6 +1,6 @@
 import Combine
 import Defaults
-import FactoryKit
+import Dependencies
 import SQLiteData
 import SwiftUI
 import UserNotifications
@@ -11,14 +11,12 @@ class Downloader {
 
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
-    @ObservationIgnored @LazyInjected(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
-    @ObservationIgnored @LazyInjected(\.getMovieVideoUseCase) private var getMovieVideoUseCase
-    @ObservationIgnored @LazyInjected(\.callUseCase) private var callUseCase
-    @ObservationIgnored @LazyInjected(\.multicallUseCase) private var multicallUseCase
+    @ObservationIgnored @Dependency(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
+    @ObservationIgnored @Dependency(\.getMovieVideoUseCase) private var getMovieVideoUseCase
+    @ObservationIgnored @Dependency(\.callUseCase) private var callUseCase
+    @ObservationIgnored @Dependency(\.multicallUseCase) private var multicallUseCase
 
     @ObservationIgnored @Dependency(\.defaultDatabase) private var database
-
-    @ObservationIgnored private let fileManager = FileManager.default
 
     @ObservationIgnored private let process: Process
 
@@ -289,7 +287,7 @@ class Downloader {
                     episodeName.count > 255 - 4 ? "\(episodeName.prefix(255 - 8))... .mp4" : "\(episodeName).mp4"
                 )
 
-                if let movieDestination = fileManager.urls(for: .downloadsDirectory, in: .userDomainMask).first?
+                if let movieDestination = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?
                     .appending(path: "HDrezka", directoryHint: .isDirectory)
                     .appending(path: movieFolder.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .isDirectory)
                     .appending(path: seasonFolder.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .isDirectory)
@@ -410,7 +408,7 @@ class Downloader {
             } else {
                 let file = name.count > 255 - 4 - actingName.count - qualityName.count ? "\(name.prefix(255 - 8 - actingName.count - qualityName.count))... \(qualityName)\(actingName).mp4" : "\(name)\(qualityName)\(actingName).mp4"
 
-                if let movieDestination = fileManager.urls(for: .downloadsDirectory, in: .userDomainMask).first?
+                if let movieDestination = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?
                     .appending(path: "HDrezka", directoryHint: .isDirectory)
                 {
                     getMovieVideoUseCase(voiceActing: data.acting, season: nil, episode: nil, favs: data.details.favs)
