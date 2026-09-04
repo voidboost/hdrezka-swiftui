@@ -1,15 +1,15 @@
 import Combine
-import FactoryKit
+import Dependencies
 import SwiftUI
 
 @Observable
 class CommentsViewModel {
-    @ObservationIgnored @LazyInjected(\.getCommentsPageUseCase) private var getCommentsPageUseCase
-    @ObservationIgnored @LazyInjected(\.getCommentUseCase) private var getCommentUseCase
-    @ObservationIgnored @LazyInjected(\.toggleLikeCommentUseCase) private var toggleLikeCommentUseCase
-    @ObservationIgnored @LazyInjected(\.deleteCommentUseCase) private var deleteCommentUseCase
-    @ObservationIgnored @LazyInjected(\.sendCommentUseCase) private var sendCommentUseCase
-    @ObservationIgnored @LazyInjected(\.getLikesUseCase) private var getLikesUseCase
+    @ObservationIgnored @Dependency(\.getCommentsPageUseCase) private var getCommentsPageUseCase
+    @ObservationIgnored @Dependency(\.getCommentUseCase) private var getCommentUseCase
+    @ObservationIgnored @Dependency(\.toggleLikeCommentUseCase) private var toggleLikeCommentUseCase
+    @ObservationIgnored @Dependency(\.deleteCommentUseCase) private var deleteCommentUseCase
+    @ObservationIgnored @Dependency(\.sendCommentUseCase) private var sendCommentUseCase
+    @ObservationIgnored @Dependency(\.getLikesUseCase) private var getLikesUseCase
 
     @ObservationIgnored private let id: String
     @ObservationIgnored private let adb: String?

@@ -1,10 +1,10 @@
 import Combine
-import FactoryKit
+import Dependencies
 import SwiftUI
 
 @Observable
 class CategoriesViewModel {
-    @ObservationIgnored @LazyInjected(\.categoriesUseCase) private var categoriesUseCase
+    @ObservationIgnored @Dependency(\.categoriesUseCase) private var categoriesUseCase
 
     private(set) var state: DataState<[MovieType]> = .loading
 

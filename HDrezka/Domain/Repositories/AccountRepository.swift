@@ -1,4 +1,5 @@
 import Combine
+import Dependencies
 
 protocol AccountRepository {
     func signIn(login: String, password: String) -> AnyPublisher<Void, Error>
@@ -42,4 +43,15 @@ protocol AccountRepository {
     func reorderBookmarksCategories(newOrder: [Bookmark]) -> AnyPublisher<Bool, Error>
 
     func getVersion() -> AnyPublisher<String, Error>
+}
+
+private enum AccountRepositoryKey: DependencyKey {
+    static var liveValue: any AccountRepository = AccountRepositoryImpl()
+}
+
+extension DependencyValues {
+    var accountRepository: any AccountRepository {
+        get { self[AccountRepositoryKey.self] }
+        set { self[AccountRepositoryKey.self] = newValue }
+    }
 }

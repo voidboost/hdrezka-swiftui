@@ -1,7 +1,7 @@
 import AVKit
 import Combine
 import Defaults
-import FactoryKit
+import Dependencies
 import Kingfisher
 import MediaPlayer
 import SQLiteData
@@ -9,9 +9,11 @@ import SwiftUI
 
 @Observable
 class PlayerViewModel {
-    @ObservationIgnored @LazyInjected(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
-    @ObservationIgnored @LazyInjected(\.getMovieThumbnailsUseCase) private var getMovieThumbnailsUseCase
-    @ObservationIgnored @LazyInjected(\.getMovieVideoUseCase) private var getMovieVideoUseCase
+    @ObservationIgnored @Dependency(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
+    @ObservationIgnored @Dependency(\.getMovieThumbnailsUseCase) private var getMovieThumbnailsUseCase
+    @ObservationIgnored @Dependency(\.getMovieVideoUseCase) private var getMovieVideoUseCase
+    
+    @ObservationIgnored @Dependency(\.notificationCenter) private var notificationCenter
 
     @ObservationIgnored @Dependency(\.defaultDatabase) private var database
     @ObservationIgnored @FetchOne private var playerPosition: PlayerPosition?
@@ -517,7 +519,7 @@ class PlayerViewModel {
                 }
                 .store(in: &subscriptions)
 
-            NotificationCenter.default.publisher(for: AVPlayerItem.didPlayToEndTimeNotification, object: currentItem)
+            notificationCenter.publisher(for: AVPlayerItem.didPlayToEndTimeNotification, object: currentItem)
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] _ in
                     guard let self else { return }
@@ -536,7 +538,7 @@ class PlayerViewModel {
                 }
                 .store(in: &subscriptions)
 
-            NotificationCenter.default.publisher(for: AVPlayerItem.failedToPlayToEndTimeNotification, object: currentItem)
+            notificationCenter.publisher(for: AVPlayerItem.failedToPlayToEndTimeNotification, object: currentItem)
                 .compactMap { $0.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? Error }
                 .handleError()
                 .receive(on: DispatchQueue.main)
@@ -557,7 +559,7 @@ class PlayerViewModel {
                 self.routesDetected = self.routeDetector.multipleRoutesDetected
             }
 
-            NotificationCenter.default.publisher(for: .AVRouteDetectorMultipleRoutesDetectedDidChange)
+            notificationCenter.publisher(for: .AVRouteDetectorMultipleRoutesDetectedDidChange)
                 .receive(on: DispatchQueue.main)
                 .sink { [weak self] _ in
                     guard let self else { return }

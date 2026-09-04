@@ -22,7 +22,7 @@
 		DEB035B72C89E1DB004ABFA1 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B62C89E1DB004ABFA1 /* FirebaseCrashlytics */; };
 		DEB035BA2C89E57A004ABFA1 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B92C89E57A004ABFA1 /* Defaults */; };
 		DEE64D0B2C8869D0002C2F2F /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = DEE64D0A2C8869D0002C2F2F /* Sparkle */; };
-		DEF920382DD5CAF20087C32C /* FactoryKit in Frameworks */ = {isa = PBXBuildFile; productRef = DEF920372DD5CAF20087C32C /* FactoryKit */; };
+		DEEDFD71304B26490074D4F4 /* Dependencies in Frameworks */ = {isa = PBXBuildFile; productRef = DEEDFD70304B26490074D4F4 /* Dependencies */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -59,6 +59,7 @@
 				DEB035BA2C89E57A004ABFA1 /* Defaults in Frameworks */,
 				043A2B722C036C7C0057721E /* OrderedCollections in Frameworks */,
 				04E9EB462C047F19001CBBCA /* YouTubePlayerKit in Frameworks */,
+				DEEDFD71304B26490074D4F4 /* Dependencies in Frameworks */,
 				04B25FD82BA46F9C00200341 /* Algorithms in Frameworks */,
 				DEB035B52C89E1DB004ABFA1 /* FirebaseAnalytics in Frameworks */,
 				04B3CA8A2BA06CAC0039F76E /* SwiftSoup in Frameworks */,
@@ -68,7 +69,6 @@
 				DE4AD63E2EAA4A7200CE7AB3 /* Kingfisher in Frameworks */,
 				DE188EE52CA6AB3100E7B1AE /* Pow in Frameworks */,
 				04E5DC0A2C120C4200BF1B7A /* Flow in Frameworks */,
-				DEF920382DD5CAF20087C32C /* FactoryKit in Frameworks */,
 				DEB035B72C89E1DB004ABFA1 /* FirebaseCrashlytics in Frameworks */,
 				DE2D67382DC3D5E900A9187C /* LicensesList in Frameworks */,
 				DE7608DA2EB4231600C4A23E /* LRUCache in Frameworks */,
@@ -128,10 +128,10 @@
 				DE188EE42CA6AB3100E7B1AE /* Pow */,
 				DE3EF0382CFF04CA0022C311 /* Alamofire */,
 				DE2D67372DC3D5E900A9187C /* LicensesList */,
-				DEF920372DD5CAF20087C32C /* FactoryKit */,
 				DE4AD63D2EAA4A7200CE7AB3 /* Kingfisher */,
 				DE7608D92EB4231600C4A23E /* LRUCache */,
 				DE99F0C730471C6C0072416C /* SQLiteData */,
+				DEEDFD70304B26490074D4F4 /* Dependencies */,
 			);
 			productName = HDRezka;
 			productReference = 04B3CA742BA06C9C0039F76E /* HDrezka.app */;
@@ -173,10 +173,10 @@
 				DEB035B82C89E57A004ABFA1 /* XCRemoteSwiftPackageReference "Defaults" */,
 				DE188EE32CA6AB3100E7B1AE /* XCRemoteSwiftPackageReference "Pow" */,
 				DE3EF0372CFF04CA0022C311 /* XCRemoteSwiftPackageReference "Alamofire" */,
-				DEF920362DD5CAF20087C32C /* XCRemoteSwiftPackageReference "Factory" */,
 				DE4AD63C2EAA4A7200CE7AB3 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				DE7608D82EB4231600C4A23E /* XCRemoteSwiftPackageReference "LRUCache" */,
 				DE99F0C630471C6C0072416C /* XCRemoteSwiftPackageReference "sqlite-data" */,
+				DEEDFD6F304B26490074D4F4 /* XCRemoteSwiftPackageReference "swift-dependencies" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 04B3CA752BA06C9C0039F76E /* Products */;
@@ -600,6 +600,8 @@
 				maximumVersion = 999.0.0;
 				minimumVersion = 0.0.1;
 			};
+			traits = (
+			);
 		};
 		DEB035B32C89E1DB004ABFA1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -628,9 +630,9 @@
 				minimumVersion = 0.0.1;
 			};
 		};
-		DEF920362DD5CAF20087C32C /* XCRemoteSwiftPackageReference "Factory" */ = {
+		DEEDFD6F304B26490074D4F4 /* XCRemoteSwiftPackageReference "swift-dependencies" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/hmlongco/Factory.git";
+			repositoryURL = "https://github.com/pointfreeco/swift-dependencies.git";
 			requirement = {
 				kind = versionRange;
 				maximumVersion = 999.0.0;
@@ -714,10 +716,10 @@
 			package = DEE64D092C8869D0002C2F2F /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
 		};
-		DEF920372DD5CAF20087C32C /* FactoryKit */ = {
+		DEEDFD70304B26490074D4F4 /* Dependencies */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = DEF920362DD5CAF20087C32C /* XCRemoteSwiftPackageReference "Factory" */;
-			productName = FactoryKit;
+			package = DEEDFD6F304B26490074D4F4 /* XCRemoteSwiftPackageReference "swift-dependencies" */;
+			productName = Dependencies;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

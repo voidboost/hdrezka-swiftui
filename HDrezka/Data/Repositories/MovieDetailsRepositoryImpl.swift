@@ -1,10 +1,10 @@
 import Alamofire
 import Combine
-import FactoryKit
+import Dependencies
 import Foundation
 
 struct MovieDetailsRepositoryImpl: MovieDetailsRepository {
-    @Injected(\.session) private var session
+    @Dependency(\.session) private var session
 
     func getMovieDetails(movieId: String) -> AnyPublisher<MovieDetailed, Error> {
         let parts = movieId.components(separatedBy: "/").filter { !$0.isEmpty }

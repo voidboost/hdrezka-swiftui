@@ -1,10 +1,10 @@
 import Alamofire
 import Combine
-import FactoryKit
+import Dependencies
 import Foundation
 
 struct Aria2RepositoryImpl: Aria2Repository {
-    @Injected(\.session) private var session
+    @Dependency(\.session) private var session
 
     func call<D: Decodable>(data: some Encodable) -> AnyPublisher<Aria2Response<D>, Error> {
         session.request(Aria2Service.call(data: data))

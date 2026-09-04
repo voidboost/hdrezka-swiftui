@@ -1,13 +1,21 @@
 import Combine
+import Dependencies
 
 struct GetPopularMoviesInCollectionUseCase {
-    private let repository: CollectionsRepository
-
-    init(repository: CollectionsRepository) {
-        self.repository = repository
-    }
+    @Dependency(\.collectionsRepository) private var repository
 
     func callAsFunction(collectionId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
         repository.getPopularMoviesInCollection(collectionId: collectionId, page: page)
+    }
+}
+
+extension GetPopularMoviesInCollectionUseCase: DependencyKey {
+    static var liveValue = Self()
+}
+
+extension DependencyValues {
+    var getPopularMoviesInCollectionUseCase: GetPopularMoviesInCollectionUseCase {
+        get { self[GetPopularMoviesInCollectionUseCase.self] }
+        set { self[GetPopularMoviesInCollectionUseCase.self] = newValue }
     }
 }

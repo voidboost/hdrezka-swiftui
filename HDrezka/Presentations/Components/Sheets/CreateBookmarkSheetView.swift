@@ -1,10 +1,10 @@
 import Combine
-import FactoryKit
+import Dependencies
 import FirebaseAnalytics
 import SwiftUI
 
 struct CreateBookmarkSheetView: View {
-    @Injected(\.createBookmarksCategoryUseCase) private var createBookmarksCategoryUseCase
+    @Dependency(\.createBookmarksCategoryUseCase) private var createBookmarksCategoryUseCase
 
     @State private var subscriptions: Set<AnyCancellable> = []
 

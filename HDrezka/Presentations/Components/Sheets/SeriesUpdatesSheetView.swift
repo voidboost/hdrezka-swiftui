@@ -1,10 +1,10 @@
 import Combine
-import FactoryKit
+import Dependencies
 import FirebaseAnalytics
 import SwiftUI
 
 struct SeriesUpdatesSheetView: View {
-    @Injected(\.getSeriesUpdatesUseCase) private var getSeriesUpdatesUseCase
+    @Dependency(\.getSeriesUpdatesUseCase) private var getSeriesUpdatesUseCase
 
     @State private var subscriptions: Set<AnyCancellable> = []
 

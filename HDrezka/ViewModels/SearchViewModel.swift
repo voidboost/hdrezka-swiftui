@@ -1,10 +1,10 @@
 import Combine
-import FactoryKit
+import Dependencies
 import SwiftUI
 
 @Observable
 class SearchViewModel {
-    @ObservationIgnored @LazyInjected(\.searchUseCase) private var searchUseCase
+    @ObservationIgnored @Dependency(\.searchUseCase) private var searchUseCase
 
     private(set) var state: DataState<[MovieSimple]> = .data([])
     private(set) var paginationState: DataPaginationState = .idle

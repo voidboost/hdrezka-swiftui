@@ -1,10 +1,10 @@
 import Alamofire
 import Combine
-import FactoryKit
+import Dependencies
 import Foundation
 
 struct PeopleRepositoryImpl: PeopleRepository {
-    @Injected(\.session) private var session
+    @Dependency(\.session) private var session
 
     func getPersonDetails(id: String) -> AnyPublisher<PersonDetailed, Error> {
         session.request(PeopleService.getPersonDetails(id: id.replacingOccurrences(of: "person/", with: "").replacingOccurrences(of: "/", with: "")))

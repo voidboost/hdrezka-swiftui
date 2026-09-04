@@ -1,13 +1,21 @@
 import Combine
+import Dependencies
 
 struct GetWatchingLaterMoviesUseCase {
-    private let repository: AccountRepository
-
-    init(repository: AccountRepository) {
-        self.repository = repository
-    }
+    @Dependency(\.accountRepository) private var repository
 
     func callAsFunction() -> AnyPublisher<[MovieWatchLater], Error> {
         repository.getWatchingLaterMovies()
+    }
+}
+
+extension GetWatchingLaterMoviesUseCase: DependencyKey {
+    static var liveValue = Self()
+}
+
+extension DependencyValues {
+    var getWatchingLaterMoviesUseCase: GetWatchingLaterMoviesUseCase {
+        get { self[GetWatchingLaterMoviesUseCase.self] }
+        set { self[GetWatchingLaterMoviesUseCase.self] = newValue }
     }
 }

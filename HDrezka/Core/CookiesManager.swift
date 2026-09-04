@@ -1,5 +1,6 @@
 import Combine
 import Defaults
+import Dependencies
 import Foundation
 
 @Observable
@@ -8,12 +9,14 @@ class CookiesManager {
 
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
+    @ObservationIgnored @Dependency(\.notificationCenter) private var notificationCenter
+
     init() {
         observe()
     }
 
     private func observe() {
-        NotificationCenter.default.publisher(for: .NSHTTPCookieManagerCookiesChanged, object: HTTPCookieStorage.shared)
+        notificationCenter.publisher(for: .NSHTTPCookieManagerCookiesChanged, object: HTTPCookieStorage.shared)
             .compactMap { $0.object as? HTTPCookieStorage }
             .compactMap { $0.cookies(for: Defaults[.mirror]) }
             .receive(on: DispatchQueue.main)

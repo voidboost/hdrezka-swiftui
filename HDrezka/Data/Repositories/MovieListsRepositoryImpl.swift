@@ -1,10 +1,10 @@
 import Alamofire
 import Combine
-import FactoryKit
+import Dependencies
 import Foundation
 
 struct MovieListsRepositoryImpl: MovieListsRepository {
-    @Injected(\.session) private var session
+    @Dependency(\.session) private var session
 
     func getPopularMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
         session.request(MovieListsService.getMovieList1(page: page, filter: "popular", genre: genre))

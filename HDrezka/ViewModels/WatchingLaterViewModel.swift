@@ -1,12 +1,12 @@
 import Combine
-import FactoryKit
+import Dependencies
 import SwiftUI
 
 @Observable
 class WatchingLaterViewModel {
-    @ObservationIgnored @LazyInjected(\.getWatchingLaterMoviesUseCase) private var getWatchingLaterMoviesUseCase
-    @ObservationIgnored @LazyInjected(\.switchWatchedItemUseCase) private var switchWatchedItemUseCase
-    @ObservationIgnored @LazyInjected(\.removeWatchingItemUseCase) private var removeWatchingItemUseCase
+    @ObservationIgnored @Dependency(\.getWatchingLaterMoviesUseCase) private var getWatchingLaterMoviesUseCase
+    @ObservationIgnored @Dependency(\.switchWatchedItemUseCase) private var switchWatchedItemUseCase
+    @ObservationIgnored @Dependency(\.removeWatchingItemUseCase) private var removeWatchingItemUseCase
 
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 

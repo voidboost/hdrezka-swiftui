@@ -1,10 +1,10 @@
 import Combine
-import FactoryKit
+import Dependencies
 import SwiftUI
 
 @Observable
 class PersonViewModel {
-    @ObservationIgnored @LazyInjected(\.getPersonDetailsUseCase) private var getPersonDetailsUseCase
+    @ObservationIgnored @Dependency(\.getPersonDetailsUseCase) private var getPersonDetailsUseCase
 
     @ObservationIgnored let id: String
 
