@@ -192,10 +192,13 @@ jobs:
 
             app "HDrezka.app"
 
-            postflight do
-              system_command "/usr/bin/xattr",
-                             args: ["-dr", "com.apple.quarantine", "#{appdir}/HDrezka.app"],
-                             sudo: false
+            postflight_steps do
+              run "/usr/bin/xattr",
+                args: [
+                  "-dr",
+                  "com.apple.quarantine",
+                  "{{appdir}}/HDrezka.app",
+                ]
             end
 
             zap trash: [
