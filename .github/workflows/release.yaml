@@ -127,6 +127,25 @@ jobs:
             --title "HDrezka ${VERSION}" \
             --generate-notes
 
+      - name: Remove previous GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release list \
+            --repo "${GITHUB_REPOSITORY}" \
+            --limit 100 \
+            --json tagName,isDraft,isPrerelease \
+            --jq '.[] | select(.isDraft == false and .isPrerelease == false) | .tagName' |
+          while read -r tag; do
+            if [ "$tag" != "${VERSION}" ]; then
+              echo "Removing release: $tag"
+              gh release delete "$tag" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --yes \
+              --cleanup-tag
+            fi
+          done
+
       - name: Clone releases repository
         env:
           TOKEN: ${{ secrets.RELEASES_TOKEN }}
