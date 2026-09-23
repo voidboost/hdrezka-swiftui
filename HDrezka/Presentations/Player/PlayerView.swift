@@ -48,7 +48,7 @@ struct PlayerView: View {
                         TapGesture(count: 2)
                             .onEnded {
                                 guard player.status == .readyToPlay,
-                                      let window = viewModel.window,
+                                      let window = Windows.player.window,
                                       !viewModel.isPictureInPictureActive || (viewModel.isPictureInPictureActive && window.styleMask.contains(.fullScreen))
                                 else {
                                     return
@@ -106,7 +106,6 @@ struct PlayerView: View {
         .focused($isFocused)
         .focusEffectDisabled()
         .background(Color.black)
-        .background(WindowAccessor(window: $viewModel.window))
         .preferredColorScheme(.dark)
         .tint(.primary)
         .contentShape(.rect)
@@ -119,17 +118,30 @@ struct PlayerView: View {
 
             viewModel.setupPlayer(subtitles: selectPosition?.subtitles)
 
-            guard viewModel.hideMainWindow, let window = appState.window else { return }
+            if let window = Windows.player.window,
+               viewModel.playerFullscreen,
+               !window.styleMask.contains(.fullScreen)
+            {
+                window.toggleFullScreen(nil)
+            }
 
-            let animation = window.animationBehavior
-            window.animationBehavior = .none
-            window.orderOut(nil)
-            window.animationBehavior = animation
+            if viewModel.hideMainWindow,
+               let window = Windows.hdrezka.window
+            {
+                let animation = window.animationBehavior
+                window.animationBehavior = .none
+                window.orderOut(nil)
+                window.animationBehavior = animation
+            }
         }
         .onDisappear {
             viewModel.resetPlayer()
 
-            guard viewModel.hideMainWindow, let window = appState.window else { return }
+            guard viewModel.hideMainWindow,
+                  let window = Windows.hdrezka.window
+            else {
+                return
+            }
 
             let animation = window.animationBehavior
             window.animationBehavior = .none
@@ -149,16 +161,6 @@ struct PlayerView: View {
 
                 viewModel.setMask((viewModel.isLoading || !viewModel.isPlaying) && !viewModel.isPictureInPictureActive)
             }
-        }
-        .onChange(of: viewModel.window) {
-            guard let window = viewModel.window,
-                  viewModel.playerFullscreen,
-                  !window.styleMask.contains(.fullScreen)
-            else {
-                return
-            }
-
-            window.toggleFullScreen(nil)
         }
         .onChange(of: scenePhase) {
             guard let player = viewModel.playerLayer.player,
@@ -187,7 +189,7 @@ struct PlayerView: View {
 
             guard let player = viewModel.playerLayer.player,
                   player.status == .readyToPlay,
-                  let window = viewModel.window,
+                  let window = Windows.player.window,
                   window.styleMask.contains(.fullScreen)
             else {
                 return

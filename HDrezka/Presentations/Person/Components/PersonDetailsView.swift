@@ -15,9 +15,9 @@ struct PersonDetailsView: View {
         HStack(alignment: .bottom, spacing: 27) {
             Button {
                 if let url = URL(string: details.hphoto) ?? URL(string: details.photo) {
-                    dismissWindow(id: "imageViewer")
+                    dismissWindow(id: Windows.imageViewer.id)
 
-                    openWindow(id: "imageViewer", value: url)
+                    openWindow(id: Windows.imageViewer.id, value: url)
                 }
             } label: {
                 KFImage
