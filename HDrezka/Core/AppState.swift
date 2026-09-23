@@ -15,8 +15,6 @@ class AppState {
     var isPremiumPresented = false
 
     var selectedTab: Tabs = .home
-
-    var window: NSWindow?
 }
 
 enum Tabs: Hashable, Identifiable, CaseIterable, View {

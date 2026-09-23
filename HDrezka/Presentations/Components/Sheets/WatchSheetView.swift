@@ -403,10 +403,10 @@ struct WatchSheetView: View {
             VStack(alignment: .center, spacing: 10) {
                 Button {
                     if let details, let selectedActing, let selectedQuality, let movie {
-                        dismissWindow(id: "player")
+                        dismissWindow(id: Windows.player.id)
 
                         openWindow(
-                            id: "player",
+                            id: Windows.player.id,
                             value: PlayerData(details: details, selectedActing: selectedActing, seasons: seasons, selectedSeason: selectedSeason, selectedEpisode: selectedEpisode, selectedQuality: selectedQuality, movie: movie)
                         )
 

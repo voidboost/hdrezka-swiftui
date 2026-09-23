@@ -6,8 +6,6 @@ struct ImageView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    @State private var window: NSWindow?
-
     init(url: URL) {
         self.url = url
     }
@@ -25,7 +23,7 @@ struct ImageView: View {
             .scaledToFit()
             .zoomable(
                 maxZoomScale: 5,
-                doubleTapZoomScale: 3,
+                doubleTapZoomScale: 3
             )
             .navigationTitle("key.imageViewer")
             .toolbar(.hidden)
@@ -35,9 +33,16 @@ struct ImageView: View {
             .focusEffectDisabled()
             .contentShape(.rect)
             .background(Color.clear)
-            .background(WindowAccessor(window: $window))
-            .onChange(of: window) {
-                guard let window, !window.styleMask.contains(.fullScreen) else { return }
+            .onAppear {
+                for window in NSApp.windows {
+                    print(window.identifier?.rawValue)
+                }
+
+                guard let window = Windows.imageViewer.window,
+                      !window.styleMask.contains(.fullScreen)
+                else {
+                    return
+                }
 
                 window.toggleFullScreen(nil)
             }
@@ -64,7 +69,7 @@ struct ImageView: View {
                     .exclusively(before:
                         TapGesture(count: 2)
                             .onEnded {
-                                guard let window else { return }
+                                guard let window = Windows.imageViewer.window else { return }
 
                                 window.toggleFullScreen(nil)
                             }
@@ -72,7 +77,7 @@ struct ImageView: View {
                                 TapGesture(count: 1)
                                     .onEnded {
                                         dismiss()
-                                    })),
+                                    }))
             )
             .overlay(alignment: .bottomTrailing) {
                 ShareLink(item: url) {

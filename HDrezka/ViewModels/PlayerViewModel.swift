@@ -12,7 +12,7 @@ class PlayerViewModel {
     @ObservationIgnored @Dependency(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
     @ObservationIgnored @Dependency(\.getMovieThumbnailsUseCase) private var getMovieThumbnailsUseCase
     @ObservationIgnored @Dependency(\.getMovieVideoUseCase) private var getMovieVideoUseCase
-    
+
     @ObservationIgnored @Dependency(\.notificationCenter) private var notificationCenter
 
     @ObservationIgnored @Dependency(\.defaultDatabase) private var database
@@ -100,7 +100,6 @@ class PlayerViewModel {
     private var hideMaskTask: Task<Void, Never>?
     private(set) var subtitlesOptions: [AVMediaSelectionOption] = []
     private(set) var thumbnails: WebVTT?
-    var window: NSWindow?
     private(set) var rate: Float = Defaults[.rate]
     private(set) var isMuted: Bool = Defaults[.isMuted]
     private(set) var volume: Float = Defaults[.volume]
@@ -586,7 +585,9 @@ class PlayerViewModel {
 
                         self.updateNextTimer()
 
-                        if let window = self.window,!isPictureInPictureActive {
+                        if let window = Windows.player.window,
+                           !isPictureInPictureActive
+                        {
                             window.makeKeyAndOrderFront(nil)
                         }
 

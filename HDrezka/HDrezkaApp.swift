@@ -155,12 +155,11 @@ struct HDrezkaApp: App {
     }
 
     var body: some Scene {
-        WindowGroup {
+        WindowGroup(id: Windows.hdrezka.id) {
             ContentView()
                 .environment(appState)
                 .environment(downloader)
                 .environment(cookiesManager)
-                .background(WindowAccessor(window: $appState.window))
                 .preferredColorScheme(theme.scheme)
         }
         .windowResizability(.contentMinSize)
@@ -169,7 +168,7 @@ struct HDrezkaApp: App {
         .commands(content: customCommands)
         .commands(content: removed)
 
-        WindowGroup("key.player", id: "player", for: PlayerData.self) { $data in
+        WindowGroup("key.player", id: Windows.player.id, for: PlayerData.self) { $data in
             if let data {
                 PlayerView(data: data)
                     .environment(appState)
@@ -183,7 +182,7 @@ struct HDrezkaApp: App {
         .commands(content: customCommands)
         .commands(content: removed)
 
-        WindowGroup("key.imageViewer", id: "imageViewer", for: URL.self) { $url in
+        WindowGroup("key.imageViewer", id: Windows.imageViewer.id, for: URL.self) { $url in
             if let url {
                 ImageView(url: url)
                     .preferredColorScheme(theme.scheme)
@@ -197,7 +196,7 @@ struct HDrezkaApp: App {
         .commands(content: customCommands)
         .commands(content: removed)
 
-        WindowGroup("key.licenses", id: "licenses") {
+        WindowGroup("key.licenses", id: Windows.licenses.id) {
             LicensesView()
                 .preferredColorScheme(theme.scheme)
                 .analyticsScreen(name: "licenses", class: "LicensesView")
@@ -249,7 +248,7 @@ struct HDrezkaApp: App {
             UpdateButton(updater: delegate.updaterController.updater)
 
             Button {
-                openWindow(id: "licenses")
+                openWindow(id: Windows.licenses.id)
             } label: {
                 Text("key.licenses")
             }
