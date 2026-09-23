@@ -16,7 +16,7 @@ jobs:
   build:
     if: github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'bump'
 
-    runs-on: macos-27
+    runs-on: macos-26
 
     permissions:
       contents: read
