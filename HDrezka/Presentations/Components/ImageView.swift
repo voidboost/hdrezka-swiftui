@@ -34,10 +34,6 @@ struct ImageView: View {
             .contentShape(.rect)
             .background(Color.clear)
             .onAppear {
-                for window in NSApp.windows {
-                    print(window.identifier?.rawValue)
-                }
-
                 guard let window = Windows.imageViewer.window,
                       !window.styleMask.contains(.fullScreen)
                 else {
