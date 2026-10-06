@@ -77,8 +77,7 @@ class PlayerViewModel {
 
     @ObservationIgnored private let routeDetector: AVRouteDetector = .init()
 
-    @ObservationIgnored private let videoOutput = AVPlayerItemVideoOutput(pixelBufferAttributes: [kCVPixelBufferPixelFormatTypeKey as String: Int(kCVPixelFormatType_32BGRA)])
-    @ObservationIgnored private let ciContext = CIContext(options: [.useSoftwareRenderer: false, .cacheIntermediates: false])
+    @ObservationIgnored private let glowRenderer = GlowRenderer()
 
     private(set) var glowImage: Image?
     private(set) var routesDetected: Bool = false
@@ -135,6 +134,18 @@ class PlayerViewModel {
                     .store(in: &subscriptions)
             }
 
+            glowRenderer.onImage = { [weak self] cgImage in
+                guard let self, self.isAmbientLightVisible, self.playerLayer.player != nil else { return }
+
+                if self.glowImage == nil {
+                    withAnimation(.easeInOut(duration: 0.15)) {
+                        self.glowImage = Image(decorative: cgImage, scale: 1.0)
+                    }
+                } else {
+                    self.glowImage = Image(decorative: cgImage, scale: 1.0)
+                }
+            }
+
             let timePublisher = player.periodicTimePublisher(forInterval: CMTime(seconds: 0.1, preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
                 .removeDuplicates()
                 .receive(on: DispatchQueue.main)
@@ -148,58 +159,15 @@ class PlayerViewModel {
 
                     self.currentTime = currentTime
 
-                    self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = currentTime
-                    self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyPlaybackRate] = self.rate
-                    self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyCurrentPlaybackDate] = currentItem.currentDate()
-                    self.nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyDefaultPlaybackRate] = player.defaultRate
+                    self.updateNowPlayingInfo([
+                        MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime,
+                        MPNowPlayingInfoPropertyPlaybackRate: self.rate,
+                        MPNowPlayingInfoPropertyCurrentPlaybackDate: currentItem.currentDate(),
+                        MPNowPlayingInfoPropertyDefaultPlaybackRate: player.defaultRate,
+                    ])
 
-                    let targetTime = CMTime(seconds: time.seconds + 0.1, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
-
-                    if self.ambientLight, self.videoGravity == .fit, !self.isPictureInPictureActive {
-                        if self.videoOutput.hasNewPixelBuffer(forItemTime: targetTime) {
-                            if #available(macOS 26.0, *),
-                               let pixelBuffer = self.videoOutput.pixelBufferAndDisplayTime(forItemTime: targetTime).pixelBuffer,
-                               let cgImage = pixelBuffer.withUnsafeBuffer({ buffer in
-                                   let ciImage = CIImage(cvPixelBuffer: buffer)
-
-                                   let scaleTransform = CGAffineTransform(scaleX: 0.25, y: 0.25)
-
-                                   let transformed = ciImage
-                                       .transformed(by: scaleTransform, highQualityDownsample: false)
-                                       .clampedToExtent()
-                                       .cropped(to: ciImage.extent.applying(scaleTransform))
-
-                                   return self.ciContext.createCGImage(transformed, from: transformed.extent)
-                               })
-                            {
-                                if self.glowImage == nil {
-                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                        self.glowImage = Image(decorative: cgImage, scale: 1.0)
-                                    }
-                                } else {
-                                    self.glowImage = Image(decorative: cgImage, scale: 1.0)
-                                }
-                            } else if let pixelBuffer = self.videoOutput.copyPixelBuffer(forItemTime: targetTime, itemTimeForDisplay: nil) {
-                                let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
-
-                                let scaleTransform = CGAffineTransform(scaleX: 0.25, y: 0.25)
-
-                                let transformed = ciImage
-                                    .transformed(by: scaleTransform, highQualityDownsample: false)
-                                    .clampedToExtent()
-                                    .cropped(to: ciImage.extent.applying(scaleTransform))
-
-                                if let cgImage = self.ciContext.createCGImage(transformed, from: transformed.extent) {
-                                    if self.glowImage == nil {
-                                        withAnimation(.easeInOut(duration: 0.15)) {
-                                            self.glowImage = Image(decorative: cgImage, scale: 1.0)
-                                        }
-                                    } else {
-                                        self.glowImage = Image(decorative: cgImage, scale: 1.0)
-                                    }
-                                }
-                            }
-                        }
+                    if self.isAmbientLightVisible {
+                        self.glowRenderer.render(at: CMTime(seconds: time.seconds + 0.1, preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
                     }
 
                     self.updateNextTimer()
@@ -762,11 +730,13 @@ class PlayerViewModel {
                 }
                 .store(in: &subscriptions)
 
-            nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyAssetURL] = urls.first
-            nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyMediaType] = MPNowPlayingInfoMediaType.video.rawValue
-            nowPlayingInfoCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyIsLiveStream] = false
-            nowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyTitle] = name
-            nowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyAlbumTitle] = voiceActing.name
+            updateNowPlayingInfo([
+                MPNowPlayingInfoPropertyAssetURL: urls.first,
+                MPNowPlayingInfoPropertyMediaType: MPNowPlayingInfoMediaType.video.rawValue,
+                MPNowPlayingInfoPropertyIsLiveStream: false,
+                MPMediaItemPropertyTitle: name,
+                MPMediaItemPropertyAlbumTitle: voiceActing.name,
+            ])
 
             if let season, let episode {
                 nowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyArtist] = "Season \(season.name) Episode \(episode.name)"
@@ -1247,13 +1217,27 @@ class PlayerViewModel {
         }
     }
 
+    private var isAmbientLightVisible: Bool {
+        ambientLight && videoGravity == .fit && !isPictureInPictureActive
+    }
+
+    private func updateNowPlayingInfo(_ changes: [String: Any?]) {
+        guard var info = nowPlayingInfoCenter.nowPlayingInfo else { return }
+
+        for (key, value) in changes {
+            info[key] = value
+        }
+
+        nowPlayingInfoCenter.nowPlayingInfo = info
+    }
+
     private func setAmbientLight(_ enable: Bool = true, avPlayerItem: AVPlayerItem) {
         for output in avPlayerItem.outputs {
             avPlayerItem.remove(output)
         }
 
         if enable {
-            avPlayerItem.add(videoOutput)
+            avPlayerItem.add(glowRenderer.videoOutput)
         } else {
             withAnimation(.easeInOut(duration: 0.15)) {
                 self.glowImage = nil
