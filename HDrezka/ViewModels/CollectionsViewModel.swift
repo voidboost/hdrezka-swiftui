@@ -48,6 +48,8 @@ class CollectionsViewModel {
     }
 
     func load() {
+        subscriptions.flush()
+
         state = .loading
         paginationState = .idle
         page = 1

@@ -14,6 +14,7 @@ class BookmarksViewModel {
     @ObservationIgnored @Dependency(\.removeFromBookmarksUseCase) private var removeFromBookmarksUseCase
 
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
+    @ObservationIgnored private var moviesSubscriptions: Set<AnyCancellable> = []
 
     private(set) var bookmarksState: DataState<[Bookmark]> = .loading
     private(set) var bookmarkState: DataState<[MovieSimple]> = .data([])
@@ -36,6 +37,8 @@ class BookmarksViewModel {
         }
 
         bookmarksState = .loading
+
+        moviesSubscriptions.flush()
 
         bookmarkState = .data([])
         paginationState = .idle
@@ -101,7 +104,7 @@ class BookmarksViewModel {
                         }
                     }
                 }
-                .store(in: &subscriptions)
+                .store(in: &moviesSubscriptions)
         }
     }
 
@@ -117,6 +120,8 @@ class BookmarksViewModel {
     }
 
     func load() {
+        moviesSubscriptions.flush()
+
         bookmarkState = .loading
         paginationState = .idle
         page = 1

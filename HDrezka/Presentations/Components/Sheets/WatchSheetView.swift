@@ -1,28 +1,16 @@
-import Combine
 import Defaults
-import Dependencies
 import FirebaseAnalytics
-import SQLiteData
 import SwiftUI
 
 struct WatchSheetView: View {
-    @Dependency(\.getMovieDetailsUseCase) private var getMovieDetailsUseCase
-    @Dependency(\.getMovieVideoUseCase) private var getMovieVideoUseCase
-    @Dependency(\.getSeriesSeasonsUseCase) private var getSeriesSeasonsUseCase
-
-    @State private var subscriptions: Set<AnyCancellable> = []
-
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
 
     @Environment(AppState.self) private var appState
 
-    @FetchOne private var selectPosition: SelectPosition?
-
     @Default(.isUserPremium) private var isUserPremium
     @Default(.isLoggedIn) private var isLoggedIn
-    @Default(.defaultQuality) private var defaultQuality
 
     private let id: String
 
@@ -471,196 +459,20 @@ struct WatchSheetView: View {
         .padding(.bottom, 25)
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
-        .onAppear {
-            getMovieDetailsUseCase(movieId: id)
-                .receive(on: DispatchQueue.main)
-                .sink { completion in
-                    guard case let .failure(error) = completion else { return }
-
-                    self.error = error
-                    isErrorPresented = true
-                } receiveValue: { details in
-                    Task { @MainActor in
-                        if let movieId = details.movieId.id {
-                            _ = try? await self.$selectPosition.load(
-                                SelectPosition.where { $0.id.eq(movieId) }
-                            )
-                        }
-
-                        withAnimation(.easeInOut) {
-                            self.details = details
-                        }
-                    }
-                }
-                .store(in: &subscriptions)
-        }
-        .onChange(of: details) {
-            if let details, let acting = details.voiceActing {
-                withAnimation(.easeInOut) {
-                    selectedActing = if !isLoggedIn,
-                                        let position = selectPosition,
-                                        let first = acting.filter({ isUserPremium != nil || !$0.isPremium }).first(where: { $0.translatorId == position.acting })
-                    {
-                        first
-                    } else if let series = details.series,
-                              let first = acting.filter({ isUserPremium != nil || !$0.isPremium }).first(where: { $0.translatorId == series.acting })
-                    {
-                        first
-                    } else if let first = acting.filter({ isUserPremium != nil || !$0.isPremium }).first(where: { $0.isSelected }) {
-                        first
-                    } else if let first = acting.first(where: { isUserPremium != nil || !$0.isPremium }) {
-                        first
-                    } else if let first = acting.first {
-                        first
-                    } else {
-                        nil
-                    }
-                }
-            }
-        }
-        .onChange(of: selectedActing) {
-            withAnimation(.easeInOut) {
-                selectedSeason = nil
-                selectedEpisode = nil
-                selectedQuality = nil
-                seasons = nil
-                movie = nil
-            }
-
-            if let details, let selectedActing {
-                if details.series != nil {
-                    if let movieId = details.movieId.id {
-                        getSeriesSeasonsUseCase(movieId: movieId, voiceActing: selectedActing, favs: details.favs)
-                            .receive(on: DispatchQueue.main)
-                            .sink { completion in
-                                guard case let .failure(error) = completion else { return }
-
-                                self.error = error
-                                isErrorPresented = true
-                            } receiveValue: { seasons in
-                                withAnimation(.easeInOut) {
-                                    self.seasons = seasons
-
-                                    selectedSeason = if !isLoggedIn,
-                                                        let position = selectPosition,
-                                                        let first = seasons.first(where: { $0.seasonId == position.season })
-                                    {
-                                        first
-                                    } else if let series = details.series,
-                                              let first = seasons.first(where: { $0.seasonId == series.season })
-                                    {
-                                        first
-                                    } else if let first = seasons.first(where: { $0.isSelected }) {
-                                        first
-                                    } else if let first = seasons.first {
-                                        first
-                                    } else {
-                                        nil
-                                    }
-                                }
-                            }
-                            .store(in: &subscriptions)
-                    } else {
-                        if !isErrorPresented {
-                            isErrorPresented = true
-                        }
-                    }
-                } else {
-                    getMovieVideoUseCase(voiceActing: selectedActing, season: nil, episode: nil, favs: details.favs)
-                        .receive(on: DispatchQueue.main)
-                        .sink { completion in
-                            guard case let .failure(error) = completion else { return }
-
-                            self.error = error
-                            isErrorPresented = true
-                        } receiveValue: { movie in
-                            if movie.needPremium {
-                                dismiss()
-
-                                appState.isPremiumPresented = true
-                            } else {
-                                withAnimation(.easeInOut) {
-                                    self.movie = movie
-
-                                    if defaultQuality != .ask,
-                                       defaultQuality != .highest,
-                                       movie.getAvailableQualities().contains(defaultQuality.rawValue)
-                                    {
-                                        selectedQuality = defaultQuality.rawValue
-                                    } else if defaultQuality == .highest,
-                                              let highest = movie.getAvailableQualities().last
-                                    {
-                                        selectedQuality = highest
-                                    }
-                                }
-                            }
-                        }
-                        .store(in: &subscriptions)
-                }
-            }
-        }
-        .onChange(of: selectedSeason) {
-            withAnimation(.easeInOut) {
-                selectedQuality = nil
-                movie = nil
-
-                selectedEpisode = if !isLoggedIn,
-                                     let position = selectPosition,
-                                     let first = selectedSeason?.episodes.first(where: { $0.episodeId == position.episode })
-                {
-                    first
-                } else if let series = details?.series,
-                          let first = selectedSeason?.episodes.first(where: { $0.episodeId == series.episode })
-                {
-                    first
-                } else if let first = selectedSeason?.episodes.first(where: { $0.isSelected }) {
-                    first
-                } else if let first = selectedSeason?.episodes.first {
-                    first
-                } else {
-                    nil
-                }
-            }
-        }
-        .onChange(of: selectedEpisode) {
-            withAnimation(.easeInOut) {
-                selectedQuality = nil
-                movie = nil
-            }
-
-            if let details, let selectedSeason, let selectedEpisode, let selectedActing {
-                getMovieVideoUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode, favs: details.favs)
-                    .receive(on: DispatchQueue.main)
-                    .sink { completion in
-                        guard case let .failure(error) = completion else { return }
-
-                        self.error = error
-                        isErrorPresented = true
-                    } receiveValue: { movie in
-                        if movie.needPremium {
-                            dismiss()
-
-                            appState.isPremiumPresented = true
-                        } else {
-                            withAnimation(.easeInOut) {
-                                self.movie = movie
-
-                                if defaultQuality != .ask,
-                                   defaultQuality != .highest,
-                                   movie.getAvailableQualities().contains(defaultQuality.rawValue)
-                                {
-                                    selectedQuality = defaultQuality.rawValue
-                                } else if defaultQuality == .highest,
-                                          let highest = movie.getAvailableQualities().last
-                                {
-                                    selectedQuality = highest
-                                }
-                            }
-                        }
-                    }
-                    .store(in: &subscriptions)
-            }
-        }
+        .modifier(
+            MovieSelectionLoader(
+                id: id,
+                details: $details,
+                seasons: $seasons,
+                selectedActing: $selectedActing,
+                selectedSeason: $selectedSeason,
+                selectedEpisode: $selectedEpisode,
+                selectedQuality: $selectedQuality,
+                movie: $movie,
+                error: $error,
+                isErrorPresented: $isErrorPresented,
+            )
+        )
         .analyticsScreen(name: "watch_sheet", class: "WatchSheetView")
     }
 

@@ -115,7 +115,7 @@ struct SliderWithTextView<T: BinaryFloatingPoint>: View {
                         }
                     }
                     .overlay {
-                        if showSeekImage || isActive, let cue = thumbnails?.cues.first(where: { TimeInterval(unitSeekImage) * TimeInterval(inRange.upperBound) > $0.timeStart && TimeInterval(unitSeekImage) * TimeInterval(inRange.upperBound) < $0.timeEnd }), let imageUrl = cue.imageUrl, let frame = cue.frame {
+                        if showSeekImage || isActive, let cue = thumbnails?.cue(at: TimeInterval(unitSeekImage) * TimeInterval(inRange.upperBound)), let imageUrl = cue.imageUrl, let frame = cue.frame {
                             KFImage
                                 .url(URL(string: imageUrl))
                                 .placeholder {

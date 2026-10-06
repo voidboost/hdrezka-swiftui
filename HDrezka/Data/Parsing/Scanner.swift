@@ -12,10 +12,10 @@ class CustomScanner {
 
     var scanLocation: Int {
         get {
-            scanner.string.distance(from: scanner.string.startIndex, to: scanner.currentIndex)
+            scanner.string.utf16.distance(from: scanner.string.startIndex, to: scanner.currentIndex)
         }
         set {
-            scanner.currentIndex = scanner.string.index(scanner.string.startIndex, offsetBy: newValue)
+            scanner.currentIndex = scanner.string.utf16.index(scanner.string.startIndex, offsetBy: newValue)
         }
     }
 

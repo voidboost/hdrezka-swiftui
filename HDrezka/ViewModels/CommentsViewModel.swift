@@ -22,6 +22,7 @@ class CommentsViewModel {
     }
 
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
+    @ObservationIgnored private var pageSubscriptions: Set<AnyCancellable> = []
 
     private(set) var state: DataState<[Comment]> = .loading
     private(set) var paginationState: DataPaginationState = .idle
@@ -75,10 +76,12 @@ class CommentsViewModel {
                     }
                 }
             }
-            .store(in: &subscriptions)
+            .store(in: &pageSubscriptions)
     }
 
     func load() {
+        pageSubscriptions.flush()
+
         paginationState = .idle
         state = .loading
         page = 1

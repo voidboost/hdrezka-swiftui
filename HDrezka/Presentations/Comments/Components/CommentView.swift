@@ -208,6 +208,9 @@ struct CommentView: View {
 
 extension CommentView: Equatable {
     static func == (lhs: CommentView, rhs: CommentView) -> Bool {
-        return lhs.comment.id == rhs.comment.id
+        lhs.comment.id == rhs.comment.id
+            && lhs.comment.likesCount == rhs.comment.likesCount
+            && lhs.comment.isLiked == rhs.comment.isLiked
+            && lhs.comment.replies == rhs.comment.replies
     }
 }

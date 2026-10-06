@@ -69,6 +69,8 @@ class HomeViewModel {
     }
 
     func load() {
+        subscriptions.flush()
+
         state = .loading
         paginationState = .idle
 
