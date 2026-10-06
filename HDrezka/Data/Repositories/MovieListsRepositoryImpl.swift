@@ -6,78 +6,59 @@ import Foundation
 struct MovieListsRepositoryImpl: MovieListsRepository {
     @Dependency(\.session) private var session
 
+    private func movies(_ convertible: MovieListsService) -> AnyPublisher<[MovieSimple], Error> {
+        session.string(convertible) { try MovieListsParser.parse(from: $0).1 }
+    }
+
+    private func moviesByCountry(countryId: String, genre: Int, page: Int, filter: String, function: String = #function) -> AnyPublisher<[MovieSimple], Error> {
+        let parts = countryId.pathParts
+
+        guard parts.count == 2 else {
+            return invalidInput(functionName: function)
+        }
+
+        return movies(.getMovieList4(type: parts[0], category: parts[1], page: page, genre: genre, filter: filter))
+    }
+
+    private func moviesByGenre(genreId: String, page: Int, filter: String, function: String = #function) -> AnyPublisher<[MovieSimple], Error> {
+        let parts = genreId.pathParts
+
+        guard let type = parts.first else {
+            return invalidInput(functionName: function)
+        }
+
+        return movies(.getMovieList3(type: type, genre: parts.count > 1 ? parts[1] : nil, page: page, filter: filter))
+    }
+
     func getPopularMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
-        session.request(MovieListsService.getMovieList1(page: page, filter: "popular", genre: genre))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
+        movies(.getMovieList1(page: page, filter: "popular", genre: genre))
     }
 
 //    func getFeaturedMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
-//        session.request(MovieListsService.getMovieList1(page: page, filter: "recommendation", genre: genre))
-//            .validate(statusCode: 200 ..< 400)
-//            .publishString()
-//            .value()
-//            .tryMap(MovieListsParser.parse)
-//            .map(\.1)
-//            .handleError()
-//            .eraseToAnyPublisher()
+//        movies(.getMovieList1(page: page, filter: "recommendation", genre: genre))
 //    }
 
     func getWatchingNowMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
-        session.request(MovieListsService.getMovieList1(page: page, filter: "watching", genre: genre))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
+        movies(.getMovieList1(page: page, filter: "watching", genre: genre))
     }
 
     func getLatestMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
-        session.request(MovieListsService.getMovieList1(page: page, filter: "last", genre: genre))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
+        movies(.getMovieList1(page: page, filter: "last", genre: genre))
     }
 
     func getSoonMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
-        session.request(MovieListsService.getMovieList1(page: page, filter: "soon", genre: genre))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
+        movies(.getMovieList1(page: page, filter: "soon", genre: genre))
     }
 
     func getHotMovies(genre: Int) -> AnyPublisher<[MovieSimple], Error> {
-        session.request(MovieListsService.getHotMovies(genre: genre))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parseHotMovies)
-            .handleError()
-            .eraseToAnyPublisher()
+        session.string(MovieListsService.getHotMovies(genre: genre), parse: MovieListsParser.parseHotMovies)
     }
 
     func getMovieList(listId: String, page: Int) -> AnyPublisher<(String, [MovieSimple]), Error> {
-        let list = listId.components(separatedBy: "/").filter { !$0.isEmpty }
+        let list = listId.pathParts
 
         guard list.count > 1 else {
-            return Fail(error: HDrezkaError.null(#function, #line, #column))
-                .handleError()
-                .eraseToAnyPublisher()
+            return invalidInput()
         }
 
         let type = list[0]
@@ -85,221 +66,50 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
         let genre = list.count > 2 && !list[2].isNumber ? list[2] : nil
         let year = list.count > 3 ? list[3] : (list.count > 2 && list[2].isNumber ? list[2] : nil)
 
-        return session.request(MovieListsService.getMovieList2(type: type, listType: listType, genre: genre, year: year, page: page))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .handleError()
-            .eraseToAnyPublisher()
+        return session.string(MovieListsService.getMovieList2(type: type, listType: listType, genre: genre, year: year, page: page), parse: MovieListsParser.parse)
     }
 
     func getPopularMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let parts = countryId.components(separatedBy: "/").filter { !$0.isEmpty }
-
-        guard parts.count == 2 else {
-            return Fail(error: HDrezkaError.null(#function, #line, #column))
-                .handleError()
-                .eraseToAnyPublisher()
-        }
-
-        let type = parts[0]
-        let category = parts[1]
-
-        return session.request(MovieListsService.getMovieList4(type: type, category: category, page: page, genre: genre, filter: "popular"))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
+        moviesByCountry(countryId: countryId, genre: genre, page: page, filter: "popular")
     }
 
     func getLatestMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let parts = countryId.components(separatedBy: "/").filter { !$0.isEmpty }
-
-        guard parts.count == 2 else {
-            return Fail(error: HDrezkaError.null(#function, #line, #column))
-                .handleError()
-                .eraseToAnyPublisher()
-        }
-
-        let type = parts[0]
-        let category = parts[1]
-
-        return session.request(MovieListsService.getMovieList4(type: type, category: category, page: page, genre: genre, filter: "last"))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
+        moviesByCountry(countryId: countryId, genre: genre, page: page, filter: "last")
     }
 
     func getSoonMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let parts = countryId.components(separatedBy: "/").filter { !$0.isEmpty }
-
-        guard parts.count == 2 else {
-            return Fail(error: HDrezkaError.null(#function, #line, #column))
-                .handleError()
-                .eraseToAnyPublisher()
-        }
-
-        let type = parts[0]
-        let category = parts[1]
-
-        return session.request(MovieListsService.getMovieList4(type: type, category: category, page: page, genre: genre, filter: "soon"))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
+        moviesByCountry(countryId: countryId, genre: genre, page: page, filter: "soon")
     }
 
     func getWatchingNowMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let parts = countryId.components(separatedBy: "/").filter { !$0.isEmpty }
-
-        guard parts.count == 2 else {
-            return Fail(error: HDrezkaError.null(#function, #line, #column))
-                .handleError()
-                .eraseToAnyPublisher()
-        }
-
-        let type = parts[0]
-        let category = parts[1]
-
-        return session.request(MovieListsService.getMovieList4(type: type, category: category, page: page, genre: genre, filter: "watching"))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
+        moviesByCountry(countryId: countryId, genre: genre, page: page, filter: "watching")
     }
 
     func getPopularMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let parts = genreId.components(separatedBy: "/").filter { !$0.isEmpty }
-
-        guard !parts.isEmpty else {
-            return Fail(error: HDrezkaError.null(#function, #line, #column))
-                .handleError()
-                .eraseToAnyPublisher()
-        }
-
-        let type = parts[0]
-        let genre = parts.count > 1 ? parts[1] : nil
-
-        return session.request(MovieListsService.getMovieList3(type: type, genre: genre, page: page, filter: "popular"))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
+        moviesByGenre(genreId: genreId, page: page, filter: "popular")
     }
 
     func getLatestMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let parts = genreId.components(separatedBy: "/").filter { !$0.isEmpty }
-
-        guard !parts.isEmpty else {
-            return Fail(error: HDrezkaError.null(#function, #line, #column))
-                .handleError()
-                .eraseToAnyPublisher()
-        }
-
-        let type = parts[0]
-        let genre = parts.count > 1 ? parts[1] : nil
-
-        return session.request(MovieListsService.getMovieList3(type: type, genre: genre, page: page, filter: "last"))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
+        moviesByGenre(genreId: genreId, page: page, filter: "last")
     }
 
     func getSoonMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let parts = genreId.components(separatedBy: "/").filter { !$0.isEmpty }
-
-        guard !parts.isEmpty else {
-            return Fail(error: HDrezkaError.null(#function, #line, #column))
-                .handleError()
-                .eraseToAnyPublisher()
-        }
-
-        let type = parts[0]
-        let genre = parts.count > 1 ? parts[1] : nil
-
-        return session.request(MovieListsService.getMovieList3(type: type, genre: genre, page: page, filter: "soon"))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
+        moviesByGenre(genreId: genreId, page: page, filter: "soon")
     }
 
     func getWatchingNowMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        let parts = genreId.components(separatedBy: "/").filter { !$0.isEmpty }
-
-        guard !parts.isEmpty else {
-            return Fail(error: HDrezkaError.null(#function, #line, #column))
-                .handleError()
-                .eraseToAnyPublisher()
-        }
-
-        let type = parts[0]
-        let genre = parts.count > 1 ? parts[1] : nil
-
-        return session.request(MovieListsService.getMovieList3(type: type, genre: genre, page: page, filter: "watching"))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
+        moviesByGenre(genreId: genreId, page: page, filter: "watching")
     }
 
     func getLatestNewestMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
-        session.request(MovieListsService.getNewestMovies(page: page, filter: "last", genre: genre))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
+        movies(.getNewestMovies(page: page, filter: "last", genre: genre))
     }
 
     func getPopularNewestMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
-        session.request(MovieListsService.getNewestMovies(page: page, filter: "popular", genre: genre))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
+        movies(.getNewestMovies(page: page, filter: "popular", genre: genre))
     }
 
     func getWatchingNowNewestMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
-        session.request(MovieListsService.getNewestMovies(page: page, filter: "watching", genre: genre))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
+        movies(.getNewestMovies(page: page, filter: "watching", genre: genre))
     }
 }

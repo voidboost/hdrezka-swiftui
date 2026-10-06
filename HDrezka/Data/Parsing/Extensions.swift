@@ -8,6 +8,17 @@ extension Document {
 }
 
 extension Element {
+    func getMovie() throws -> MovieSimple {
+        try MovieSimple(
+            movieId: getId(),
+            name: getName(),
+            details: getDetails(),
+            poster: getPoster(),
+            cat: getCat(),
+            info: getInfo(),
+        )
+    }
+
     func getId() throws -> String {
         try attr("data-url").cleanPath.orThrow()
     }

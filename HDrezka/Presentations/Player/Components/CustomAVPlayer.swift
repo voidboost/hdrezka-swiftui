@@ -183,7 +183,7 @@ private extension URL {
     }
 }
 
-private final class FallbackInterceptor: RequestInterceptor {
+private final class FallbackInterceptor: RequestInterceptor, @unchecked Sendable {
     private let urls: [URL]
     private let lock = NSLock()
     private var currentIndex = 0

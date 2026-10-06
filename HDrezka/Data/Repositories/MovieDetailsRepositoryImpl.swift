@@ -6,66 +6,34 @@ import Foundation
 struct MovieDetailsRepositoryImpl: MovieDetailsRepository {
     @Dependency(\.session) private var session
 
-    func getMovieDetails(movieId: String) -> AnyPublisher<MovieDetailed, Error> {
-        let parts = movieId.components(separatedBy: "/").filter { !$0.isEmpty }
+    private func movieDetailsPage<T>(movieId: String, function: String = #function, parse: @escaping (String) throws -> T) -> AnyPublisher<T, Error> {
+        let parts = movieId.pathParts
 
         guard parts.count == 3 else {
-            return Fail(error: HDrezkaError.null(#function, #line, #column))
-                .handleError()
-                .eraseToAnyPublisher()
+            return invalidInput(functionName: function)
         }
 
-        let type = parts[0]
-        let genre = parts[1]
-        let name = parts[2]
+        return session.string(MovieDetailsService.getMovieDetails(type: parts[0], genre: parts[1], name: parts[2]), parse: parse)
+    }
 
-        return session.request(MovieDetailsService.getMovieDetails(type: type, genre: genre, name: name))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap { res in
-                try MovieDetailsParser.parseMovieDetails(from: res, movieId: movieId)
-            }
-            .handleError()
-            .eraseToAnyPublisher()
+    func getMovieDetails(movieId: String) -> AnyPublisher<MovieDetailed, Error> {
+        movieDetailsPage(movieId: movieId) { res in
+            try MovieDetailsParser.parseMovieDetails(from: res, movieId: movieId)
+        }
     }
 
     func getMovieBookmarks(movieId: String) -> AnyPublisher<[Bookmark], Error> {
-        let parts = movieId.components(separatedBy: "/").filter { !$0.isEmpty }
-
-        guard parts.count == 3 else {
-            return Fail(error: HDrezkaError.null(#function, #line, #column))
-                .handleError()
-                .eraseToAnyPublisher()
-        }
-
-        let type = parts[0]
-        let genre = parts[1]
-        let name = parts[2]
-
-        return session.request(MovieDetailsService.getMovieDetails(type: type, genre: genre, name: name))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieDetailsParser.parseBookmarks)
-            .handleError()
-            .eraseToAnyPublisher()
+        movieDetailsPage(movieId: movieId, parse: MovieDetailsParser.parseBookmarks)
     }
 
     func getMovieVideo(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, favs: String) -> AnyPublisher<MovieVideo, Error> {
-        session.request(MovieDetailsService.getMovieVideo(voiceActing: voiceActing, season: season, episode: episode, favs: favs))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieDetailsParser.parseMovieVideo)
-            .handleError()
-            .eraseToAnyPublisher()
+        session.string(MovieDetailsService.getMovieVideo(voiceActing: voiceActing, season: season, episode: episode, favs: favs), parse: MovieDetailsParser.parseMovieVideo)
     }
 
     func getMovieThumbnails(path: String) -> AnyPublisher<WebVTT, Error> {
         session.request(MovieDetailsService.getMovieThumbnails(path: path))
             .validate(statusCode: 200 ..< 400)
-            .publishString()
+            .publishString(queue: parsingQueue)
             .tryMap { res in
                 guard let url = res.request?.url,
                       let string = res.value
@@ -75,166 +43,75 @@ struct MovieDetailsRepositoryImpl: MovieDetailsRepository {
 
                 return try WebVTTParser(string: string, vttUrl: url).parse()
             }
+            .receive(on: DispatchQueue.main)
             .handleError()
-            .eraseToAnyPublisher()
     }
 
     func getSeriesSeasons(movieId: String, voiceActing: MovieVoiceActing, favs: String) -> AnyPublisher<[MovieSeason], Error> {
-        session.request(MovieDetailsService.getSeriesSeasons(movieId: movieId, voiceActing: voiceActing, favs: favs))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieDetailsParser.parseSeriesSeasons)
-            .handleError()
-            .eraseToAnyPublisher()
+        session.string(MovieDetailsService.getSeriesSeasons(movieId: movieId, voiceActing: voiceActing, favs: favs), parse: MovieDetailsParser.parseSeriesSeasons)
     }
 
     func getMovieTrailerId(movieId: String) -> AnyPublisher<String, Error> {
-        session.request(MovieDetailsService.getMovieTrailer(id: movieId))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieDetailsParser.parseTrailerId)
-            .handleError()
-            .eraseToAnyPublisher()
+        session.string(MovieDetailsService.getMovieTrailer(id: movieId), parse: MovieDetailsParser.parseTrailerId)
     }
 
     func getCommentsPage(movieId: String, page: Int) -> AnyPublisher<[Comment], Error> {
-        session.request(MovieDetailsService.getComments(movieId: movieId, page: page, type: nil, commentId: nil, skin: nil))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieDetailsParser.parseComments)
-            .handleError()
-            .eraseToAnyPublisher()
+        session.string(MovieDetailsService.getComments(movieId: movieId, page: page, type: nil, commentId: nil, skin: nil), parse: MovieDetailsParser.parseComments)
     }
 
     func getComment(movieId: String, commentId: String) -> AnyPublisher<Comment, Error> {
-        session.request(MovieDetailsService.getComments(movieId: movieId, page: nil, type: nil, commentId: commentId, skin: nil))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieDetailsParser.parseComments)
-            .tryMap { try $0.compactMap { $0.findComment(commentId) }.first.orThrow() }
-            .handleError()
-            .eraseToAnyPublisher()
+        session.string(MovieDetailsService.getComments(movieId: movieId, page: nil, type: nil, commentId: commentId, skin: nil)) { res in
+            try MovieDetailsParser.parseComments(from: res).lazy.compactMap { $0.findComment(commentId) }.first.orThrow()
+        }
     }
 
     func toggleLikeComment(id: String) -> AnyPublisher<(Int, Bool), Error> {
-        session.request(MovieDetailsService.toggleCommentLike(id: id))
-            .validate(statusCode: 200 ..< 400)
-            .publishData()
-            .value()
-            .tryMap { res in
-                guard let json = try? JSONSerialization.jsonObject(with: res, options: .fragmentsAllowed) as? [String: Any],
-                      let count = json["count"] as? Int,
-                      let type = json["type"] as? String
-                else {
-                    throw HDrezkaError.parseJson("count or type", "toggleLikeComment")
-                }
+        session.json(MovieDetailsService.toggleCommentLike(id: id), function: "toggleLikeComment") { json in
+            let count: Int = try json.require("count")
+            let type: String = try json.require("type")
 
-                return (count, type == "plus")
-            }
-            .handleError()
-            .eraseToAnyPublisher()
+            return (count, type == "plus")
+        }
     }
 
     func reportComment(id: String, issue: Int, text: String) -> AnyPublisher<Bool, Error> {
-        session.request(MovieDetailsService.reportComment(id: id, issue: issue, text: text))
-            .validate(statusCode: 200 ..< 400)
-            .publishData()
-            .value()
-            .tryMap { res in
-                guard let json = try? JSONSerialization.jsonObject(with: res, options: .fragmentsAllowed) as? [String: Any],
-                      let success = json["success"] as? Bool
-                else {
-                    throw HDrezkaError.parseJson("success", "reportComment")
-                }
-
-                return success
-            }
-            .handleError()
-            .eraseToAnyPublisher()
+        session.success(MovieDetailsService.reportComment(id: id, issue: issue, text: text), function: "reportComment")
     }
 
     func deleteComment(id: String, hash: String) -> AnyPublisher<(Bool, String?), Error> {
-        session.request(MovieDetailsService.deleteComment(id: id, hash: hash))
-            .validate(statusCode: 200 ..< 400)
-            .publishData()
-            .value()
-            .tryMap { res in
-                guard let json = try? JSONSerialization.jsonObject(with: res, options: .fragmentsAllowed) as? [String: Any],
-                      let success = json["success"] as? Bool
-                else {
-                    throw HDrezkaError.parseJson("success", "reportComment")
-                }
-
-                return (success, json["message"] as? String)
-            }
-            .handleError()
-            .eraseToAnyPublisher()
+        session.json(MovieDetailsService.deleteComment(id: id, hash: hash), function: "deleteComment") { json in
+            try (json.require("success"), json["message"])
+        }
     }
 
     func sendComment(id: String?, postId: String, name: String?, text: String, adb: String?, type: String?) -> AnyPublisher<SendCommentResult, Error> {
-        session.request(MovieDetailsService.sendComment(id: id, postId: postId, name: name, text: text, adb: adb, type: type))
-            .validate(statusCode: 200 ..< 400)
-            .publishData()
-            .value()
-            .tryMap { res in
-                guard let json = try? JSONSerialization.jsonObject(with: res, options: .fragmentsAllowed) as? [String: Any],
-                      let success = json["success"] as? Bool,
-                      let onModeration = json["on_moderation"] as? Bool,
-                      let message = json["message"] as? [String]
-                else {
-                    throw HDrezkaError.parseJson("success or on_moderation or message", "sendComment")
-                }
+        session.json(MovieDetailsService.sendComment(id: id, postId: postId, name: name, text: text, adb: adb, type: type), function: "sendComment") { json in
+            let success: Bool = try json.require("success")
+            let onModeration: Bool = try json.require("on_moderation")
+            let message: [String] = try json.require("message")
 
-                return SendCommentResult(success: success, onModeration: onModeration, message: message.joined(separator: "\n"))
-            }
-            .handleError()
-            .eraseToAnyPublisher()
+            return SendCommentResult(success: success, onModeration: onModeration, message: message.joined(separator: "\n"))
+        }
     }
 
     func getLikes(id: String) -> AnyPublisher<[Like], Error> {
-        session.request(MovieDetailsService.getlikes(id: id))
-            .validate(statusCode: 200 ..< 400)
-            .publishData()
-            .value()
-            .tryMap { res in
-                guard let json = try? JSONSerialization.jsonObject(with: res, options: .fragmentsAllowed) as? [String: Any],
-                      let message = json["message"] as? String
-                else {
-                    throw HDrezkaError.parseJson("message", "getLikes")
-                }
-
-                return try MovieDetailsParser.parseLikes(from: message)
-            }
-            .handleError()
-            .eraseToAnyPublisher()
+        session.json(MovieDetailsService.getlikes(id: id), function: "getLikes") { json in
+            try MovieDetailsParser.parseLikes(from: json.require("message"))
+        }
     }
 
     func rate(id: String, rating: Int) -> AnyPublisher<(Float?, String?)?, Error> {
-        session.request(MovieDetailsService.rate(id: id, rating: rating))
-            .validate(statusCode: 200 ..< 400)
-            .publishData()
-            .value()
-            .tryMap { res in
-                guard let json = try? JSONSerialization.jsonObject(with: res, options: .fragmentsAllowed) as? [String: Any],
-                      let success = json["success"] as? Bool
-                else {
-                    throw HDrezkaError.parseJson("success", "rate")
-                }
+        session.json(MovieDetailsService.rate(id: id, rating: rating), function: "rate") { json in
+            let success: Bool = try json.require("success")
 
-                if success {
-                    let num = json["num"] as? String
-                    let votes = json["votes"] as? String
-
-                    return (Float(num ?? ""), votes?.shortNumber)
-                } else {
-                    return nil
-                }
+            guard success else {
+                return nil
             }
-            .handleError()
-            .eraseToAnyPublisher()
+
+            let num: String? = json["num"]
+            let votes: String? = json["votes"]
+
+            return (Float(num ?? ""), votes?.shortNumber)
+        }
     }
 }

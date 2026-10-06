@@ -7,22 +7,10 @@ struct SearchRepositoryImpl: SearchRepository {
     @Dependency(\.session) private var session
 
     func search(query: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        session.request(SearchService.search(query: query, page: page))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(SearchParser.parseSearch)
-            .handleError()
-            .eraseToAnyPublisher()
+        session.string(SearchService.search(query: query, page: page), parse: SearchParser.parseSearch)
     }
 
     func categories() -> AnyPublisher<[MovieType], Error> {
-        session.request(SearchService.categories)
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(SearchParser.parseCategories)
-            .handleError()
-            .eraseToAnyPublisher()
+        session.string(SearchService.categories, parse: SearchParser.parseCategories)
     }
 }

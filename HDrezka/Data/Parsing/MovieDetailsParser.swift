@@ -538,16 +538,7 @@ private extension SwiftSoup.Document {
     }
 
     func getDetailsWatchAlsoMovies() throws -> [MovieSimple] {
-        try select(".b-sidelist__holder .b-content__inline_item").map {
-            try MovieSimple(
-                movieId: $0.getId(),
-                name: $0.getName(),
-                details: $0.getDetails(),
-                poster: $0.getPoster(),
-                cat: $0.getCat(),
-                info: $0.getInfo(),
-            )
-        }
+        try select(".b-sidelist__holder .b-content__inline_item").map { try $0.getMovie() }
     }
 
     func getBookmarks() throws -> [Bookmark] {

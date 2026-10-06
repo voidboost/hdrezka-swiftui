@@ -139,15 +139,6 @@ private extension Document {
 
 private extension Elements {
     func getMovies() throws -> [MovieSimple] {
-        try map {
-            try MovieSimple(
-                movieId: $0.getId(),
-                name: $0.getName(),
-                details: $0.getDetails(),
-                poster: $0.getPoster(),
-                cat: $0.getCat(),
-                info: $0.getInfo(),
-            )
-        }
+        try map { try $0.getMovie() }
     }
 }
