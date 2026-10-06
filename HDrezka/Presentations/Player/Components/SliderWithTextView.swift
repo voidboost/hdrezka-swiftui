@@ -132,7 +132,7 @@ struct SliderWithTextView<T: BinaryFloatingPoint>: View {
                                 .background(.ultraThickMaterial, in: .rect(cornerRadius: 6))
                                 .overlay(.ultraThickMaterial, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
                                 .overlay(alignment: .bottom) {
-                                    Text((T(Float(unitSeekImage)) * inRange.upperBound).asTimeString(style: .positional))
+                                    Text((T(Float(unitSeekImage)) * inRange.upperBound).asTimeString)
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                         .padding(3)
@@ -143,9 +143,9 @@ struct SliderWithTextView<T: BinaryFloatingPoint>: View {
                 }
 
                 HStack {
-                    Text(progressDuration.asTimeString(style: .positional))
+                    Text(progressDuration.asTimeString)
                     Spacer(minLength: 0)
-                    Text("-" + (inRange.upperBound - progressDuration).asTimeString(style: .positional))
+                    Text("-" + (inRange.upperBound - progressDuration).asTimeString)
                 }
                 .font(.caption.monospacedDigit())
                 .foregroundColor(isActive ? fillColor : emptyColor)
@@ -179,16 +179,21 @@ struct SliderWithTextView<T: BinaryFloatingPoint>: View {
     }
 }
 
-extension BinaryFloatingPoint {
-    func asTimeString(style: DateComponentsFormatter.UnitsStyle) -> String {
+private enum TimeFormatters {
+    static let minutes = make([.minute, .second])
+    static let hours = make([.hour, .minute, .second])
+
+    private static func make(_ units: NSCalendar.Unit) -> DateComponentsFormatter {
         let formatter = DateComponentsFormatter()
-        if self < 3600 {
-            formatter.allowedUnits = [.minute, .second]
-        } else {
-            formatter.allowedUnits = [.hour, .minute, .second]
-        }
-        formatter.unitsStyle = style
+        formatter.allowedUnits = units
+        formatter.unitsStyle = .positional
         formatter.zeroFormattingBehavior = .pad
-        return formatter.string(from: TimeInterval(self)) ?? ""
+        return formatter
+    }
+}
+
+extension BinaryFloatingPoint {
+    var asTimeString: String {
+        (self < 3600 ? TimeFormatters.minutes : TimeFormatters.hours).string(from: TimeInterval(self)) ?? ""
     }
 }

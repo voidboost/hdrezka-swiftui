@@ -364,7 +364,7 @@ class PlayerViewModel {
                             Task { @MainActor [weak self] in
                                 guard let self else { return }
 
-                                try? await self.$playerPosition.load(
+                                _ = try? await self.$playerPosition.load(
                                     PlayerPosition
                                         .where {
                                             $0.id.id.eq(voiceId) &&
@@ -375,12 +375,10 @@ class PlayerViewModel {
                                 )
 
                                 if let position = self.playerPosition {
-                                    player.seek(to: CMTime(seconds: position.position, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] complete in
-                                        guard let self else { return }
+                                    let complete = await player.seek(to: CMTime(seconds: position.position, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero)
 
-                                        if playing, complete {
-                                            player.playImmediately(atRate: rate)
-                                        }
+                                    if playing, complete {
+                                        player.playImmediately(atRate: self.rate)
                                     }
                                 } else if playing {
                                     player.playImmediately(atRate: self.rate)

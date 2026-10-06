@@ -776,7 +776,7 @@ struct OpenExternalPlayerSheetView: View {
                 } receiveValue: { details in
                     Task { @MainActor in
                         if let movieId = details.movieId.id {
-                            try? await self.$selectPosition.load(
+                            _ = try? await self.$selectPosition.load(
                                 SelectPosition.where { $0.id.eq(movieId) }
                             )
                         }

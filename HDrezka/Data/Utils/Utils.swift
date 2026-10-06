@@ -38,46 +38,31 @@ extension String {
         CharacterSet.decimalDigits.isSuperset(of: CharacterSet(charactersIn: self))
     }
 
+    private static let shortNumberFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.decimalSeparator = "."
+        formatter.allowsFloats = true
+        formatter.minimumIntegerDigits = 1
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 1
+        return formatter
+    }()
+
+    private static let shortNumberAbbreviations: [(threshold: Double, suffix: String)] = [
+        (1_000_000_000, "B"),
+        (1_000_000, "M"),
+        (1000, "K"),
+    ]
+
     var shortNumber: String {
-        if let number = Int(String(unicodeScalars.filter(CharacterSet.decimalDigits.contains))) {
-            let numFormatter = NumberFormatter()
-
-            struct Abbrevation {
-                let threshold: Double
-                let divisor: Double
-                let suffix: String
-            }
-
-            let abbreviations: [Abbrevation] = [.init(threshold: 0, divisor: 1, suffix: ""),
-                                                .init(threshold: 1000.0, divisor: 1000.0, suffix: "K"),
-                                                .init(threshold: 1_000_000.0, divisor: 1_000_000.0, suffix: "M"),
-                                                .init(threshold: 1_000_000_000.0, divisor: 1_000_000_000.0, suffix: "B")]
-
-            let startValue = Double(Swift.abs(number))
-            var abbreviation: Abbrevation {
-                var prevAbbreviation: Abbrevation = .init(threshold: 0, divisor: 1, suffix: "")
-                for tmpAbbreviation in abbreviations {
-                    if startValue < tmpAbbreviation.threshold {
-                        break
-                    }
-                    prevAbbreviation = tmpAbbreviation
-                }
-                return prevAbbreviation
-            }
-
-            let value = Double(number) / abbreviation.divisor
-            numFormatter.positiveSuffix = abbreviation.suffix
-            numFormatter.negativeSuffix = abbreviation.suffix
-            numFormatter.decimalSeparator = "."
-            numFormatter.allowsFloats = true
-            numFormatter.minimumIntegerDigits = 1
-            numFormatter.minimumFractionDigits = 0
-            numFormatter.maximumFractionDigits = 1
-
-            return numFormatter.string(from: NSNumber(value: value)) ?? "0"
-        } else {
+        guard let number = Int(String(unicodeScalars.filter(CharacterSet.decimalDigits.contains))) else {
             return "0"
         }
+
+        let value = Double(number)
+        let (divisor, suffix) = Self.shortNumberAbbreviations.first { value >= $0.threshold } ?? (1, "")
+
+        return (Self.shortNumberFormatter.string(from: NSNumber(value: value / divisor)) ?? "0") + suffix
     }
 
     func page(_ page: Int) -> String {

@@ -7,16 +7,7 @@ class SearchParser {
         try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString)
             .checker()
             .getMovies()
-            .map { movie in
-                try MovieSimple(
-                    movieId: movie.getId(),
-                    name: movie.getName(),
-                    details: movie.getDetails(),
-                    poster: movie.getPoster(),
-                    cat: movie.getCat(),
-                    info: movie.getInfo(),
-                )
-            }
+            .map { try $0.getMovie() }
     }
 
     static func parseCategories(from: String) throws -> [MovieType] {

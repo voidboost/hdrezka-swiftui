@@ -102,173 +102,28 @@ class ListViewModel {
     @ObservationIgnored private var page = 1
 
     private func getData(isInitial: Bool = true) {
-        if let list {
-            getMovieListUseCase(listId: list.listId, page: page)
-                .receive(on: DispatchQueue.main)
-                .sink { [weak self] completion in
-                    guard let self,
-                          case let .failure(error) = completion
-                    else {
-                        return
-                    }
-
-                    withAnimation(.easeInOut) {
-                        if isInitial {
-                            self.state = .error(error)
-                        } else {
-                            self.paginationState = .error(error)
-                        }
-                    }
-                } receiveValue: { [weak self] result in
-                    guard let self else { return }
-
-                    self.page += 1
-
-                    withAnimation(.easeInOut) {
-                        if isInitial {
-                            if !result.0.isEmpty {
-                                self.title = result.0
-                            }
-                            self.state = .data(result.1)
-                        } else {
-                            self.state.append(result.1)
-                            self.paginationState = .idle
-                        }
-                    }
-                }
-                .store(in: &subscriptions)
-        } else if let movies {
+        if let movies {
             withAnimation(.easeInOut) {
                 self.state = .data(movies)
             }
+
+            return
+        }
+
+        let publisher: AnyPublisher<(String?, [MovieSimple]), Error>
+
+        if let list {
+            publisher = getMovieListUseCase(listId: list.listId, page: page)
+                .map { ($0.0, $0.1) }
+                .eraseToAnyPublisher()
         } else if let country {
-            getPublisher(country: country)
-                .receive(on: DispatchQueue.main)
-                .sink { [weak self] completion in
-                    guard let self,
-                          case let .failure(error) = completion
-                    else {
-                        return
-                    }
-
-                    withAnimation(.easeInOut) {
-                        if isInitial {
-                            self.state = .error(error)
-                        } else {
-                            self.paginationState = .error(error)
-                        }
-                    }
-                } receiveValue: { [weak self] result in
-                    guard let self else { return }
-
-                    self.page += 1
-
-                    withAnimation(.easeInOut) {
-                        if isInitial {
-                            self.state = .data(result)
-                        } else {
-                            self.state.append(result)
-                            self.paginationState = .idle
-                        }
-                    }
-                }
-                .store(in: &subscriptions)
+            publisher = withoutTitle(getPublisher(country: country))
         } else if let genre {
-            getPublisher(genre: genre)
-                .receive(on: DispatchQueue.main)
-                .sink { [weak self] completion in
-                    guard let self,
-                          case let .failure(error) = completion
-                    else {
-                        return
-                    }
-
-                    withAnimation(.easeInOut) {
-                        if isInitial {
-                            self.state = .error(error)
-                        } else {
-                            self.paginationState = .error(error)
-                        }
-                    }
-                } receiveValue: { [weak self] result in
-                    guard let self else { return }
-
-                    self.page += 1
-
-                    withAnimation(.easeInOut) {
-                        if isInitial {
-                            self.state = .data(result)
-                        } else {
-                            self.state.append(result)
-                            self.paginationState = .idle
-                        }
-                    }
-                }
-                .store(in: &subscriptions)
+            publisher = withoutTitle(getPublisher(genre: genre))
         } else if let category {
-            getPublisher(category: category)
-                .receive(on: DispatchQueue.main)
-                .sink { [weak self] completion in
-                    guard let self,
-                          case let .failure(error) = completion
-                    else {
-                        return
-                    }
-
-                    withAnimation(.easeInOut) {
-                        if isInitial {
-                            self.state = .error(error)
-                        } else {
-                            self.paginationState = .error(error)
-                        }
-                    }
-                } receiveValue: { [weak self] result in
-                    guard let self else { return }
-
-                    self.page += 1
-
-                    withAnimation(.easeInOut) {
-                        if isInitial {
-                            self.state = .data(result)
-                        } else {
-                            self.state.append(result)
-                            self.paginationState = .idle
-                        }
-                    }
-                }
-                .store(in: &subscriptions)
+            publisher = withoutTitle(getPublisher(category: category))
         } else if let collection {
-            getPublisher(collection: collection, filter: filter)
-                .receive(on: DispatchQueue.main)
-                .sink { [weak self] completion in
-                    guard let self,
-                          case let .failure(error) = completion
-                    else {
-                        return
-                    }
-
-                    withAnimation(.easeInOut) {
-                        if isInitial {
-                            self.state = .error(error)
-                        } else {
-                            self.paginationState = .error(error)
-                        }
-                    }
-                } receiveValue: { [weak self] result in
-                    guard let self else { return }
-
-                    self.page += 1
-
-                    withAnimation(.easeInOut) {
-                        if isInitial {
-                            self.state = .data(result)
-                        } else {
-                            self.state.append(result)
-                            self.paginationState = .idle
-                        }
-                    }
-                }
-                .store(in: &subscriptions)
+            publisher = withoutTitle(getPublisher(collection: collection, filter: filter))
         } else {
             withAnimation(.easeInOut) {
                 if isInitial {
@@ -277,7 +132,50 @@ class ListViewModel {
                     self.paginationState = .error(HDrezkaError.unknown)
                 }
             }
+
+            return
         }
+
+        publisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                guard let self,
+                      case let .failure(error) = completion
+                else {
+                    return
+                }
+
+                withAnimation(.easeInOut) {
+                    if isInitial {
+                        self.state = .error(error)
+                    } else {
+                        self.paginationState = .error(error)
+                    }
+                }
+            } receiveValue: { [weak self] title, movies in
+                guard let self else { return }
+
+                self.page += 1
+
+                withAnimation(.easeInOut) {
+                    if isInitial {
+                        if let title, !title.isEmpty {
+                            self.title = title
+                        }
+                        self.state = .data(movies)
+                    } else {
+                        self.state.append(movies)
+                        self.paginationState = .idle
+                    }
+                }
+            }
+            .store(in: &subscriptions)
+    }
+
+    private func withoutTitle(_ publisher: AnyPublisher<[MovieSimple], Error>) -> AnyPublisher<(String?, [MovieSimple]), Error> {
+        publisher
+            .map { (nil, $0) }
+            .eraseToAnyPublisher()
     }
 
     private func getPublisher(country: MovieCountry) -> AnyPublisher<[MovieSimple], Error> {

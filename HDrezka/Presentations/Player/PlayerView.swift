@@ -112,7 +112,7 @@ struct PlayerView: View {
         .task {
             viewModel.dismiss = dismiss
 
-            try? await $selectPosition.load(
+            _ = try? await $selectPosition.load(
                 SelectPosition.where { $0.id.eq(viewModel.voiceActing.voiceId) }
             )
 

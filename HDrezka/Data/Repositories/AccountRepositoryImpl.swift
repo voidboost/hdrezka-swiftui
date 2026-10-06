@@ -8,338 +8,120 @@ import SwiftSoup
 struct AccountRepositoryImpl: AccountRepository {
     @Dependency(\.session) private var session
 
-    func signIn(login: String, password: String) -> AnyPublisher<Void, Error> {
-        session.request(AccountService.signIn(login: login, password: password))
-            .validate(statusCode: 200 ..< 400)
-            .publishData()
-            .value()
-            .tryMap { data in
-                guard let json = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as? [String: Any],
-                      let success = json["success"] as? Bool
-                else {
-                    throw HDrezkaError.parseJson("success", "signIn")
-                }
+    private func authorize(_ convertible: AccountService, function: String, fallback: @escaping (String, SwiftSoup.Document) throws -> [String]) -> AnyPublisher<Void, Error> {
+        session.json(convertible, function: function) { json in
+            let success: Bool = try json.require("success")
 
-                guard success else {
-                    guard let message = json["message"] as? String else {
-                        throw HDrezkaError.parseJson("message", "signIn")
-                    }
+            guard success else {
+                let message: String = try json.require("message")
 
-                    let document = try SwiftSoup.parseHTML(
-                        message,
-                        Defaults[.mirror].absoluteString,
-                    )
+                let document = try SwiftSoup.parseHTML(
+                    message,
+                    Defaults[.mirror].absoluteString,
+                )
 
-                    let messages = try document.select("ul").first()?.select("li").map { li in try li.text() } ?? message.split(whereSeparator: \.isNewline).map(String.init)
+                let messages = try document.select("ul").first()?.select("li").map { li in try li.text() } ?? fallback(message, document)
 
-                    throw HDrezkaError.site(messages)
-                }
+                throw HDrezkaError.site(messages)
             }
-            .handleError()
-            .eraseToAnyPublisher()
+        }
+    }
+
+    private func bookmarksByCategory(id: Int, filter: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
+        session.string(AccountService.getBookmarksByCategory(id: id, filter: filter, genre: genre, page: page)) { try MovieListsParser.parse(from: $0).1 }
+    }
+
+    func signIn(login: String, password: String) -> AnyPublisher<Void, Error> {
+        authorize(.signIn(login: login, password: password), function: "signIn") { message, _ in
+            message.split(whereSeparator: \.isNewline).map(String.init)
+        }
     }
 
     func signUp(email: String, login: String, password: String, verifyCode: String, step: Int) -> AnyPublisher<Void, Error> {
-        session.request(AccountService.signUp(email: email, login: login, password: password, verifyCode: verifyCode, step: step))
-            .validate(statusCode: 200 ..< 400)
-            .publishData()
-            .value()
-            .tryMap { data in
-                guard let json = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as? [String: Any],
-                      let success = json["success"] as? Bool
-                else {
-                    throw HDrezkaError.parseJson("success", "signIn")
-                }
-
-                guard success else {
-                    guard let message = json["message"] as? String else {
-                        throw HDrezkaError.parseJson("message", "signIn")
-                    }
-
-                    let document = try SwiftSoup.parseHTML(
-                        message,
-                        Defaults[.mirror].absoluteString,
-                    )
-
-                    let messages = try document.select("ul").first()?.select("li").map { li in try li.text() } ?? document.text().split(whereSeparator: \.isNewline).map(String.init)
-
-                    throw HDrezkaError.site(messages)
-                }
-            }
-            .handleError()
-            .eraseToAnyPublisher()
+        authorize(.signUp(email: email, login: login, password: password, verifyCode: verifyCode, step: step), function: "signUp") { _, document in
+            try document.text().split(whereSeparator: \.isNewline).map(String.init)
+        }
     }
 
     func restore(login: String) -> AnyPublisher<String?, Error> {
-        session.request(AccountService.restore(login: login.trim()))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(AccountParser.checkRestore)
-            .handleError()
-            .eraseToAnyPublisher()
+        session.string(AccountService.restore(login: login.trim()), parse: AccountParser.checkRestore)
     }
 
     func logout() -> AnyPublisher<Bool, Error> {
-        session.request(AccountService.logout)
-            .validate(statusCode: 200 ..< 400)
-            .publishUnserialized()
-            .value()
-            .tryMap { _ in true }
-            .handleError()
-            .eraseToAnyPublisher()
+        session.perform(AccountService.logout)
     }
 
     func getWatchingLaterMovies() -> AnyPublisher<[MovieWatchLater], Error> {
-        session.request(AccountService.getWatchingLaterMovies)
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(AccountParser.parseWatchingLaterMovies)
-            .handleError()
-            .eraseToAnyPublisher()
+        session.string(AccountService.getWatchingLaterMovies, parse: AccountParser.parseWatchingLaterMovies)
     }
 
     func saveWatchingState(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, position: Int?, total: Int?) -> AnyPublisher<Bool, Error> {
-        session.request(AccountService.sendWatching(postId: voiceActing.voiceId, translatorId: voiceActing.translatorId, season: season?.seasonId, episode: episode?.episodeId, currentTime: position, duration: total != 1 ? total : nil))
-            .validate(statusCode: 200 ..< 400)
-            .publishData()
-            .value()
-            .tryMap { res in
-                guard let json = try? JSONSerialization.jsonObject(with: res, options: .fragmentsAllowed) as? [String: Any],
-                      let success = json["success"] as? Bool
-                else {
-                    throw HDrezkaError.parseJson("success", "saveWatchingState")
-                }
-
-                return success
-            }
-            .handleError()
-            .eraseToAnyPublisher()
+        session.success(AccountService.sendWatching(postId: voiceActing.voiceId, translatorId: voiceActing.translatorId, season: season?.seasonId, episode: episode?.episodeId, currentTime: position, duration: total != 1 ? total : nil), function: "saveWatchingState")
     }
 
     func switchWatchedItem(item: MovieWatchLater) -> AnyPublisher<Bool, Error> {
-        session.request(AccountService.switchWatchedItem(id: item.dataId))
-            .validate(statusCode: 200 ..< 400)
-            .publishData()
-            .value()
-            .tryMap { res in
-                guard let json = try? JSONSerialization.jsonObject(with: res, options: .fragmentsAllowed) as? [String: Any],
-                      let success = json["success"] as? Bool
-                else {
-                    throw HDrezkaError.parseJson("success", "switchWatchedItem")
-                }
-
-                return success
-            }
-            .handleError()
-            .eraseToAnyPublisher()
+        session.success(AccountService.switchWatchedItem(id: item.dataId), function: "switchWatchedItem")
     }
 
     func removeWatchingItem(item: MovieWatchLater) -> AnyPublisher<Bool, Error> {
-        session.request(AccountService.removeWatchingItem(id: item.dataId))
-            .validate(statusCode: 200 ..< 400)
-            .publishData()
-            .value()
-            .tryMap { res in
-                guard let json = try? JSONSerialization.jsonObject(with: res, options: .fragmentsAllowed) as? [String: Any],
-                      let success = json["success"] as? Bool
-                else {
-                    throw HDrezkaError.parseJson("success", "removeWatchingItem")
-                }
-
-                return success
-            }
-            .handleError()
-            .eraseToAnyPublisher()
+        session.success(AccountService.removeWatchingItem(id: item.dataId), function: "removeWatchingItem")
     }
 
     func getSeriesUpdates() -> AnyPublisher<[SeriesUpdateGroup], Error> {
-        session.request(AccountService.getSeriesUpdates)
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(AccountParser.parseSeriesUpdates)
-            .handleError()
-            .eraseToAnyPublisher()
+        session.string(AccountService.getSeriesUpdates, parse: AccountParser.parseSeriesUpdates)
     }
 
     func getBookmarks() -> AnyPublisher<[Bookmark], Error> {
-        session.request(AccountService.getBookmarks)
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(AccountParser.parseBookmarks)
-            .handleError()
-            .eraseToAnyPublisher()
+        session.string(AccountService.getBookmarks, parse: AccountParser.parseBookmarks)
     }
 
     func getBookmarksByCategoryAdded(id: Int, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        session.request(AccountService.getBookmarksByCategory(id: id, filter: "added", genre: genre, page: page))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
+        bookmarksByCategory(id: id, filter: "added", genre: genre, page: page)
     }
 
     func getBookmarksByCategoryYear(id: Int, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        session.request(AccountService.getBookmarksByCategory(id: id, filter: "year", genre: genre, page: page))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
+        bookmarksByCategory(id: id, filter: "year", genre: genre, page: page)
     }
 
     func getBookmarksByCategoryPopular(id: Int, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        session.request(AccountService.getBookmarksByCategory(id: id, filter: "popular", genre: genre, page: page))
-            .validate(statusCode: 200 ..< 400)
-            .publishString()
-            .value()
-            .tryMap(MovieListsParser.parse)
-            .map(\.1)
-            .handleError()
-            .eraseToAnyPublisher()
+        bookmarksByCategory(id: id, filter: "popular", genre: genre, page: page)
     }
 
     func createBookmarksCategory(name: String) -> AnyPublisher<Bookmark, Error> {
-        session.request(AccountService.createBookmarkCategory(name: name))
-            .validate(statusCode: 200 ..< 400)
-            .publishData()
-            .value()
-            .tryMap { res in
-                guard let json = try? JSONSerialization.jsonObject(with: res, options: .fragmentsAllowed) as? [String: Any],
-                      let id = json["id"] as? Int
-                else {
-                    throw HDrezkaError.parseJson("id", "createBookmarksCategory")
-                }
-
-                return Bookmark(bookmarkId: id, name: name, count: 0)
-            }
-            .handleError()
-            .eraseToAnyPublisher()
+        session.json(AccountService.createBookmarkCategory(name: name), function: "createBookmarksCategory") { json in
+            try Bookmark(bookmarkId: json.require("id"), name: name, count: 0)
+        }
     }
 
     func changeBookmarksCategoryName(id: Int, newName: String) -> AnyPublisher<Bool, Error> {
-        session.request(AccountService.changeBookmarkCategoryName(newName: newName, catId: id))
-            .validate(statusCode: 200 ..< 400)
-            .publishData()
-            .value()
-            .tryMap { res in
-                guard let json = try? JSONSerialization.jsonObject(with: res, options: .fragmentsAllowed) as? [String: Any],
-                      let success = json["success"] as? Bool
-                else {
-                    throw HDrezkaError.parseJson("success", "changeBookmarksCategoryName")
-                }
-
-                return success
-            }
-            .handleError()
-            .eraseToAnyPublisher()
+        session.success(AccountService.changeBookmarkCategoryName(newName: newName, catId: id), function: "changeBookmarksCategoryName")
     }
 
     func deleteBookmarksCategory(id: Int) -> AnyPublisher<Bool, Error> {
-        session.request(AccountService.deleteBookmarkCategory(catId: id))
-            .validate(statusCode: 200 ..< 400)
-            .publishUnserialized()
-            .value()
-            .tryMap { _ in true }
-            .handleError()
-            .eraseToAnyPublisher()
+        session.perform(AccountService.deleteBookmarkCategory(catId: id))
     }
 
     func addToBookmarks(movieId: String, bookmarkUserCategory: Int) -> AnyPublisher<Bool, Error> {
-        session.request(AccountService.addToBookmarks(movieId: movieId, catId: bookmarkUserCategory))
-            .validate(statusCode: 200 ..< 400)
-            .publishData()
-            .value()
-            .tryMap { res in
-                guard let json = try? JSONSerialization.jsonObject(with: res, options: .fragmentsAllowed) as? [String: Any],
-                      let success = json["success"] as? Bool
-                else {
-                    throw HDrezkaError.parseJson("success", "addToBookmarks")
-                }
-
-                return success
-            }
-            .handleError()
-            .eraseToAnyPublisher()
+        session.success(AccountService.addToBookmarks(movieId: movieId, catId: bookmarkUserCategory), function: "addToBookmarks")
     }
 
     func removeFromBookmarks(movies: [String], bookmarkUserCategory: Int) -> AnyPublisher<Bool, Error> {
-        session.request(AccountService.removeFromBookmarks(movies: movies, catId: bookmarkUserCategory))
-            .validate(statusCode: 200 ..< 400)
-            .publishData()
-            .value()
-            .tryMap { res in
-                guard let json = try? JSONSerialization.jsonObject(with: res, options: .fragmentsAllowed) as? [String: Any],
-                      let success = json["success"] as? Bool
-                else {
-                    throw HDrezkaError.parseJson("success", "removeFromBookmarks")
-                }
-
-                return success
-            }
-            .handleError()
-            .eraseToAnyPublisher()
+        session.success(AccountService.removeFromBookmarks(movies: movies, catId: bookmarkUserCategory), function: "removeFromBookmarks")
     }
 
     func moveBetweenBookmarks(movies: [String], fromBookmarkUserCategory: Int, toBookmarkUserCategory: Int) -> AnyPublisher<Int, Error> {
-        session.request(AccountService.moveBetweenBookmarks(movies: movies, fromCatId: fromBookmarkUserCategory, toCatId: toBookmarkUserCategory))
-            .validate(statusCode: 200 ..< 400)
-            .publishData()
-            .value()
-            .tryMap { res in
-                guard let json = try? JSONSerialization.jsonObject(with: res, options: .fragmentsAllowed) as? [String: Any],
-                      let moved = json["moved"] as? Int
-                else {
-                    throw HDrezkaError.parseJson("moved", "moveBetweenBookmarks")
-                }
-
-                return moved
-            }
-            .handleError()
-            .eraseToAnyPublisher()
+        session.json(AccountService.moveBetweenBookmarks(movies: movies, fromCatId: fromBookmarkUserCategory, toCatId: toBookmarkUserCategory), function: "moveBetweenBookmarks") { json in
+            try json.require("moved")
+        }
     }
 
     func reorderBookmarksCategories(newOrder: [Bookmark]) -> AnyPublisher<Bool, Error> {
-        session.request(AccountService.reorderBookmarksCategories(newOrder: newOrder))
-            .validate(statusCode: 200 ..< 400)
-            .publishData()
-            .value()
-            .tryMap { res in
-                guard let json = try? JSONSerialization.jsonObject(with: res, options: .fragmentsAllowed) as? [String: Any],
-                      let success = json["success"] as? Bool
-                else {
-                    throw HDrezkaError.parseJson("success", "reorderBookmarksCategories")
-                }
-
-                return success
-            }
-            .handleError()
-            .eraseToAnyPublisher()
+        session.success(AccountService.reorderBookmarksCategories(newOrder: newOrder), function: "reorderBookmarksCategories")
     }
 
     func getVersion() -> AnyPublisher<String, Error> {
-        session.request(AccountService.getVersion)
-            .validate(statusCode: 200 ..< 400)
-            .publishData()
-            .value()
-            .tryMap { res in
-                guard let json = try? JSONSerialization.jsonObject(with: res, options: .fragmentsAllowed) as? [String: Any],
-                      let version = json["version"] as? String
-                else {
-                    throw HDrezkaError.parseJson("version", "getVersion")
-                }
-
-                return version
-            }
-            .handleError()
-            .eraseToAnyPublisher()
+        session.json(AccountService.getVersion, function: "getVersion") { json in
+            try json.require("version")
+        }
     }
 }
