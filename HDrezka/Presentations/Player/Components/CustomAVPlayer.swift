@@ -15,7 +15,7 @@ class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
     private let urls: [URL]
     private let subtitles: [MovieSubtitles]
 
-    private var m3u8String: String?
+    private var m3u8Data: Data?
     private var playlistDuration: Double = 0.0
 
     private let loaderQueue = DispatchQueue(label: "resourceLoader")
@@ -64,7 +64,7 @@ class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
         let request = session.request(urls.first!, method: .get, headers: [.userAgent(Const.userAgent)])
             .validate(statusCode: 200 ..< 400)
             .interceptor(FallbackInterceptor(urls: urls))
-            .responseString { [weak self] response in
+            .responseString(queue: loaderQueue) { [weak self] response in
                 guard let self,
                       let string = response.value,
                       let url = response.request?.url,
@@ -85,9 +85,7 @@ class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
     }
 
     private func handleFragments(_ request: AVAssetResourceLoadingRequest) -> Bool {
-        guard let m3u8String,
-              let data = m3u8String.data(using: .utf8)
-        else {
+        guard let data = m3u8Data else {
             return false
         }
 
@@ -115,6 +113,7 @@ class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
         let lines = string.components(separatedBy: .newlines).filter { !$0.isEmpty }
         var newLines = [String]()
         var iterator = lines.makeIterator()
+        let baseURL = url.pathExtension.isEmpty ? url : url.deletingLastPathComponent()
 
         playlistDuration = 0.0
 
@@ -123,11 +122,11 @@ class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
 
             if line.hasPrefix(extInfPrefix), let nextLine = iterator.next() {
                 playlistDuration += getDuration(line)
-                newLines.append(URL(string: nextLine, relativeTo: url.pathExtension.isEmpty ? url : url.deletingLastPathComponent())?.absoluteString ?? nextLine)
+                newLines.append(URL(string: nextLine, relativeTo: baseURL)?.absoluteString ?? nextLine)
             }
         }
 
-        m3u8String = newLines.joined(separator: "\n")
+        m3u8Data = newLines.joined(separator: "\n").data(using: .utf8)
     }
 
     private func getDuration(_ line: String) -> Double {

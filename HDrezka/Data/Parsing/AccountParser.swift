@@ -52,9 +52,11 @@ class AccountParser {
     }
 
     static func checkRestore(from: String) throws -> String? {
-        guard try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).select(".b-info__title").text().contains("Запрос успешно принят") else { return nil }
+        let site = try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString)
 
-        return try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).select(".b-info__message b").first()?.text()
+        guard try site.select(".b-info__title").text().contains("Запрос успешно принят") else { return nil }
+
+        return try site.select(".b-info__message b").first()?.text()
     }
 
     static func parseBookmarks(from: String) throws -> [Bookmark] {

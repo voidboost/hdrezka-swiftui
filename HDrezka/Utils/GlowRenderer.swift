@@ -47,7 +47,6 @@ final class GlowRenderer: @unchecked Sendable {
 
         let transformed = ciImage
             .transformed(by: scaleTransform, highQualityDownsample: false)
-            .clampedToExtent()
             .cropped(to: ciImage.extent.applying(scaleTransform))
 
         return ciContext.createCGImage(transformed, from: transformed.extent)

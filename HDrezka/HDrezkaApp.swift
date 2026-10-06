@@ -221,7 +221,7 @@ struct HDrezkaApp: App {
         .commands(content: removed)
 
         MenuBarExtra(isInserted: Binding {
-            !downloader.downloads.isEmpty
+            downloader.hasDownloads
         } set: { _ in }) {
             DownloadsView()
                 .environment(downloader)

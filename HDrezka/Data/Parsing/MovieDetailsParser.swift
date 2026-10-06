@@ -154,46 +154,37 @@ class MovieDetailsParser {
     }
 
     static func parseSeriesSeasons(from: String) throws -> [MovieSeason] {
-        if let seasons = try? SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).getSeasons() {
-            return seasons
-        } else {
-            guard let json = try? JSONSerialization.jsonObject(with: from.data(using: .utf8).orThrow(), options: .allowFragments) as? [String: Any] else {
+        guard let json = try? JSONSerialization.jsonObject(with: from.data(using: .utf8).orThrow(), options: .allowFragments) as? [String: Any] else {
+            guard let seasons = try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).getSeasons() else {
                 throw HDrezkaError.parseJson("json", "parseSeriesSeasons")
             }
 
-            guard let seasonsString = json["seasons"] as? String, let seasons = try SwiftSoup.parseHTML(seasonsString, Defaults[.mirror].absoluteString).body() else {
-                throw HDrezkaError.parseJson("seasons", "parseSeriesSeasons")
-            }
-
-            guard let episodeString = json["episodes"] as? String, let episodes = try SwiftSoup.parseHTML(episodeString, Defaults[.mirror].absoluteString).body() else {
-                throw HDrezkaError.parseJson("episodes", "parseSeriesSeasons")
-            }
-
-            return try seasons
-                .select(".b-simple_season__item")
-                .map { season in
-                    let seasonId = try season.attr("data-tab_id")
-
-                    let seasonEpisodes = try episodes
-                        .select(".b-simple_episode__item[data-season_id=\(seasonId)]")
-                        .map { episode in
-                            try MovieEpisode(
-                                episodeId: episode.attr("data-episode_id"),
-                                name: episode.text().trimmingCharacters(in: .decimalDigits.inverted).isEmpty ? episode.text() : episode.text().trimmingCharacters(in: .decimalDigits.inverted),
-                                isSelected: episode.hasClass("active"),
-                                url: episode.attr("href").cleanPath,
-                            )
-                        }
-
-                    return try MovieSeason(
-                        seasonId: seasonId,
-                        name: season.text().trimmingCharacters(in: .decimalDigits.inverted).isEmpty ? season.text() : season.text().trimmingCharacters(in: .decimalDigits.inverted),
-                        episodes: seasonEpisodes,
-                        isSelected: season.hasClass("active"),
-                        url: season.attr("href").cleanPath,
-                    )
-                }
+            return seasons
         }
+
+        guard let seasonsString = json["seasons"] as? String, let seasons = try SwiftSoup.parseHTML(seasonsString, Defaults[.mirror].absoluteString).body() else {
+            throw HDrezkaError.parseJson("seasons", "parseSeriesSeasons")
+        }
+
+        guard let episodeString = json["episodes"] as? String, let episodes = try SwiftSoup.parseHTML(episodeString, Defaults[.mirror].absoluteString).body() else {
+            throw HDrezkaError.parseJson("episodes", "parseSeriesSeasons")
+        }
+
+        let episodesBySeason = try Dictionary(grouping: episodes.select(".b-simple_episode__item")) { try $0.attr("data-season_id") }
+
+        return try seasons
+            .select(".b-simple_season__item")
+            .map { season in
+                let seasonId = try season.attr("data-tab_id")
+
+                return try MovieSeason(
+                    seasonId: seasonId,
+                    name: season.getNumberName(),
+                    episodes: (episodesBySeason[seasonId] ?? []).map { try $0.getEpisode() },
+                    isSelected: season.hasClass("active"),
+                    url: season.attr("href").cleanPath,
+                )
+            }
     }
 
     static func parseComments(from: String) throws -> [Comment] {
@@ -311,6 +302,22 @@ private extension Elements {
 }
 
 private extension Element {
+    func getNumberName() throws -> String {
+        let text = try text()
+        let number = text.trimmingCharacters(in: .decimalDigits.inverted)
+
+        return number.isEmpty ? text : number
+    }
+
+    func getEpisode() throws -> MovieEpisode {
+        try MovieEpisode(
+            episodeId: attr("data-episode_id"),
+            name: getNumberName(),
+            isSelected: hasClass("active"),
+            url: attr("href").cleanPath,
+        )
+    }
+
     func getComment() throws -> (AttributedString, [Comment.Spoiler]) {
         try select(".title_spoiler").remove()
 
@@ -336,7 +343,7 @@ private extension Element {
             case "a":
                 try styles.insert(.link(element.attr("href")))
             case "div" where element.hasClass("text_spoiler"):
-                try spoilers.append(.init(range: .init(location: commentText.length, length: element.text(trimAndNormaliseWhitespace: false).count)))
+                try spoilers.append(.init(range: .init(location: commentText.length, length: element.text(trimAndNormaliseWhitespace: false).utf16.count)))
             default:
                 break
             }
@@ -582,29 +589,36 @@ private extension SwiftSoup.Document {
     }
 
     func getSeasons() throws -> [MovieSeason]? {
-        if try (select("#simple-seasons-tabs").isEmpty() && select("#simple-episodes-tabs").isEmpty()) {
+        let hasSeasonsTabs = try !select("#simple-seasons-tabs").isEmpty()
+
+        if !hasSeasonsTabs, try select("#simple-episodes-tabs").isEmpty() {
             return nil
         }
 
-        if try (select("#simple-seasons-tabs").isEmpty()) {
+        var episodeLists: [String: Element] = [:]
+
+        for list in try select("[id^=simple-episodes-list-]") {
+            let id = list.id()
+
+            if episodeLists[id] == nil {
+                episodeLists[id] = list
+            }
+        }
+
+        func episodes(of seasonId: String) throws -> [MovieEpisode] {
+            try episodeLists["simple-episodes-list-\(seasonId)"].orThrow()
+                .select(".b-simple_episode__item")
+                .map { try $0.getEpisode() }
+        }
+
+        if !hasSeasonsTabs {
             let id = try select("[id*=\"simple-episodes-list\"] .b-simple_episode__item").first().orThrow().attr("data-season_id")
 
-            let episodes = try select("#simple-episodes-list-\(id)").first().orThrow()
-                .select(".b-simple_episode__item")
-                .map { episode in
-                    try MovieEpisode(
-                        episodeId: episode.attr("data-episode_id"),
-                        name: episode.text().trimmingCharacters(in: .decimalDigits.inverted).isEmpty ? episode.text() : episode.text().trimmingCharacters(in: .decimalDigits.inverted),
-                        isSelected: episode.hasClass("active"),
-                        url: episode.attr("href").cleanPath,
-                    )
-                }
-
-            return [
+            return try [
                 MovieSeason(
                     seasonId: id,
                     name: id.trimmingCharacters(in: .decimalDigits.inverted),
-                    episodes: episodes,
+                    episodes: episodes(of: id),
                     isSelected: true,
                     url: nil,
                 ),
@@ -612,21 +626,11 @@ private extension SwiftSoup.Document {
         } else {
             return try select(".b-simple_season__item").map { season in
                 let id = try season.attr("data-tab_id")
-                let episodes = try select("#simple-episodes-list-\(id)").first().orThrow()
-                    .select(".b-simple_episode__item")
-                    .map { episode in
-                        try MovieEpisode(
-                            episodeId: episode.attr("data-episode_id"),
-                            name: episode.text().trimmingCharacters(in: .decimalDigits.inverted).isEmpty ? episode.text() : episode.text().trimmingCharacters(in: .decimalDigits.inverted),
-                            isSelected: episode.hasClass("active"),
-                            url: episode.attr("href").cleanPath,
-                        )
-                    }
 
                 return try MovieSeason(
                     seasonId: id,
-                    name: season.text().trimmingCharacters(in: .decimalDigits.inverted).isEmpty ? season.text() : season.text().trimmingCharacters(in: .decimalDigits.inverted),
-                    episodes: episodes,
+                    name: season.getNumberName(),
+                    episodes: episodes(of: id),
                     isSelected: season.hasClass("active"),
                     url: season.attr("href").cleanPath,
                 )
@@ -654,8 +658,9 @@ private extension SwiftSoup.Document {
                     )
                 }
         } else {
+            let siteString = try html()
+
             func getByOffset(offsetKey: String) throws -> [MovieVoiceActing] {
-                let siteString = try html()
                 guard let index = siteString.range(of: offsetKey) else {
                     throw HDrezkaError.parseJson("voice acting", "getByOffset")
                 }

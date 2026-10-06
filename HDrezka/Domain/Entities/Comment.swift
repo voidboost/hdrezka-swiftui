@@ -67,6 +67,8 @@ struct Comment: Identifiable, Hashable, Codable {
     }
 
     mutating func updateRects(containerWidth: CGFloat) {
+        guard !spoilers.isEmpty else { return }
+
         let textStorage = NSTextStorage(attributedString: NSAttributedString(text))
         let layoutManager = NSLayoutManager()
         let textContainer = NSTextContainer(size: CGSize(width: containerWidth, height: .greatestFiniteMagnitude))

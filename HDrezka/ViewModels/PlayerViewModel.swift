@@ -463,8 +463,11 @@ class PlayerViewModel {
 
             currentItem.publisher(for: \.loadedTimeRanges)
                 .compactMap { $0 as? [CMTimeRange] }
+                .removeDuplicates()
                 .receive(on: DispatchQueue.main)
-                .assign(to: \.loadedTimeRanges, on: self)
+                .sink { [weak self] loadedTimeRanges in
+                    self?.loadedTimeRanges = loadedTimeRanges
+                }
                 .store(in: &subscriptions)
 
             currentItem.publisher(for: \.error)
@@ -632,7 +635,9 @@ class PlayerViewModel {
             Defaults.publisher(.playerFullscreen)
                 .receive(on: DispatchQueue.main)
                 .map(\.newValue)
-                .assign(to: \.playerFullscreen, on: self)
+                .sink { [weak self] playerFullscreen in
+                    self?.playerFullscreen = playerFullscreen
+                }
                 .store(in: &subscriptions)
 
             Defaults.publisher(.videoGravity)

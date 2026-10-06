@@ -22,7 +22,15 @@ class Downloader {
 
     var isRunning: Bool = false
 
-    var downloads: [Download] = []
+    var downloads: [Download] = [] {
+        didSet {
+            if hasDownloads == downloads.isEmpty {
+                hasDownloads = !downloads.isEmpty
+            }
+        }
+    }
+
+    private(set) var hasDownloads: Bool = false
 
     init() {
         let open = UNNotificationAction(identifier: "open", title: String(localized: "key.open"))
@@ -222,7 +230,7 @@ class Downloader {
                                 self.downloads.removeAll(where: { $0.gid == status.gid })
                             } else if let index = self.downloads.firstIndex(where: { download in
                                 download.gid == status.gid
-                            }) {
+                            }), self.downloads[index].status != status {
                                 self.downloads[index].updateStatus(status)
                             }
                         }
