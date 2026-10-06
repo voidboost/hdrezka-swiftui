@@ -139,6 +139,19 @@ extension Optional {
 }
 
 class AttributedTextStyle {
+    private static let regularFont = NSFont.systemFont(ofSize: 13)
+    private static let boldFont = NSFontManager.shared.convert(regularFont, toHaveTrait: .boldFontMask)
+    private static let italicFont = NSFontManager.shared.convert(regularFont, toHaveTrait: .italicFontMask)
+    private static let boldItalicFont = NSFontManager.shared.convert(boldFont, toHaveTrait: .italicFontMask)
+    private static let linkColor = NSColor(Color.accentColor)
+
+    private static let paragraphStyle: NSParagraphStyle = {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = .left
+        paragraphStyle.lineBreakMode = .byWordWrapping
+        return paragraphStyle
+    }()
+
     private(set) var attributes: [NSAttributedString.Key: Any] = [:]
 
     func font(
@@ -148,21 +161,13 @@ class AttributedTextStyle {
         strikethrough: Bool = false,
         link: String? = nil
     ) {
-        var font = NSFont.systemFont(ofSize: 13)
-        let fontManager = NSFontManager.shared
-
-        if bold {
-            font = fontManager.convert(font, toHaveTrait: .boldFontMask)
+        let font = switch (bold, italic) {
+        case (true, true): Self.boldItalicFont
+        case (true, false): Self.boldFont
+        case (false, true): Self.italicFont
+        case (false, false): Self.regularFont
         }
 
-        if italic {
-            font = fontManager.convert(font, toHaveTrait: .italicFontMask)
-        }
-
-        self.font(font, underline, strikethrough, link)
-    }
-
-    func font(_ font: NSFont, _ underline: Bool, _ strikethrough: Bool, _ link: String?) {
         attributes[.font] = font
         attributes[.foregroundColor] = NSColor.labelColor
 
@@ -176,14 +181,10 @@ class AttributedTextStyle {
 
         if let link {
             attributes[.link] = link
-            attributes[.foregroundColor] = NSColor(Color.accentColor)
+            attributes[.foregroundColor] = Self.linkColor
         }
 
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .left
-        paragraphStyle.lineBreakMode = .byWordWrapping
-
-        attributes[.paragraphStyle] = paragraphStyle
+        attributes[.paragraphStyle] = Self.paragraphStyle
     }
 }
 

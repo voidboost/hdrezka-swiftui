@@ -93,7 +93,7 @@ class Downloader {
         }
 
         Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
-            .flatMap { _ in
+            .flatMap(maxPublishers: .max(1)) { _ in
                 self.callUseCase(data:
                     Aria2Request(
                         method: .getGlobalStat,
@@ -103,7 +103,7 @@ class Downloader {
                     ))
                     .catch { _ in Empty<Aria2Response<GlobalStatusResult>, Error>() }
             }
-            .flatMap { (response: Aria2Response<GlobalStatusResult>) in
+            .flatMap(maxPublishers: .max(1)) { (response: Aria2Response<GlobalStatusResult>) in
                 guard let result = response.result,
                       result.numActive > 0 || result.numWaiting > 0 || result.numStopped > 0
                 else {
