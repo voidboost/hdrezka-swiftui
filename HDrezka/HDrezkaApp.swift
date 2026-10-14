@@ -141,6 +141,8 @@ struct HDrezkaApp: App {
             $0.defaultDatabase = try! appDatabase()
         }
 
+        KingfisherManager.shared.defaultOptions += [.backgroundDecode]
+
         switch Defaults[.cache] {
         case .off:
             ImageCache.default.memoryStorage.config.expiration = .expired

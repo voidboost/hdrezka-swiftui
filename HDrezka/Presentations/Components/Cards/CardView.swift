@@ -67,11 +67,11 @@ struct CardView: View {
                     ZStack(alignment: .topLeading) {
                         if reservesSpace {
                             VStack(alignment: .leading) {
-                                Text(name)
+                                Text(verbatim: " ")
                                     .font(.title3.weight(.semibold))
                                     .lineLimit(2, reservesSpace: true)
 
-                                Text(details)
+                                Text(verbatim: " ")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                                     .lineLimit(2, reservesSpace: true)
