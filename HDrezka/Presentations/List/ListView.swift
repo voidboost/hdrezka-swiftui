@@ -52,9 +52,7 @@ struct ListView: View {
         .onScrollTargetVisibilityChange(idType: MovieSimple.ID.self) { onScreenCards in
             if viewModel.paginationState == .idle,
                let movies = viewModel.state.data,
-               !movies.isEmpty,
-               let last = movies.last,
-               onScreenCards.contains(where: { $0 == last.id })
+               movies.suffix(12).contains(where: { onScreenCards.contains($0.id) })
             {
                 viewModel.loadMore()
             }
