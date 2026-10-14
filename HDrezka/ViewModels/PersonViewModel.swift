@@ -17,6 +17,8 @@ class PersonViewModel {
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
     func load() {
+        subscriptions.flush()
+
         state = .loading
 
         getPersonDetailsUseCase(id: id)
