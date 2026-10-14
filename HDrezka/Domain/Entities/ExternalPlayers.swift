@@ -10,6 +10,13 @@ enum ExternalPlayers: Int, CaseIterable, Identifiable {
         self
     }
 
+    static var isAnyInstalled: Bool {
+        allCases.contains {
+            NSWorkspace.shared.urlForApplication(withBundleIdentifier: $0.bundleIdentifier) != nil
+                || NSWorkspace.shared.urlForApplication(toOpen: $0.url) != nil
+        }
+    }
+
     var url: URL {
         switch self {
         case .iina:

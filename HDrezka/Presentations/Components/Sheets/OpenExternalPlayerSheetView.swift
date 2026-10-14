@@ -457,7 +457,7 @@ struct OpenExternalPlayerSheetView: View {
             }
 
             VStack(alignment: .center, spacing: 10) {
-                if !ExternalPlayers.allCases.compactMap({ NSWorkspace.shared.urlForApplication(withBundleIdentifier: $0.bundleIdentifier) }).isEmpty || !ExternalPlayers.allCases.compactMap({ NSWorkspace.shared.urlForApplication(toOpen: $0.url) }).isEmpty {
+                if ExternalPlayers.isAnyInstalled {
                     if NSWorkspace.shared.urlForApplication(toOpen: ExternalPlayers.iina.url) != nil {
                         Button {
                             if let selectedActing {

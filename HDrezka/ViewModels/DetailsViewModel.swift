@@ -27,6 +27,8 @@ class DetailsViewModel {
     var collectionDestination: MoviesCollection?
 
     func load() {
+        subscriptions.flush()
+
         state = .loading
 
         getMovieDetailsUseCase(movieId: id)
