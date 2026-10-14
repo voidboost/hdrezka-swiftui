@@ -86,7 +86,8 @@ class PlayerViewModel {
     private(set) var isPictureInPicturePossible: Bool = false
     private(set) var loadedTimeRanges: [CMTimeRange] = []
     var timer: Int?
-    private var timerTask: Task<Void, Never>?
+    @ObservationIgnored private var timerTask: Task<Void, Never>?
+    @ObservationIgnored private var timerDeadline: ContinuousClock.Instant?
     private(set) var nextTimer: CGFloat?
     var currentTime: Double = 0.0
     private(set) var duration: Double = .greatestFiniteMagnitude
@@ -95,8 +96,9 @@ class PlayerViewModel {
     private(set) var isPlaying: Bool = true
     private(set) var isLoading: Bool = true
     private(set) var isMaskShow: Bool = true
-    private var isMaskLocked: Bool = false
-    private var hideMaskTask: Task<Void, Never>?
+    @ObservationIgnored private var isMaskLocked: Bool = false
+    @ObservationIgnored private var hideMaskTask: Task<Void, Never>?
+    @ObservationIgnored private var hideMaskDeadline: ContinuousClock.Instant?
     private(set) var subtitlesOptions: [AVMediaSelectionOption] = []
     private(set) var thumbnails: WebVTT?
     private(set) var rate: Float = Defaults[.rate]
@@ -159,13 +161,6 @@ class PlayerViewModel {
 
                     self.currentTime = currentTime
 
-                    self.updateNowPlayingInfo([
-                        MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime,
-                        MPNowPlayingInfoPropertyPlaybackRate: self.rate,
-                        MPNowPlayingInfoPropertyCurrentPlaybackDate: currentItem.currentDate(),
-                        MPNowPlayingInfoPropertyDefaultPlaybackRate: player.defaultRate,
-                    ])
-
                     if self.isAmbientLightVisible {
                         self.glowRenderer.render(at: CMTime(seconds: time.seconds + 0.1, preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
                     }
@@ -180,6 +175,13 @@ class PlayerViewModel {
                     guard let self else { return }
 
                     let currentTime = time.seconds
+
+                    self.updateNowPlayingInfo([
+                        MPNowPlayingInfoPropertyElapsedPlaybackTime: currentTime,
+                        MPNowPlayingInfoPropertyPlaybackRate: self.rate,
+                        MPNowPlayingInfoPropertyCurrentPlaybackDate: currentItem.currentDate(),
+                        MPNowPlayingInfoPropertyDefaultPlaybackRate: player.defaultRate,
+                    ])
 
                     let voiceId = self.voiceActing.voiceId
                     let translatorId = self.voiceActing.translatorId
@@ -908,8 +910,8 @@ class PlayerViewModel {
         remoteCommandCenter.skipBackwardCommand.removeTarget(nil)
         remoteCommandCenter.skipForwardCommand.removeTarget(nil)
 
-        timerTask?.cancel()
-        hideMaskTask?.cancel()
+        cancelTimer()
+        cancelHideMask()
 
         thumbnails = nil
 
@@ -980,23 +982,38 @@ class PlayerViewModel {
     }
 
     func resetTimer() {
-        timerTask?.cancel()
-
         updateNextTimer()
 
         guard let timer,
               timer > 0,
               isPlaying
         else {
+            cancelTimer()
             return
         }
 
-        timerTask = Task { @MainActor [weak self] in
-            try? await Task.sleep(for: .seconds(timer))
+        let deadline = ContinuousClock.now + .seconds(timer)
 
-            guard !Task.isCancelled,
-                  let self,
-                  let player = self.playerLayer.player,
+        let isRunning = timerTask != nil && timerDeadline.map { $0 <= deadline } == true
+
+        timerDeadline = deadline
+
+        guard !isRunning else { return }
+
+        timerTask?.cancel()
+        timerTask = Task { @MainActor [weak self] in
+            while let deadline = self?.timerDeadline, ContinuousClock.now < deadline {
+                try? await Task.sleep(until: deadline, clock: .continuous)
+
+                guard !Task.isCancelled else { return }
+            }
+
+            guard !Task.isCancelled, let self else { return }
+
+            self.timerTask = nil
+            self.timerDeadline = nil
+
+            guard let player = self.playerLayer.player,
                   player.status == .readyToPlay
             else {
                 return
@@ -1006,6 +1023,12 @@ class PlayerViewModel {
         }
     }
 
+    private func cancelTimer() {
+        timerTask?.cancel()
+        timerTask = nil
+        timerDeadline = nil
+    }
+
     func setMask(_ newValue: Bool) {
         guard !isMaskLocked else { return }
 
@@ -1013,19 +1036,37 @@ class PlayerViewModel {
             isMaskShow = newValue
         }
 
-        hideMaskTask?.cancel()
+        guard newValue, !isLoading, isPlaying else {
+            cancelHideMask()
+            return
+        }
 
-        guard newValue, !isLoading, isPlaying else { return }
+        hideMaskDeadline = ContinuousClock.now + .seconds(3)
+
+        guard hideMaskTask == nil else { return }
 
         hideMaskTask = Task { @MainActor [weak self] in
-            try? await Task.sleep(for: .seconds(3))
+            while let deadline = self?.hideMaskDeadline, ContinuousClock.now < deadline {
+                try? await Task.sleep(until: deadline, clock: .continuous)
+
+                guard !Task.isCancelled else { return }
+            }
 
             guard !Task.isCancelled, let self else { return }
+
+            self.hideMaskTask = nil
+            self.hideMaskDeadline = nil
 
             self.showCursor(false)
 
             self.setMask(false)
         }
+    }
+
+    private func cancelHideMask() {
+        hideMaskTask?.cancel()
+        hideMaskTask = nil
+        hideMaskDeadline = nil
     }
 
     func lockMask(_ newValue: Bool) {
@@ -1035,7 +1076,7 @@ class PlayerViewModel {
             isMaskShow = newValue
         }
 
-        hideMaskTask?.cancel()
+        cancelHideMask()
     }
 
     func unlockMask(_ newValue: Bool) {
