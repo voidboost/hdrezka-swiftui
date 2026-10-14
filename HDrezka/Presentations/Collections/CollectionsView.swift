@@ -32,9 +32,7 @@ struct CollectionsView: View {
         .onScrollTargetVisibilityChange(idType: MoviesCollection.ID.self) { onScreenCards in
             if viewModel.paginationState == .idle,
                let collections = viewModel.state.data,
-               !collections.isEmpty,
-               let last = collections.last,
-               onScreenCards.contains(where: { $0 == last.id })
+               collections.suffix(8).contains(where: { onScreenCards.contains($0.id) })
             {
                 viewModel.loadMore()
             }
