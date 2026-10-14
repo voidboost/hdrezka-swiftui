@@ -27,6 +27,10 @@ struct DetailsComponentView: View {
 
     @State private var franchiseExpanded: Bool = false
 
+    @State private var hasExternalPlayer: Bool = false
+
+    @State private var trailer: YouTubePlayer?
+
     @State private var blurHeght: CGFloat = .zero
 
     @Environment(\.colorScheme) private var colorScheme
@@ -122,7 +126,7 @@ struct DetailsComponentView: View {
                                     }
                                 }
 
-                                if !ExternalPlayers.allCases.compactMap({ NSWorkspace.shared.urlForApplication(withBundleIdentifier: $0.bundleIdentifier) }).isEmpty || !ExternalPlayers.allCases.compactMap({ NSWorkspace.shared.urlForApplication(toOpen: $0.url) }).isEmpty {
+                                if hasExternalPlayer {
                                     Button {
                                         isOpenExternalPlayerPresented = true
                                     } label: {
@@ -226,29 +230,7 @@ struct DetailsComponentView: View {
                 .font(.title3)
                 .textSelection(.enabled)
 
-            if let trailerId {
-                #if DEBUG
-                    let isLoggingEnabled = true
-                #else
-                    let isLoggingEnabled = false
-                #endif
-
-                let trailer = YouTubePlayer(
-                    source: .video(id: trailerId),
-                    parameters: .init(
-                        autoPlay: false,
-                        loopEnabled: true,
-                        showControls: true,
-                        showFullscreenButton: true
-                    ),
-                    configuration: .init(
-                        openURLAction: .init { url, _ in
-                            openURL(url)
-                        }
-                    ),
-                    isLoggingEnabled: isLoggingEnabled
-                )
-
+            if let trailer {
                 YouTubePlayerView(trailer, transaction: .init(animation: .easeInOut)) { state in
                     if state.isIdle {
                         ProgressView()
@@ -276,6 +258,12 @@ struct DetailsComponentView: View {
             }
         }
         .padding(.horizontal, 36)
+        .onChange(of: trailerId, initial: true) {
+            trailer = trailerId.map(makeTrailer)
+        }
+        .onAppear {
+            hasExternalPlayer = ExternalPlayers.isAnyInstalled
+        }
 
         if details.franchise != nil || details.schedule != nil {
             Divider()
@@ -490,5 +478,29 @@ struct DetailsComponentView: View {
             .scrollIndicators(.never)
         }
         .padding(.bottom, 18)
+    }
+
+    private func makeTrailer(id: String) -> YouTubePlayer {
+        #if DEBUG
+            let isLoggingEnabled = true
+        #else
+            let isLoggingEnabled = false
+        #endif
+
+        return YouTubePlayer(
+            source: .video(id: id),
+            parameters: .init(
+                autoPlay: false,
+                loopEnabled: true,
+                showControls: true,
+                showFullscreenButton: true
+            ),
+            configuration: .init(
+                openURLAction: .init { url, _ in
+                    openURL(url)
+                }
+            ),
+            isLoggingEnabled: isLoggingEnabled
+        )
     }
 }
