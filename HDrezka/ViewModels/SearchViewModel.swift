@@ -17,6 +17,8 @@ class SearchViewModel {
 
     @ObservationIgnored private var page = 1
 
+    @ObservationIgnored private var loadedQuery = ""
+
     var query: String = ""
 
     private func getData(query: String, isInitial: Bool = true) {
@@ -67,17 +69,22 @@ class SearchViewModel {
 
             guard !Task.isCancelled, let self else { return }
 
+            let query = self.query.trim()
+
+            guard force || query != self.loadedQuery || self.state.error != nil else { return }
+
+            self.loadedQuery = query
             self.paginationState = .idle
             self.page = 1
             self.subscriptions.flush()
 
-            if !self.query.trim().isEmpty {
+            if !query.isEmpty {
                 withAnimation(.easeInOut) {
                     self.state = .loading
-                    self.title = .init(localized: "key.search.result-\(self.query.trim())")
+                    self.title = .init(localized: "key.search.result-\(query)")
                 }
 
-                self.getData(query: self.query.trim())
+                self.getData(query: query)
             } else {
                 withAnimation(.easeInOut) {
                     self.title = .init(localized: "key.search")
@@ -88,12 +95,12 @@ class SearchViewModel {
     }
 
     func loadMore() {
-        guard paginationState == .idle, !query.isEmpty else { return }
+        guard paginationState == .idle, !loadedQuery.isEmpty else { return }
 
         withAnimation(.easeInOut) {
             self.paginationState = .loading
         }
 
-        getData(query: query.trim(), isInitial: false)
+        getData(query: loadedQuery, isInitial: false)
     }
 }
