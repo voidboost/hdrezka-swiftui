@@ -11,6 +11,8 @@ class CategoriesViewModel {
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
 
     func load() {
+        subscriptions.flush()
+
         state = .loading
 
         categoriesUseCase()
