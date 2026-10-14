@@ -3,6 +3,9 @@ import SwiftUI
 struct CommentTextView: View {
     @State private var comment: Comment
 
+    @State private var revealing: [UUID: Date] = [:]
+    @State private var isVisible = true
+
     @Environment(CommentsViewModel.self) private var viewModel
 
     init(comment: Comment) {
@@ -10,40 +13,17 @@ struct CommentTextView: View {
     }
 
     var body: some View {
-        Text(comment.text)
+        content
             .lineLimit(nil)
             .multilineTextAlignment(.leading)
             .textSelection(.enabled)
-            .onGeometryChange(for: CGFloat.self) { geometry in
-                geometry.size.width
-            } action: { width in
-                comment.updateRects(containerWidth: width)
-            }
-            .overlay {
-                ForEach(comment.spoilers) { spoiler in
-                    ForEach(spoiler.rects.indices, id: \.self) { rectIndex in
-                        let rect = spoiler.rects[rectIndex]
-
-//                            Rectangle()
-//                                .stroke(.red, lineWidth: 1)
-//                                .frame(width: rect.width, height: rect.height)
-//                                .position(x: rect.x + rect.width * 0.5, y: rect.y + rect.height * 0.5)
-
-                        SpoilerView()
-                            .contentShape(.rect)
-                            .background(.background, in: .rect)
-                            .clipShape(.rect)
-                            .onTapGesture {
-                                withAnimation(.easeInOut) {
-                                    comment.removeSpoiler(spoiler.id)
-                                }
-                            }
-                            .frame(width: rect.width, height: rect.height)
-                            .position(x: rect.midX, y: rect.midY)
-                    }
-                }
-            }
             .environment(\.openURL, OpenURLAction { url in
+                if url.scheme == Self.spoilerScheme, let id = UUID(uuidString: url.absoluteString.replacingOccurrences(of: "\(Self.spoilerScheme):", with: "")) {
+                    reveal(id)
+
+                    return .handled
+                }
+
                 guard let path = url.cleanPath, url.id != nil else { return .systemAction }
 
                 if let fragment = url.cleanFragment, fragment.contains("comment") {
@@ -58,5 +38,67 @@ struct CommentTextView: View {
                     return .handled
                 }
             })
+    }
+
+    private static let spoilerScheme = "spoiler"
+
+    @ViewBuilder
+    private var content: some View {
+        if comment.spoilers.isEmpty {
+            Text(comment.text)
+        } else {
+            let text = text
+
+            TimelineView(.animation(minimumInterval: 1 / 60, paused: !isVisible)) { timeline in
+                text.textRenderer(SpoilerTextRenderer(date: timeline.date))
+            }
+            .onScrollVisibilityChange { isVisible in
+                self.isVisible = isVisible
+            }
+        }
+    }
+
+    private var text: Text {
+        let source = comment.text
+        var parts: [Text] = []
+        var cursor = source.startIndex
+
+        for spoiler in comment.spoilers {
+            guard let range = Range(spoiler.range, in: source), range.lowerBound >= cursor else { continue }
+
+            if cursor < range.lowerBound {
+                parts.append(Text(AttributedString(source[cursor ..< range.lowerBound])))
+            }
+
+            var hidden = AttributedString(source[range])
+            let revealDate = revealing[spoiler.id]
+
+            if revealDate == nil {
+                hidden.link = URL(string: "\(Self.spoilerScheme):\(spoiler.id.uuidString)")
+            }
+
+            parts.append(Text(hidden).customAttribute(SpoilerAttribute(id: spoiler.id, revealDate: revealDate)))
+
+            cursor = range.upperBound
+        }
+
+        if cursor < source.endIndex {
+            parts.append(Text(AttributedString(source[cursor ..< source.endIndex])))
+        }
+
+        return parts.reduce(Text(verbatim: ""), +)
+    }
+
+    private func reveal(_ id: UUID) {
+        guard revealing[id] == nil else { return }
+
+        revealing[id] = .now
+
+        Task {
+            try? await Task.sleep(for: .seconds(SpoilerTextRenderer.revealDuration))
+
+            comment.removeSpoiler(id)
+            revealing[id] = nil
+        }
     }
 }
