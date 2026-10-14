@@ -13,7 +13,7 @@ struct CategoriesView: View {
                         if let typeView = CategoriesTypeView(type: type) {
                             typeView.equatable()
 
-                            if type != types.last {
+                            if type.id != types.last?.id {
                                 Divider()
                             }
                         }
