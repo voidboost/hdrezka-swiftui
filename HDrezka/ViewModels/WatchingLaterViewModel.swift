@@ -9,6 +9,7 @@ class WatchingLaterViewModel {
     @ObservationIgnored @Dependency(\.removeWatchingItemUseCase) private var removeWatchingItemUseCase
 
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
+    @ObservationIgnored private var loadSubscriptions: Set<AnyCancellable> = []
 
     private(set) var state: DataState<[MovieWatchLater]> = .loading
 
@@ -16,6 +17,8 @@ class WatchingLaterViewModel {
     var isErrorPresented: Bool = false
 
     func load() {
+        loadSubscriptions.flush()
+
         state = .loading
 
         getWatchingLaterMoviesUseCase()
@@ -37,7 +40,7 @@ class WatchingLaterViewModel {
                     self.state = .data(result)
                 }
             }
-            .store(in: &subscriptions)
+            .store(in: &loadSubscriptions)
     }
 
     func switchWatchedItem(movie: MovieWatchLater) {
