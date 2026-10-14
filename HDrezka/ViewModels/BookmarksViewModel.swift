@@ -14,6 +14,7 @@ class BookmarksViewModel {
     @ObservationIgnored @Dependency(\.removeFromBookmarksUseCase) private var removeFromBookmarksUseCase
 
     @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
+    @ObservationIgnored private var bookmarksSubscriptions: Set<AnyCancellable> = []
     @ObservationIgnored private var moviesSubscriptions: Set<AnyCancellable> = []
 
     private(set) var bookmarksState: DataState<[Bookmark]> = .loading
@@ -38,6 +39,7 @@ class BookmarksViewModel {
 
         bookmarksState = .loading
 
+        bookmarksSubscriptions.flush()
         moviesSubscriptions.flush()
 
         bookmarkState = .data([])
@@ -63,7 +65,7 @@ class BookmarksViewModel {
                     self.bookmarksState = .data(result)
                 }
             }
-            .store(in: &subscriptions)
+            .store(in: &bookmarksSubscriptions)
     }
 
     @ObservationIgnored private var page = 1
