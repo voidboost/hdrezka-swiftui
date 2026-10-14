@@ -6,7 +6,7 @@ struct Comment: Identifiable, Hashable, Codable {
     let author: String
     let photo: String
     let text: AttributedString
-    private(set) var spoilers: [Spoiler]
+    let spoilers: [Spoiler]
     private(set) var replies: [Comment]
     private(set) var likesCount: Int
     private(set) var isLiked: Bool
@@ -29,6 +29,17 @@ struct Comment: Identifiable, Hashable, Codable {
         self.isAdmin = isAdmin
         self.deleteHash = deleteHash
         self.id = id
+    }
+
+    static func == (lhs: Comment, rhs: Comment) -> Bool {
+        lhs.id == rhs.id
+            && lhs.likesCount == rhs.likesCount
+            && lhs.isLiked == rhs.isLiked
+            && lhs.replies == rhs.replies
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 
     mutating func like(_ count: Int, _ isLiked: Bool, _ comment: Comment) {
@@ -64,10 +75,6 @@ struct Comment: Identifiable, Hashable, Codable {
                 replies[index].deleteComment(commentId)
             }
         }
-    }
-
-    mutating func removeSpoiler(_ id: UUID) {
-        spoilers.removeAll { $0.id == id }
     }
 }
 
