@@ -1,15 +1,18 @@
 import SwiftUI
 
 struct CommentTextView: View {
-    @State private var comment: Comment
+    private let text: AttributedString
+
+    @State private var spoilers: [Comment.Spoiler]
 
     @State private var revealing: [UUID: Date] = [:]
     @State private var isVisible = true
 
     @Environment(CommentsViewModel.self) private var viewModel
 
-    init(comment: Comment) {
-        self.comment = comment
+    init(text: AttributedString, spoilers: [Comment.Spoiler]) {
+        self.text = text
+        self.spoilers = spoilers
     }
 
     var body: some View {
@@ -44,10 +47,10 @@ struct CommentTextView: View {
 
     @ViewBuilder
     private var content: some View {
-        if comment.spoilers.isEmpty {
-            Text(comment.text)
+        if spoilers.isEmpty {
+            Text(text)
         } else {
-            let text = text
+            let text = spoilerText
 
             TimelineView(.animation(minimumInterval: 1 / 60, paused: !isVisible)) { timeline in
                 text.textRenderer(SpoilerTextRenderer(date: timeline.date))
@@ -58,12 +61,12 @@ struct CommentTextView: View {
         }
     }
 
-    private var text: Text {
-        let source = comment.text
+    private var spoilerText: Text {
+        let source = text
         var parts: [Text] = []
         var cursor = source.startIndex
 
-        for spoiler in comment.spoilers {
+        for spoiler in spoilers {
             guard let range = Range(spoiler.range, in: source), range.lowerBound >= cursor else { continue }
 
             if cursor < range.lowerBound {
@@ -97,7 +100,7 @@ struct CommentTextView: View {
         Task {
             try? await Task.sleep(for: .seconds(SpoilerTextRenderer.revealDuration))
 
-            comment.removeSpoiler(id)
+            spoilers.removeAll { $0.id == id }
             revealing[id] = nil
         }
     }

@@ -15,7 +15,6 @@ static float4 hash43(float3 p) {
     return fract((p4.xxyz + p4.yzzw) * p4.zywx);
 }
 
-// Telegram's dust alpha: random base alpha plus additive valueOverLife [0, 0, 1, 0, -1].
 static float lifeAlpha(float base, float age) {
     float curve = age < 0.25 ? 0.0
         : age < 0.5 ? (age - 0.25) * 4.0
@@ -25,10 +24,6 @@ static float lifeAlpha(float base, float age) {
     return saturate(base + curve);
 }
 
-// Particles are split into layers. Each layer is a grid that drifts as a whole (`drifts` holds one
-// offset per layer, computed on the CPU), with one particle per cell plus a small velocity of its own.
-// A particle stays within [-0.25, 1.25] cells of its cell origin, so while radius + 0.5 <= cell / 4
-// a pixel only has to check the 2×2 cells around it.
 [[ stitchable ]] half4 spoiler(
     float2 position,
     half4 color,
