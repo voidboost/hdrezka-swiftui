@@ -44,11 +44,16 @@ jobs:
           defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
           defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES
 
+      - name: Install Metal toolchain
+        run: |
+          xcodebuild -downloadComponent MetalToolchain
+
       - name: Build app
         run: |
           xcodebuild archive \
             -scheme HDrezka \
             -project HDrezka.xcodeproj \
+            -destination 'generic/platform=macOS' \
             -archivePath build/HDrezka.xcarchive \
             SKIP_INSTALL=NO \
             CODE_SIGNING_ALLOWED=NO \
