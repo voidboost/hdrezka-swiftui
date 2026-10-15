@@ -30,7 +30,6 @@ class CustomAVPlayer: AVPlayer {
     }
 }
 
-/// All mutable state is touched only on `queue`, which AVFoundation and Alamofire use for every callback.
 private final class PlaylistResourceLoader: NSObject, AVAssetResourceLoaderDelegate, @unchecked Sendable {
     @Dependency(\.session) private var session
 
