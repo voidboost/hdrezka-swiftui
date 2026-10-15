@@ -91,7 +91,7 @@ struct CategoriesTypeView: View {
 }
 
 extension CategoriesTypeView: Equatable {
-    static func == (lhs: CategoriesTypeView, rhs: CategoriesTypeView) -> Bool {
+    nonisolated static func == (lhs: CategoriesTypeView, rhs: CategoriesTypeView) -> Bool {
         return lhs.type.id == rhs.type.id
     }
 }

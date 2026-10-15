@@ -6,6 +6,7 @@ import SwiftUI
 import UserNotifications
 
 @Observable
+@MainActor
 class Downloader {
     @ObservationIgnored static let shared = Downloader()
 
@@ -240,7 +241,7 @@ class Downloader {
             .store(in: &subscriptions)
     }
 
-    private func notificate(_ id: String, _ title: String, _ subtitle: String? = nil, _ category: String? = nil, _ userInfo: [AnyHashable: Any] = [:]) {
+    nonisolated private func notificate(_ id: String, _ title: String, _ subtitle: String? = nil, _ category: String? = nil, _ userInfo: [String: any Sendable] = [:]) {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             if settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional {
                 let content = UNMutableNotificationContent()

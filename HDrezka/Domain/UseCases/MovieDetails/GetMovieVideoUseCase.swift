@@ -10,7 +10,7 @@ struct GetMovieVideoUseCase {
 }
 
 extension GetMovieVideoUseCase: DependencyKey {
-    static var liveValue = Self()
+    static let liveValue = Self()
 }
 
 extension DependencyValues {

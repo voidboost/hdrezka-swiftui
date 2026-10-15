@@ -2,6 +2,7 @@ import FirebaseAnalytics
 import SwiftUI
 
 @Observable
+@MainActor
 class AppState {
     @ObservationIgnored static let shared = AppState()
 
@@ -15,6 +16,12 @@ class AppState {
     var isPremiumPresented = false
 
     var selectedTab: Tabs = .home
+
+    nonisolated static func presentSignIn() {
+        Task { @MainActor in
+            shared.isSignInPresented = true
+        }
+    }
 }
 
 enum Tabs: Hashable, Identifiable, CaseIterable, View {
@@ -139,7 +146,7 @@ enum Tabs: Hashable, Identifiable, CaseIterable, View {
         }
     }
 
-    var id: Self {
+    nonisolated var id: Self {
         self
     }
 }

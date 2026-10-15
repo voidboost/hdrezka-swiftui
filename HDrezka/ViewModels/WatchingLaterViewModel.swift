@@ -3,6 +3,7 @@ import Dependencies
 import SwiftUI
 
 @Observable
+@MainActor
 class WatchingLaterViewModel {
     @ObservationIgnored @Dependency(\.getWatchingLaterMoviesUseCase) private var getWatchingLaterMoviesUseCase
     @ObservationIgnored @Dependency(\.switchWatchedItemUseCase) private var switchWatchedItemUseCase

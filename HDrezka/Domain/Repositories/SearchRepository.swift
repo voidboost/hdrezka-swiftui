@@ -1,14 +1,14 @@
 import Combine
 import Dependencies
 
-protocol SearchRepository {
+protocol SearchRepository: Sendable {
     func search(query: String, page: Int) -> AnyPublisher<[MovieSimple], Error>
 
     func categories() -> AnyPublisher<[MovieType], Error>
 }
 
 private enum SearchRepositoryKey: DependencyKey {
-    static var liveValue: any SearchRepository = SearchRepositoryImpl()
+    static let liveValue: any SearchRepository = SearchRepositoryImpl()
 }
 
 extension DependencyValues {

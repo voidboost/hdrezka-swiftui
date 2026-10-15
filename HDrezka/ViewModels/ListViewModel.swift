@@ -4,6 +4,7 @@ import Dependencies
 import SwiftUI
 
 @Observable
+@MainActor
 class ListViewModel {
 //    @ObservationIgnored @Dependency(\.getFeaturedMoviesUseCase) private var getFeaturedMoviesUseCase
     @ObservationIgnored @Dependency(\.getHotMoviesUseCase) private var getHotMoviesUseCase

@@ -47,7 +47,7 @@ struct CollectionCardView: View {
 }
 
 extension CollectionCardView: Equatable {
-    static func == (lhs: CollectionCardView, rhs: CollectionCardView) -> Bool {
+    nonisolated static func == (lhs: CollectionCardView, rhs: CollectionCardView) -> Bool {
         return lhs.collection.id == rhs.collection.id
     }
 }

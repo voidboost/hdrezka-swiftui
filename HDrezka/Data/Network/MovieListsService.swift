@@ -63,7 +63,7 @@ extension MovieListsService: URLRequestConvertible {
 
         switch self {
         case let .getMovieList1(_, filter, genre):
-            var params: [String: Any] = [:]
+            var params: Parameters = [:]
             params["filter"] = filter
             params["genre"] = genre != 0 ? genre : nil
 
@@ -71,13 +71,13 @@ extension MovieListsService: URLRequestConvertible {
         case let .getMovieList3(_, _, _, filter):
             return try URLEncoding.queryString.encode(request, with: ["filter": filter])
         case let .getMovieList4(_, _, _, genre, filter):
-            var params: [String: Any] = [:]
+            var params: Parameters = [:]
             params["filter"] = filter
             params["genre"] = genre != 0 ? genre : nil
 
             return try URLEncoding.queryString.encode(request, with: params)
         case let .getNewestMovies(_, filter, genre):
-            var params: [String: Any] = [:]
+            var params: Parameters = [:]
             params["filter"] = filter
             params["genre"] = genre != 0 ? genre : nil
 

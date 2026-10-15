@@ -4,7 +4,7 @@ import Foundation
 import UserNotifications
 
 private enum SessionKey: DependencyKey {
-    static var liveValue = Session(
+    static let liveValue = Session(
         rootQueue: .init(label: "io.silentsea.hdrezka.rootQueue", qos: .userInitiated),
         startRequestsImmediately: false,
         interceptor: Interceptor(interceptors: [CustomInterceptor(), OfflineRetrier()]),

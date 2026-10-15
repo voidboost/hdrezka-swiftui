@@ -3,6 +3,7 @@ import Dependencies
 import SwiftUI
 
 @Observable
+@MainActor
 class CategoriesViewModel {
     @ObservationIgnored @Dependency(\.categoriesUseCase) private var categoriesUseCase
 

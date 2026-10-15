@@ -4,34 +4,20 @@ import Defaults
 import Dependencies
 import Foundation
 
-class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
-    @Dependency(\.session) private var session
-
-    private let mainScheme = "mainm3u8"
-    private let fragmentsScheme = "fragmentsm3u8"
-    private let subtitlesScheme = "subtitlesm3u8"
-    private let extInfPrefix = "#EXTINF:"
-
-    private let urls: [URL]
-    private let subtitles: [MovieSubtitles]
-
-    private var m3u8Data: Data?
-    private var playlistDuration: Double = 0.0
-
-    private let loaderQueue = DispatchQueue(label: "resourceLoader")
+class CustomAVPlayer: AVPlayer {
+    private let loader: PlaylistResourceLoader
 
     init?(urls: [URL], subtitles: [MovieSubtitles]) {
-        guard let customURL = urls.first?.replaceURLScheme(with: mainScheme) else {
+        guard let customURL = urls.first?.replaceURLScheme(with: PlaylistResourceLoader.mainScheme) else {
             return nil
         }
 
-        self.urls = urls
-        self.subtitles = subtitles
+        loader = PlaylistResourceLoader(urls: urls, subtitles: subtitles)
 
         super.init()
 
         let asset = AVURLAsset(url: customURL)
-        asset.resourceLoader.setDelegate(self, queue: loaderQueue)
+        asset.resourceLoader.setDelegate(loader, queue: loader.queue)
 
         let playerItem = AVPlayerItem(asset: asset)
         playerItem.allowedAudioSpatializationFormats = Defaults[.spatialAudio].format
@@ -42,6 +28,29 @@ class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
 
         replaceCurrentItem(with: playerItem)
     }
+}
+
+/// All mutable state is touched only on `queue`, which AVFoundation and Alamofire use for every callback.
+private final class PlaylistResourceLoader: NSObject, AVAssetResourceLoaderDelegate, @unchecked Sendable {
+    @Dependency(\.session) private var session
+
+    static let mainScheme = "mainm3u8"
+    private let fragmentsScheme = "fragmentsm3u8"
+    private let subtitlesScheme = "subtitlesm3u8"
+    private let extInfPrefix = "#EXTINF:"
+
+    private let urls: [URL]
+    private let subtitles: [MovieSubtitles]
+
+    private var m3u8Data: Data?
+    private var playlistDuration: Double = 0.0
+
+    let queue = DispatchQueue(label: "resourceLoader")
+
+    init(urls: [URL], subtitles: [MovieSubtitles]) {
+        self.urls = urls
+        self.subtitles = subtitles
+    }
 
     func resourceLoader(_: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
         guard let scheme = loadingRequest.request.url?.scheme else {
@@ -49,7 +58,7 @@ class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
         }
 
         switch scheme {
-        case mainScheme:
+        case Self.mainScheme:
             return handleMainRequest(loadingRequest)
         case fragmentsScheme:
             return handleFragments(loadingRequest)
@@ -64,7 +73,7 @@ class CustomAVPlayer: AVPlayer, AVAssetResourceLoaderDelegate {
         let request = session.request(urls.first!, method: .get, headers: [.userAgent(Const.userAgent)])
             .validate(statusCode: 200 ..< 400)
             .interceptor(FallbackInterceptor(urls: urls))
-            .responseString(queue: loaderQueue) { [weak self] response in
+            .responseString(queue: queue) { [weak self] response in
                 guard let self,
                       let string = response.value,
                       let url = response.request?.url,

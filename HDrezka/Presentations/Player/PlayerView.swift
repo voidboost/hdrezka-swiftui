@@ -217,21 +217,9 @@ struct PlayerView: View {
 
                 player.volume = max(player.volume - 0.05, 0.0)
             case .left:
-                player.seek(to: CMTime(seconds: max(viewModel.currentTime - 10.0, 0.0), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { complete in
-                    if viewModel.isPlaying, complete {
-                        player.playImmediately(atRate: viewModel.rate)
-                    }
-                }
-
-                viewModel.currentTime = max(viewModel.currentTime - 10.0, 0.0)
+                viewModel.skip(player, by: -10.0)
             case .right:
-                player.seek(to: CMTime(seconds: min(viewModel.currentTime + 10.0, viewModel.duration), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { complete in
-                    if viewModel.isPlaying, complete {
-                        player.playImmediately(atRate: viewModel.rate)
-                    }
-                }
-
-                viewModel.currentTime = min(viewModel.currentTime + 10.0, viewModel.duration)
+                viewModel.skip(player, by: 10.0)
             default:
                 break
             }

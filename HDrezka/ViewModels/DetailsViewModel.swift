@@ -4,6 +4,7 @@ import SwiftUI
 import YouTubePlayerKit
 
 @Observable
+@MainActor
 class DetailsViewModel {
     @ObservationIgnored @Dependency(\.getMovieDetailsUseCase) private var getMovieDetailsUseCase
     @ObservationIgnored @Dependency(\.getMovieTrailerIdUseCase) private var getMovieTrailerIdUseCase

@@ -10,7 +10,7 @@ struct CreateBookmarksCategoryUseCase {
 }
 
 extension CreateBookmarksCategoryUseCase: DependencyKey {
-    static var liveValue = Self()
+    static let liveValue = Self()
 }
 
 extension DependencyValues {

@@ -33,13 +33,13 @@ private struct PeriodicTimePublisher: Publisher {
     }
 }
 
-private final class PeriodicTimeSubscription<S: Subscriber>: Subscription where S.Input == CMTime, S.Failure == Never {
-    private var subscriber: S?
+private final class PeriodicTimeSubscription: Subscription, @unchecked Sendable {
+    private var subscriber: AnySubscriber<CMTime, Never>?
     private weak var player: AVPlayer?
     private var observer: Any?
 
-    init(subscriber: S, player: AVPlayer, interval: CMTime, queue: DispatchQueue?) {
-        self.subscriber = subscriber
+    init(subscriber: some Subscriber<CMTime, Never>, player: AVPlayer, interval: CMTime, queue: DispatchQueue?) {
+        self.subscriber = AnySubscriber(subscriber)
         self.player = player
 
         observer = player.addPeriodicTimeObserver(forInterval: interval, queue: queue) { [weak self] time in

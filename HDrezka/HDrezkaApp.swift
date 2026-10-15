@@ -10,8 +10,9 @@ import SQLiteData
 import SwiftUI
 import UserNotifications
 
+@MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
-    private let updateNotificationIdentifier = "UpdateCheck".base64Decoded
+    private nonisolated let updateNotificationIdentifier = "UpdateCheck".base64Decoded
     var updaterController: SPUStandardUpdaterController!
 
     override init() {
@@ -60,20 +61,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 }
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
-    func userNotificationCenter(_: UNUserNotificationCenter, willPresent _: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    nonisolated func userNotificationCenter(_: UNUserNotificationCenter, willPresent _: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.list, .banner, .sound, .badge])
     }
 
-    func userNotificationCenter(_: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+    nonisolated func userNotificationCenter(_: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         if response.notification.request.identifier == updateNotificationIdentifier, response.actionIdentifier == UNNotificationDefaultActionIdentifier {
-            updaterController.checkForUpdates(nil)
+            Task { @MainActor in
+                updaterController.checkForUpdates(nil)
+            }
         } else {
             let userInfo = response.notification.request.content.userInfo
 
             switch response.actionIdentifier {
             case "cancel":
                 if let gid = userInfo["gid"] as? String {
-                    Downloader.shared.remove(gid)
+                    Task { @MainActor in
+                        Downloader.shared.remove(gid)
+                    }
                 }
             case "open":
                 if let url = userInfo["url"] as? String, let fileUrl = URL(string: url), fileUrl.isFileURL {
@@ -81,7 +86,9 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                 }
             case "retry":
                 if let retryData = userInfo["data"] as? Data, let data = try? JSONDecoder().decode(DownloadData.self, from: retryData) {
-                    Downloader.shared.download(data)
+                    Task { @MainActor in
+                        Downloader.shared.download(data)
+                    }
                 }
             case "need_premium":
                 NSWorkspace.shared.open((!Defaults.Keys.mirror.isDefaultValue ? Defaults[.mirror] : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
@@ -95,17 +102,19 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
 }
 
 extension AppDelegate: SPUUpdaterDelegate, SPUStandardUserDriverDelegate {
-    func updater(_: SPUUpdater, willScheduleUpdateCheckAfterDelay _: TimeInterval) {
+    nonisolated func updater(_: SPUUpdater, willScheduleUpdateCheckAfterDelay _: TimeInterval) {
         UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound]) { _, _ in }
     }
 
-    var supportsGentleScheduledUpdateReminders: Bool {
+    nonisolated var supportsGentleScheduledUpdateReminders: Bool {
         true
     }
 
-    func standardUserDriverWillHandleShowingUpdate(_: Bool, forUpdate update: SUAppcastItem, state: SPUUserUpdateState) {
+    nonisolated func standardUserDriverWillHandleShowingUpdate(_: Bool, forUpdate update: SUAppcastItem, state: SPUUserUpdateState) {
         if !state.userInitiated {
-            NSApp.dockTile.badgeLabel = "1"
+            Task { @MainActor in
+                NSApp.dockTile.badgeLabel = "1"
+            }
 
             let content = UNMutableNotificationContent()
             content.title = String(localized: "key.update")
@@ -117,8 +126,10 @@ extension AppDelegate: SPUUpdaterDelegate, SPUStandardUserDriverDelegate {
         }
     }
 
-    func standardUserDriverDidReceiveUserAttention(forUpdate _: SUAppcastItem) {
-        NSApp.dockTile.badgeLabel = ""
+    nonisolated func standardUserDriverDidReceiveUserAttention(forUpdate _: SUAppcastItem) {
+        Task { @MainActor in
+            NSApp.dockTile.badgeLabel = ""
+        }
 
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [updateNotificationIdentifier])
     }

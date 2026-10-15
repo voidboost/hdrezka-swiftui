@@ -10,7 +10,7 @@ struct ToggleLikeCommentUseCase {
 }
 
 extension ToggleLikeCommentUseCase: DependencyKey {
-    static var liveValue = Self()
+    static let liveValue = Self()
 }
 
 extension DependencyValues {

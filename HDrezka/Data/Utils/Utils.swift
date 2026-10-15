@@ -139,13 +139,13 @@ extension Optional {
 }
 
 class AttributedTextStyle {
-    private static let regularFont = NSFont.systemFont(ofSize: 13)
-    private static let boldFont = NSFontManager.shared.convert(regularFont, toHaveTrait: .boldFontMask)
-    private static let italicFont = NSFontManager.shared.convert(regularFont, toHaveTrait: .italicFontMask)
-    private static let boldItalicFont = NSFontManager.shared.convert(boldFont, toHaveTrait: .italicFontMask)
+    nonisolated(unsafe) private static let regularFont = NSFont.systemFont(ofSize: 13)
+    nonisolated(unsafe) private static let boldFont = NSFontManager.shared.convert(regularFont, toHaveTrait: .boldFontMask)
+    nonisolated(unsafe) private static let italicFont = NSFontManager.shared.convert(regularFont, toHaveTrait: .italicFontMask)
+    nonisolated(unsafe) private static let boldItalicFont = NSFontManager.shared.convert(boldFont, toHaveTrait: .italicFontMask)
     private static let linkColor = NSColor(Color.accentColor)
 
-    private static let paragraphStyle: NSParagraphStyle = {
+    nonisolated(unsafe) private static let paragraphStyle: NSParagraphStyle = {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .left
         paragraphStyle.lineBreakMode = .byWordWrapping
@@ -219,7 +219,7 @@ private extension Publisher {
         } else if let afError = error.asAFError {
             if afError.responseCode != nil || afError.isSessionTaskError {
                 if let code = afError.responseCode, code == 403 {
-                    AppState.shared.isSignInPresented = true
+                    AppState.presentSignIn()
 
                     return HDrezkaError.loginRequired(Defaults[.mirror])
                 }
@@ -234,7 +234,7 @@ private extension Publisher {
             if case .mirrorBanned = hdrezkaError {
                 return hdrezkaError
             } else if case .loginRequired = hdrezkaError {
-                AppState.shared.isSignInPresented = true
+                AppState.presentSignIn()
 
                 return hdrezkaError
             } else if case .site = hdrezkaError {

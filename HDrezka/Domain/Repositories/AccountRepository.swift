@@ -1,7 +1,7 @@
 import Combine
 import Dependencies
 
-protocol AccountRepository {
+protocol AccountRepository: Sendable {
     func signIn(login: String, password: String) -> AnyPublisher<Void, Error>
 
     func signUp(email: String, login: String, password: String, verifyCode: String, step: Int) -> AnyPublisher<Void, Error>
@@ -46,7 +46,7 @@ protocol AccountRepository {
 }
 
 private enum AccountRepositoryKey: DependencyKey {
-    static var liveValue: any AccountRepository = AccountRepositoryImpl()
+    static let liveValue: any AccountRepository = AccountRepositoryImpl()
 }
 
 extension DependencyValues {

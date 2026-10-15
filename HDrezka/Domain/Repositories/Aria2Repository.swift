@@ -1,14 +1,14 @@
 import Combine
 import Dependencies
 
-protocol Aria2Repository {
-    func call<D: Decodable>(data: some Encodable) -> AnyPublisher<Aria2Response<D>, Error>
+protocol Aria2Repository: Sendable {
+    func call<D: Decodable & Sendable>(data: some Encodable & Sendable) -> AnyPublisher<Aria2Response<D>, Error>
 
-    func multicall<D: Decodable>(data: [some Encodable]) -> AnyPublisher<[Aria2Response<D>], Error>
+    func multicall<D: Decodable & Sendable>(data: [some Encodable & Sendable]) -> AnyPublisher<[Aria2Response<D>], Error>
 }
 
 private enum Aria2RepositoryKey: DependencyKey {
-    static var liveValue: any Aria2Repository = Aria2RepositoryImpl()
+    static let liveValue: any Aria2Repository = Aria2RepositoryImpl()
 }
 
 extension DependencyValues {

@@ -10,7 +10,7 @@ struct GetWatchingNowMoviesByCountryUseCase {
 }
 
 extension GetWatchingNowMoviesByCountryUseCase: DependencyKey {
-    static var liveValue = Self()
+    static let liveValue = Self()
 }
 
 extension DependencyValues {

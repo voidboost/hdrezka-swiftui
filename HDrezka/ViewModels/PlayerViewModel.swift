@@ -8,6 +8,7 @@ import SQLiteData
 import SwiftUI
 
 @Observable
+@MainActor
 class PlayerViewModel {
     @ObservationIgnored @Dependency(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
     @ObservationIgnored @Dependency(\.getMovieThumbnailsUseCase) private var getMovieThumbnailsUseCase
@@ -47,10 +48,6 @@ class PlayerViewModel {
         self.quality = quality
 
         times = seasons != nil && season != nil && episode != nil ? [900, 1800, 2700, 3600, -1] : [900, 1800, 2700, 3600]
-    }
-
-    deinit {
-        resetPlayer()
     }
 
     var isSeries: Bool {
@@ -247,17 +244,19 @@ class PlayerViewModel {
                             }
                         }
 
-                        currentItem.asset.loadMediaSelectionGroup(for: .legible) { [weak self] mediaSelectionGroup, _ in
-                            guard let self else { return }
+                        Task { @MainActor [weak self] in
+                            guard let mediaSelectionGroup = try? await currentItem.asset.loadMediaSelectionGroup(for: .legible),
+                                  let self
+                            else {
+                                return
+                            }
 
-                            if let mediaSelectionGroup {
-                                currentItem.select(mediaSelectionGroup.options.filter { $0.extendedLanguageTag != nil }.first(where: { $0.extendedLanguageTag == subtitles }), in: mediaSelectionGroup)
+                            currentItem.select(mediaSelectionGroup.options.filter { $0.extendedLanguageTag != nil }.first(where: { $0.extendedLanguageTag == subtitles }), in: mediaSelectionGroup)
 
-                                withAnimation(.easeInOut(duration: 0.15)) {
-                                    self.subtitlesOptions = mediaSelectionGroup.options.filter { $0.extendedLanguageTag != nil }
-                                } completion: {
-                                    self.subtitles = subtitles
-                                }
+                            withAnimation(.easeInOut(duration: 0.15)) {
+                                self.subtitlesOptions = mediaSelectionGroup.options.filter { $0.extendedLanguageTag != nil }
+                            } completion: {
+                                self.subtitles = subtitles
                             }
                         }
 
@@ -287,15 +286,7 @@ class PlayerViewModel {
                             self.remoteCommandCenter.previousTrackCommand.addTarget { [weak self] _ in
                                 guard let self else { return .commandFailed }
 
-                                player.seek(to: CMTime(seconds: max(self.currentTime - 10.0, 0.0), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] complete in
-                                    guard let self else { return }
-
-                                    if self.isPlaying, complete {
-                                        player.playImmediately(atRate: self.rate)
-                                    }
-                                }
-
-                                self.currentTime = max(self.currentTime - 10.0, 0.0)
+                                self.skip(player, by: -10.0)
 
                                 return .success
                             }
@@ -303,15 +294,7 @@ class PlayerViewModel {
                             self.remoteCommandCenter.nextTrackCommand.addTarget { [weak self] _ in
                                 guard let self else { return .commandFailed }
 
-                                player.seek(to: CMTime(seconds: min(self.currentTime + 10.0, self.duration), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] complete in
-                                    guard let self else { return }
-
-                                    if self.isPlaying, complete {
-                                        player.playImmediately(atRate: self.rate)
-                                    }
-                                }
-
-                                self.currentTime = min(self.currentTime + 10.0, self.duration)
+                                self.skip(player, by: 10.0)
 
                                 return .success
                             }
@@ -323,12 +306,12 @@ class PlayerViewModel {
                         self.updateNextTimer()
 
                         if let seek {
-                            player.seek(to: seek, toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] _ in
-                                guard let self else { return }
+                            Task { [weak self] in
+                                _ = await player.seek(to: seek, toleranceBefore: .zero, toleranceAfter: .zero)
 
-                                if playing {
-                                    player.playImmediately(atRate: self.rate)
-                                }
+                                guard let self, playing else { return }
+
+                                player.playImmediately(atRate: self.rate)
                             }
                         } else {
                             Task { @MainActor [weak self] in
@@ -432,9 +415,9 @@ class PlayerViewModel {
                 .store(in: &subscriptions)
 
             player.publisher(for: \.error)
+                .receive(on: DispatchQueue.main)
                 .compactMap(\.self)
                 .handleError()
-                .receive(on: DispatchQueue.main)
                 .sink { [weak self] error in
                     guard let self else { return }
 
@@ -449,9 +432,9 @@ class PlayerViewModel {
                 .store(in: &subscriptions)
 
             currentItem.publisher(for: \.duration)
+                .receive(on: DispatchQueue.main)
                 .compactMap(\.self)
                 .filter { $0.isValid && !$0.isIndefinite && !$0.isNegativeInfinity && !$0.isPositiveInfinity && $0.seconds > 0 }
-                .receive(on: DispatchQueue.main)
                 .sink { [weak self] duration in
                     guard let self else { return }
 
@@ -464,18 +447,18 @@ class PlayerViewModel {
                 .store(in: &subscriptions)
 
             currentItem.publisher(for: \.loadedTimeRanges)
+                .receive(on: DispatchQueue.main)
                 .compactMap { $0 as? [CMTimeRange] }
                 .removeDuplicates()
-                .receive(on: DispatchQueue.main)
                 .sink { [weak self] loadedTimeRanges in
                     self?.loadedTimeRanges = loadedTimeRanges
                 }
                 .store(in: &subscriptions)
 
             currentItem.publisher(for: \.error)
+                .receive(on: DispatchQueue.main)
                 .compactMap(\.self)
                 .handleError()
-                .receive(on: DispatchQueue.main)
                 .sink { [weak self] error in
                     guard let self else { return }
 
@@ -494,7 +477,9 @@ class PlayerViewModel {
                 .sink { [weak self] _ in
                     guard let self else { return }
 
-                    player.seek(to: CMTime(seconds: 0, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] _ in
+                    Task { [weak self] in
+                        _ = await player.seek(to: .zero, toleranceBefore: .zero, toleranceAfter: .zero)
+
                         guard let self else { return }
 
                         if self.isPictureInPictureActive, let pipController = self.pipController {
@@ -509,9 +494,9 @@ class PlayerViewModel {
                 .store(in: &subscriptions)
 
             notificationCenter.publisher(for: AVPlayerItem.failedToPlayToEndTimeNotification, object: currentItem)
+                .receive(on: DispatchQueue.main)
                 .compactMap { $0.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? Error }
                 .handleError()
-                .receive(on: DispatchQueue.main)
                 .sink { [weak self] error in
                     guard let self else { return }
 
@@ -702,15 +687,7 @@ class PlayerViewModel {
                         self.remoteCommandCenter.previousTrackCommand.addTarget { [weak self] _ in
                             guard let self else { return .commandFailed }
 
-                            player.seek(to: CMTime(seconds: max(self.currentTime - 10.0, 0.0), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] complete in
-                                guard let self else { return }
-
-                                if self.isPlaying, complete {
-                                    player.playImmediately(atRate: self.rate)
-                                }
-                            }
-
-                            self.currentTime = max(self.currentTime - 10.0, 0.0)
+                            self.skip(player, by: -10.0)
 
                             return .success
                         }
@@ -718,15 +695,7 @@ class PlayerViewModel {
                         self.remoteCommandCenter.nextTrackCommand.addTarget { [weak self] _ in
                             guard let self else { return .commandFailed }
 
-                            player.seek(to: CMTime(seconds: min(self.currentTime + 10.0, self.duration), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] complete in
-                                guard let self else { return }
-
-                                if self.isPlaying, complete {
-                                    player.playImmediately(atRate: self.rate)
-                                }
-                            }
-
-                            self.currentTime = min(self.currentTime + 10.0, self.duration)
+                            self.skip(player, by: 10.0)
 
                             return .success
                         }
@@ -750,10 +719,10 @@ class PlayerViewModel {
             }
 
             if let url = URL(string: poster) {
-                KingfisherManager.shared.retrieveImage(with: url) { [weak self] result in
-                    if case let .success(value) = result {
-                        self?.nowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: value.image.size) { _ in value.image }
-                    }
+                Task { [weak self] in
+                    guard let image = try? await KingfisherManager.shared.retrieveImage(with: url).image else { return }
+
+                    self?.nowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyArtwork] = Self.artwork(image)
                 }
             }
 
@@ -790,13 +759,7 @@ class PlayerViewModel {
                     return .commandFailed
                 }
 
-                player.seek(to: CMTime(seconds: effectiveEvent.positionTime, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] success in
-                    guard let self else { return }
-
-                    if success {
-                        self.updateNextTimer()
-                    }
-                }
+                self.seek(player, to: effectiveEvent.positionTime)
 
                 return .success
             }
@@ -825,15 +788,7 @@ class PlayerViewModel {
                     return .commandFailed
                 }
 
-                player.seek(to: CMTime(seconds: max(self.currentTime - event.interval, 0.0), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] complete in
-                    guard let self else { return }
-
-                    if self.isPlaying, complete {
-                        player.playImmediately(atRate: self.rate)
-                    }
-                }
-
-                self.currentTime = max(self.currentTime - event.interval, 0.0)
+                self.skip(player, by: -event.interval)
 
                 return .success
             }
@@ -845,15 +800,7 @@ class PlayerViewModel {
                     return .commandFailed
                 }
 
-                player.seek(to: CMTime(seconds: min(self.currentTime + event.interval, self.duration), preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] complete in
-                    guard let self else { return }
-
-                    if self.isPlaying, complete {
-                        player.playImmediately(atRate: self.rate)
-                    }
-                }
-
-                self.currentTime = min(self.currentTime + event.interval, self.duration)
+                self.skip(player, by: event.interval)
 
                 return .success
             }
@@ -891,6 +838,31 @@ class PlayerViewModel {
                 self.pipController = pipController
             }
         }
+    }
+
+    func skip(_ player: AVPlayer, by interval: Double) {
+        let target = min(max(currentTime + interval, 0.0), duration)
+
+        Task {
+            if await player.seek(to: CMTime(seconds: target, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero), isPlaying {
+                player.playImmediately(atRate: rate)
+            }
+        }
+
+        currentTime = target
+    }
+
+    func seek(_ player: AVPlayer, to seconds: Double) {
+        Task {
+            if await player.seek(to: CMTime(seconds: seconds, preferredTimescale: CMTimeScale(NSEC_PER_SEC)), toleranceBefore: .zero, toleranceAfter: .zero) {
+                updateNextTimer()
+            }
+        }
+    }
+
+    // MediaPlayer calls the request handler on its own queue, so it must not inherit main actor isolation.
+    private nonisolated static func artwork(_ image: NSImage) -> MPMediaItemArtwork {
+        MPMediaItemArtwork(boundsSize: image.size) { _ in image }
     }
 
     func resetPlayer(completion: (() -> Void)? = nil) {

@@ -10,7 +10,7 @@ struct ReportCommentUseCase {
 }
 
 extension ReportCommentUseCase: DependencyKey {
-    static var liveValue = Self()
+    static let liveValue = Self()
 }
 
 extension DependencyValues {

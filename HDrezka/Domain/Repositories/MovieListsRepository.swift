@@ -1,7 +1,7 @@
 import Combine
 import Dependencies
 
-protocol MovieListsRepository {
+protocol MovieListsRepository: Sendable {
     func getPopularMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
 
 //    func getFeaturedMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
@@ -40,7 +40,7 @@ protocol MovieListsRepository {
 }
 
 private enum MovieListsRepositoryKey: DependencyKey {
-    static var liveValue: any MovieListsRepository = MovieListsRepositoryImpl()
+    static let liveValue: any MovieListsRepository = MovieListsRepositoryImpl()
 }
 
 extension DependencyValues {

@@ -10,7 +10,7 @@ struct GetMovieBookmarksUseCase {
 }
 
 extension GetMovieBookmarksUseCase: DependencyKey {
-    static var liveValue = Self()
+    static let liveValue = Self()
 }
 
 extension DependencyValues {
