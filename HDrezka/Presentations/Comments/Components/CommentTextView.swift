@@ -3,16 +3,14 @@ import SwiftUI
 struct CommentTextView: View {
     private let text: AttributedString
 
-    @State private var spoilers: [Comment.Spoiler]
-
+    @State private var revealed: Set<UUID> = []
     @State private var revealing: [UUID: Date] = [:]
     @State private var isVisible = true
 
     @Environment(CommentsViewModel.self) private var viewModel
 
-    init(text: AttributedString, spoilers: [Comment.Spoiler]) {
+    init(text: AttributedString) {
         self.text = text
-        self.spoilers = spoilers
     }
 
     var body: some View {
@@ -47,12 +45,12 @@ struct CommentTextView: View {
 
     @ViewBuilder
     private var content: some View {
-        if spoilers.isEmpty {
+        if !hasHiddenSpoilers {
             Text(text)
         } else {
             let text = spoilerText
 
-            TimelineView(.animation(minimumInterval: 1 / 60, paused: !isVisible)) { timeline in
+            TimelineView(.animation(paused: !isVisible)) { timeline in
                 text.textRenderer(SpoilerTextRenderer(date: timeline.date))
             }
             .onScrollVisibilityChange { isVisible in
@@ -61,35 +59,29 @@ struct CommentTextView: View {
         }
     }
 
+    private var hasHiddenSpoilers: Bool {
+        text.runs[Comment.SpoilerKey.self].contains { id, _ in
+            id.map { !revealed.contains($0) } ?? false
+        }
+    }
+
     private var spoilerText: Text {
-        let source = text
-        var parts: [Text] = []
-        var cursor = source.startIndex
+        text.runs[Comment.SpoilerKey.self].reduce(Text(verbatim: "")) { result, run in
+            let (id, range) = run
+            var part = AttributedString(text[range])
 
-        for spoiler in spoilers {
-            guard let range = Range(spoiler.range, in: source), range.lowerBound >= cursor else { continue }
-
-            if cursor < range.lowerBound {
-                parts.append(Text(AttributedString(source[cursor ..< range.lowerBound])))
+            guard let id, !revealed.contains(id) else {
+                return result + Text(part)
             }
 
-            var hidden = AttributedString(source[range])
-            let revealDate = revealing[spoiler.id]
+            let revealDate = revealing[id]
 
             if revealDate == nil {
-                hidden.link = URL(string: "\(Self.spoilerScheme):\(spoiler.id.uuidString)")
+                part.link = URL(string: "\(Self.spoilerScheme):\(id.uuidString)")
             }
 
-            parts.append(Text(hidden).customAttribute(SpoilerAttribute(id: spoiler.id, revealDate: revealDate)))
-
-            cursor = range.upperBound
+            return result + Text(part).customAttribute(SpoilerAttribute(id: id, revealDate: revealDate))
         }
-
-        if cursor < source.endIndex {
-            parts.append(Text(AttributedString(source[cursor ..< source.endIndex])))
-        }
-
-        return parts.reduce(Text(verbatim: ""), +)
     }
 
     private func reveal(_ id: UUID) {
@@ -100,7 +92,7 @@ struct CommentTextView: View {
         Task {
             try? await Task.sleep(for: .seconds(SpoilerTextRenderer.revealDuration))
 
-            spoilers.removeAll { $0.id == id }
+            revealed.insert(id)
             revealing[id] = nil
         }
     }

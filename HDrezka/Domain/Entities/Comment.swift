@@ -1,12 +1,11 @@
 import SwiftUI
 
-struct Comment: Identifiable, Hashable, Codable {
+struct Comment: Identifiable, Hashable {
     let commentId: String
     let date: String
     let author: String
     let photo: String
     let text: AttributedString
-    let spoilers: [Spoiler]
     private(set) var replies: [Comment]
     private(set) var likesCount: Int
     private(set) var isLiked: Bool
@@ -15,13 +14,12 @@ struct Comment: Identifiable, Hashable, Codable {
     let deleteHash: String?
     let id: UUID
 
-    init(commentId: String, date: String, author: String, photo: String, text: AttributedString, spoilers: [Spoiler], replies: [Comment], likesCount: Int, isLiked: Bool, selfComment: Bool, isAdmin: Bool, deleteHash: String?, id: UUID = .init()) {
+    init(commentId: String, date: String, author: String, photo: String, text: AttributedString, replies: [Comment], likesCount: Int, isLiked: Bool, selfComment: Bool, isAdmin: Bool, deleteHash: String?, id: UUID = .init()) {
         self.commentId = commentId
         self.date = date
         self.author = author
         self.photo = photo
         self.text = text
-        self.spoilers = spoilers
         self.replies = replies
         self.likesCount = likesCount
         self.isLiked = isLiked
@@ -79,21 +77,10 @@ struct Comment: Identifiable, Hashable, Codable {
 }
 
 extension Comment {
-    enum TextStyles: Hashable {
-        case bold
-        case italic
-        case underline
-        case strikethrough
-        case link(String)
-    }
+    /// Marks text hidden under a spoiler; every spoiler gets its own id.
+    enum SpoilerKey: AttributedStringKey {
+        typealias Value = UUID
 
-    struct Spoiler: Identifiable, Hashable, Codable {
-        let range: NSRange
-        let id: UUID
-
-        init(range: NSRange, id: UUID = .init()) {
-            self.range = range
-            self.id = id
-        }
+        static let name = "io.silentsea.hdrezka.spoiler"
     }
 }

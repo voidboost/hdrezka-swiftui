@@ -39,7 +39,7 @@ struct CommentView: View {
                         .foregroundColor(.secondary)
                 }
 
-                CommentTextView(text: comment.text, spoilers: comment.spoilers)
+                CommentTextView(text: comment.text)
 
                 HStack(alignment: .center, spacing: 8) {
                     CommentLikeButton(comment: comment)

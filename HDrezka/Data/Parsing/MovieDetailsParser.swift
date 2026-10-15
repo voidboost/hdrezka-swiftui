@@ -318,77 +318,46 @@ private extension Element {
         )
     }
 
-    func getComment() throws -> (AttributedString, [Comment.Spoiler]) {
+    func getComment() throws -> AttributedString {
         try select(".title_spoiler").remove()
 
         for br in try select("br") {
             try br.replaceWith(TextNode("\n", nil))
         }
 
-        let commentText: NSMutableAttributedString = .init()
-        var spoilers: [Comment.Spoiler] = []
+        var commentText = AttributedString()
 
-        func processElement(_ element: Element, _ styles: Set<Comment.TextStyles> = .init()) throws {
-            var styles: Set<Comment.TextStyles> = styles
+        func append(_ text: String, _ attributes: AttributeContainer = .init()) {
+            commentText.append(AttributedString(text, attributes: attributes))
+        }
+
+        func processElement(_ element: Element, _ attributes: AttributeContainer = .init()) throws {
+            var attributes = attributes
 
             switch element.tagName() {
             case "b":
-                styles.insert(.bold)
+                attributes.inlinePresentationIntent = (attributes.inlinePresentationIntent ?? []).union(.stronglyEmphasized)
             case "i":
-                styles.insert(.italic)
+                attributes.inlinePresentationIntent = (attributes.inlinePresentationIntent ?? []).union(.emphasized)
             case "u":
-                styles.insert(.underline)
+                attributes.swiftUI.underlineStyle = .single
             case "s":
-                styles.insert(.strikethrough)
+                attributes.swiftUI.strikethroughStyle = .single
             case "a":
-                try styles.insert(.link(element.attr("href")))
+                attributes.link = try URL(string: element.attr("href").replacingMirrorHost)
             case "div" where element.hasClass("text_spoiler"):
-                try spoilers.append(.init(range: .init(location: commentText.length, length: element.text(trimAndNormaliseWhitespace: false).utf16.count)))
+                attributes[Comment.SpoilerKey.self] = UUID()
             default:
                 break
             }
 
             for child in element.getChildNodes() {
                 if let childElement = child as? Element {
-                    try processElement(childElement, styles)
+                    try processElement(childElement, attributes)
                 } else if let childTextNode = child as? TextNode {
-                    let text: String = if case .link = styles.first(where: {
-                        if case .link = $0 {
-                            true
-                        } else {
-                            false
-                        }
-                    }), let url = URL(string: childTextNode.getWholeText()), let host = url.host(), Const.mirror.host() == host, let redirectHost = Const.redirectMirror.host() {
-                        childTextNode.getWholeText().replacingOccurrences(of: host, with: redirectHost)
-                    } else {
-                        childTextNode.getWholeText()
-                    }
+                    let text = childTextNode.getWholeText()
 
-                    commentText.append(string: text) {
-                        let link: String? = if case let .link(link) = styles.first(where: {
-                            if case .link = $0 {
-                                true
-                            } else {
-                                false
-                            }
-                        }), let url = URL(string: link) {
-                            if let host = url.host(), Const.mirror.host() == host, let redirectHost = Const.redirectMirror.host() {
-                                link.replacingOccurrences(of: host, with: redirectHost)
-                            } else {
-                                link
-                            }
-                        } else {
-                            nil
-                        }
-
-                        $0.font(
-                            bold: styles.contains(.bold),
-                            italic: styles.contains(.italic),
-                            underline: styles.contains(.underline),
-                            strikethrough: styles.contains(.strikethrough),
-                            link: link,
-                        )
-                    }
+                    append(attributes.link != nil ? text.replacingMirrorHost : text, attributes)
                 }
             }
         }
@@ -397,24 +366,21 @@ private extension Element {
             if let element = child as? Element {
                 try processElement(element)
             } else if let textNode = child as? TextNode {
-                commentText.append(string: textNode.getWholeText()) { $0.font() }
+                append(textNode.getWholeText())
             }
         }
 
-        return (AttributedString(commentText), spoilers)
+        return commentText
     }
 
     func getComments(depth: Int = 0) throws -> [Comment] {
         try select(".comments-tree-item[data-indent=\"\(depth)\"]").map {
-            let (text, spoilers) = try $0.select(".text").first().orThrow().getComment()
-
-            return try Comment(
+            try Comment(
                 commentId: $0.attr("data-id"),
                 date: $0.select(".date").first().orThrow().text().replacingOccurrences(of: "оставлен ", with: ""),
                 author: $0.select(".name").first().orThrow().text(),
                 photo: $0.select("img").first().orThrow().attr("src"),
-                text: text,
-                spoilers: spoilers,
+                text: $0.select(".text").first().orThrow().getComment(),
                 replies: $0.getComments(depth: depth + 1),
                 likesCount: Int($0.select(".b-comment__like_it").first()?.attr("data-likes_num") ?? "0").orThrow(),
                 isLiked: $0.select(".b-comment__like_it").first()?.hasClass("disabled") == true,
@@ -834,5 +800,18 @@ private extension String {
         } else {
             self
         }
+    }
+}
+
+private extension String {
+    var replacingMirrorHost: String {
+        guard let host = URL(string: self)?.host(),
+              host == Const.mirror.host(),
+              let redirectHost = Const.redirectMirror.host()
+        else {
+            return self
+        }
+
+        return replacingOccurrences(of: host, with: redirectHost)
     }
 }
