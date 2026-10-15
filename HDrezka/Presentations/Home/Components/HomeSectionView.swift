@@ -45,7 +45,7 @@ struct HomeSectionView: View {
 }
 
 extension HomeSectionView: Equatable {
-    static func == (lhs: HomeSectionView, rhs: HomeSectionView) -> Bool {
+    nonisolated static func == (lhs: HomeSectionView, rhs: HomeSectionView) -> Bool {
         lhs.category.id == rhs.category.id
     }
 }

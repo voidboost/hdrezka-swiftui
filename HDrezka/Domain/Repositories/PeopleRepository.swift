@@ -1,12 +1,12 @@
 import Combine
 import Dependencies
 
-protocol PeopleRepository {
+protocol PeopleRepository: Sendable {
     func getPersonDetails(id: String) -> AnyPublisher<PersonDetailed, Error>
 }
 
 private enum PeopleRepositoryKey: DependencyKey {
-    static var liveValue: any PeopleRepository = PeopleRepositoryImpl()
+    static let liveValue: any PeopleRepository = PeopleRepositoryImpl()
 }
 
 extension DependencyValues {

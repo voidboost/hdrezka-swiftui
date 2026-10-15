@@ -10,7 +10,7 @@ struct MoveBetweenBookmarksUseCase {
 }
 
 extension MoveBetweenBookmarksUseCase: DependencyKey {
-    static var liveValue = Self()
+    static let liveValue = Self()
 }
 
 extension DependencyValues {

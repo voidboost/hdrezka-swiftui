@@ -4,6 +4,7 @@ import Dependencies
 import Foundation
 
 @Observable
+@MainActor
 class CookiesManager {
     @ObservationIgnored static let shared = CookiesManager()
 
@@ -17,9 +18,9 @@ class CookiesManager {
 
     private func observe() {
         notificationCenter.publisher(for: .NSHTTPCookieManagerCookiesChanged, object: HTTPCookieStorage.shared)
+            .receive(on: DispatchQueue.main)
             .compactMap { $0.object as? HTTPCookieStorage }
             .compactMap { $0.cookies(for: Defaults[.mirror]) }
-            .receive(on: DispatchQueue.main)
             .sink { cookies in
                 if cookies.contains(where: { $0.name == "dle_user_id" }),
                    cookies.contains(where: { $0.name == "dle_password" })

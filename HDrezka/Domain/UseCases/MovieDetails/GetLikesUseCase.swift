@@ -10,7 +10,7 @@ struct GetLikesUseCase {
 }
 
 extension GetLikesUseCase: DependencyKey {
-    static var liveValue = Self()
+    static let liveValue = Self()
 }
 
 extension DependencyValues {

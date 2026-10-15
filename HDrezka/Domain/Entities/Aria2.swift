@@ -330,3 +330,11 @@ enum Aria2Method: String, Encodable {
     case removeDownloadResult = "aria2.removeDownloadResult"
     case getGlobalStat = "aria2.getGlobalStat"
 }
+
+extension Aria2Request: Sendable where E: Sendable {}
+
+extension Aria2Response: Sendable where D: Sendable {}
+
+extension AddUriParams: Sendable where E: Sendable {}
+
+extension OptionsParams: Sendable where E: Sendable {}

@@ -1,7 +1,7 @@
 import Combine
 import Dependencies
 
-protocol CollectionsRepository {
+protocol CollectionsRepository: Sendable {
     func getCollections(page: Int) -> AnyPublisher<[MoviesCollection], Error>
 
     func getWatchingNowMoviesInCollection(collectionId: String, page: Int) -> AnyPublisher<[MovieSimple], Error>
@@ -14,7 +14,7 @@ protocol CollectionsRepository {
 }
 
 private enum CollectionsRepositoryKey: DependencyKey {
-    static var liveValue: any CollectionsRepository = CollectionsRepositoryImpl()
+    static let liveValue: any CollectionsRepository = CollectionsRepositoryImpl()
 }
 
 extension DependencyValues {

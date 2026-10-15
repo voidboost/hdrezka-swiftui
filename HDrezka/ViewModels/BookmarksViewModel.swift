@@ -3,6 +3,7 @@ import Dependencies
 import SwiftUI
 
 @Observable
+@MainActor
 class BookmarksViewModel {
     @ObservationIgnored @Dependency(\.getBookmarksUseCase) private var getBookmarksUseCase
     @ObservationIgnored @Dependency(\.getBookmarksByCategoryAddedUseCase) private var getBookmarksByCategoryAddedUseCase

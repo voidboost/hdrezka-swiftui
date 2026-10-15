@@ -89,7 +89,7 @@ extension AccountService: URLRequestConvertible {
         case let .restore(login):
             return try URLEncoding.httpBody.encode(URLEncoding.queryString.encode(request, with: ["do": "lostpassword"]), with: ["lostname": login, "sumbit": 1, "submit_lost": "submit_lost"])
         case let .sendWatching(postId, translatorId, season, episode, currentTime, duration):
-            var params: [String: Any] = [:]
+            var params: Parameters = [:]
             params["post_id"] = postId
             params["translator_id"] = translatorId
             params["season"] = season ?? "0"
@@ -103,7 +103,7 @@ extension AccountService: URLRequestConvertible {
         case let .removeWatchingItem(id):
             return try URLEncoding.httpBody.encode(request, with: ["id": id])
         case let .getBookmarksByCategory(_, filter, genre, _):
-            var params: [String: Any] = [:]
+            var params: Parameters = [:]
             params["filter"] = filter
             if genre != 0 {
                 params["genre"] = genre

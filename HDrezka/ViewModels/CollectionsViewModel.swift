@@ -3,6 +3,7 @@ import Dependencies
 import SwiftUI
 
 @Observable
+@MainActor
 class CollectionsViewModel {
     @ObservationIgnored @Dependency(\.getCollectionsUseCase) private var getCollectionsUseCase
 

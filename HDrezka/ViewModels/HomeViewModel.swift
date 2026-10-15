@@ -3,6 +3,7 @@ import Dependencies
 import SwiftUI
 
 @Observable
+@MainActor
 class HomeViewModel {
     @ObservationIgnored @Dependency(\.getHotMoviesUseCase) private var getHotMoviesUseCase
 //    @ObservationIgnored @Dependency(\.getFeaturedMoviesUseCase) private var getFeaturedMoviesUseCase

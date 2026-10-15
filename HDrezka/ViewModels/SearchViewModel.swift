@@ -3,6 +3,7 @@ import Dependencies
 import SwiftUI
 
 @Observable
+@MainActor
 class SearchViewModel {
     @ObservationIgnored @Dependency(\.searchUseCase) private var searchUseCase
 

@@ -3,6 +3,7 @@ import Dependencies
 import SwiftUI
 
 @Observable
+@MainActor
 class PersonViewModel {
     @ObservationIgnored @Dependency(\.getPersonDetailsUseCase) private var getPersonDetailsUseCase
 

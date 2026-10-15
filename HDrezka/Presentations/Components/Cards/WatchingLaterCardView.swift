@@ -106,7 +106,7 @@ struct WatchingLaterCardView: View {
 }
 
 extension WatchingLaterCardView: Equatable {
-    static func == (lhs: WatchingLaterCardView, rhs: WatchingLaterCardView) -> Bool {
+    nonisolated static func == (lhs: WatchingLaterCardView, rhs: WatchingLaterCardView) -> Bool {
         lhs.movie.id == rhs.movie.id && lhs.movie.watched == rhs.movie.watched
     }
 }

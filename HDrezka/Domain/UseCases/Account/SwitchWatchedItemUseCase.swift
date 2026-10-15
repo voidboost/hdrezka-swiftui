@@ -10,7 +10,7 @@ struct SwitchWatchedItemUseCase {
 }
 
 extension SwitchWatchedItemUseCase: DependencyKey {
-    static var liveValue = Self()
+    static let liveValue = Self()
 }
 
 extension DependencyValues {

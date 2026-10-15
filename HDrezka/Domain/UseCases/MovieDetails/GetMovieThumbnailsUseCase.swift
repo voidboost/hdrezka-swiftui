@@ -10,7 +10,7 @@ struct GetMovieThumbnailsUseCase {
 }
 
 extension GetMovieThumbnailsUseCase: DependencyKey {
-    static var liveValue = Self()
+    static let liveValue = Self()
 }
 
 extension DependencyValues {

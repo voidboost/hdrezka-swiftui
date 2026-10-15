@@ -3,6 +3,7 @@ import Dependencies
 import SwiftUI
 
 @Observable
+@MainActor
 class CommentsViewModel {
     @ObservationIgnored @Dependency(\.getCommentsPageUseCase) private var getCommentsPageUseCase
     @ObservationIgnored @Dependency(\.getCommentUseCase) private var getCommentUseCase

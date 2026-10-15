@@ -1,7 +1,7 @@
 import Combine
 import Dependencies
 
-protocol MovieDetailsRepository {
+protocol MovieDetailsRepository: Sendable {
     func getMovieDetails(movieId: String) -> AnyPublisher<MovieDetailed, Error>
 
     func getMovieBookmarks(movieId: String) -> AnyPublisher<[Bookmark], Error>
@@ -32,7 +32,7 @@ protocol MovieDetailsRepository {
 }
 
 private enum MovieDetailsRepositoryKey: DependencyKey {
-    static var liveValue: any MovieDetailsRepository = MovieDetailsRepositoryImpl()
+    static let liveValue: any MovieDetailsRepository = MovieDetailsRepositoryImpl()
 }
 
 extension DependencyValues {

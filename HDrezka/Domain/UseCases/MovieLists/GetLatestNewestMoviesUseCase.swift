@@ -10,7 +10,7 @@ struct GetLatestNewestMoviesUseCase {
 }
 
 extension GetLatestNewestMoviesUseCase: DependencyKey {
-    static var liveValue = Self()
+    static let liveValue = Self()
 }
 
 extension DependencyValues {

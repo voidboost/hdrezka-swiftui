@@ -10,7 +10,7 @@ enum Windows: String, CaseIterable, Identifiable {
         rawValue
     }
 
-    var window: NSWindow? {
+    @MainActor var window: NSWindow? {
         NSApp.windows.first(where: { $0.identifier?.rawValue.localizedCaseInsensitiveContains(rawValue) ?? false })
     }
 }

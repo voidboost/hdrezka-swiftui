@@ -101,7 +101,7 @@ extension MovieDetailsService: URLRequestConvertible {
                 return request
             }
 
-            var params: [String: Any] = [:]
+            var params: Parameters = [:]
             params["id"] = voiceActing.voiceId
             params["translator_id"] = voiceActing.translatorId
             params["favs"] = favs
@@ -134,7 +134,7 @@ extension MovieDetailsService: URLRequestConvertible {
 
             return try URLEncoding.httpBody.encode(URLEncoding.queryString.encode(request, with: ["t": Int(Date().timeIntervalSince1970 * 1000)]), with: ["id": movieId, "translator_id": voiceActing.translatorId, "action": "get_episodes", "favs": favs])
         case let .getComments(movieId, page, type, commentId, skin):
-            var params: [String: Any] = [:]
+            var params: Parameters = [:]
             params["news_id"] = movieId
             params["cstart"] = page ?? 1
             params["t"] = Int(Date().timeIntervalSince1970 * 1000)
@@ -150,7 +150,7 @@ extension MovieDetailsService: URLRequestConvertible {
         case let .deleteComment(id, hash):
             return try URLEncoding.queryString.encode(request, with: ["id": id, "dle_allow_hash": hash, "type": 0, "area": "ajax"])
         case let .sendComment(id, postId, name, text, adb, type):
-            var params: [String: Any] = [:]
+            var params: Parameters = [:]
             params["parent"] = id ?? 0
             params["replyto_id"] = id
             params["post_id"] = postId

@@ -98,7 +98,7 @@ struct CommentView: View {
 }
 
 extension CommentView: Equatable {
-    static func == (lhs: CommentView, rhs: CommentView) -> Bool {
+    nonisolated static func == (lhs: CommentView, rhs: CommentView) -> Bool {
         lhs.comment == rhs.comment
     }
 }
