@@ -29,26 +29,20 @@ struct CardView: View {
                         .clipShape(.rect(cornerRadius: 6))
                         .overlay(alignment: .topTrailing) {
                             if let cat = movie.cat {
-                                if let rating = cat.rating {
-                                    let rating = Text(verbatim: "\(rating)").fontWeight(.medium)
-                                    let icon = Text(Image(systemName: cat.icon))
+                                let icon = Text(Image(systemName: cat.icon))
 
-                                    Text("key.cat-\(cat.title)-\(rating)-\(icon)")
-                                        .font(.caption)
-                                        .foregroundStyle(.white)
-                                        .padding(.vertical, 3)
-                                        .padding(.horizontal, 6)
-                                        .background(cat.color, in: .rect(bottomLeadingRadius: 6, topTrailingRadius: 6))
-                                } else {
-                                    let icon = Text(Image(systemName: cat.icon))
-
-                                    Text("key.cat-\(cat.title)-\(icon)")
-                                        .font(.caption)
-                                        .foregroundStyle(.white)
-                                        .padding(.vertical, 3)
-                                        .padding(.horizontal, 6)
-                                        .background(cat.color, in: .rect(bottomLeadingRadius: 6, topTrailingRadius: 6))
+                                Group {
+                                    if let rating = cat.rating {
+                                        Text("key.cat-\(cat.title)-\(Text(verbatim: "\(rating)").fontWeight(.medium))-\(icon)")
+                                    } else {
+                                        Text("key.cat-\(cat.title)-\(icon)")
+                                    }
                                 }
+                                .font(.caption)
+                                .foregroundStyle(.white)
+                                .padding(.vertical, 3)
+                                .padding(.horizontal, 6)
+                                .background(cat.color, in: .rect(bottomLeadingRadius: 6, topTrailingRadius: 6))
                             }
                         }
                         .overlay(alignment: .bottomLeading) {
