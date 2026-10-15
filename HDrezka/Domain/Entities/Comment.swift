@@ -77,7 +77,6 @@ struct Comment: Identifiable, Hashable {
 }
 
 extension Comment {
-    /// Marks text hidden under a spoiler; every spoiler gets its own id.
     enum SpoilerKey: AttributedStringKey {
         typealias Value = UUID
 

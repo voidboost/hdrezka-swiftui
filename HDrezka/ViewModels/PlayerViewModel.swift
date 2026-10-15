@@ -860,7 +860,6 @@ class PlayerViewModel {
         }
     }
 
-    // MediaPlayer calls the request handler on its own queue, so it must not inherit main actor isolation.
     private nonisolated static func artwork(_ image: NSImage) -> MPMediaItemArtwork {
         MPMediaItemArtwork(boundsSize: image.size) { _ in image }
     }
