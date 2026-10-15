@@ -5,7 +5,6 @@ import Defaults
 import FirebaseCrashlytics
 import Foundation
 import SwiftSoup
-import SwiftUI
 
 extension SwiftSoup.Document {
     func checker() throws -> SwiftSoup.Document {
@@ -135,64 +134,6 @@ extension Optional {
         }
 
         return self
-    }
-}
-
-class AttributedTextStyle {
-    nonisolated(unsafe) private static let regularFont = NSFont.systemFont(ofSize: 13)
-    nonisolated(unsafe) private static let boldFont = NSFontManager.shared.convert(regularFont, toHaveTrait: .boldFontMask)
-    nonisolated(unsafe) private static let italicFont = NSFontManager.shared.convert(regularFont, toHaveTrait: .italicFontMask)
-    nonisolated(unsafe) private static let boldItalicFont = NSFontManager.shared.convert(boldFont, toHaveTrait: .italicFontMask)
-    private static let linkColor = NSColor(Color.accentColor)
-
-    nonisolated(unsafe) private static let paragraphStyle: NSParagraphStyle = {
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .left
-        paragraphStyle.lineBreakMode = .byWordWrapping
-        return paragraphStyle
-    }()
-
-    private(set) var attributes: [NSAttributedString.Key: Any] = [:]
-
-    func font(
-        bold: Bool = false,
-        italic: Bool = false,
-        underline: Bool = false,
-        strikethrough: Bool = false,
-        link: String? = nil
-    ) {
-        let font = switch (bold, italic) {
-        case (true, true): Self.boldItalicFont
-        case (true, false): Self.boldFont
-        case (false, true): Self.italicFont
-        case (false, false): Self.regularFont
-        }
-
-        attributes[.font] = font
-        attributes[.foregroundColor] = NSColor.labelColor
-
-        if underline {
-            attributes[.underlineStyle] = NSUnderlineStyle.single.rawValue
-        }
-
-        if strikethrough {
-            attributes[.strikethroughStyle] = NSUnderlineStyle.single.rawValue
-        }
-
-        if let link {
-            attributes[.link] = link
-            attributes[.foregroundColor] = Self.linkColor
-        }
-
-        attributes[.paragraphStyle] = Self.paragraphStyle
-    }
-}
-
-extension NSMutableAttributedString {
-    func append(string: String, _ styleConfigurationBlock: (AttributedTextStyle) -> Void) {
-        let style = AttributedTextStyle()
-        styleConfigurationBlock(style)
-        append(NSAttributedString(string: string, attributes: style.attributes))
     }
 }
 
