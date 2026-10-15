@@ -37,7 +37,7 @@ class Const {
         sysctlbyname("hw.model", nil, &size, nil, 0)
         var model = [CChar](repeating: 0, count: Int(size))
         sysctlbyname("hw.model", &model, &size, nil, 0)
-        let deviceModel = String(cString: model)
+        let deviceModel = String(utf8String: model) ?? "Unknown"
 
         return "\(appName)/\(appVersion)(\(appBundle)) (\(deviceModel); \(osName) \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion); \(Self.deviceUUID))"
     }
