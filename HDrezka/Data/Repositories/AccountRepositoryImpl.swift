@@ -13,16 +13,20 @@ struct AccountRepositoryImpl: AccountRepository {
             let success: Bool = try json.require("success")
 
             guard success else {
-                let message: String = try json.require("message")
+                if let message = try? json.require("message") as String, !message.isEmpty {
+                    let document = try SwiftSoup.parseHTML(
+                        message,
+                        Defaults[.mirror].absoluteString
+                    )
 
-                let document = try SwiftSoup.parseHTML(
-                    message,
-                    Defaults[.mirror].absoluteString,
-                )
+                    let messages = try document.select("ul").first()?.select("li").map { li in try li.text() } ?? fallback(message, document)
 
-                let messages = try document.select("ul").first()?.select("li").map { li in try li.text() } ?? fallback(message, document)
-
-                throw HDrezkaError.site(messages)
+                    throw HDrezkaError.site(messages)
+                } else if let messages = try? json.require("message") as [String: String], !messages.isEmpty {
+                    throw HDrezkaError.site(Array(messages.values))
+                } else {
+                    throw HDrezkaError.unknown
+                }
             }
         }
     }
