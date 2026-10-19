@@ -31,7 +31,7 @@ struct DetailsComponentView: View {
 
     @State private var trailer: YouTubePlayer?
 
-    @State private var blurHeght: CGFloat = .zero
+    @State private var headerHeight = DetailsHeaderHeight()
 
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.openWindow) private var openWindow
@@ -179,7 +179,7 @@ struct DetailsComponentView: View {
             .onGeometryChange(for: CGFloat.self) { geometry in
                 geometry.size.height
             } action: { height in
-                blurHeght = height
+                headerHeight.value = height
             }
 
             DetailsInfoColumnsView(details: details)
@@ -188,41 +188,7 @@ struct DetailsComponentView: View {
         .padding(.top, 18)
         .padding(.top, topSafeAreaInset)
         .background {
-            ZStack {
-                KFImage
-                    .url(URL(string: details.poster))
-                    .placeholder {
-                        Color.gray
-                    }
-                    .resizable()
-                    .loadTransition(.blurReplace(.downUp), animation: .bouncy)
-                    .cancelOnDisappear(true)
-                    .retry(NetworkRetryStrategy())
-                    .scaledToFill()
-                    .frame(maxWidth: .infinity)
-                    .frame(height: blurHeght)
-                    .clipShape(.rect)
-
-                Rectangle().fill(.ultraThickMaterial)
-
-                Rectangle()
-                    .fill(.background)
-                    .mask {
-                        LinearGradient(stops: [
-                            .init(color: .black.opacity(0.3), location: 0.9),
-                            .init(color: .black, location: 1.0),
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom)
-                    }
-            }
-            .viewModifier { view in
-                if #available(macOS 26, *) {
-                    view.backgroundExtensionEffect()
-                } else {
-                    view
-                }
-            }
+            DetailsBackdropView(poster: details.poster, height: headerHeight)
         }
 
         HStack(alignment: .center, spacing: 18) {
@@ -502,5 +468,54 @@ struct DetailsComponentView: View {
             ),
             isLoggingEnabled: isLoggingEnabled
         )
+    }
+}
+
+@Observable
+@MainActor
+private final class DetailsHeaderHeight {
+    var value: CGFloat = .zero
+}
+
+private struct DetailsBackdropView: View {
+    let poster: String
+    let height: DetailsHeaderHeight
+
+    var body: some View {
+        ZStack {
+            KFImage
+                .url(URL(string: poster))
+                .placeholder {
+                    Color.gray
+                }
+                .resizable()
+                .loadTransition(.blurReplace(.downUp), animation: .bouncy)
+                .cancelOnDisappear(true)
+                .retry(NetworkRetryStrategy())
+                .scaledToFill()
+                .frame(maxWidth: .infinity)
+                .frame(height: height.value)
+                .clipShape(.rect)
+
+            Rectangle().fill(.ultraThickMaterial)
+
+            Rectangle()
+                .fill(.background)
+                .mask {
+                    LinearGradient(stops: [
+                        .init(color: .black.opacity(0.3), location: 0.9),
+                        .init(color: .black, location: 1.0),
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom)
+                }
+        }
+        .viewModifier { view in
+            if #available(macOS 26, *) {
+                view.backgroundExtensionEffect()
+            } else {
+                view
+            }
+        }
     }
 }
