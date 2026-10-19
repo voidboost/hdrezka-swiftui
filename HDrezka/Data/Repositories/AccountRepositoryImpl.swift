@@ -8,20 +8,26 @@ import SwiftSoup
 struct AccountRepositoryImpl: AccountRepository {
     @Dependency(\.session) private var session
 
-    private func authorize(_ convertible: AccountService, function: String, fallback: @escaping (String, SwiftSoup.Document) throws -> [String]) -> AnyPublisher<Void, Error> {
+    private func authorize(_ convertible: AccountService, function: String) -> AnyPublisher<Void, Error> {
         session.json(convertible, function: function) { json in
             let success: Bool = try json.require("success")
 
             guard success else {
-                if let message = try? json.require("message") as String, !message.isEmpty {
-                    let document = try SwiftSoup.parseHTML(
+                if let message = try? json.require("message") as String,
+                   !message.isEmpty
+                {
+                    if let document = try? SwiftSoup.parseHTML(
                         message,
                         Defaults[.mirror].absoluteString
-                    )
+                    ) {
+                        if let messages = try? document.select("ul").first()?.select("li").map({ li in try li.text() }), !messages.isEmpty {
+                            throw HDrezkaError.site(messages)
+                        } else if let messages = try? document.text().split(whereSeparator: \.isNewline).map(String.init), !messages.isEmpty {
+                            throw HDrezkaError.site(messages)
+                        }
+                    }
 
-                    let messages = try document.select("ul").first()?.select("li").map { li in try li.text() } ?? fallback(message, document)
-
-                    throw HDrezkaError.site(messages)
+                    throw HDrezkaError.site(message.split(whereSeparator: \.isNewline).map(String.init))
                 } else if let messages = try? json.require("message") as [String: String], !messages.isEmpty {
                     throw HDrezkaError.site(Array(messages.values))
                 } else {
@@ -36,15 +42,11 @@ struct AccountRepositoryImpl: AccountRepository {
     }
 
     func signIn(login: String, password: String) -> AnyPublisher<Void, Error> {
-        authorize(.signIn(login: login, password: password), function: "signIn") { message, _ in
-            message.split(whereSeparator: \.isNewline).map(String.init)
-        }
+        authorize(.signIn(login: login, password: password), function: "signIn")
     }
 
     func signUp(email: String, login: String, password: String, verifyCode: String, step: Int) -> AnyPublisher<Void, Error> {
-        authorize(.signUp(email: email, login: login, password: password, verifyCode: verifyCode, step: step), function: "signUp") { _, document in
-            try document.text().split(whereSeparator: \.isNewline).map(String.init)
-        }
+        authorize(.signUp(email: email, login: login, password: password, verifyCode: verifyCode, step: step), function: "signUp")
     }
 
     func restore(login: String) -> AnyPublisher<String?, Error> {
