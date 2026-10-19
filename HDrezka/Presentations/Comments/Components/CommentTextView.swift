@@ -50,7 +50,7 @@ struct CommentTextView: View {
         } else {
             let text = spoilerText
 
-            TimelineView(.animation(paused: !isVisible)) { timeline in
+            TimelineView(.animation(minimumInterval: 1 / 60, paused: !isVisible)) { timeline in
                 text.textRenderer(SpoilerTextRenderer(date: timeline.date))
             }
             .onScrollVisibilityChange { isVisible in

@@ -4,11 +4,7 @@ import SwiftUI
 import Vision
 
 struct RemoveBackgroundImageProcessor: ImageProcessor {
-    let identifier: String
-
-    init() {
-        identifier = "com.onevcat.Kingfisher.RemoveBackgroundImageProcessor(\(UUID().uuidString)"
-    }
+    let identifier = "com.onevcat.Kingfisher.RemoveBackgroundImageProcessor"
 
     func process(item: ImageProcessItem, options: KingfisherParsedOptionsInfo) -> KFCrossPlatformImage? {
         switch item {
@@ -25,6 +21,7 @@ extension KFOptionSetter {
         appendProcessor(
             RemoveBackgroundImageProcessor(),
         )
+        .serialize(as: .PNG)
     }
 }
 
@@ -55,9 +52,11 @@ private extension CGImage {
     }
 }
 
+private let ciContext = CIContext(options: [.cacheIntermediates: false])
+
 private extension CIImage {
     func render() -> NSImage? {
-        guard let cgImage = CIContext(options: nil).createCGImage(self, from: extent) else { return nil }
+        guard let cgImage = ciContext.createCGImage(self, from: extent) else { return nil }
 
         return NSImage(cgImage: cgImage, size: CGSize(width: cgImage.width, height: cgImage.height))
     }
