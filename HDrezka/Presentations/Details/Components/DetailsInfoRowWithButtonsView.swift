@@ -1,3 +1,4 @@
+import ComposableArchitecture
 import Kingfisher
 import SwiftUI
 
@@ -8,7 +9,7 @@ struct DetailsInfoRowWithButtonsView<T: Named>: View {
 
     @State private var isPresented: Bool = false
 
-    @Environment(DetailsViewModel.self) private var viewModel
+    @Environment(StoreOf<DetailsFeature>.self) private var store
 
     init(_ title: String, _ description: String, _ data: [T]) {
         self.title = title
@@ -81,15 +82,15 @@ struct DetailsInfoRowWithButtonsView<T: Named>: View {
                                     Button {
                                         switch Destinations.fromNamed(item) {
                                         case let .country(country):
-                                            viewModel.countryDestination = country
+                                            store.countryDestination = country
                                         case let .genre(genre):
-                                            viewModel.genreDestination = genre
+                                            store.genreDestination = genre
                                         case let .person(person):
-                                            viewModel.personDestination = person
+                                            store.personDestination = person
                                         case let .list(list):
-                                            viewModel.listDestination = list
+                                            store.listDestination = list
                                         case let .collection(collection):
-                                            viewModel.collectionDestination = collection
+                                            store.collectionDestination = collection
                                         default:
                                             fatalError("Need \"named\" implementation")
                                         }

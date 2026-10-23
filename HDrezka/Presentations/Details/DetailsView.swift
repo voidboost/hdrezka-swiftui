@@ -1,14 +1,15 @@
+import ComposableArchitecture
 import Defaults
 import SwiftUI
 
 struct DetailsView: View {
     private let title: String?
 
-    @State private var viewModel: DetailsViewModel
+    @State private var store: StoreOf<DetailsFeature>
 
     init(movie: MovieSimple) {
         title = movie.name
-        viewModel = DetailsViewModel(id: movie.movieId)
+        _store = State(initialValue: Store(initialState: DetailsFeature.State(id: movie.movieId)) { DetailsFeature() })
     }
 
     @State private var isBookmarksPresented = false
@@ -20,17 +21,17 @@ struct DetailsView: View {
 
     @State private var topSafeAreaInset: CGFloat = .zero
 
-    var body: some View {
+    private var content: some View {
         ScrollView(.vertical) {
             LazyVStack(alignment: .leading, spacing: 18) {
-                if let details = viewModel.state.data {
+                if let details = store.details.data {
                     DetailsComponentView(
                         details: details,
-                        trailerId: viewModel.trailerId,
+                        trailerId: store.trailerId,
                         topSafeAreaInset: topSafeAreaInset,
                         isSchedulePresented: $isSchedulePresented
                     )
-                    .environment(viewModel)
+                    .environment(store)
                 }
             }
         }
@@ -45,38 +46,38 @@ struct DetailsView: View {
         .ignoresSafeArea(edges: .top)
         .contentMargins(.top, topSafeAreaInset, for: .scrollIndicators)
         .overlay {
-            if let error = viewModel.state.error {
+            if let error = store.details.error {
                 ErrorStateView(error) {
-                    viewModel.load()
+                    store.send(.reload)
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if viewModel.state == .loading {
+            } else if store.details == .loading {
                 LoadingStateView()
                     .padding(.vertical, 18)
                     .padding(.horizontal, 36)
             }
         }
         .transition(.opacity)
-        .navigationTitle(viewModel.state.data?.nameRussian ?? title ?? "")
+        .navigationTitle(store.details.data?.nameRussian ?? title ?? "")
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button {
-                    viewModel.load()
+                    store.send(.reload)
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
                 .keyboardShortcut("r", modifiers: .command)
-                .disabled(viewModel.state.data == nil)
+                .disabled(store.details.data == nil)
             }
 
             ToolbarItemGroup(placement: .primaryAction) {
-                if let details = viewModel.state.data {
+                if let details = store.details.data {
                     NavigationLink(value: Destinations.comments(details)) {
                         HStack(alignment: .center, spacing: 4) {
                             Image(systemName: "bubble.left.and.bubble.right")
 
-                            if let details = viewModel.state.data, details.commentsCount > 0 {
+                            if let details = store.details.data, details.commentsCount > 0 {
                                 Text(verbatim: "(\(details.commentsCount))")
                             }
                         }
@@ -89,13 +90,13 @@ struct DetailsView: View {
                     } label: {
                         Image(systemName: "bookmark")
                     }
-                    .disabled(viewModel.state.data == nil)
+                    .disabled(store.details.data == nil)
                 }
 
-                ShareLink(item: (!_mirror.isDefaultValue ? mirror : Const.redirectMirror).appending(path: viewModel.id, directoryHint: .notDirectory)) {
+                ShareLink(item: (!_mirror.isDefaultValue ? mirror : Const.redirectMirror).appending(path: store.id, directoryHint: .notDirectory)) {
                     Image(systemName: "square.and.arrow.up")
                 }
-                .disabled(viewModel.state.data == nil)
+                .disabled(store.details.data == nil)
             }
         }
         .onGeometryChange(for: CGFloat.self) { geometry in
@@ -104,52 +105,43 @@ struct DetailsView: View {
             topSafeAreaInset = inset
         }
         .onAppear {
-            switch viewModel.state {
-            case .data:
-                break
-            default:
-                viewModel.load()
-            }
+            store.send(.onAppear)
         }
         .sheet(isPresented: $isBookmarksPresented) {
-            BookmarksSheetView(id: viewModel.id, isCreateBookmarkPresented: $isCreateBookmarkPresented)
+            BookmarksSheetView(id: store.id, isCreateBookmarkPresented: $isCreateBookmarkPresented)
         }
         .sheet(isPresented: $isCreateBookmarkPresented) {
             CreateBookmarkSheetView()
         }
         .sheet(isPresented: $isSchedulePresented) {
-            if let details = viewModel.state.data, let schedule = details.schedule, !schedule.isEmpty {
+            if let details = store.details.data, let schedule = details.schedule, !schedule.isEmpty {
                 ScheduleSheetView(schedule: schedule)
             }
         }
-        .alert("key.ops", isPresented: $viewModel.isErrorPresented) {
-            Button(role: .cancel) {} label: {
-                Text("key.ok")
-            }
-        } message: {
-            if let error = viewModel.error {
-                Text(error.localizedDescription)
-            }
-        }
+        .alert($store.scope(state: \.alert, action: \.alert))
         .dialogSeverity(.critical)
         .onChange(of: isCreateBookmarkPresented) {
             isBookmarksPresented = !isCreateBookmarkPresented
         }
         .background(.background)
-        .navigationDestination(item: $viewModel.countryDestination) {
-            ListView(country: $0)
-        }
-        .navigationDestination(item: $viewModel.genreDestination) {
-            ListView(genre: $0)
-        }
-        .navigationDestination(item: $viewModel.personDestination) {
-            PersonView(person: $0)
-        }
-        .navigationDestination(item: $viewModel.listDestination) {
-            ListView(list: $0)
-        }
-        .navigationDestination(item: $viewModel.collectionDestination) {
-            ListView(collection: $0)
-        }
+    }
+
+    var body: some View {
+        content
+            .navigationDestination(item: $store.countryDestination) {
+                ListView(country: $0)
+            }
+            .navigationDestination(item: $store.genreDestination) {
+                ListView(genre: $0)
+            }
+            .navigationDestination(item: $store.personDestination) {
+                PersonView(person: $0)
+            }
+            .navigationDestination(item: $store.listDestination) {
+                ListView(list: $0)
+            }
+            .navigationDestination(item: $store.collectionDestination) {
+                ListView(collection: $0)
+            }
     }
 }

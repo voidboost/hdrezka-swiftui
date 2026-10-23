@@ -1,3 +1,4 @@
+import ComposableArchitecture
 import Defaults
 import SwiftUI
 
@@ -12,7 +13,7 @@ struct DetailsInfoRowRatingView: View {
 
     @Default(.isLoggedIn) private var isLoggedIn
 
-    @Environment(DetailsViewModel.self) private var viewModel
+    @Environment(StoreOf<DetailsFeature>.self) private var store
 
     init(_ title: String, _ rating: Float, _ rated: Bool, _ votes: String?) {
         self.title = title
@@ -26,7 +27,7 @@ struct DetailsInfoRowRatingView: View {
             ForEach(0 ..< 10) { index in
                 if !rated, isLoggedIn {
                     Button {
-                        viewModel.rate(rating: index + 1)
+                        store.send(.rate(index + 1))
                     } label: {
                         Image(systemName: "star.fill")
                             .font(.system(.body, design: .rounded))
