@@ -23,18 +23,16 @@ struct AppFeature {
     struct State: Equatable {
         var selectedTab: Tabs = .home
 
+        /// The navigation stack of the selected tab. macOS TabView rebuilds a tab's NavigationStack whenever it is left
+        /// and routes pushes to whichever stack is on screen, so a single path that resets on tab change mirrors the UI.
+        var path = StackState<Path.State>()
+
         var home = HomeFeature.State()
-        var homePath = StackState<Path.State>()
         var search = SearchFeature.State()
-        var searchPath = StackState<Path.State>()
         var categories = CategoriesFeature.State()
-        var categoriesPath = StackState<Path.State>()
         var collections = CollectionsFeature.State()
-        var collectionsPath = StackState<Path.State>()
         var watchingLater = WatchingLaterFeature.State()
-        var watchingLaterPath = StackState<Path.State>()
         var bookmarks = BookmarksFeature.State()
-        var bookmarksPath = StackState<Path.State>()
 
         var isSignOutPresented = false
         var isPremiumPresented = false
@@ -46,18 +44,13 @@ struct AppFeature {
 
     enum Action: BindableAction {
         case binding(BindingAction<State>)
+        case path(StackActionOf<Path>)
         case home(HomeFeature.Action)
-        case homePath(StackActionOf<Path>)
         case search(SearchFeature.Action)
-        case searchPath(StackActionOf<Path>)
         case categories(CategoriesFeature.Action)
-        case categoriesPath(StackActionOf<Path>)
         case collections(CollectionsFeature.Action)
-        case collectionsPath(StackActionOf<Path>)
         case watchingLater(WatchingLaterFeature.Action)
-        case watchingLaterPath(StackActionOf<Path>)
         case bookmarks(BookmarksFeature.Action)
-        case bookmarksPath(StackActionOf<Path>)
         case appLaunched
         case routeReceived(AppRoute)
         case signInTapped
@@ -76,6 +69,13 @@ struct AppFeature {
 
     var body: some ReducerOf<Self> {
         BindingReducer()
+            .onChange(of: \.selectedTab) { _, _ in
+                Reduce { state, _ in
+                    state.path = StackState()
+
+                    return .none
+                }
+            }
 
         Scope(state: \.home, action: \.home) { HomeFeature() }
         Scope(state: \.search, action: \.search) { SearchFeature() }
@@ -87,27 +87,16 @@ struct AppFeature {
         Reduce { state, action in
             switch action {
             case let .home(.delegate(.push(route))):
-                state.homePath.append(Path.State(route))
+                state.path.append(Path.State(route))
 
                 return .none
 
-            case let .homePath(action):
-                return push(action, to: &state.homePath)
+            case let .path(.element(_, action)):
+                if let route = action.route {
+                    state.path.append(Path.State(route))
+                }
 
-            case let .searchPath(action):
-                return push(action, to: &state.searchPath)
-
-            case let .categoriesPath(action):
-                return push(action, to: &state.categoriesPath)
-
-            case let .collectionsPath(action):
-                return push(action, to: &state.collectionsPath)
-
-            case let .watchingLaterPath(action):
-                return push(action, to: &state.watchingLaterPath)
-
-            case let .bookmarksPath(action):
-                return push(action, to: &state.bookmarksPath)
+                return .none
 
             case .appLaunched:
                 return .merge(
@@ -185,27 +174,13 @@ struct AppFeature {
 
                 return .none
 
-            case .binding, .home, .search, .categories, .collections, .watchingLater, .bookmarks, .destination, .alert:
+            case .binding, .path, .home, .search, .categories, .collections, .watchingLater, .bookmarks, .destination, .alert:
                 return .none
             }
         }
-        .forEach(\.homePath, action: \.homePath)
-        .forEach(\.searchPath, action: \.searchPath)
-        .forEach(\.categoriesPath, action: \.categoriesPath)
-        .forEach(\.collectionsPath, action: \.collectionsPath)
-        .forEach(\.watchingLaterPath, action: \.watchingLaterPath)
-        .forEach(\.bookmarksPath, action: \.bookmarksPath)
+        .forEach(\.path, action: \.path)
         .ifLet(\.$destination, action: \.destination)
         .ifLet(\.$alert, action: \.alert)
-    }
-
-    /// Pushes a route that a screen in the stack requested through its `push` delegate.
-    private func push(_ action: StackActionOf<Path>, to path: inout StackState<Path.State>) -> Effect<Action> {
-        if case let .element(_, action) = action, let route = action.route {
-            path.append(Path.State(route))
-        }
-
-        return .none
     }
 }
 

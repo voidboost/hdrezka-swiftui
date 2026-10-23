@@ -169,51 +169,30 @@ struct ContentView: View {
         }
     }
 
-    @ViewBuilder
     private func stack(for tab: Tabs) -> some View {
+        NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
+            root(for: tab)
+                .analyticsScreen(name: tab.name, class: tab.className)
+        } destination: { store in
+            PathView(store: store)
+        }
+    }
+
+    @ViewBuilder
+    private func root(for tab: Tabs) -> some View {
         switch tab {
         case .home:
-            NavigationStack(path: $store.scope(state: \.homePath, action: \.homePath)) {
-                HomeView(store: store.scope(state: \.home, action: \.home))
-                    .analyticsScreen(name: tab.name, class: tab.className)
-            } destination: { store in
-                PathView(store: store)
-            }
+            HomeView(store: store.scope(state: \.home, action: \.home))
         case .search:
-            NavigationStack(path: $store.scope(state: \.searchPath, action: \.searchPath)) {
-                SearchView(store: store.scope(state: \.search, action: \.search))
-                    .analyticsScreen(name: tab.name, class: tab.className)
-            } destination: { store in
-                PathView(store: store)
-            }
+            SearchView(store: store.scope(state: \.search, action: \.search))
         case .categories:
-            NavigationStack(path: $store.scope(state: \.categoriesPath, action: \.categoriesPath)) {
-                CategoriesView(store: store.scope(state: \.categories, action: \.categories))
-                    .analyticsScreen(name: tab.name, class: tab.className)
-            } destination: { store in
-                PathView(store: store)
-            }
+            CategoriesView(store: store.scope(state: \.categories, action: \.categories))
         case .collections:
-            NavigationStack(path: $store.scope(state: \.collectionsPath, action: \.collectionsPath)) {
-                CollectionsView(store: store.scope(state: \.collections, action: \.collections))
-                    .analyticsScreen(name: tab.name, class: tab.className)
-            } destination: { store in
-                PathView(store: store)
-            }
+            CollectionsView(store: store.scope(state: \.collections, action: \.collections))
         case .watchingLater:
-            NavigationStack(path: $store.scope(state: \.watchingLaterPath, action: \.watchingLaterPath)) {
-                WatchingLaterView(store: store.scope(state: \.watchingLater, action: \.watchingLater))
-                    .analyticsScreen(name: tab.name, class: tab.className)
-            } destination: { store in
-                PathView(store: store)
-            }
+            WatchingLaterView(store: store.scope(state: \.watchingLater, action: \.watchingLater))
         case .bookmarks:
-            NavigationStack(path: $store.scope(state: \.bookmarksPath, action: \.bookmarksPath)) {
-                BookmarksView(store: store.scope(state: \.bookmarks, action: \.bookmarks))
-                    .analyticsScreen(name: tab.name, class: tab.className)
-            } destination: { store in
-                PathView(store: store)
-            }
+            BookmarksView(store: store.scope(state: \.bookmarks, action: \.bookmarks))
         }
     }
 }
