@@ -1,17 +1,18 @@
+import ComposableArchitecture
 import SwiftUI
 
 struct BookmarksListView: View {
-    @Environment(BookmarksViewModel.self) private var viewModel
+    @Environment(StoreOf<BookmarksFeature>.self) private var store
 
     var body: some View {
         List(selection: Binding {
-            viewModel.selectedBookmark
+            store.selectedBookmark
         } set: { selectedBookmark in
             guard let selectedBookmark else { return }
 
-            viewModel.selectedBookmark = selectedBookmark
+            store.selectedBookmark = selectedBookmark
         }) {
-            if let bookmarks = viewModel.bookmarksState.data, !bookmarks.isEmpty {
+            if let bookmarks = store.bookmarks.data, !bookmarks.isEmpty {
                 ForEach(bookmarks) { bookmark in
                     Text(bookmark.name)
                         .font(.title3)
@@ -23,22 +24,22 @@ struct BookmarksListView: View {
                         .listRowInsets(.init())
                         .contextMenu {
                             Button {
-                                viewModel.renameBookmark = bookmark
+                                store.renameBookmark = bookmark
                             } label: {
                                 Text("key.rename")
                             }
 
                             Button {
-                                viewModel.deleteBookmarksCategory(bookmark: bookmark)
+                                store.send(.deleteBookmark(bookmark))
                             } label: {
                                 Text("key.delete")
                             }
                         }
                         .viewModifier { view in
-                            if viewModel.selectedBookmark != bookmark.bookmarkId {
+                            if store.selectedBookmark != bookmark.bookmarkId {
                                 view.dropDestination(for: MovieSimple.self) { movies, _ in
                                     if !movies.isEmpty, !movies.compactMap(\.movieId.id).isEmpty {
-                                        viewModel.moveBetweenBookmarks(movies: movies, toBookmark: bookmark)
+                                        store.send(.moveMovies(movies, to: bookmark))
 
                                         return true
                                     }
@@ -51,7 +52,7 @@ struct BookmarksListView: View {
                         }
                         .swipeActions(edge: .trailing) {
                             Button {
-                                viewModel.deleteBookmarksCategory(bookmark: bookmark)
+                                store.send(.deleteBookmark(bookmark))
                             } label: {
                                 Image(systemName: "trash")
                                     .font(.title3)
@@ -59,7 +60,7 @@ struct BookmarksListView: View {
                             .tint(.accentColor)
 
                             Button {
-                                viewModel.renameBookmark = bookmark
+                                store.renameBookmark = bookmark
                             } label: {
                                 Image(systemName: "pencil")
                                     .font(.title3)
@@ -68,7 +69,7 @@ struct BookmarksListView: View {
                         }
                 }
                 .onMove { fromOffsets, toOffset in
-                    viewModel.reorderBookmarksCategories(fromOffsets: fromOffsets, toOffset: toOffset)
+                    store.send(.reorderBookmarks(fromOffsets: fromOffsets, toOffset: toOffset))
                 }
             }
         }
@@ -83,7 +84,7 @@ struct BookmarksListView: View {
             }
         }
         .overlay {
-            if let error = viewModel.bookmarksState.error {
+            if let error = store.bookmarks.error {
                 VStack(alignment: .center, spacing: 8) {
                     Text(error.localizedDescription)
                         .font(.system(.title2, weight: .medium))
@@ -91,7 +92,7 @@ struct BookmarksListView: View {
                         .multilineTextAlignment(.center)
 
                     Button {
-                        viewModel.getBookmarks(reset: true)
+                        store.send(.reloadBookmarks(reset: true))
                     } label: {
                         Text("key.retry")
                             .font(.body)
@@ -102,7 +103,7 @@ struct BookmarksListView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(18)
-            } else if let bookmarks = viewModel.bookmarksState.data, bookmarks.isEmpty {
+            } else if let bookmarks = store.bookmarks.data, bookmarks.isEmpty {
                 VStack(alignment: .center, spacing: 8) {
                     Text("key.bookmark.empty")
                         .font(.system(.title2, weight: .medium))
@@ -110,7 +111,7 @@ struct BookmarksListView: View {
                         .multilineTextAlignment(.center)
 
                     Button {
-                        viewModel.isCreateBookmarkPresented = true
+                        store.isCreateBookmarkPresented = true
                     } label: {
                         Text("key.create")
                             .font(.body)
@@ -120,7 +121,7 @@ struct BookmarksListView: View {
                     .keyboardShortcut("n", modifiers: .command)
 
                     Button {
-                        viewModel.getBookmarks(reset: true)
+                        store.send(.reloadBookmarks(reset: true))
                     } label: {
                         Text("key.retry")
                             .font(.body)
@@ -131,7 +132,7 @@ struct BookmarksListView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(18)
-            } else if viewModel.bookmarksState == .loading {
+            } else if store.bookmarks == .loading {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding(18)

@@ -1,3 +1,4 @@
+import ComposableArchitecture
 import Combine
 import Defaults
 import Dependencies
@@ -7,7 +8,11 @@ import SwiftUI
 struct WatchingLaterView: View {
     private let title = String(localized: "key.watching_later")
 
-    @State private var viewModel = WatchingLaterViewModel()
+    @State private var store: StoreOf<WatchingLaterFeature>
+
+    init(store: StoreOf<WatchingLaterFeature> = Store(initialState: WatchingLaterFeature.State()) { WatchingLaterFeature() }) {
+        _store = State(initialValue: store)
+    }
 
     private let columns = [
         GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading),
@@ -18,19 +23,19 @@ struct WatchingLaterView: View {
     var body: some View {
         ScrollView(.vertical) {
             LazyVGrid(columns: columns, alignment: .leading, spacing: 18) {
-                if let movies = viewModel.state.data, !movies.isEmpty {
+                if let movies = store.movies.data, !movies.isEmpty {
                     ForEach(movies) { movie in
                         WatchingLaterCardView(movie: movie)
                             .equatable()
                             .contextMenu {
                                 Button {
-                                    viewModel.switchWatchedItem(movie: movie)
+                                    store.send(.switchWatched(movie))
                                 } label: {
                                     Text(movie.watched ? String(localized: "key.mark.unwatched") : String(localized: "key.mark.watched"))
                                 }
 
                                 Button {
-                                    viewModel.removeWatchingItem(movie: movie)
+                                    store.send(.remove(movie))
 
                                     if let watchLaterId = movie.watchLaterId.id {
                                         Task.detached(priority: .utility) {
@@ -61,19 +66,19 @@ struct WatchingLaterView: View {
             }
         }
         .overlay {
-            if let error = viewModel.state.error {
+            if let error = store.movies.error {
                 ErrorStateView(error) {
-                    viewModel.load()
+                    store.send(.reload)
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if let movies = viewModel.state.data, movies.isEmpty {
+            } else if let movies = store.movies.data, movies.isEmpty {
                 EmptyStateView(String(localized: "key.watching_later.empty"), String(localized: "key.watching_later.empty.description")) {
-                    viewModel.load()
+                    store.send(.reload)
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if viewModel.state == .loading {
+            } else if store.movies == .loading {
                 LoadingStateView()
                     .padding(.vertical, 18)
                     .padding(.horizontal, 36)
@@ -84,31 +89,18 @@ struct WatchingLaterView: View {
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button {
-                    viewModel.load()
+                    store.send(.reload)
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
                 .keyboardShortcut("r", modifiers: .command)
-                .disabled(viewModel.state.data?.isEmpty != false)
+                .disabled(store.movies.data?.isEmpty != false)
             }
         }
         .onAppear {
-            switch viewModel.state {
-            case .data:
-                break
-            default:
-                viewModel.load()
-            }
+            store.send(.onAppear)
         }
-        .alert("key.ops", isPresented: $viewModel.isErrorPresented) {
-            Button(role: .cancel) {} label: {
-                Text("key.ok")
-            }
-        } message: {
-            if let error = viewModel.error {
-                Text(error.localizedDescription)
-            }
-        }
+        .alert($store.scope(state: \.alert, action: \.alert))
         .dialogSeverity(.critical)
         .background(.background)
     }

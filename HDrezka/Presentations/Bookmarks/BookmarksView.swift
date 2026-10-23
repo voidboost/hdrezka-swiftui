@@ -1,51 +1,56 @@
+import ComposableArchitecture
 import SwiftUI
 
 struct BookmarksView: View {
     private let title = String(localized: "key.bookmarks")
 
-    @State private var viewModel = BookmarksViewModel()
+    @State private var store: StoreOf<BookmarksFeature>
+
+    init(store: StoreOf<BookmarksFeature> = Store(initialState: BookmarksFeature.State()) { BookmarksFeature() }) {
+        _store = State(initialValue: store)
+    }
 
     var body: some View {
         HStack(alignment: .center, spacing: 0) {
             BookmarksListView()
-                .environment(viewModel)
+                .environment(store)
 
             Divider()
 
             BookmarksMoviesView()
-                .environment(viewModel)
+                .environment(store)
         }
         .transition(.opacity)
         .navigationTitle(title)
         .toolbar {
             ToolbarItemGroup(placement: .navigation) {
                 Button {
-                    viewModel.getBookmarks(reset: true)
+                    store.send(.reloadBookmarks(reset: true))
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
                 .keyboardShortcut("r", modifiers: .command)
-                .disabled(viewModel.bookmarksState.data?.isEmpty != false || (viewModel.bookmarkState.data?.isEmpty != false && viewModel.selectedBookmark != nil))
+                .disabled(store.bookmarks.data?.isEmpty != false || (store.movies.data?.isEmpty != false && store.selectedBookmark != nil))
 
                 Button {
-                    viewModel.isCreateBookmarkPresented = true
+                    store.isCreateBookmarkPresented = true
                 } label: {
                     Image(systemName: "plus")
                 }
                 .keyboardShortcut("n", modifiers: .command)
-                .disabled(viewModel.bookmarksState.data?.isEmpty != false)
+                .disabled(store.bookmarks.data?.isEmpty != false)
             }
 
             ToolbarItem(placement: .primaryAction) {
                 Menu {
-                    Picker("key.filter.select", selection: $viewModel.filter) {
+                    Picker("key.filter.select", selection: $store.filter) {
                         ForEach(BookmarkFilters.allCases) { filter in
                             Text(filter.rawValue).tag(filter)
                         }
                     }
                     .pickerStyle(.inline)
 
-                    Picker("key.genre.select", selection: $viewModel.genre) {
+                    Picker("key.genre.select", selection: $store.genre) {
                         ForEach(Genres.allCases) { genre in
                             Text(genre.rawValue).tag(genre)
                         }
@@ -56,50 +61,18 @@ struct BookmarksView: View {
                 }
                 .menuStyle(.button)
                 .menuIndicator(.hidden)
-                .disabled(viewModel.bookmarkState == .loading || viewModel.selectedBookmark == nil)
+                .disabled(store.movies == .loading || store.selectedBookmark == nil)
             }
-        }
-        .onChange(of: viewModel.selectedBookmark) {
-            if viewModel.selectedBookmark != nil {
-                viewModel.load()
-            }
-        }
-        .onChange(of: viewModel.isCreateBookmarkPresented) {
-            if !viewModel.isCreateBookmarkPresented {
-                viewModel.getBookmarks(reset: true)
-            }
-        }
-        .onChange(of: viewModel.renameBookmark) {
-            if viewModel.renameBookmark == nil {
-                viewModel.getBookmarks(reset: true)
-            }
-        }
-        .onChange(of: viewModel.filter) {
-            viewModel.load()
-        }
-        .onChange(of: viewModel.genre) {
-            viewModel.load()
         }
         .onAppear {
-            switch viewModel.bookmarksState {
-            case .data:
-                break
-            default:
-                viewModel.getBookmarks()
-            }
+            store.send(.onAppear)
         }
-        .alert("key.ops", isPresented: $viewModel.isErrorPresented) {
-            Button(role: .cancel) {} label: { Text("key.ok") }
-        } message: {
-            if let error = viewModel.error {
-                Text(error.localizedDescription)
-            }
-        }
+        .alert($store.scope(state: \.alert, action: \.alert))
         .dialogSeverity(.critical)
-        .sheet(item: $viewModel.renameBookmark) { bookmark in
+        .sheet(item: $store.renameBookmark) { bookmark in
             RenameBookmarkSheetView(bookmark: bookmark)
         }
-        .sheet(isPresented: $viewModel.isCreateBookmarkPresented) {
+        .sheet(isPresented: $store.isCreateBookmarkPresented) {
             CreateBookmarkSheetView()
         }
         .background(.background)

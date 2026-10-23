@@ -1,3 +1,4 @@
+import ComposableArchitecture
 import SwiftUI
 
 struct BookmarksMoviesView: View {
@@ -5,19 +6,19 @@ struct BookmarksMoviesView: View {
         GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading),
     ]
 
-    @Environment(BookmarksViewModel.self) private var viewModel
+    @Environment(StoreOf<BookmarksFeature>.self) private var store
 
     var body: some View {
         ScrollView(.vertical) {
             LazyVGrid(columns: columns, alignment: .leading, spacing: 18) {
-                if let movies = viewModel.bookmarkState.data, !movies.isEmpty {
+                if let movies = store.movies.data, !movies.isEmpty {
                     ForEach(movies) { movie in
                         CardView(movie: movie, draggable: true)
                             .equatable()
                             .contextMenu {
                                 Button {
                                     if let movieId = movie.movieId.id {
-                                        viewModel.removeFromBookmarks(movies: [movieId])
+                                        store.send(.removeMovies([movieId]))
                                     }
                                 } label: {
                                     Text("key.delete")
@@ -30,17 +31,17 @@ struct BookmarksMoviesView: View {
             .padding(18)
             .scrollTargetLayout()
 
-            if viewModel.paginationState == .loading {
+            if store.paginationState == .loading {
                 LoadingPaginationStateView()
             }
         }
         .scrollIndicators(.visible, axes: .vertical)
         .onScrollTargetVisibilityChange(idType: MovieSimple.ID.self) { onScreenCards in
-            if viewModel.paginationState == .idle,
-               let movies = viewModel.bookmarkState.data,
+            if store.paginationState == .idle,
+               let movies = store.movies.data,
                movies.suffix(12).contains(where: { onScreenCards.contains($0.id) })
             {
-                viewModel.loadMore()
+                store.send(.loadMore)
             }
         }
         .viewModifier { view in
@@ -51,7 +52,7 @@ struct BookmarksMoviesView: View {
             }
         }
         .overlay {
-            if let error = viewModel.bookmarkState.error {
+            if let error = store.movies.error {
                 VStack(alignment: .center, spacing: 8) {
                     Text(error.localizedDescription)
                         .font(.system(.title, weight: .medium))
@@ -59,7 +60,7 @@ struct BookmarksMoviesView: View {
                         .multilineTextAlignment(.center)
 
                     Button {
-                        viewModel.load()
+                        store.send(.reloadMovies)
                     } label: {
                         Text("key.retry")
                             .font(.title3)
@@ -70,16 +71,16 @@ struct BookmarksMoviesView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(18)
-            } else if let movies = viewModel.bookmarkState.data, movies.isEmpty {
+            } else if let movies = store.movies.data, movies.isEmpty {
                 VStack(alignment: .center, spacing: 8) {
-                    Text(viewModel.selectedBookmark == nil ? String(localized: "key.bookmarks.select") : String(localized: "key.bookmarks.empty"))
+                    Text(store.selectedBookmark == nil ? String(localized: "key.bookmarks.select") : String(localized: "key.bookmarks.empty"))
                         .font(.system(.title, weight: .medium))
                         .lineLimit(nil)
                         .multilineTextAlignment(.center)
 
-                    if viewModel.selectedBookmark != nil {
+                    if store.selectedBookmark != nil {
                         Button {
-                            viewModel.load()
+                            store.send(.reloadMovies)
                         } label: {
                             Text("key.retry")
                                 .font(.title3)
@@ -91,7 +92,7 @@ struct BookmarksMoviesView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(18)
-            } else if viewModel.bookmarkState == .loading {
+            } else if store.movies == .loading {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding(18)

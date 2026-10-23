@@ -116,13 +116,3 @@ struct DetailsFeature {
         .ifLet(\.$alert, action: \.alert)
     }
 }
-
-extension AlertState where Action == DetailsFeature.Action.Alert {
-    static func error(_ error: (any Error)? = nil) -> Self {
-        Self(
-            title: { TextState("key.ops") },
-            actions: { ButtonState(role: .cancel) { TextState("key.ok") } },
-            message: error.map { error in { TextState(error.localizedDescription) } }
-        )
-    }
-}
