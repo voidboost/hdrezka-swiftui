@@ -1,14 +1,15 @@
+import ComposableArchitecture
 import Defaults
 import SwiftUI
 
 struct PersonView: View {
     private let title: String
 
-    @State private var viewModel: PersonViewModel
+    @State private var store: StoreOf<PersonFeature>
 
     init(person: PersonSimple) {
         title = person.name
-        viewModel = PersonViewModel(id: person.personId)
+        _store = State(initialValue: Store(initialState: PersonFeature.State(id: person.personId)) { PersonFeature() })
     }
 
     @Default(.mirror) private var mirror
@@ -16,7 +17,7 @@ struct PersonView: View {
     var body: some View {
         ScrollView(.vertical) {
             LazyVStack(alignment: .leading, spacing: 18) {
-                if let details = viewModel.state.data {
+                if let details = store.details.data {
                     PersonDetailsView(details: details)
                 }
             }
@@ -31,13 +32,13 @@ struct PersonView: View {
             }
         }
         .overlay {
-            if let error = viewModel.state.error {
+            if let error = store.details.error {
                 ErrorStateView(error) {
-                    viewModel.load()
+                    store.send(.reload)
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if viewModel.state == .loading {
+            } else if store.details == .loading {
                 LoadingStateView()
                     .padding(.vertical, 18)
                     .padding(.horizontal, 36)
@@ -48,28 +49,23 @@ struct PersonView: View {
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button {
-                    viewModel.load()
+                    store.send(.reload)
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
                 .keyboardShortcut("r", modifiers: .command)
-                .disabled(viewModel.state.data == nil)
+                .disabled(store.details.data == nil)
             }
 
             ToolbarItem(placement: .primaryAction) {
-                ShareLink(item: (!_mirror.isDefaultValue ? mirror : Const.redirectMirror).appending(path: viewModel.id, directoryHint: .notDirectory)) {
+                ShareLink(item: (!_mirror.isDefaultValue ? mirror : Const.redirectMirror).appending(path: store.id, directoryHint: .notDirectory)) {
                     Image(systemName: "square.and.arrow.up")
                 }
-                .disabled(viewModel.state.data == nil)
+                .disabled(store.details.data == nil)
             }
         }
         .onAppear {
-            switch viewModel.state {
-            case .data:
-                break
-            default:
-                viewModel.load()
-            }
+            store.send(.onAppear)
         }
         .background(.background)
     }
