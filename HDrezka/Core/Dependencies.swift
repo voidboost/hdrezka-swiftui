@@ -6,7 +6,6 @@ import UserNotifications
 private enum SessionKey: DependencyKey {
     static let liveValue = Session(
         rootQueue: .init(label: "io.silentsea.hdrezka.rootQueue", qos: .userInitiated),
-        startRequestsImmediately: false,
         interceptor: Interceptor(interceptors: [CustomInterceptor(), OfflineRetrier()]),
         redirectHandler: .modify { task, request, _ in
             var newRequest = task.originalRequest ?? task.currentRequest ?? request

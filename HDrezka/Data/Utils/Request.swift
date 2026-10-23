@@ -25,7 +25,6 @@ extension Session {
             let string = try await request(convertible)
                 .validate(statusCode: 200 ..< 400)
                 .serializingString()
-                .resumed()
                 .value
 
             return try parse(string)
@@ -38,7 +37,6 @@ extension Session {
             let data = try await request(convertible)
                 .validate(statusCode: 200 ..< 400)
                 .serializingData()
-                .resumed()
                 .value
 
             guard let raw = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as? [String: Any] else {
@@ -63,15 +61,6 @@ extension Session {
 
             return true
         }
-    }
-}
-
-extension DataTask {
-    /// The shared `Session` is created with `startRequestsImmediately: false`, so async requests must be resumed explicitly.
-    func resumed() -> Self {
-        resume()
-
-        return self
     }
 }
 
