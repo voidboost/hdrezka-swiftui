@@ -4,11 +4,7 @@ import SwiftUI
 struct CategoriesView: View {
     private let title = String(localized: "key.categories")
 
-    @State private var store: StoreOf<CategoriesFeature>
-
-    init(store: StoreOf<CategoriesFeature> = Store(initialState: CategoriesFeature.State()) { CategoriesFeature() }) {
-        _store = State(initialValue: store)
-    }
+    @Bindable var store: StoreOf<CategoriesFeature>
 
     var body: some View {
         ScrollView(.vertical) {

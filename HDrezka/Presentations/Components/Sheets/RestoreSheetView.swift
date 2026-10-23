@@ -1,22 +1,13 @@
-import Combine
-import Dependencies
+import ComposableArchitecture
 import FirebaseAnalytics
 import SwiftUI
 
 struct RestoreSheetView: View {
-    @Dependency(\.restoreUseCase) private var restoreUseCase
-
-    @State private var subscriptions: Set<AnyCancellable> = []
+    @Bindable var store: StoreOf<RestoreFeature>
 
     @Environment(\.dismiss) private var dismiss
 
-    @Environment(AppState.self) private var appState
 
-    @State private var login: String = ""
-    @State private var state: EmptyState = .data
-    @State private var email: String = ""
-
-    @State private var isSuccessPresented: Bool = false
 
     private enum FocusedField {
         case login
@@ -26,7 +17,7 @@ struct RestoreSheetView: View {
 
     var body: some View {
         Group {
-            switch state {
+            switch store.status {
             case .data:
                 VStack(alignment: .center, spacing: 25) {
                     VStack(alignment: .center, spacing: 5) {
@@ -48,13 +39,13 @@ struct RestoreSheetView: View {
                             HStack(alignment: .center, spacing: 8) {
                                 Text("key.username.full")
 
-                                TextField("key.username.full", text: $login, prompt: Text(String(localized: "key.username.full").lowercased()))
+                                TextField("key.username.full", text: $store.login, prompt: Text(String(localized: "key.username.full").lowercased()))
                                     .textFieldStyle(.plain)
                                     .multilineTextAlignment(.trailing)
                                     .focused($focusedField, equals: .login)
                                     .onSubmit {
-                                        if !login.isEmpty {
-                                            load()
+                                        if !store.login.isEmpty {
+                                            store.send(.submit)
                                         }
                                     }
                             }
@@ -68,22 +59,20 @@ struct RestoreSheetView: View {
 
                     VStack(alignment: .center, spacing: 10) {
                         Button {
-                            load()
+                            store.send(.submit)
                         } label: {
                             Text("key.restore")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
                                 .contentShape(.rect(cornerRadius: 6))
-                                .background(!login.isEmpty ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
+                                .background(!store.login.isEmpty ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
-                        .disabled(login.isEmpty)
-                        .animation(.easeInOut, value: !login.isEmpty)
+                        .disabled(store.login.isEmpty)
+                        .animation(.easeInOut, value: !store.login.isEmpty)
 
                         Button {
-                            dismiss()
-
-                            appState.isSignInPresented = true
+                            store.send(.signInTapped)
                         } label: {
                             Text("key.cancel")
                                 .frame(width: 250, height: 30)
@@ -116,11 +105,7 @@ struct RestoreSheetView: View {
 
                     VStack(alignment: .center, spacing: 10) {
                         Button {
-                            subscriptions.flush()
-
-                            withAnimation(.easeInOut) {
-                                state = .data
-                            }
+                            store.send(.cancelRequest, animation: .easeInOut)
                         } label: {
                             Text("key.cancel")
                                 .frame(width: 250, height: 30)
@@ -150,9 +135,7 @@ struct RestoreSheetView: View {
 
                     VStack(alignment: .center, spacing: 10) {
                         Button {
-                            withAnimation(.easeInOut) {
-                                state = .data
-                            }
+                            store.send(.retry, animation: .easeInOut)
                         } label: {
                             Text("key.retry")
                                 .frame(width: 250, height: 30)
@@ -163,9 +146,7 @@ struct RestoreSheetView: View {
                         .buttonStyle(.plain)
 
                         Button {
-                            dismiss()
-
-                            appState.isSignInPresented = true
+                            store.send(.signInTapped)
                         } label: {
                             Text("key.cancel")
                                 .frame(width: 250, height: 30)
@@ -182,43 +163,15 @@ struct RestoreSheetView: View {
         .padding(.bottom, 25)
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
-        .alert("key.restore.success", isPresented: $isSuccessPresented) {
+        .alert("key.restore.success", isPresented: $store.isSuccessPresented) {
             Button(role: .cancel) {
-                dismiss()
-
-                appState.isSignInPresented = true
+                store.send(.signInTapped)
             } label: {
                 Text("key.ok")
             }
         } message: {
-            Text("key.restore.success.message-\(email)")
+            Text("key.restore.success.message-\(store.email)")
         }
         .analyticsScreen(name: "restore_sheet", class: "RestoreSheetView")
-    }
-
-    private func load() {
-        withAnimation(.easeInOut) {
-            state = .loading
-        }
-
-        restoreUseCase(login: login)
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
-
-                withAnimation(.easeInOut) {
-                    state = .error(error)
-                }
-            } receiveValue: { email in
-                if let email, !email.isEmpty {
-                    self.email = email
-                    isSuccessPresented = true
-                } else {
-                    withAnimation(.easeInOut) {
-                        state = .error(NSError())
-                    }
-                }
-            }
-            .store(in: &subscriptions)
     }
 }

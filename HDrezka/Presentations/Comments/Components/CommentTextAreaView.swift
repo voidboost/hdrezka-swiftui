@@ -10,7 +10,6 @@ struct CommentTextAreaView: View {
     @Default(.isLoggedIn) private var isLoggedIn
     @Default(.allowedComments) private var allowedComments
 
-    @Environment(AppState.self) private var appState
     @Environment(StoreOf<CommentsFeature>.self) private var store
 
     var body: some View {
@@ -69,7 +68,7 @@ struct CommentTextAreaView: View {
         .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
         .onChange(of: feedback) {
             if !allowedComments, !feedback.trim().isEmpty {
-                appState.commentsRulesPresented = true
+                store.send(.rulesTapped)
             }
         }
     }

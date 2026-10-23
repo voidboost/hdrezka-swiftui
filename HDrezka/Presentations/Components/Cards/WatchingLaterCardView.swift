@@ -12,7 +12,7 @@ struct WatchingLaterCardView: View {
     @State private var outerHeight: CGFloat = 1
 
     var body: some View {
-        NavigationLink(value: Destinations.details(MovieSimple(movieId: movie.watchLaterId, name: movie.name, poster: movie.cover))) {
+        NavigationLink(route: .details(MovieSimple(movieId: movie.watchLaterId, name: movie.name, poster: movie.cover))) {
             VStack(alignment: .leading, spacing: 6) {
                 KFImage
                     .url(URL(string: movie.cover))

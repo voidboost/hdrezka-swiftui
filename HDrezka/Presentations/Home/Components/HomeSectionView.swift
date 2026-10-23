@@ -26,7 +26,7 @@ struct HomeSectionView: View {
 
                 Spacer()
 
-                NavigationLink(value: Destinations.category(category.category)) {
+                NavigationLink(route: .category(category.category)) {
                     HStack(alignment: .center) {
                         Text("key.see_all")
                             .font(.subheadline)

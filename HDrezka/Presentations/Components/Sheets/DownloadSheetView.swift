@@ -13,7 +13,7 @@ struct DownloadSheetView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
-    @Environment(AppState.self) private var appState
+    @Dependency(\.appRouter) private var appRouter
     @Environment(Downloader.self) private var downloader
 
     @Dependency(\.defaultDatabase) private var database
@@ -110,7 +110,7 @@ struct DownloadSheetView: View {
                                                         } else {
                                                             dismiss()
 
-                                                            appState.isPremiumPresented = true
+                                                            appRouter.present(.premium)
                                                         }
                                                     } label: {
                                                         Label {
@@ -316,7 +316,7 @@ struct DownloadSheetView: View {
                                                 } else {
                                                     dismiss()
 
-                                                    appState.isPremiumPresented = true
+                                                    appRouter.present(.premium)
                                                 }
                                             } label: {
                                                 Text(quality)
@@ -340,7 +340,7 @@ struct DownloadSheetView: View {
                                                 } else if isLoggedIn {
                                                     dismiss()
 
-                                                    appState.isPremiumPresented = true
+                                                    appRouter.present(.premium)
                                                 } else if isUserPremium != nil {
                                                     isLoginPresented = true
                                                 }
@@ -622,7 +622,7 @@ struct DownloadSheetView: View {
                 Button(role: .destructive) {
                     dismiss()
 
-                    appState.isSignInPresented = true
+                    appRouter.present(.signIn)
                 } label: {
                     Text("key.sign_in")
                 }
@@ -643,7 +643,7 @@ struct DownloadSheetView: View {
             Button {
                 dismiss()
 
-                appState.isSignInPresented = true
+                appRouter.present(.signIn)
             } label: {
                 Text("key.sign_in")
             }

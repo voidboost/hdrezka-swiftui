@@ -1,39 +1,26 @@
-import Alamofire
-import Combine
+import ComposableArchitecture
 import Defaults
-import Dependencies
+import FirebaseAnalytics
 import Pow
-import SwiftSoup
 import SwiftUI
 
 struct ContentView: View {
-    @Dependency(\.logoutUseCase) private var logoutUseCase
-    @Dependency(\.getVersionUseCase) private var getVersionUseCase
+    @Bindable var store: StoreOf<AppFeature>
 
     @Default(.isLoggedIn) private var isLoggedIn
     @Default(.mirror) private var mirror
     @Default(.isUserPremium) private var isUserPremium
-    @Default(.lastHdrezkaAppVersion) private var lastHdrezkaAppVersion
     @Default(.isFirstLaunch) private var isFirstLaunch
     @Default(.snow) private var snow
     @Default(.forceSnow) private var forceSnow
 
-    @Environment(AppState.self) private var appState
-
     @State private var showDays = false
 
-    @State private var error: Error?
-    @State private var isErrorPresented: Bool = false
-
-    @State private var subscriptions: Set<AnyCancellable> = []
-
-    var body: some View {
-        @Bindable var appState = appState
-
-        TabView(selection: $appState.selectedTab) {
+    private var tabs: some View {
+        TabView(selection: $store.selectedTab) {
             ForEach(Tabs.allCases.filter { !$0.needAccount }) { tab in
                 Tab(value: tab) {
-                    tab
+                    stack(for: tab)
                 } label: {
                     Label {
                         Text(tab.label)
@@ -47,7 +34,7 @@ struct ContentView: View {
                 TabSection {
                     ForEach(Tabs.allCases.filter(\.needAccount)) { tab in
                         Tab(value: tab) {
-                            tab
+                            stack(for: tab)
                         } label: {
                             Label {
                                 Text(tab.label)
@@ -94,9 +81,9 @@ struct ContentView: View {
         .tabViewSidebarBottomBar {
             Button {
                 if isLoggedIn {
-                    appState.isSignOutPresented = true
+                    store.isSignOutPresented = true
                 } else {
-                    appState.isSignInPresented = true
+                    store.send(.signInTapped)
                 }
             } label: {
                 HStack {
@@ -124,41 +111,25 @@ struct ContentView: View {
             .padding(.vertical, 5)
         }
         .frame(minWidth: 1100, minHeight: 600)
-        .onAppear {
-            getVersionUseCase()
-                .receive(on: DispatchQueue.main)
-                .sink { _ in } receiveValue: { version in
-                    lastHdrezkaAppVersion = version
-                }
-                .store(in: &subscriptions)
-        }
-        .onChange(of: isLoggedIn) {
-            if !isLoggedIn, appState.selectedTab.needAccount {
-                appState.selectedTab = .home
-            }
-        }
-        .sheet(isPresented: $appState.isSignInPresented) {
-            SignInSheetView()
-        }
-        .sheet(isPresented: $appState.isSignUpPresented) {
-            SignUpSheetView()
-        }
-        .sheet(isPresented: $appState.isRestorePresented) {
-            RestoreSheetView()
-        }
-        .confirmationDialog("key.sign_out.label", isPresented: $appState.isSignOutPresented) {
-            Button(role: .destructive) {
-                logoutUseCase()
-                    .receive(on: DispatchQueue.main)
-                    .sink { completion in
-                        guard case let .failure(error) = completion else { return }
+    }
 
-                        self.error = error
-                        isErrorPresented = true
-                    } receiveValue: { success in
-                        isErrorPresented = !success
-                    }
-                    .store(in: &subscriptions)
+    var body: some View {
+        tabs
+        .onChange(of: isLoggedIn) {
+            store.send(.loggedInChanged(isLoggedIn))
+        }
+        .sheet(item: $store.scope(state: \.destination?.signIn, action: \.destination.signIn)) { store in
+            SignInSheetView(store: store)
+        }
+        .sheet(item: $store.scope(state: \.destination?.signUp, action: \.destination.signUp)) { store in
+            SignUpSheetView(store: store)
+        }
+        .sheet(item: $store.scope(state: \.destination?.restore, action: \.destination.restore)) { store in
+            RestoreSheetView(store: store)
+        }
+        .confirmationDialog("key.sign_out.label", isPresented: $store.isSignOutPresented) {
+            Button(role: .destructive) {
+                store.send(.signOutConfirmed)
             } label: {
                 Text("key.yes")
             }
@@ -166,21 +137,13 @@ struct ContentView: View {
             Text("key.sign_out.q")
         }
         .dialogSeverity(.critical)
-        .alert("key.ops", isPresented: $isErrorPresented) {
-            Button(role: .cancel) {} label: {
-                Text("key.ok")
-            }
-        } message: {
-            if let error {
-                Text(error.localizedDescription)
-            }
-        }
-        .confirmationDialog("key.premium_content", isPresented: $appState.isPremiumPresented) {
+        .alert($store.scope(state: \.alert, action: \.alert))
+        .confirmationDialog("key.premium_content", isPresented: $store.isPremiumPresented) {
             Link("key.buy", destination: (!_mirror.isDefaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
         } message: {
             Text("key.premium.description")
         }
-        .sheet(isPresented: $appState.commentsRulesPresented) {
+        .sheet(isPresented: $store.isCommentsRulesPresented) {
             CommentsRulesSheetView()
         }
         .alert("key.disclaimer", isPresented: $isFirstLaunch) {
@@ -204,5 +167,75 @@ struct ContentView: View {
                     .ignoresSafeArea()
             }
         }
+    }
+
+    @ViewBuilder
+    private func stack(for tab: Tabs) -> some View {
+        switch tab {
+        case .home:
+            NavigationStack(path: $store.scope(state: \.homePath, action: \.homePath)) {
+                HomeView(store: store.scope(state: \.home, action: \.home))
+                    .analyticsScreen(name: tab.name, class: tab.className)
+            } destination: { store in
+                PathView(store: store)
+            }
+        case .search:
+            NavigationStack(path: $store.scope(state: \.searchPath, action: \.searchPath)) {
+                SearchView(store: store.scope(state: \.search, action: \.search))
+                    .analyticsScreen(name: tab.name, class: tab.className)
+            } destination: { store in
+                PathView(store: store)
+            }
+        case .categories:
+            NavigationStack(path: $store.scope(state: \.categoriesPath, action: \.categoriesPath)) {
+                CategoriesView(store: store.scope(state: \.categories, action: \.categories))
+                    .analyticsScreen(name: tab.name, class: tab.className)
+            } destination: { store in
+                PathView(store: store)
+            }
+        case .collections:
+            NavigationStack(path: $store.scope(state: \.collectionsPath, action: \.collectionsPath)) {
+                CollectionsView(store: store.scope(state: \.collections, action: \.collections))
+                    .analyticsScreen(name: tab.name, class: tab.className)
+            } destination: { store in
+                PathView(store: store)
+            }
+        case .watchingLater:
+            NavigationStack(path: $store.scope(state: \.watchingLaterPath, action: \.watchingLaterPath)) {
+                WatchingLaterView(store: store.scope(state: \.watchingLater, action: \.watchingLater))
+                    .analyticsScreen(name: tab.name, class: tab.className)
+            } destination: { store in
+                PathView(store: store)
+            }
+        case .bookmarks:
+            NavigationStack(path: $store.scope(state: \.bookmarksPath, action: \.bookmarksPath)) {
+                BookmarksView(store: store.scope(state: \.bookmarks, action: \.bookmarks))
+                    .analyticsScreen(name: tab.name, class: tab.className)
+            } destination: { store in
+                PathView(store: store)
+            }
+        }
+    }
+}
+
+private struct PathView: View {
+    let store: StoreOf<AppFeature.Path>
+
+    var body: some View {
+        let analytics = store.state.analytics
+
+        Group {
+            switch store.case {
+            case let .details(store):
+                DetailsView(store: store)
+            case let .list(store):
+                ListView(store: store)
+            case let .person(store):
+                PersonView(store: store)
+            case let .comments(store):
+                CommentsView(store: store)
+            }
+        }
+        .analyticsScreen(name: analytics.name, class: analytics.className)
     }
 }

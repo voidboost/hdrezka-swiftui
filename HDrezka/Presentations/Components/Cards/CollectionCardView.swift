@@ -9,7 +9,7 @@ struct CollectionCardView: View {
     }
 
     var body: some View {
-        NavigationLink(value: Destinations.collection(collection)) {
+        NavigationLink(route: .collection(collection)) {
             VStack(alignment: .center, spacing: 6) {
                 if let poster = collection.poster {
                     KFImage

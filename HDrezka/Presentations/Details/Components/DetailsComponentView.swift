@@ -248,7 +248,7 @@ struct DetailsComponentView: View {
                         LazyVStack(alignment: .leading, spacing: 0) {
                             ForEach(franchise.prefix(franchiseExpanded ? franchise.count : 5)) { fr in
                                 if !fr.current, let movieId = fr.franchiseId {
-                                    NavigationLink(value: Destinations.details(MovieSimple(movieId: movieId, name: fr.name))) {
+                                    NavigationLink(route: .details(MovieSimple(movieId: movieId, name: fr.name))) {
                                         HStack(alignment: .center, spacing: 4) {
                                             ZStack(alignment: .center) {
                                                 ZStack(alignment: .center) {

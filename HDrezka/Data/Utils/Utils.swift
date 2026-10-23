@@ -2,6 +2,7 @@ import Alamofire
 import AVFoundation
 import Combine
 import Defaults
+import Dependencies
 import FirebaseCrashlytics
 import Foundation
 import SwiftSoup
@@ -152,6 +153,8 @@ extension Publisher where Output == Error, Failure == Never {
 }
 
 func handleError(_ error: Error) -> Error {
+    @Dependency(\.appRouter) var appRouter
+
     if error is CancellationError || error.asAFError?.isExplicitlyCancelledError == true {
         return CancellationError()
     } else if let avError = error as? AVError {
@@ -161,7 +164,7 @@ func handleError(_ error: Error) -> Error {
     } else if let afError = error.asAFError {
         if afError.responseCode != nil || afError.isSessionTaskError {
             if let code = afError.responseCode, code == 403 {
-                AppState.presentSignIn()
+                appRouter.present(.signIn)
 
                 return HDrezkaError.loginRequired(Defaults[.mirror])
             }
@@ -176,7 +179,7 @@ func handleError(_ error: Error) -> Error {
         if case .mirrorBanned = hdrezkaError {
             return hdrezkaError
         } else if case .loginRequired = hdrezkaError {
-            AppState.presentSignIn()
+            appRouter.present(.signIn)
 
             return hdrezkaError
         } else if case .site = hdrezkaError {

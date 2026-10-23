@@ -13,7 +13,7 @@ struct OpenExternalPlayerSheetView: View {
     @Environment(\.openURL) private var openURL
     @Environment(\.dismiss) private var dismiss
 
-    @Environment(AppState.self) private var appState
+    @Dependency(\.appRouter) private var appRouter
 
     @Dependency(\.defaultDatabase) private var database
 
@@ -109,7 +109,7 @@ struct OpenExternalPlayerSheetView: View {
                                                         } else {
                                                             dismiss()
 
-                                                            appState.isPremiumPresented = true
+                                                            appRouter.present(.premium)
                                                         }
                                                     } label: {
                                                         Label {
@@ -315,7 +315,7 @@ struct OpenExternalPlayerSheetView: View {
                                                 } else {
                                                     dismiss()
 
-                                                    appState.isPremiumPresented = true
+                                                    appRouter.present(.premium)
                                                 }
                                             } label: {
                                                 Text(quality)
@@ -339,7 +339,7 @@ struct OpenExternalPlayerSheetView: View {
                                                 } else if isLoggedIn {
                                                     dismiss()
 
-                                                    appState.isPremiumPresented = true
+                                                    appRouter.present(.premium)
                                                 } else if isUserPremium != nil {
                                                     isLoginPresented = true
                                                 }
@@ -727,7 +727,7 @@ struct OpenExternalPlayerSheetView: View {
                 Button(role: .destructive) {
                     dismiss()
 
-                    appState.isSignInPresented = true
+                    appRouter.present(.signIn)
                 } label: {
                     Text("key.sign_in")
                 }
@@ -748,7 +748,7 @@ struct OpenExternalPlayerSheetView: View {
             Button {
                 dismiss()
 
-                appState.isSignInPresented = true
+                appRouter.present(.signIn)
             } label: {
                 Text("key.sign_in")
             }

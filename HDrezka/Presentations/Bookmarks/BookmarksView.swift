@@ -4,11 +4,7 @@ import SwiftUI
 struct BookmarksView: View {
     private let title = String(localized: "key.bookmarks")
 
-    @State private var store: StoreOf<BookmarksFeature>
-
-    init(store: StoreOf<BookmarksFeature> = Store(initialState: BookmarksFeature.State()) { BookmarksFeature() }) {
-        _store = State(initialValue: store)
-    }
+    @Bindable var store: StoreOf<BookmarksFeature>
 
     var body: some View {
         HStack(alignment: .center, spacing: 0) {

@@ -10,6 +10,7 @@ import SwiftUI
 @Observable
 @MainActor
 class PlayerViewModel {
+    @ObservationIgnored @Dependency(\.appRouter) private var appRouter
     @ObservationIgnored @Dependency(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
     @ObservationIgnored @Dependency(\.getMovieThumbnailsUseCase) private var getMovieThumbnailsUseCase
     @ObservationIgnored @Dependency(\.getMovieVideoUseCase) private var getMovieVideoUseCase
@@ -1105,7 +1106,7 @@ class PlayerViewModel {
                         if movie.needPremium {
                             self.dismiss?()
 
-                            AppState.shared.isPremiumPresented = true
+                            self.appRouter.present(.premium)
                         } else {
                             self.movie = movie
                             self.episode = prevEpisode
@@ -1141,7 +1142,7 @@ class PlayerViewModel {
                         if movie.needPremium {
                             self.dismiss?()
 
-                            AppState.shared.isPremiumPresented = true
+                            self.appRouter.present(.premium)
                         } else {
                             self.movie = movie
                             self.season = prevSeason
@@ -1184,7 +1185,7 @@ class PlayerViewModel {
                         if movie.needPremium {
                             self.dismiss?()
 
-                            AppState.shared.isPremiumPresented = true
+                            self.appRouter.present(.premium)
                         } else {
                             self.movie = movie
                             self.episode = nextEpisode
@@ -1220,7 +1221,7 @@ class PlayerViewModel {
                         if movie.needPremium {
                             self.dismiss?()
 
-                            AppState.shared.isPremiumPresented = true
+                            self.appRouter.present(.premium)
                         } else {
                             self.movie = movie
                             self.season = nextSeason

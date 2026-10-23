@@ -8,11 +8,7 @@ import SwiftUI
 struct WatchingLaterView: View {
     private let title = String(localized: "key.watching_later")
 
-    @State private var store: StoreOf<WatchingLaterFeature>
-
-    init(store: StoreOf<WatchingLaterFeature> = Store(initialState: WatchingLaterFeature.State()) { WatchingLaterFeature() }) {
-        _store = State(initialValue: store)
-    }
+    @Bindable var store: StoreOf<WatchingLaterFeature>
 
     private let columns = [
         GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading),

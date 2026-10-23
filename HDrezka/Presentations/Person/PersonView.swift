@@ -3,14 +3,7 @@ import Defaults
 import SwiftUI
 
 struct PersonView: View {
-    private let title: String
-
-    @State private var store: StoreOf<PersonFeature>
-
-    init(person: PersonSimple) {
-        title = person.name
-        _store = State(initialValue: Store(initialState: PersonFeature.State(id: person.personId)) { PersonFeature() })
-    }
+    let store: StoreOf<PersonFeature>
 
     @Default(.mirror) private var mirror
 
@@ -45,7 +38,7 @@ struct PersonView: View {
             }
         }
         .transition(.opacity)
-        .navigationTitle(title)
+        .navigationTitle(store.name)
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button {

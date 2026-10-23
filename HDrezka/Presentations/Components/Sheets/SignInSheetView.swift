@@ -1,19 +1,13 @@
-import Combine
+import ComposableArchitecture
 import Defaults
-import Dependencies
 import FirebaseAnalytics
 import SwiftUI
 
 struct SignInSheetView: View {
-    @Dependency(\.signInUseCase) private var signInUseCase
+    @Bindable var store: StoreOf<SignInFeature>
 
     @Environment(\.dismiss) private var dismiss
 
-    @Environment(AppState.self) private var appState
-
-    @State private var username: String = ""
-    @State private var password: String = ""
-    @State private var state: EmptyState = .data
 
     @State private var showPassword: Bool = false
     @State private var passwordIsEmpty: Bool = true
@@ -24,11 +18,9 @@ struct SignInSheetView: View {
 
     @FocusState private var focusedField: FocusedField?
 
-    @State private var subscriptions: Set<AnyCancellable> = []
-
     var body: some View {
         Group {
-            if state.isLoading {
+            if store.status.isLoading {
                 VStack(alignment: .center, spacing: 25) {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "person.circle")
@@ -48,11 +40,7 @@ struct SignInSheetView: View {
 
                     VStack(alignment: .center, spacing: 10) {
                         Button {
-                            subscriptions.flush()
-
-                            withAnimation(.easeInOut) {
-                                state = .data
-                            }
+                            store.send(.cancelRequest, animation: .easeInOut)
                         } label: {
                             Text("key.cancel")
                                 .frame(width: 250, height: 30)
@@ -83,7 +71,7 @@ struct SignInSheetView: View {
                             HStack(alignment: .center, spacing: 8) {
                                 Text("key.username")
 
-                                TextField("key.username", text: $username, prompt: Text(String(localized: "key.username.full").lowercased()))
+                                TextField("key.username", text: $store.username, prompt: Text(String(localized: "key.username.full").lowercased()))
                                     .textFieldStyle(.plain)
                                     .multilineTextAlignment(.trailing)
                                     .focused($focusedField, equals: .username)
@@ -99,33 +87,33 @@ struct SignInSheetView: View {
                                 Text("key.password")
 
                                 if showPassword {
-                                    TextField("key.password", text: $password, prompt: Text(String(localized: "key.password").lowercased()))
+                                    TextField("key.password", text: $store.password, prompt: Text(String(localized: "key.password").lowercased()))
                                         .textFieldStyle(.plain)
                                         .multilineTextAlignment(.trailing)
                                         .focused($focusedField, equals: .password)
-                                        .onChange(of: password) {
+                                        .onChange(of: store.password) {
                                             withAnimation(.easeInOut(duration: 0.15)) {
-                                                passwordIsEmpty = password.isEmpty
+                                                passwordIsEmpty = store.password.isEmpty
                                             }
                                         }
                                         .onSubmit {
-                                            if !username.isEmpty, !password.isEmpty {
-                                                load()
+                                            if !store.username.isEmpty, !store.password.isEmpty {
+                                                store.send(.submit)
                                             }
                                         }
                                 } else {
-                                    SecureField("key.password", text: $password, prompt: Text(String(localized: "key.password").lowercased()))
+                                    SecureField("key.password", text: $store.password, prompt: Text(String(localized: "key.password").lowercased()))
                                         .textFieldStyle(.plain)
                                         .multilineTextAlignment(.trailing)
                                         .focused($focusedField, equals: .password)
-                                        .onChange(of: password) {
+                                        .onChange(of: store.password) {
                                             withAnimation(.easeInOut(duration: 0.15)) {
-                                                passwordIsEmpty = password.isEmpty
+                                                passwordIsEmpty = store.password.isEmpty
                                             }
                                         }
                                         .onSubmit {
-                                            if !username.isEmpty, !password.isEmpty {
-                                                load()
+                                            if !store.username.isEmpty, !store.password.isEmpty {
+                                                store.send(.submit)
                                             }
                                         }
                                 }
@@ -158,9 +146,7 @@ struct SignInSheetView: View {
                         .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
 
                         Button {
-                            dismiss()
-
-                            appState.isRestorePresented = true
+                            store.send(.restoreTapped)
                         } label: {
                             Text("key.password.lost")
                                 .font(.caption)
@@ -171,17 +157,17 @@ struct SignInSheetView: View {
 
                     VStack(alignment: .center, spacing: 10) {
                         Button {
-                            load()
+                            store.send(.submit)
                         } label: {
                             Text("key.sign_in")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
                                 .contentShape(.rect(cornerRadius: 6))
-                                .background(!username.isEmpty && !password.isEmpty ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
+                                .background(!store.username.isEmpty && !store.password.isEmpty ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
-                        .disabled(username.isEmpty || password.isEmpty)
-                        .animation(.easeInOut, value: !username.isEmpty && !password.isEmpty)
+                        .disabled(store.username.isEmpty || store.password.isEmpty)
+                        .animation(.easeInOut, value: !store.username.isEmpty && !store.password.isEmpty)
 
                         Button {
                             dismiss()
@@ -198,9 +184,7 @@ struct SignInSheetView: View {
                         Text("key.sign_in.sign_up.q").font(.caption)
 
                         Button {
-                            dismiss()
-
-                            appState.isSignUpPresented = true
+                            store.send(.signUpTapped)
                         } label: {
                             Text(verbatim: "\(String(localized: "key.register"))!")
                                 .font(.caption)
@@ -220,11 +204,9 @@ struct SignInSheetView: View {
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
         .analyticsScreen(name: "sign_in_sheet", class: "SignInSheetView")
-        .alert("key.ops", isPresented: Binding { state.error != nil } set: { _ in }) {
+        .alert("key.ops", isPresented: Binding { store.status.error != nil } set: { _ in }) {
             Button {
-                withAnimation(.easeInOut) {
-                    state = .data
-                }
+                store.send(.retry, animation: .easeInOut)
             } label: {
                 Text("key.retry")
             }
@@ -235,29 +217,10 @@ struct SignInSheetView: View {
                 Text("key.cancel")
             }
         } message: {
-            if let error = state.error {
+            if let error = store.status.error {
                 Text(error.localizedDescription)
             }
         }
         .dialogSeverity(.critical)
-    }
-
-    private func load() {
-        withAnimation(.easeInOut) {
-            state = .loading
-        }
-
-        signInUseCase(login: username, password: password)
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
-
-                withAnimation(.easeInOut) {
-                    state = .error(error)
-                }
-            } receiveValue: { _ in
-                dismiss()
-            }
-            .store(in: &subscriptions)
     }
 }

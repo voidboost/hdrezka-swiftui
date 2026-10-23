@@ -13,7 +13,7 @@ struct CardView: View {
     }
 
     var body: some View {
-        NavigationLink(value: Destinations.details(movie)) {
+        NavigationLink(route: .details(movie)) {
             VStack(alignment: .leading, spacing: 6) {
                 if let poster = movie.poster {
                     KFImage

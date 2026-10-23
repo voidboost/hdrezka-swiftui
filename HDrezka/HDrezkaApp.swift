@@ -1,4 +1,5 @@
 import Combine
+import ComposableArchitecture
 import Defaults
 import Dependencies
 import FirebaseAnalytics
@@ -138,7 +139,7 @@ extension AppDelegate: SPUUpdaterDelegate, SPUStandardUserDriverDelegate {
 @main
 struct HDrezkaApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
-    @State private var appState: AppState = .shared
+    @State private var store: StoreOf<AppFeature>
     @State private var downloader: Downloader = .shared
     @State private var cookiesManager: CookiesManager = .shared
     @Environment(\.openWindow) private var openWindow
@@ -149,8 +150,12 @@ struct HDrezkaApp: App {
 
     init() {
         prepareDependencies {
-            $0.defaultDatabase = try! appDatabase()
+            $0.defaultDatabase = try! Self.appDatabase()
         }
+
+        let store = Store(initialState: AppFeature.State()) { AppFeature() }
+        store.send(.appLaunched)
+        _store = State(initialValue: store)
 
         KingfisherManager.shared.defaultOptions += [.backgroundDecode]
 
@@ -169,8 +174,7 @@ struct HDrezkaApp: App {
 
     var body: some Scene {
         WindowGroup(id: Windows.hdrezka.id) {
-            ContentView()
-                .environment(appState)
+            ContentView(store: store)
                 .environment(downloader)
                 .environment(cookiesManager)
                 .preferredColorScheme(theme.scheme)
@@ -184,7 +188,6 @@ struct HDrezkaApp: App {
         WindowGroup("key.player", id: Windows.player.id, for: PlayerData.self) { $data in
             if let data {
                 PlayerView(data: data)
-                    .environment(appState)
                     .analyticsScreen(name: "player", class: "PlayerView")
             }
         }
@@ -333,7 +336,7 @@ struct HDrezkaApp: App {
         }
     }
 
-    private func appDatabase() throws -> any DatabaseWriter {
+    private static func appDatabase() throws -> any DatabaseWriter {
         let configuration = Configuration()
 
         let database = try defaultDatabase(path: Const.dbPath, configuration: configuration)
