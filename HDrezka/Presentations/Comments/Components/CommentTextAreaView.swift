@@ -1,3 +1,4 @@
+import ComposableArchitecture
 import Defaults
 import SwiftUI
 
@@ -10,7 +11,7 @@ struct CommentTextAreaView: View {
     @Default(.allowedComments) private var allowedComments
 
     @Environment(AppState.self) private var appState
-    @Environment(CommentsViewModel.self) private var viewModel
+    @Environment(StoreOf<CommentsFeature>.self) private var store
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -41,7 +42,7 @@ struct CommentTextAreaView: View {
                 }
 
                 Button {
-                    viewModel.sendComment(name: isLoggedIn ? nil : name, text: feedback)
+                    store.send(.sendComment(name: isLoggedIn ? nil : name, text: feedback))
 
                     name = ""
                     feedback = ""
