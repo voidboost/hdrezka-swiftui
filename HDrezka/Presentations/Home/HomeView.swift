@@ -10,8 +10,6 @@ struct HomeView: View {
         _store = State(initialValue: store)
     }
 
-    @State private var movieDestination: MovieSimple?
-
     var body: some View {
         ScrollView(.vertical) {
             LazyVStack(alignment: .leading, spacing: 18) {
@@ -89,7 +87,7 @@ struct HomeView: View {
 
             ToolbarItem(placement: .primaryAction) {
                 Button {
-                    store.isSeriesUpdatesPresented = true
+                    store.send(.seriesUpdatesTapped)
                 } label: {
                     Image(systemName: "bell")
                 }
@@ -100,10 +98,10 @@ struct HomeView: View {
             store.send(.onAppear)
         }
         .background(.background)
-        .sheet(isPresented: $store.isSeriesUpdatesPresented) {
-            SeriesUpdatesSheetView(movieDestination: $movieDestination)
+        .sheet(item: $store.scope(state: \.seriesUpdates, action: \.seriesUpdates)) { store in
+            SeriesUpdatesSheetView(store: store)
         }
-        .navigationDestination(item: $movieDestination) {
+        .navigationDestination(item: $store.movieDestination) {
             DetailsView(movie: $0)
         }
     }

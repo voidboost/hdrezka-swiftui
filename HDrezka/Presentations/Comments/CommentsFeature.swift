@@ -13,7 +13,6 @@ struct CommentsFeature {
         var paginationState: DataPaginationState = .idle
 
         var reply: String?
-        var reportComment: Comment?
         var comment: Comment?
         var isCommentPresented = false
         var likes: [String: Likes] = [:]
@@ -21,6 +20,7 @@ struct CommentsFeature {
 
         @Presents var alert: AlertState<Action.Alert>?
         @Presents var moderationAlert: AlertState<Action.Alert>?
+        @Presents var reportComment: CommentReportFeature.State?
         @Presents var deleteDialog: ConfirmationDialogState<Action.DeleteDialog>?
 
         fileprivate var page = 1
@@ -46,6 +46,8 @@ struct CommentsFeature {
         case likesLoaded(commentId: String, Result<[Like], any Error>)
         case sendComment(name: String?, text: String)
         case commentSent(Result<SendCommentResult, any Error>)
+        case reportTapped(Comment)
+        case reportComment(PresentationAction<CommentReportFeature.Action>)
         case deleteTapped(Comment)
         case commentDeleted(Comment, Result<(Bool, String?), any Error>)
         case alert(PresentationAction<Alert>)
@@ -247,6 +249,11 @@ struct CommentsFeature {
 
                 return .none
 
+            case let .reportTapped(comment):
+                state.reportComment = CommentReportFeature.State(comment: comment)
+
+                return .none
+
             case let .deleteTapped(comment):
                 state.deleteDialog = .delete(comment)
 
@@ -291,12 +298,15 @@ struct CommentsFeature {
 
                 return .none
 
-            case .alert, .moderationAlert, .deleteDialog:
+            case .alert, .moderationAlert, .reportComment, .deleteDialog:
                 return .none
             }
         }
         .ifLet(\.$alert, action: \.alert)
         .ifLet(\.$moderationAlert, action: \.moderationAlert)
+        .ifLet(\.$reportComment, action: \.reportComment) {
+            CommentReportFeature()
+        }
         .ifLet(\.$deleteDialog, action: \.deleteDialog)
     }
 
