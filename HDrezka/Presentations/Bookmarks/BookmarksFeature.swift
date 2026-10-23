@@ -148,26 +148,12 @@ struct BookmarksFeature {
 
                 return loadMovies(id: selectedBookmark, state: state, isInitial: false)
 
-            case let .moviesLoaded(isInitial, .success(movies)):
-                state.page += 1
-
-                if isInitial {
-                    state.movies = .data(movies)
-                } else if !movies.isEmpty {
-                    state.movies.append(movies)
-                    state.paginationState = .idle
-                } else {
-                    state.paginationState = .error(HDrezkaError.unknown)
+            case let .moviesLoaded(isInitial, result):
+                if case .success = result {
+                    state.page += 1
                 }
 
-                return .none
-
-            case let .moviesLoaded(isInitial, .failure(error)):
-                if isInitial {
-                    state.movies = .error(error)
-                } else {
-                    state.paginationState = .error(error)
-                }
+                state.paginationState = state.movies.receivePage(result, isInitial: isInitial, emptyPageIsError: true)
 
                 return .none
 

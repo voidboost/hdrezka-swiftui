@@ -67,26 +67,15 @@ struct HomeFeature {
 
                 return load(page, isInitial: false)
 
-            case let .categoryLoaded(category, isInitial, .success(movies)):
-                state.nextPage = Categories.allCases.element(after: category)
-
-                let newCategory = Category(category: category, title: category.localized, movies: movies, id: uuid())
-
-                if isInitial {
-                    state.categories = .data([newCategory])
-                } else {
-                    state.categories.append([newCategory])
-                    state.paginationState = .idle
+            case let .categoryLoaded(category, isInitial, result):
+                if case .success = result {
+                    state.nextPage = Categories.allCases.element(after: category)
                 }
 
-                return .none
-
-            case let .categoryLoaded(_, isInitial, .failure(error)):
-                if isInitial {
-                    state.categories = .error(error)
-                } else {
-                    state.paginationState = .error(error)
-                }
+                state.paginationState = state.categories.receivePage(
+                    result.map { [Category(category: category, title: category.localized, movies: $0, id: uuid())] },
+                    isInitial: isInitial
+                )
 
                 return .none
 

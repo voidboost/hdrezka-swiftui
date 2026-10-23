@@ -120,26 +120,12 @@ struct CommentsFeature {
 
                 return load(movieId: movieId, page: state.page, isInitial: false)
 
-            case let .commentsLoaded(isInitial, .success(comments)):
-                state.page += 1
-
-                if isInitial {
-                    state.comments = .data(comments)
-                } else if !comments.isEmpty {
-                    state.comments.append(comments)
-                    state.paginationState = .idle
-                } else {
-                    state.paginationState = .error(HDrezkaError.unknown)
+            case let .commentsLoaded(isInitial, result):
+                if case .success = result {
+                    state.page += 1
                 }
 
-                return .none
-
-            case let .commentsLoaded(isInitial, .failure(error)):
-                if isInitial {
-                    state.comments = .error(error)
-                } else {
-                    state.paginationState = .error(error)
-                }
+                state.paginationState = state.comments.receivePage(result, isInitial: isInitial, emptyPageIsError: true)
 
                 return .none
 

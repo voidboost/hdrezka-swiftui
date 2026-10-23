@@ -16,9 +16,9 @@ class CookiesManager {
     }
 
     private func observe() {
-        observation = Task { [weak self, notificationCenter] in
+        observation = Task { [notificationCenter] in
             for await _ in notificationCenter.notifications(named: .NSHTTPCookieManagerCookiesChanged, object: HTTPCookieStorage.shared) {
-                guard self != nil, let cookies = HTTPCookieStorage.shared.cookies(for: Defaults[.mirror]) else { continue }
+                guard let cookies = HTTPCookieStorage.shared.cookies(for: Defaults[.mirror]) else { continue }
 
                 if cookies.contains(where: { $0.name == "dle_user_id" }),
                    cookies.contains(where: { $0.name == "dle_password" })

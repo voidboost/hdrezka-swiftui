@@ -44,24 +44,12 @@ struct CollectionsFeature {
 
                 return load(page: state.page, isInitial: false)
 
-            case let .collectionsLoaded(isInitial, .success(collections)):
-                state.page += 1
-
-                if isInitial {
-                    state.collections = .data(collections)
-                } else {
-                    state.collections.append(collections)
-                    state.paginationState = .idle
+            case let .collectionsLoaded(isInitial, result):
+                if case .success = result {
+                    state.page += 1
                 }
 
-                return .none
-
-            case let .collectionsLoaded(isInitial, .failure(error)):
-                if isInitial {
-                    state.collections = .error(error)
-                } else {
-                    state.paginationState = .error(error)
-                }
+                state.paginationState = state.collections.receivePage(result, isInitial: isInitial)
 
                 return .none
             }

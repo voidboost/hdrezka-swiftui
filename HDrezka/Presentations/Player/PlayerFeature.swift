@@ -6,14 +6,6 @@ import SwiftUI
 
 @Reducer
 struct PlayerFeature {
-    struct Failure: Equatable {
-        let error: any Error
-
-        static func == (lhs: Self, rhs: Self) -> Bool {
-            lhs.error as NSError == rhs.error as NSError
-        }
-    }
-
     @ObservableState
     struct State: Equatable {
         let poster: String
@@ -38,7 +30,7 @@ struct PlayerFeature {
         var isMaskShow = true
         var timer: Int?
         var nextTimer: CGFloat?
-        var error: Failure?
+        var error: EquatableError?
         var subtitles: String?
         var subtitlesOptions: [SubtitleOption] = []
         var thumbnails: WebVTT?
@@ -223,7 +215,7 @@ struct PlayerFeature {
                     .cancel(id: CancelID.track),
                     .cancel(id: CancelID.hideMask),
                     .cancel(id: CancelID.sleepTimer),
-                    .run { [engine] _ in await engine.reset() }
+                    perform { $0.reset() }
                 )
 
             case let .selectPositionLoaded(subtitles):
@@ -245,15 +237,15 @@ struct PlayerFeature {
                 return .none
 
             case let .playbackPositionLoaded(position):
-                return .run { [engine, rate = state.rate, isPlaying = state.playsAfterSetup] _ in
+                return perform { [rate = state.rate, isPlaying = state.playsAfterSetup] engine in
                     if let position {
                         let isComplete = await engine.seek(to: position)
 
                         if isPlaying, isComplete {
-                            await engine.play(rate: rate)
+                            engine.play(rate: rate)
                         }
                     } else if isPlaying {
-                        await engine.play(rate: rate)
+                        engine.play(rate: rate)
                     }
                 }
 
@@ -277,13 +269,13 @@ struct PlayerFeature {
 
                 guard !state.isPictureInPictureActive else { return resetTimer }
 
-                return .merge(resetTimer, .run { [engine] _ in await engine.toggleMute() })
+                return .merge(resetTimer, perform { $0.toggleMute() })
 
             case let .volumeChanged(volume):
-                return .run { [engine] _ in await engine.setVolume(volume) }
+                return perform { $0.setVolume(volume) }
 
             case let .seek(seconds):
-                return .run { [engine] _ in _ = await engine.seek(to: seconds) }
+                return perform { _ = await $0.seek(to: seconds) }
 
             case let .skip(interval):
                 return skip(by: interval, &state)
@@ -297,11 +289,11 @@ struct PlayerFeature {
                 case .up:
                     guard state.volume < 1.0 else { return resetTimer }
 
-                    return .merge(resetTimer, .run { [engine, volume = state.volume] _ in await engine.setVolume(min(volume + 0.05, 1.0)) })
+                    return .merge(resetTimer, perform { [volume = state.volume] engine in engine.setVolume(min(volume + 0.05, 1.0)) })
                 case .down:
                     guard state.volume > 0.0 else { return resetTimer }
 
-                    return .merge(resetTimer, .run { [engine, volume = state.volume] _ in await engine.setVolume(max(volume - 0.05, 0.0)) })
+                    return .merge(resetTimer, perform { [volume = state.volume] engine in engine.setVolume(max(volume - 0.05, 0.0)) })
                 case .left:
                     return .merge(resetTimer, skip(by: -10.0, &state))
                 case .right:
@@ -332,7 +324,7 @@ struct PlayerFeature {
                 return setup(&state, seek: nil, isPlaying: true)
 
             case let .trackLoaded(_, _, .failure(error)):
-                state.error = Failure(error: error)
+                state.error = EquatableError(error)
 
                 return .none
 
@@ -349,7 +341,7 @@ struct PlayerFeature {
             case let .subtitlesSelected(language):
                 state.subtitles = language
 
-                return .run { [engine, voiceActing = state.voiceActing, season = state.season, episode = state.episode] _ in
+                return perform { [voiceActing = state.voiceActing, season = state.season, episode = state.episode] engine in
                     guard await engine.selectSubtitles(language) else { return }
 
                     try? await database.write { db in
@@ -373,7 +365,7 @@ struct PlayerFeature {
                 return resetSleepTimer(&state)
 
             case .pictureInPictureTapped:
-                return .run { [engine] _ in await engine.startPictureInPicture() }
+                return perform { $0.startPictureInPicture() }
 
             case .userActivity:
                 return resetSleepTimer(&state)
@@ -406,12 +398,12 @@ struct PlayerFeature {
             case .sleepTimerFired:
                 guard state.isReady else { return .none }
 
-                return .run { [engine] _ in await engine.pause() }
+                return perform { $0.pause() }
 
             case let .scenePhaseChanged(isActive):
                 guard !isActive, state.isReady, !state.isPictureInPictureActive, state.isPlaying else { return .none }
 
-                return .run { [engine] _ in await engine.pause() }
+                return perform { $0.pause() }
 
             case .retryTapped:
                 resetState(&state)
@@ -477,7 +469,7 @@ struct PlayerFeature {
 
                     await send(.subtitleOptionsLoaded(options), animation: .easeInOut(duration: 0.15))
                 },
-                .run { [engine, mode = state.trackCommandMode] _ in await engine.configureTrackCommands(mode) },
+                perform { [mode = state.trackCommandMode] engine in engine.configureTrackCommands(mode) },
                 startPlayback(state)
             )
 
@@ -514,10 +506,10 @@ struct PlayerFeature {
             updateNextTimer(&state)
 
             return .merge(
-                .run { [engine] _ in
+                perform { engine in
                     Defaults[.volume] = volume
 
-                    await engine.setMuted(Defaults[.isMuted])
+                    engine.setMuted(Defaults[.isMuted])
                 },
                 showCursor(),
                 setMask(!state.isPictureInPictureActive, &state)
@@ -536,9 +528,9 @@ struct PlayerFeature {
 
         case let .failed(error):
             resetState(&state)
-            state.error = Failure(error: error)
+            state.error = EquatableError(error)
 
-            return .run { [engine] _ in await engine.reset() }
+            return perform { $0.reset() }
 
         case .didPlayToEnd:
             let isPictureInPictureActive = state.isPictureInPictureActive
@@ -566,7 +558,7 @@ struct PlayerFeature {
             return .merge(
                 showCursor(),
                 setMask(!isActive, &state),
-                .run { [engine, isVisible = state.isAmbientLightVisible] _ in await engine.setAmbientLight(isVisible) }
+                perform { [isVisible = state.isAmbientLightVisible] engine in engine.setAmbientLight(isVisible) }
             )
 
         case let .pictureInPicturePossible(isPossible):
@@ -577,13 +569,13 @@ struct PlayerFeature {
         case let .remote(command):
             switch command {
             case .play:
-                return .run { [engine, rate = state.rate] _ in await engine.play(rate: rate) }
+                return perform { [rate = state.rate] engine in engine.play(rate: rate) }
             case .pause:
-                return .run { [engine] _ in await engine.pause() }
+                return perform { $0.pause() }
             case .togglePlayPause:
                 return togglePlayback(state)
             case let .changePosition(position):
-                return .run { [engine] _ in _ = await engine.seek(to: position) }
+                return perform { _ = await $0.seek(to: position) }
             case let .changeRate(rate):
                 return .run { _ in Defaults[.rate] = rate }
             case let .skip(interval):
@@ -601,7 +593,7 @@ struct PlayerFeature {
         case let .rate(rate):
             state.rate = rate
 
-            return .run { [engine, isPlaying = state.isPlaying] _ in await engine.setRate(rate, isPlaying: isPlaying) }
+            return perform { [isPlaying = state.isPlaying] engine in engine.setRate(rate, isPlaying: isPlaying) }
 
         case let .isMuted(isMuted):
             state.isMuted = isMuted
@@ -614,7 +606,7 @@ struct PlayerFeature {
             return .none
 
         case let .spatialAudio(spatialAudio):
-            return .run { [engine] _ in await engine.setSpatialAudio(spatialAudio) }
+            return perform { $0.setSpatialAudio(spatialAudio) }
 
         case let .playerFullscreen(playerFullscreen):
             state.playerFullscreen = playerFullscreen
@@ -624,22 +616,22 @@ struct PlayerFeature {
         case let .videoGravity(videoGravity):
             state.videoGravity = videoGravity
 
-            return .run { [engine, isVisible = state.isAmbientLightVisible] _ in
-                await engine.setAmbientLight(isVisible)
-                await engine.setVideoGravity(videoGravity)
+            return perform { [isVisible = state.isAmbientLightVisible] engine in
+                engine.setAmbientLight(isVisible)
+                engine.setVideoGravity(videoGravity)
             }
 
         case let .ambientLight(ambientLight):
             state.ambientLight = ambientLight
 
-            return .run { [engine, isVisible = state.isAmbientLightVisible] _ in await engine.setAmbientLight(isVisible) }
+            return perform { [isVisible = state.isAmbientLightVisible] engine in engine.setAmbientLight(isVisible) }
 
         case let .mediaControlButtonIsSeeking(isSeeking):
             state.mediaControlButtonIsSeeking = isSeeking
 
             guard state.isReady else { return .none }
 
-            return .run { [engine, mode = state.trackCommandMode] _ in await engine.configureTrackCommands(mode) }
+            return perform { [mode = state.trackCommandMode] engine in engine.configureTrackCommands(mode) }
         }
     }
 
@@ -689,11 +681,11 @@ struct PlayerFeature {
 
     private func startPlayback(_ state: State) -> Effect<Action> {
         if let seek = state.pendingSeek {
-            return .run { [engine, rate = state.rate, isPlaying = state.playsAfterSetup] _ in
+            return perform { [rate = state.rate, isPlaying = state.playsAfterSetup] engine in
                 _ = await engine.seek(to: seek)
 
                 if isPlaying {
-                    await engine.play(rate: rate)
+                    engine.play(rate: rate)
                 }
             }
         }
@@ -739,11 +731,11 @@ struct PlayerFeature {
     }
 
     private func togglePlayback(_ state: State) -> Effect<Action> {
-        .run { [engine, isPlaying = state.isPlaying, rate = state.rate] _ in
+        perform { [isPlaying = state.isPlaying, rate = state.rate] engine in
             if isPlaying {
-                await engine.pause()
+                engine.pause()
             } else {
-                await engine.play(rate: rate)
+                engine.play(rate: rate)
             }
         }
     }
@@ -753,9 +745,9 @@ struct PlayerFeature {
 
         state.currentTime = target
 
-        return .run { [engine, isPlaying = state.isPlaying, rate = state.rate] _ in
+        return perform { [isPlaying = state.isPlaying, rate = state.rate] engine in
             if await engine.seek(to: target), isPlaying {
-                await engine.play(rate: rate)
+                engine.play(rate: rate)
             }
         }
     }
@@ -798,8 +790,13 @@ struct PlayerFeature {
         }
     }
 
+    /// Runs a command against the engine on the main actor.
+    private func perform(_ operation: @escaping @MainActor @Sendable (PlayerEngine) async -> Void) -> Effect<Action> {
+        .run { [engine] _ in await operation(engine) }
+    }
+
     private func showCursor(_ isShowed: Bool = true) -> Effect<Action> {
-        .run { [engine] _ in await engine.showCursor(isShowed) }
+        perform { $0.showCursor(isShowed) }
     }
 
     private func observeDefaults() -> Effect<Action> {

@@ -44,6 +44,26 @@ extension DataState where T: RangeReplaceableCollection {
             self = .data(newData)
         }
     }
+
+    /// Applies a loaded page and returns the resulting pagination state: the first page replaces the content,
+    /// later pages are appended. An empty later page is reported as an error when `emptyPageIsError` is set.
+    mutating func receivePage(_ result: Result<T, any Error>, isInitial: Bool, emptyPageIsError: Bool = false) -> DataPaginationState {
+        switch result {
+        case let .success(items) where isInitial:
+            self = .data(items)
+            return .idle
+        case let .success(items) where emptyPageIsError && items.isEmpty:
+            return .error(HDrezkaError.unknown)
+        case let .success(items):
+            append(items)
+            return .idle
+        case let .failure(error) where isInitial:
+            self = .error(error)
+            return .idle
+        case let .failure(error):
+            return .error(error)
+        }
+    }
 }
 
 enum DataPaginationState: Equatable {
@@ -107,5 +127,18 @@ extension EmptyState {
         default:
             return false
         }
+    }
+}
+
+/// Wraps an error so it can live in `Equatable` reducer state.
+struct EquatableError: Equatable {
+    let base: any Error
+
+    init(_ base: any Error) {
+        self.base = base
+    }
+
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.base as NSError == rhs.base as NSError
     }
 }

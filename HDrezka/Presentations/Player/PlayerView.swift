@@ -21,7 +21,7 @@ struct PlayerView: View {
     var body: some View {
         Group {
             if let error = store.error {
-                ErrorStateView(error.error) {
+                ErrorStateView(error.base) {
                     store.send(.retryTapped)
                 }
                 .padding(.vertical, 18)

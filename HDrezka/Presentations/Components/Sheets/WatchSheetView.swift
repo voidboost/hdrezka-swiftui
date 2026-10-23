@@ -10,7 +10,7 @@ struct WatchSheetView: View {
     private var details: MovieDetailed? { store.details }
     private var seasons: [MovieSeason]? { store.seasons }
     private var movie: MovieVideo? { store.movie }
-    private var error: (any Error)? { store.error }
+    private var error: (any Error)? { store.error?.base }
 
     private var selectedActing: MovieVoiceActing? {
         get { store.selectedActing }

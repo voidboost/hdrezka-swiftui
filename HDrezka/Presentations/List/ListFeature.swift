@@ -134,27 +134,16 @@ struct ListFeature {
 
                 return load(state, isInitial: false)
 
-            case let .moviesLoaded(isInitial, .success((title, movies))):
-                state.page += 1
+            case let .moviesLoaded(isInitial, result):
+                if case let .success((title, _)) = result {
+                    state.page += 1
 
-                if isInitial {
-                    if let title, !title.isEmpty {
+                    if isInitial, let title, !title.isEmpty {
                         state.title = title
                     }
-                    state.movies = .data(movies)
-                } else {
-                    state.movies.append(movies)
-                    state.paginationState = .idle
                 }
 
-                return .none
-
-            case let .moviesLoaded(isInitial, .failure(error)):
-                if isInitial {
-                    state.movies = .error(error)
-                } else {
-                    state.paginationState = .error(error)
-                }
+                state.paginationState = state.movies.receivePage(result.map(\.1), isInitial: isInitial)
 
                 return .none
             }

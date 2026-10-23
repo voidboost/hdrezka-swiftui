@@ -19,28 +19,13 @@ struct MovieSelectionFeature {
         var selectedSubtitles: MovieSubtitles?
         var movie: MovieVideo?
 
-        var error: (any Error)?
+        var error: EquatableError?
         var isErrorPresented = false
 
         fileprivate var selectPosition: SelectPosition?
 
         init(id: String) {
             self.id = id
-        }
-
-        static func == (lhs: Self, rhs: Self) -> Bool {
-            lhs.id == rhs.id
-                && lhs.details == rhs.details
-                && lhs.seasons == rhs.seasons
-                && lhs.selectedActing == rhs.selectedActing
-                && lhs.selectedSeason == rhs.selectedSeason
-                && lhs.selectedEpisode == rhs.selectedEpisode
-                && lhs.selectedQuality == rhs.selectedQuality
-                && lhs.selectedSubtitles == rhs.selectedSubtitles
-                && lhs.movie == rhs.movie
-                && lhs.isErrorPresented == rhs.isErrorPresented
-                && lhs.error as NSError? == rhs.error as NSError?
-                && lhs.selectPosition == rhs.selectPosition
         }
     }
 
@@ -187,7 +172,7 @@ struct MovieSelectionFeature {
                  let .seasonsLoaded(.failure(error)),
                  let .videoLoaded(.failure(error)),
                  let .showError(error):
-                state.error = error
+                state.error = EquatableError(error)
                 state.isErrorPresented = true
 
                 return .none
