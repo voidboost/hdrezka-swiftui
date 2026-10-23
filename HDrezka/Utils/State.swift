@@ -45,8 +45,6 @@ extension DataState where T: RangeReplaceableCollection {
         }
     }
 
-    /// Applies a loaded page and returns the resulting pagination state: the first page replaces the content,
-    /// later pages are appended. An empty later page is reported as an error when `emptyPageIsError` is set.
     mutating func receivePage(_ result: Result<T, any Error>, isInitial: Bool, emptyPageIsError: Bool = false) -> DataPaginationState {
         switch result {
         case let .success(items) where isInitial:
@@ -130,7 +128,6 @@ extension EmptyState {
     }
 }
 
-/// Wraps an error so it can live in `Equatable` reducer state.
 struct EquatableError: Equatable {
     let base: any Error
 

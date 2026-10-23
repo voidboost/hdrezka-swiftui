@@ -3,7 +3,6 @@ import Defaults
 import SQLiteData
 import SwiftUI
 
-/// Shared selection flow (details → voice acting → season → episode → video) behind the watch, download and external player sheets.
 @Reducer
 struct MovieSelectionFeature {
     @ObservableState

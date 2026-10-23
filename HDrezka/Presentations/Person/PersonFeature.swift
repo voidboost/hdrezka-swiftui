@@ -32,7 +32,6 @@ struct PersonFeature {
         Reduce { state, action in
             switch action {
             case .onAppear:
-                // onAppear can fire more than once; only an error warrants loading again while there is no data.
                 guard state.details.data == nil, !state.hasAppeared || state.details.error != nil else { return .none }
 
                 state.hasAppeared = true

@@ -191,8 +191,6 @@ struct DetailsComponentView: View {
         .background {
             DetailsBackdropView(poster: details.poster, height: headerHeight)
         }
-        // The header holds the external player button; the body's other rows appear lazily (LazyVStack),
-        // so the check must run here rather than on a row that may start off screen.
         .onAppear {
             hasExternalPlayer = ExternalPlayers.isAnyInstalled
         }

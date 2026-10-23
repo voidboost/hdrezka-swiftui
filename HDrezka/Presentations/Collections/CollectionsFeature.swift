@@ -28,7 +28,6 @@ struct CollectionsFeature {
         Reduce { state, action in
             switch action {
             case .onAppear:
-                // onAppear can fire more than once; only an error warrants loading again while there is no data.
                 guard state.collections.data == nil, !state.hasAppeared || state.collections.error != nil else { return .none }
 
                 state.hasAppeared = true

@@ -790,7 +790,6 @@ struct PlayerFeature {
         }
     }
 
-    /// Runs a command against the engine on the main actor.
     private func perform(_ operation: @escaping @MainActor @Sendable (PlayerEngine) async -> Void) -> Effect<Action> {
         .run { [engine] _ in await operation(engine) }
     }
