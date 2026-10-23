@@ -8,12 +8,14 @@ struct Aria2RepositoryImpl: Aria2Repository {
     func call<D: Decodable & Sendable>(data: some Encodable & Sendable) async throws -> Aria2Response<D> {
         try await session.request(Aria2Service.call(data: data))
             .serializingDecodable(Aria2Response<D>.self)
+            .resumed()
             .value
     }
 
     func multicall<D: Decodable & Sendable>(data: [some Encodable & Sendable]) async throws -> [Aria2Response<D>] {
         try await session.request(Aria2Service.multicall(data: data))
             .serializingDecodable([Aria2Response<D>].self)
+            .resumed()
             .value
     }
 }

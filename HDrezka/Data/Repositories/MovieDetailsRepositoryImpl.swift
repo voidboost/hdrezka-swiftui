@@ -35,6 +35,7 @@ struct MovieDetailsRepositoryImpl: MovieDetailsRepository {
             let response = await session.request(MovieDetailsService.getMovieThumbnails(path: path))
                 .validate(statusCode: 200 ..< 400)
                 .serializingString()
+                .resumed()
                 .response
 
             let string = try response.result.get()
