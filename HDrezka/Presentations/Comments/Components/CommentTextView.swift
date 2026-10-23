@@ -1,3 +1,4 @@
+import ComposableArchitecture
 import SwiftUI
 
 struct CommentTextView: View {
@@ -7,7 +8,7 @@ struct CommentTextView: View {
     @State private var revealing: [UUID: Date] = [:]
     @State private var isVisible = true
 
-    @Environment(CommentsViewModel.self) private var viewModel
+    @Environment(StoreOf<CommentsFeature>.self) private var store
 
     init(text: AttributedString) {
         self.text = text
@@ -30,11 +31,11 @@ struct CommentTextView: View {
                 if let fragment = url.cleanFragment, fragment.contains("comment") {
                     let commentId = fragment.replacingOccurrences(of: "comment", with: "")
 
-                    viewModel.getComment(movieId: path, commentId: commentId)
+                    store.send(.linkedCommentTapped(movieId: path, commentId: commentId))
 
                     return .handled
                 } else {
-                    viewModel.movieDestination = .init(movieId: path)
+                    store.movieDestination = .init(movieId: path)
 
                     return .handled
                 }

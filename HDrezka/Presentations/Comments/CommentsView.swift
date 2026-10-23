@@ -1,30 +1,31 @@
+import ComposableArchitecture
 import SwiftUI
 
 struct CommentsView: View {
     private let title: String
 
-    @State private var viewModel: CommentsViewModel
+    @State private var store: StoreOf<CommentsFeature>
 
     init(details: MovieDetailed) {
         title = details.commentsCount > 0 ? String(localized: "key.comments-\(details.commentsCount)") : String(localized: "key.comments")
-        viewModel = CommentsViewModel(id: details.movieId, adb: details.adb, type: details.type)
+        _store = State(initialValue: Store(initialState: CommentsFeature.State(details: details)) { CommentsFeature() })
     }
 
     var body: some View {
         ScrollView(.vertical) {
-            if viewModel.state.data?.isEmpty == false, viewModel.reply == nil {
+            if store.comments.data?.isEmpty == false, store.reply == nil {
                 CommentTextAreaView()
                     .padding(.top, 18)
                     .padding(.horizontal, 36)
-                    .environment(viewModel)
+                    .environment(store)
             }
 
             LazyVStack(alignment: .leading, spacing: 16) {
-                if let comments = viewModel.state.data, !comments.isEmpty {
+                if let comments = store.comments.data, !comments.isEmpty {
                     ForEach(comments) { comment in
                         CommentView(comment: comment)
                             .equatable()
-                            .environment(viewModel)
+                            .environment(store)
                     }
                 }
             }
@@ -32,19 +33,19 @@ struct CommentsView: View {
             .padding(.vertical, 18)
             .padding(.horizontal, 36)
 
-            if viewModel.paginationState == .loading {
+            if store.paginationState == .loading {
                 LoadingPaginationStateView()
             }
         }
         .scrollIndicators(.visible, axes: .vertical)
         .onScrollTargetVisibilityChange(idType: Comment.ID.self) { onScreenComments in
-            if viewModel.paginationState == .idle,
-               let comments = viewModel.state.data,
+            if store.paginationState == .idle,
+               let comments = store.comments.data,
                !comments.isEmpty,
                let last = comments.last,
                onScreenComments.contains(where: { $0 == last.id })
             {
-                viewModel.loadMore()
+                store.send(.loadMore)
             }
         }
         .viewModifier { view in
@@ -55,18 +56,18 @@ struct CommentsView: View {
             }
         }
         .overlay {
-            if let error = viewModel.state.error {
+            if let error = store.comments.error {
                 ErrorStateView(error) {
-                    viewModel.load()
+                    store.send(.reload)
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if let comments = viewModel.state.data, comments.isEmpty {
+            } else if let comments = store.comments.data, comments.isEmpty {
                 ScrollView(.vertical) {
                     CommentTextAreaView()
                         .padding(.vertical, 18)
                         .padding(.horizontal, 36)
-                        .environment(viewModel)
+                        .environment(store)
                 }
                 .scrollIndicators(.visible, axes: .vertical)
                 .viewModifier { view in
@@ -76,7 +77,7 @@ struct CommentsView: View {
                         view
                     }
                 }
-            } else if viewModel.state == .loading {
+            } else if store.comments == .loading {
                 LoadingStateView()
                     .padding(.vertical, 18)
                     .padding(.horizontal, 36)
@@ -87,47 +88,28 @@ struct CommentsView: View {
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button {
-                    viewModel.load()
+                    store.send(.reload)
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
                 .keyboardShortcut("r", modifiers: .command)
-                .disabled(viewModel.state.data?.isEmpty != false)
+                .disabled(store.comments.data?.isEmpty != false)
             }
         }
         .onAppear {
-            switch viewModel.state {
-            case .data:
-                break
-            default:
-                viewModel.load()
-            }
+            store.send(.onAppear)
         }
-        .alert("key.ops", isPresented: $viewModel.isErrorPresented) {
-            Button(role: .cancel) {} label: { Text("key.ok") }
-        } message: {
-            if let message = viewModel.message {
-                Text(message)
-            } else if let error = viewModel.error {
-                Text(error.localizedDescription)
-            }
-        }
+        .alert($store.scope(state: \.alert, action: \.alert))
         .dialogSeverity(.critical)
-        .alert("key.comments.success", isPresented: $viewModel.isOnModerationPresented) {
-            Button(role: .cancel) {} label: { Text("key.ok") }
-        } message: {
-            if let message = viewModel.message {
-                Text(message)
-            }
-        }
+        .alert($store.scope(state: \.moderationAlert, action: \.moderationAlert))
         .dialogSeverity(.automatic)
-        .sheet(isPresented: $viewModel.isCommentPresented) {
+        .sheet(isPresented: $store.isCommentPresented) {
             VStack(alignment: .center, spacing: 25) {
-                if let comment = viewModel.comment {
+                if let comment = store.comment {
                     ScrollView(.vertical) {
                         CommentView(comment: comment)
                             .equatable()
-                            .environment(viewModel)
+                            .environment(store)
                     }
                     .scrollIndicators(.visible, axes: .vertical)
                 } else {
@@ -135,7 +117,7 @@ struct CommentsView: View {
                 }
 
                 Button {
-                    viewModel.isCommentPresented = false
+                    store.isCommentPresented = false
                 } label: {
                     Text("key.done")
                         .frame(width: 250, height: 30)
@@ -150,28 +132,12 @@ struct CommentsView: View {
             .frame(width: 650)
             .frame(maxHeight: 520)
         }
-        .sheet(item: $viewModel.reportComment) { comment in
+        .sheet(item: $store.reportComment) { comment in
             CommentReportSheetView(comment: comment)
         }
-        .confirmationDialog("key.comment.delete.label", isPresented: Binding {
-            viewModel.deleteComment != nil
-        } set: {
-            if !$0 {
-                viewModel.deleteComment = nil
-            }
-        }) {
-            if let comment = viewModel.deleteComment {
-                Button {
-                    viewModel.deleteComment(comment: comment)
-                } label: {
-                    Text("key.comment.delete.confirm")
-                }
-            }
-        } message: {
-            Text("key.comment.delete")
-        }
+        .confirmationDialog($store.scope(state: \.deleteDialog, action: \.deleteDialog))
         .background(.background)
-        .navigationDestination(item: $viewModel.movieDestination) {
+        .navigationDestination(item: $store.movieDestination) {
             DetailsView(movie: $0)
         }
     }

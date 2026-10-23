@@ -1,6 +1,6 @@
 import Foundation
 
-struct Likes: Identifiable {
+struct Likes: Identifiable, Hashable {
     let likes: [Like]
     let id: UUID
 
@@ -10,7 +10,7 @@ struct Likes: Identifiable {
     }
 }
 
-struct Like: Identifiable {
+struct Like: Identifiable, Hashable {
     let photo: String
     let name: String
     let id: UUID

@@ -1,3 +1,4 @@
+import ComposableArchitecture
 import Defaults
 import Kingfisher
 import Pow
@@ -10,7 +11,7 @@ struct CommentView: View {
         self.comment = comment
     }
 
-    @Environment(CommentsViewModel.self) private var viewModel
+    @Environment(StoreOf<CommentsFeature>.self) private var store
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -48,7 +49,7 @@ struct CommentView: View {
 
                     if !comment.isAdmin {
                         Button {
-                            viewModel.reportComment = comment
+                            store.reportComment = comment
                         } label: {
                             Image(systemName: "exclamationmark.bubble.fill")
                                 .foregroundColor(.accentColor)
@@ -66,7 +67,7 @@ struct CommentView: View {
 
                     if comment.deleteHash != nil {
                         Button {
-                            viewModel.deleteComment = comment
+                            store.send(.deleteTapped(comment))
                         } label: {
                             Image(systemName: "trash")
                                 .foregroundColor(.accentColor)
@@ -111,14 +112,14 @@ private struct CommentLikeButton: View {
     @Default(.isLoggedIn) private var isLoggedIn
 
     @Environment(AppState.self) private var appState
-    @Environment(CommentsViewModel.self) private var viewModel
+    @Environment(StoreOf<CommentsFeature>.self) private var store
 
     var body: some View {
-        @Bindable var viewModel = viewModel
+        @Bindable var store = store
 
         Button {
             if isLoggedIn {
-                viewModel.like(comment: comment)
+                store.send(.likeTapped(comment))
             } else {
                 appState.isSignInPresented = true
             }
@@ -158,9 +159,9 @@ private struct CommentLikeButton: View {
 
             guard !Task.isCancelled else { return }
 
-            viewModel.getLikes(comment: comment)
+            store.send(.likesHovered(comment))
         }
-        .popover(item: $viewModel.likes[comment.commentId], attachmentAnchor: .rect(.bounds), arrowEdge: .top) { like in
+        .popover(item: $store.likes[comment.commentId], attachmentAnchor: .rect(.bounds), arrowEdge: .top) { like in
             VStack(alignment: .center, spacing: 10) {
                 if !like.likes.isEmpty {
                     let chunks = like.likes.chunks(ofCount: 8)
@@ -204,16 +205,16 @@ private struct CommentLikeButton: View {
 private struct CommentReplyButton: View {
     let commentId: String
 
-    @Environment(CommentsViewModel.self) private var viewModel
+    @Environment(StoreOf<CommentsFeature>.self) private var store
 
     var body: some View {
         Button {
             withAnimation(.easeInOut) {
-                viewModel.reply = (viewModel.reply == commentId) ? nil : commentId
+                store.reply = (store.reply == commentId) ? nil : commentId
             }
         } label: {
             Group {
-                if viewModel.reply == commentId {
+                if store.reply == commentId {
                     Image(systemName: "chevron.up")
                 } else {
                     Text("key.reply")
@@ -233,10 +234,10 @@ private struct CommentReplyButton: View {
 private struct CommentReplyArea: View {
     let commentId: String
 
-    @Environment(CommentsViewModel.self) private var viewModel
+    @Environment(StoreOf<CommentsFeature>.self) private var store
 
     var body: some View {
-        if viewModel.reply == commentId {
+        if store.reply == commentId {
             CommentTextAreaView()
         }
     }
