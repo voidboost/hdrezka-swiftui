@@ -7,6 +7,9 @@ struct DetailsFeature {
     enum Destination {
         case bookmarks(BookmarksSheetFeature)
         case createBookmark(CreateBookmarkFeature)
+        case watch(MovieSelectionFeature)
+        case download(MovieSelectionFeature)
+        case openExternalPlayer(MovieSelectionFeature)
     }
 
     @ObservableState
@@ -35,6 +38,9 @@ struct DetailsFeature {
         case rate(Int)
         case rated(Result<(Float?, String?)?, any Error>)
         case bookmarksTapped
+        case watchTapped
+        case downloadTapped
+        case openExternalPlayerTapped
         case push(Destinations)
         case delegate(Delegate)
         case alert(PresentationAction<Alert>)
@@ -126,6 +132,21 @@ struct DetailsFeature {
 
             case .bookmarksTapped:
                 state.destination = .bookmarks(BookmarksSheetFeature.State(id: state.id))
+
+                return .none
+
+            case .watchTapped:
+                state.destination = .watch(MovieSelectionFeature.State(id: state.details.data?.movieId ?? state.id))
+
+                return .none
+
+            case .downloadTapped:
+                state.destination = .download(MovieSelectionFeature.State(id: state.details.data?.movieId ?? state.id))
+
+                return .none
+
+            case .openExternalPlayerTapped:
+                state.destination = .openExternalPlayer(MovieSelectionFeature.State(id: state.details.data?.movieId ?? state.id))
 
                 return .none
 

@@ -1,3 +1,4 @@
+import ComposableArchitecture
 import Kingfisher
 import SwiftUI
 import YouTubePlayerKit
@@ -21,9 +22,7 @@ struct DetailsComponentView: View {
         _isSchedulePresented = isSchedulePresented
     }
 
-    @State private var isPlayPresented: Bool = false
-    @State private var isDownloadPresented: Bool = false
-    @State private var isOpenExternalPlayerPresented: Bool = false
+    @Environment(StoreOf<DetailsFeature>.self) private var store
 
     @State private var franchiseExpanded: Bool = false
 
@@ -39,6 +38,8 @@ struct DetailsComponentView: View {
     @Environment(\.dismissWindow) private var dismissWindow
 
     var body: some View {
+        @Bindable var store = store
+
         VStack(spacing: 18) {
             VStack(spacing: 18) {
                 HStack(alignment: .bottom, spacing: 27) {
@@ -90,7 +91,7 @@ struct DetailsComponentView: View {
                         HStack(alignment: .center, spacing: 12) {
                             if details.available {
                                 Button {
-                                    isPlayPresented = true
+                                    store.send(.watchTapped)
                                 } label: {
                                     Label("key.watch", systemImage: "play.fill")
                                         .font(.body)
@@ -102,13 +103,13 @@ struct DetailsComponentView: View {
                                         .background(Color.accentColor, in: .capsule)
                                 }
                                 .buttonStyle(.plain)
-                                .sheet(isPresented: $isPlayPresented) {
-                                    WatchSheetView(id: details.movieId)
+                                .sheet(item: $store.scope(state: \.destination?.watch, action: \.destination.watch)) { store in
+                                    WatchSheetView(store: store)
                                 }
 
                                 if downloader.isRunning {
                                     Button {
-                                        isDownloadPresented = true
+                                        store.send(.downloadTapped)
                                     } label: {
                                         Label("key.download", systemImage: "arrow.down.circle")
                                             .font(.body)
@@ -121,14 +122,14 @@ struct DetailsComponentView: View {
                                             .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                                     }
                                     .buttonStyle(.plain)
-                                    .sheet(isPresented: $isDownloadPresented) {
-                                        DownloadSheetView(id: details.movieId)
+                                    .sheet(item: $store.scope(state: \.destination?.download, action: \.destination.download)) { store in
+                                        DownloadSheetView(store: store)
                                     }
                                 }
 
                                 if hasExternalPlayer {
                                     Button {
-                                        isOpenExternalPlayerPresented = true
+                                        store.send(.openExternalPlayerTapped)
                                     } label: {
                                         Label("key.open.external", systemImage: "arrow.up.forward.app")
                                             .font(.body)
@@ -141,8 +142,8 @@ struct DetailsComponentView: View {
                                             .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
                                     }
                                     .buttonStyle(.plain)
-                                    .sheet(isPresented: $isOpenExternalPlayerPresented) {
-                                        OpenExternalPlayerSheetView(id: details.movieId)
+                                    .sheet(item: $store.scope(state: \.destination?.openExternalPlayer, action: \.destination.openExternalPlayer)) { store in
+                                        OpenExternalPlayerSheetView(store: store)
                                     }
                                 }
                             } else if details.comingSoon {
