@@ -1,4 +1,3 @@
-import Combine
 import Defaults
 import Dependencies
 import Foundation
@@ -8,7 +7,7 @@ import Foundation
 class CookiesManager {
     @ObservationIgnored static let shared = CookiesManager()
 
-    @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
+    @ObservationIgnored private var observation: Task<Void, Never>?
 
     @ObservationIgnored @Dependency(\.notificationCenter) private var notificationCenter
 
@@ -17,11 +16,10 @@ class CookiesManager {
     }
 
     private func observe() {
-        notificationCenter.publisher(for: .NSHTTPCookieManagerCookiesChanged, object: HTTPCookieStorage.shared)
-            .receive(on: DispatchQueue.main)
-            .compactMap { $0.object as? HTTPCookieStorage }
-            .compactMap { $0.cookies(for: Defaults[.mirror]) }
-            .sink { cookies in
+        observation = Task { [weak self, notificationCenter] in
+            for await _ in notificationCenter.notifications(named: .NSHTTPCookieManagerCookiesChanged, object: HTTPCookieStorage.shared) {
+                guard self != nil, let cookies = HTTPCookieStorage.shared.cookies(for: Defaults[.mirror]) else { continue }
+
                 if cookies.contains(where: { $0.name == "dle_user_id" }),
                    cookies.contains(where: { $0.name == "dle_password" })
                 {
@@ -33,11 +31,11 @@ class CookiesManager {
 
                 Defaults[.allowedComments] = cookies.contains { $0.name == "allowed_comments" && $0.value == "1" }
             }
-            .store(in: &subscriptions)
+        }
     }
 
     func setMirror(_ mirror: URL) {
-        subscriptions.flush()
+        observation?.cancel()
 
         defer { observe() }
 

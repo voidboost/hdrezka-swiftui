@@ -1,4 +1,3 @@
-import Combine
 import Defaults
 import Dependencies
 import SQLiteData
@@ -10,7 +9,7 @@ import UserNotifications
 class Downloader {
     @ObservationIgnored static let shared = Downloader()
 
-    @ObservationIgnored private var subscriptions: Set<AnyCancellable> = []
+    @ObservationIgnored private var pollingTask: Task<Void, Never>?
 
     @ObservationIgnored @Dependency(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
     @ObservationIgnored @Dependency(\.getMovieVideoUseCase) private var getMovieVideoUseCase
@@ -83,7 +82,7 @@ class Downloader {
             Task { @MainActor [weak self] in
                 guard let self else { return }
 
-                self.subscriptions.flush()
+                self.pollingTask?.cancel()
 
                 withAnimation(.easeInOut) {
                     self.isRunning = false
@@ -101,144 +100,118 @@ class Downloader {
             fatalError("Failed to start aria2 process: \(error)")
         }
 
-        Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
-            .flatMap(maxPublishers: .max(1)) { _ in
-                self.callUseCase(data:
-                    Aria2Request(
-                        method: .getGlobalStat,
-                        params: EmptyTokenParams(
-                            token: Const.token
-                        )
-                    ))
-                    .catch { _ in Empty<Aria2Response<GlobalStatusResult>, Error>() }
+        pollingTask = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(1))
+
+                await self?.poll()
             }
-            .flatMap(maxPublishers: .max(1)) { (response: Aria2Response<GlobalStatusResult>) in
-                guard let result = response.result,
-                      result.numActive > 0 || result.numWaiting > 0 || result.numStopped > 0
-                else {
-                    return Empty<[Aria2Response<[StatusResult]>], Error>().eraseToAnyPublisher()
-                }
+        }
+    }
 
-                let keys = [
-                    "gid",
-                    "status",
-                    "totalLength",
-                    "completedLength",
-                    "downloadSpeed",
-                    "errorCode",
-                ]
+    private func poll() async {
+        guard let response: Aria2Response<GlobalStatusResult> = try? await callUseCase(
+            data: Aria2Request(
+                method: .getGlobalStat,
+                params: EmptyTokenParams(
+                    token: Const.token
+                )
+            )
+        ),
+            let result = response.result,
+            result.numActive > 0 || result.numWaiting > 0 || result.numStopped > 0
+        else {
+            return
+        }
 
-                var data: [Aria2Request<OffsetParams>] = []
+        let keys = [
+            "gid",
+            "status",
+            "totalLength",
+            "completedLength",
+            "downloadSpeed",
+            "errorCode",
+        ]
 
-                if result.numActive > 0 {
-                    data.append(
-                        Aria2Request(
-                            method: .tellActive,
-                            params: OffsetParams(
-                                token: Const.token,
-                                keys: keys
-                            )
-                        )
+        var data: [Aria2Request<OffsetParams>] = []
+
+        if result.numActive > 0 {
+            data.append(
+                Aria2Request(
+                    method: .tellActive,
+                    params: OffsetParams(
+                        token: Const.token,
+                        keys: keys
                     )
-                }
+                )
+            )
+        }
 
-                if result.numWaiting > 0 {
-                    data.append(
-                        Aria2Request(
-                            method: .tellWaiting,
-                            params: OffsetParams(
-                                token: Const.token,
-                                offset: 0,
-                                num: result.numWaiting,
-                                keys: keys
-                            )
-                        )
+        if result.numWaiting > 0 {
+            data.append(
+                Aria2Request(
+                    method: .tellWaiting,
+                    params: OffsetParams(
+                        token: Const.token,
+                        offset: 0,
+                        num: result.numWaiting,
+                        keys: keys
                     )
-                }
+                )
+            )
+        }
 
-                if result.numStopped > 0 {
-                    data.append(
-                        Aria2Request(
-                            method: .tellStopped,
-                            params: OffsetParams(
-                                token: Const.token,
-                                offset: 0,
-                                num: result.numStopped,
-                                keys: keys
-                            )
-                        )
+        if result.numStopped > 0 {
+            data.append(
+                Aria2Request(
+                    method: .tellStopped,
+                    params: OffsetParams(
+                        token: Const.token,
+                        offset: 0,
+                        num: result.numStopped,
+                        keys: keys
                     )
-                }
+                )
+            )
+        }
 
-                return self.multicallUseCase(data: data)
-                    .catch { _ in Empty<[Aria2Response<[StatusResult]>], Error>() }
-                    .eraseToAnyPublisher()
-            }
-            .receive(on: DispatchQueue.main)
-            .sink { _ in } receiveValue: { [weak self] (responses: [Aria2Response<[StatusResult]>]) in
-                guard let self else { return }
+        guard let responses: [Aria2Response<[StatusResult]>] = try? await multicallUseCase(data: data) else { return }
 
-                for response in responses {
-                    if let statuses = response.result {
-                        for status in statuses {
-                            if status.status == .complete || status.status == .removed || status.status == .error {
-                                if status.status == .complete,
-                                   let download = self.downloads.first(where: { download in
-                                       download.gid == status.gid
-                                   })
-                                {
-                                    self.notificate(download.data.notificationId, String(localized: "key.download.success"), String(localized: "key.download.success.notification-\(download.data.name)"), "open", ["url": download.fileURL.absoluteString])
+        for response in responses {
+            guard let statuses = response.result else { continue }
 
-                                    if download.data.all, let episode = download.data.episode, let nextEpisode = download.data.season?.episodes.element(after: episode) {
-                                        self.download(download.data.newEpisede(nextEpisode))
-                                    }
-                                }
+            for status in statuses {
+                if status.status == .complete || status.status == .removed || status.status == .error {
+                    if status.status == .complete,
+                       let download = downloads.first(where: { $0.gid == status.gid })
+                    {
+                        notificate(download.data.notificationId, String(localized: "key.download.success"), String(localized: "key.download.success.notification-\(download.data.name)"), "open", ["url": download.fileURL.absoluteString])
 
-                                if status.status == .error,
-                                   let download = self.downloads.first(where: { download in
-                                       download.gid == status.gid
-                                   })
-                                {
-                                    if let errorCode = status.errorCode,
-                                       let aria2ErrorCode = Aria2ErrorCode(rawValue: errorCode)
-                                    {
-                                        if let retryData = download.data.retryData {
-                                            self.notificate(download.data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(download.data.name)-\(aria2ErrorCode.description)"), "retry", ["data": retryData])
-                                        } else {
-                                            self.notificate(download.data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(download.data.name)-\(aria2ErrorCode.description)"))
-                                        }
-                                    } else {
-                                        if let retryData = download.data.retryData {
-                                            self.notificate(download.data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(download.data.name)-\(Aria2ErrorCode.unknownError.description)"), "retry", ["data": retryData])
-                                        } else {
-                                            self.notificate(download.data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(download.data.name)-\(Aria2ErrorCode.unknownError.description)"))
-                                        }
-                                    }
-                                }
-
-                                self.callUseCase(
-                                    data: Aria2Request(
-                                        method: .removeDownloadResult,
-                                        params: GidParams(
-                                            token: Const.token,
-                                            gid: status.gid
-                                        )
-                                    )
-                                )
-                                .sink { _ in } receiveValue: { (_: Aria2Response<String>) in }
-                                .store(in: &self.subscriptions)
-
-                                self.downloads.removeAll(where: { $0.gid == status.gid })
-                            } else if let index = self.downloads.firstIndex(where: { download in
-                                download.gid == status.gid
-                            }), self.downloads[index].status != status {
-                                self.downloads[index].updateStatus(status)
-                            }
+                        if download.data.all, let episode = download.data.episode, let nextEpisode = download.data.season?.episodes.element(after: episode) {
+                            self.download(download.data.newEpisede(nextEpisode))
                         }
                     }
+
+                    if status.status == .error,
+                       let download = downloads.first(where: { $0.gid == status.gid })
+                    {
+                        let errorCode = status.errorCode.flatMap(Aria2ErrorCode.init(rawValue:)) ?? .unknownError
+
+                        if let retryData = download.data.retryData {
+                            notificate(download.data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(download.data.name)-\(errorCode.description)"), "retry", ["data": retryData])
+                        } else {
+                            notificate(download.data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(download.data.name)-\(errorCode.description)"))
+                        }
+                    }
+
+                    removeDownloadResult(status.gid)
+
+                    downloads.removeAll(where: { $0.gid == status.gid })
+                } else if let index = downloads.firstIndex(where: { $0.gid == status.gid }), downloads[index].status != status {
+                    downloads[index].updateStatus(status)
                 }
             }
-            .store(in: &subscriptions)
+        }
     }
 
     nonisolated private func notificate(_ id: String, _ title: String, _ subtitle: String? = nil, _ category: String? = nil, _ userInfo: [String: any Sendable] = [:]) {
@@ -269,422 +242,274 @@ class Downloader {
     }
 
     func download(_ data: DownloadData) {
-        if let retryData = data.retryData {
-            let name = data.details.nameRussian
-
-            let actingName = if !data.acting.name.isEmpty {
-                " [\(data.acting.name)]"
-            } else {
-                ""
-            }
-
-            let qualityName = if !data.quality.isEmpty {
-                " [\(data.quality)]"
-            } else {
-                ""
-            }
-
-            if let season = data.season, let episode = data.episode {
-                let (seasonName, episodeName) = (
-                    String(localized: "key.season-\(season.name.contains(/^\d/) ? season.name : season.seasonId)"),
-                    String(localized: "key.episode-\(episode.name.contains(/^\d/) ? episode.name : episode.episodeId)")
-                )
-
-                let (movieFolder, seasonFolder, movieFile) = (
-                    name.count > 255 - actingName.count - qualityName.count ? "\(name.prefix(255 - actingName.count - qualityName.count - 4))... \(qualityName)\(actingName)" : "\(name)\(qualityName)\(actingName)",
-                    seasonName.count > 255 ? "\(seasonName.prefix(255 - 3))..." : "\(seasonName)",
-                    episodeName.count > 255 - 4 ? "\(episodeName.prefix(255 - 8))... .mp4" : "\(episodeName).mp4"
-                )
-
-                if let movieDestination = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?
-                    .appending(path: "HDrezka", directoryHint: .isDirectory)
-                    .appending(path: movieFolder.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .isDirectory)
-                    .appending(path: seasonFolder.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .isDirectory)
-                {
-                    getMovieVideoUseCase(voiceActing: data.acting, season: season, episode: episode, favs: data.details.favs)
-                        .receive(on: DispatchQueue.main)
-                        .sink { [weak self] completion in
-                            guard let self,
-                                  case let .failure(error) = completion
-                            else {
-                                return
-                            }
-
-                            self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
-                        } receiveValue: { [weak self] movie in
-                            guard let self else { return }
-
-                            if movie.needPremium {
-                                self.notificate(data.notificationId, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(data.name)"), "need_premium")
-                            } else {
-                                if Defaults[.isLoggedIn] {
-                                    self.saveWatchingStateUseCase(voiceActing: data.acting, season: season, episode: episode)
-                                        .sink { _ in } receiveValue: { _ in }
-                                        .store(in: &self.subscriptions)
-                                }
-
-                                let voiceId = data.acting.voiceId
-                                let translatorId = data.acting.translatorId
-                                let seasonId = season.seasonId
-                                let episodeId = episode.episodeId
-                                let subtitles = data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
-
-                                Task.detached(priority: .utility) { [weak self] in
-                                    guard let self else { return }
-
-                                    try? await self.database.write { db in
-                                        try SelectPosition
-                                            .upsert {
-                                                SelectPosition.Draft(
-                                                    id: voiceId,
-                                                    acting: translatorId,
-                                                    season: seasonId,
-                                                    episode: episodeId,
-                                                    subtitles: subtitles
-                                                )
-                                            }
-                                            .execute(db)
-                                    }
-                                }
-
-                                if let movieUrls = movie.getClosestTo(quality: data.quality) {
-                                    self.callUseCase(
-                                        data: Aria2Request(
-                                            method: .addUri,
-                                            params: AddUriParams(
-                                                token: Const.token,
-                                                uris: movieUrls.map(\.absoluteString),
-                                                options: [
-                                                    "dir": movieDestination.path(percentEncoded: false),
-                                                    "out": movieFile.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"),
-                                                ]
-                                            )
-                                        )
-                                    )
-                                    .receive(on: DispatchQueue.main)
-                                    .sink { _ in } receiveValue: { [weak self] (response: Aria2Response<String>) in
-                                        guard let self else { return }
-
-                                        if let gid = response.result {
-                                            self.downloads.append(
-                                                .init(
-                                                    gid: gid,
-                                                    data: data,
-                                                    fileURL: movieDestination.appending(path: movieFile.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .notDirectory)
-                                                )
-                                            )
-
-                                            self.notificate(data.notificationId, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(data.name)"), "cancel", ["gid": gid])
-                                        } else if let error = response.error {
-                                            self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.code.description)"), "retry", ["data": retryData])
-                                        } else {
-                                            self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized:
-                                                "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
-                                        }
-                                    }
-                                    .store(in: &self.subscriptions)
-
-                                    if let subtitles = data.subtitles,
-                                       let sub = movie.subtitles.first(where: { $0.name == subtitles.name }),
-                                       let subtitlesUrl = URL(string: sub.link)
-                                    {
-                                        self.callUseCase(
-                                            data: Aria2Request(
-                                                method: .addUri,
-                                                params: AddUriParams(
-                                                    token: Const.token,
-                                                    uris: [subtitlesUrl.absoluteString],
-                                                    options: [
-                                                        "dir": movieDestination.path(percentEncoded: false),
-                                                        "out": movieFile.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":").replacingOccurrences(of: ".mp4", with: " [\(sub.name)].\(subtitlesUrl.pathExtension)"),
-                                                    ]
-                                                )
-                                            )
-                                        )
-                                        .sink { _ in } receiveValue: { (_: Aria2Response<String>) in }
-                                        .store(in: &self.subscriptions)
-                                    }
-                                }
-                            }
-                        }
-                        .store(in: &subscriptions)
-                } else {
-                    notificate(data.notificationId, String(localized: "key.download.failed"), String(localized:
-                        "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
-                }
-            } else if let season = data.season, let episode = season.episodes.first {
-                download(data.newEpisede(episode))
-            } else {
-                let file = name.count > 255 - 4 - actingName.count - qualityName.count ? "\(name.prefix(255 - 8 - actingName.count - qualityName.count))... \(qualityName)\(actingName).mp4" : "\(name)\(qualityName)\(actingName).mp4"
-
-                if let movieDestination = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?
-                    .appending(path: "HDrezka", directoryHint: .isDirectory)
-                {
-                    getMovieVideoUseCase(voiceActing: data.acting, season: nil, episode: nil, favs: data.details.favs)
-                        .receive(on: DispatchQueue.main)
-                        .sink { [weak self] completion in
-                            guard let self,
-                                  case let .failure(error) = completion
-                            else {
-                                return
-                            }
-
-                            self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized:
-                                "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
-                        } receiveValue: { [weak self] movie in
-                            guard let self else { return }
-
-                            if movie.needPremium {
-                                self.notificate(data.notificationId, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(data.name)"), "need_premium")
-                            } else {
-                                if Defaults[.isLoggedIn] {
-                                    self.saveWatchingStateUseCase(voiceActing: data.acting, season: nil, episode: nil)
-                                        .sink { _ in } receiveValue: { _ in }
-                                        .store(in: &self.subscriptions)
-                                }
-
-                                let voiceId = data.acting.voiceId
-                                let translatorId = data.acting.translatorId
-                                let subtitles = data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
-
-                                Task.detached(priority: .utility) { [weak self] in
-                                    guard let self else { return }
-
-                                    try? await self.database.write { db in
-                                        try SelectPosition
-                                            .upsert {
-                                                SelectPosition.Draft(
-                                                    id: voiceId,
-                                                    acting: translatorId,
-                                                    subtitles: subtitles
-                                                )
-                                            }
-                                            .execute(db)
-                                    }
-                                }
-
-                                if let movieUrls = movie.getClosestTo(quality: data.quality) {
-                                    self.callUseCase(
-                                        data: Aria2Request(
-                                            method: .addUri,
-                                            params: AddUriParams(
-                                                token: Const.token,
-                                                uris: movieUrls.map(\.absoluteString),
-                                                options: [
-                                                    "dir": movieDestination.path(percentEncoded: false),
-                                                    "out": file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"),
-                                                ]
-                                            )
-                                        )
-                                    )
-                                    .receive(on: DispatchQueue.main)
-                                    .sink { _ in } receiveValue: { [weak self] (response: Aria2Response<String>) in
-                                        guard let self else { return }
-
-                                        if let gid = response.result {
-                                            self.downloads.append(
-                                                .init(
-                                                    gid: gid,
-                                                    data: data,
-                                                    fileURL: movieDestination.appending(path: file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .notDirectory)
-                                                )
-                                            )
-
-                                            self.notificate(data.notificationId, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(data.name)"), "cancel", ["gid": gid])
-                                        } else if let error = response.error {
-                                            self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized:
-                                                "key.download.failed.notification-\(data.name)-\(error.code.description)"), "retry", ["data": retryData])
-                                        } else {
-                                            self.notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
-                                        }
-                                    }
-                                    .store(in: &self.subscriptions)
-
-                                    if let subtitles = data.subtitles,
-                                       let sub = movie.subtitles.first(where: { $0.name == subtitles.name }),
-                                       let subtitlesUrl = URL(string: sub.link)
-                                    {
-                                        self.callUseCase(
-                                            data: Aria2Request(
-                                                method: .addUri,
-                                                params: AddUriParams(
-                                                    token: Const.token,
-                                                    uris: [subtitlesUrl.absoluteString],
-                                                    options: [
-                                                        "dir": movieDestination.path(percentEncoded: false),
-                                                        "out": file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":").replacingOccurrences(of: ".mp4", with: " [\(sub.name)].\(subtitlesUrl.pathExtension)"),
-                                                    ]
-                                                )
-                                            )
-                                        )
-                                        .sink { _ in } receiveValue: { (_: Aria2Response<String>) in }
-                                        .store(in: &self.subscriptions)
-                                    }
-                                }
-                            }
-                        }
-                        .store(in: &subscriptions)
-                } else {
-                    notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
-                }
-            }
-        } else {
+        guard let retryData = data.retryData else {
             notificate(UUID().uuidString, String(localized: "key.download.failed"))
+
+            return
+        }
+
+        let name = data.details.nameRussian
+
+        let actingName = if !data.acting.name.isEmpty {
+            " [\(data.acting.name)]"
+        } else {
+            ""
+        }
+
+        let qualityName = if !data.quality.isEmpty {
+            " [\(data.quality)]"
+        } else {
+            ""
+        }
+
+        if let season = data.season, let episode = data.episode {
+            let (seasonName, episodeName) = (
+                String(localized: "key.season-\(season.name.contains(/^\d/) ? season.name : season.seasonId)"),
+                String(localized: "key.episode-\(episode.name.contains(/^\d/) ? episode.name : episode.episodeId)")
+            )
+
+            let (movieFolder, seasonFolder, movieFile) = (
+                name.count > 255 - actingName.count - qualityName.count ? "\(name.prefix(255 - actingName.count - qualityName.count - 4))... \(qualityName)\(actingName)" : "\(name)\(qualityName)\(actingName)",
+                seasonName.count > 255 ? "\(seasonName.prefix(255 - 3))..." : "\(seasonName)",
+                episodeName.count > 255 - 4 ? "\(episodeName.prefix(255 - 8))... .mp4" : "\(episodeName).mp4"
+            )
+
+            guard let movieDestination = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?
+                .appending(path: "HDrezka", directoryHint: .isDirectory)
+                .appending(path: movieFolder.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .isDirectory)
+                .appending(path: seasonFolder.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .isDirectory)
+            else {
+                notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
+
+                return
+            }
+
+            Task {
+                await start(data, retryData: retryData, season: season, episode: episode, destination: movieDestination, file: movieFile)
+            }
+        } else if let season = data.season, let episode = season.episodes.first {
+            download(data.newEpisede(episode))
+        } else {
+            let file = name.count > 255 - 4 - actingName.count - qualityName.count ? "\(name.prefix(255 - 8 - actingName.count - qualityName.count))... \(qualityName)\(actingName).mp4" : "\(name)\(qualityName)\(actingName).mp4"
+
+            guard let movieDestination = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?
+                .appending(path: "HDrezka", directoryHint: .isDirectory)
+            else {
+                notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
+
+                return
+            }
+
+            Task {
+                await start(data, retryData: retryData, season: nil, episode: nil, destination: movieDestination, file: file)
+            }
+        }
+    }
+
+    private func start(_ data: DownloadData, retryData: Data, season: MovieSeason?, episode: MovieEpisode?, destination: URL, file: String) async {
+        let movie: MovieVideo
+
+        do {
+            movie = try await getMovieVideoUseCase(voiceActing: data.acting, season: season, episode: episode, favs: data.details.favs)
+        } catch {
+            notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
+
+            return
+        }
+
+        guard !movie.needPremium else {
+            notificate(data.notificationId, String(localized: "key.download.needPremium"), String(localized: "key.download.needPremium.notification-\(data.name)"), "need_premium")
+
+            return
+        }
+
+        if Defaults[.isLoggedIn] {
+            Task {
+                _ = try? await saveWatchingStateUseCase(voiceActing: data.acting, season: season, episode: episode)
+            }
+        }
+
+        let voiceId = data.acting.voiceId
+        let translatorId = data.acting.translatorId
+        let seasonId = season?.seasonId
+        let episodeId = episode?.episodeId
+        let subtitles = data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
+
+        Task.detached(priority: .utility) { [database] in
+            try? await database.write { db in
+                try SelectPosition
+                    .upsert {
+                        SelectPosition.Draft(
+                            id: voiceId,
+                            acting: translatorId,
+                            season: seasonId,
+                            episode: episodeId,
+                            subtitles: subtitles
+                        )
+                    }
+                    .execute(db)
+            }
+        }
+
+        guard let movieUrls = movie.getClosestTo(quality: data.quality) else { return }
+
+        let out = file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":")
+
+        if let subtitles = data.subtitles,
+           let sub = movie.subtitles.first(where: { $0.name == subtitles.name }),
+           let subtitlesUrl = URL(string: sub.link)
+        {
+            Task {
+                let _: Aria2Response<String>? = try? await callUseCase(
+                    data: Aria2Request(
+                        method: .addUri,
+                        params: AddUriParams(
+                            token: Const.token,
+                            uris: [subtitlesUrl.absoluteString],
+                            options: [
+                                "dir": destination.path(percentEncoded: false),
+                                "out": out.replacingOccurrences(of: ".mp4", with: " [\(sub.name)].\(subtitlesUrl.pathExtension)"),
+                            ]
+                        )
+                    )
+                )
+            }
+        }
+
+        guard let response: Aria2Response<String> = try? await callUseCase(
+            data: Aria2Request(
+                method: .addUri,
+                params: AddUriParams(
+                    token: Const.token,
+                    uris: movieUrls.map(\.absoluteString),
+                    options: [
+                        "dir": destination.path(percentEncoded: false),
+                        "out": out,
+                    ]
+                )
+            )
+        ) else {
+            return
+        }
+
+        if let gid = response.result {
+            downloads.append(
+                .init(
+                    gid: gid,
+                    data: data,
+                    fileURL: destination.appending(path: out, directoryHint: .notDirectory)
+                )
+            )
+
+            notificate(data.notificationId, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(data.name)"), "cancel", ["gid": gid])
+        } else if let error = response.error {
+            notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.code.description)"), "retry", ["data": retryData])
+        } else {
+            notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
         }
     }
 
     func maxConcurrentDownloadsChange() {
-        callUseCase(
-            data: Aria2Request(
-                method: .changeGlobalOption,
-                params: OptionsParams(
-                    token: Const.token,
-                    options: [
-                        "max-concurrent-downloads": Defaults[.maxConcurrentDownloads],
-                    ]
+        Task {
+            let _: Aria2Response<String>? = try? await callUseCase(
+                data: Aria2Request(
+                    method: .changeGlobalOption,
+                    params: OptionsParams(
+                        token: Const.token,
+                        options: [
+                            "max-concurrent-downloads": Defaults[.maxConcurrentDownloads],
+                        ]
+                    )
                 )
             )
-        )
-        .sink { _ in } receiveValue: { (_: Aria2Response<String>) in }
-        .store(in: &subscriptions)
+        }
     }
 
     func remove(_ gid: String) {
-        callUseCase(
-            data: Aria2Request(
-                method: .remove,
-                params: GidParams(
-                    token: Const.token,
-                    gid: gid
-                )
-            )
-        )
-        .receive(on: DispatchQueue.main)
-        .sink { _ in } receiveValue: { [weak self] (response: Aria2Response<String>) in
-            guard let self else { return }
-
-            if let gid = response.result {
-                if let download = self.downloads.first(where: { download in
-                    download.gid == gid
-                }) {
-                    if let retryData = download.data.retryData {
-                        self.notificate(download.data.notificationId, String(localized: "key.download.canceled"), String(localized: "key.download.canceled.notification-\(download.data.name)"), "retry", ["data": retryData])
-                    } else {
-                        self.notificate(download.data.notificationId, String(localized: "key.download.canceled"), String(localized: "key.download.canceled.notification-\(download.data.name)"))
-                    }
-                }
-
-                self.downloads.removeAll(where: { $0.gid == gid })
-
-                self.callUseCase(
-                    data: Aria2Request(
-                        method: .removeDownloadResult,
-                        params: GidParams(
-                            token: Const.token,
-                            gid: gid
-                        )
+        Task {
+            guard let response: Aria2Response<String> = try? await callUseCase(
+                data: Aria2Request(
+                    method: .remove,
+                    params: GidParams(
+                        token: Const.token,
+                        gid: gid
                     )
                 )
-                .sink { _ in } receiveValue: { (_: Aria2Response<String>) in }
-                .store(in: &self.subscriptions)
+            ),
+                let gid = response.result
+            else {
+                return
             }
+
+            if let download = downloads.first(where: { $0.gid == gid }) {
+                if let retryData = download.data.retryData {
+                    notificate(download.data.notificationId, String(localized: "key.download.canceled"), String(localized: "key.download.canceled.notification-\(download.data.name)"), "retry", ["data": retryData])
+                } else {
+                    notificate(download.data.notificationId, String(localized: "key.download.canceled"), String(localized: "key.download.canceled.notification-\(download.data.name)"))
+                }
+            }
+
+            downloads.removeAll(where: { $0.gid == gid })
+
+            removeDownloadResult(gid)
         }
-        .store(in: &subscriptions)
     }
 
     func pause(_ gid: String) {
-        callUseCase(
-            data: Aria2Request(
-                method: .pause,
-                params: GidParams(
-                    token: Const.token,
-                    gid: gid
+        Task {
+            guard let response: Aria2Response<String> = try? await callUseCase(
+                data: Aria2Request(
+                    method: .pause,
+                    params: GidParams(
+                        token: Const.token,
+                        gid: gid
+                    )
                 )
-            )
-        )
-        .receive(on: DispatchQueue.main)
-        .sink { _ in } receiveValue: { [weak self] (response: Aria2Response<String>) in
-            guard let self else { return }
-
-            if let gid = response.result,
-               let index = self.downloads.firstIndex(where: { download in
-                   download.gid == gid
-               })
-            {
-                self.downloads[index].pause()
+            ),
+                let gid = response.result,
+                let index = downloads.firstIndex(where: { $0.gid == gid })
+            else {
+                return
             }
-        }
-        .store(in: &subscriptions)
-    }
 
-//    func pauseAll() {
-//        callUseCase(
-//            data: Aria2Request(
-//                method: .pauseAll,
-//                params: EmptyTokenParams(
-//                    token: Const.token
-//                )
-//            )
-//        )
-//        .receive(on: DispatchQueue.main)
-//        .sink { _ in } receiveValue: { [weak self] (response: Aria2Response<String>) in
-//            guard let self else { return }
-//
-//            if response.result == "OK" {
-//                for index in self.downloads.indices {
-//                    self.downloads[index].pause()
-//                }
-//            }
-//        }
-//        .store(in: &subscriptions)
-//    }
+            downloads[index].pause()
+        }
+    }
 
     func unpause(_ gid: String) {
-        callUseCase(
-            data: Aria2Request(
-                method: .unpause,
-                params: GidParams(
-                    token: Const.token,
-                    gid: gid
+        Task {
+            guard let response: Aria2Response<String> = try? await callUseCase(
+                data: Aria2Request(
+                    method: .unpause,
+                    params: GidParams(
+                        token: Const.token,
+                        gid: gid
+                    )
                 )
-            )
-        )
-        .receive(on: DispatchQueue.main)
-        .sink { _ in } receiveValue: { [weak self] (response: Aria2Response<String>) in
-            guard let self else { return }
-
-            if let gid = response.result,
-               let index = self.downloads.firstIndex(where: { download in
-                   download.gid == gid
-               })
-            {
-                self.downloads[index].unpause()
+            ),
+                let gid = response.result,
+                let index = downloads.firstIndex(where: { $0.gid == gid })
+            else {
+                return
             }
+
+            downloads[index].unpause()
         }
-        .store(in: &subscriptions)
     }
 
-//    func unpauseAll() {
-//        callUseCase(
-//            data: Aria2Request(
-//                method: .unpauseAll,
-//                params: EmptyTokenParams(
-//                    token: Const.token
-//                )
-//            )
-//        )
-//        .receive(on: DispatchQueue.main)
-//        .sink { _ in } receiveValue: { [weak self] (response: Aria2Response<String>) in
-//            guard let self else { return }
-//
-//            if response.result == "OK" {
-//                for index in self.downloads.indices {
-//                    self.downloads[index].unpause()
-//                }
-//            }
-//        }
-//        .store(in: &subscriptions)
-//    }
+    private func removeDownloadResult(_ gid: String) {
+        Task {
+            let _: Aria2Response<String>? = try? await callUseCase(
+                data: Aria2Request(
+                    method: .removeDownloadResult,
+                    params: GidParams(
+                        token: Const.token,
+                        gid: gid
+                    )
+                )
+            )
+        }
+    }
 
     func terminate() {
         process.terminate()
