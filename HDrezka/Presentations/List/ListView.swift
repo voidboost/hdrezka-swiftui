@@ -1,31 +1,39 @@
-import Defaults
+import ComposableArchitecture
 import SwiftUI
 
 struct ListView: View {
-    @State private var viewModel: ListViewModel
+    @State private var store: StoreOf<ListFeature>
+
+    init(store: StoreOf<ListFeature>) {
+        _store = State(initialValue: store)
+    }
+
+    init(source: ListFeature.Source) {
+        self.init(store: Store(initialState: ListFeature.State(source: source)) { ListFeature() })
+    }
 
     init(movies: [MovieSimple], title: String) {
-        viewModel = ListViewModel(movies: movies, title: title)
+        self.init(source: .movies(movies, title: title))
     }
 
     init(list: MovieList) {
-        viewModel = ListViewModel(list: list)
+        self.init(source: .list(list))
     }
 
     init(country: MovieCountry) {
-        viewModel = ListViewModel(country: country)
+        self.init(source: .country(country))
     }
 
     init(genre: MovieGenre) {
-        viewModel = ListViewModel(genre: genre)
+        self.init(source: .genre(genre))
     }
 
     init(category: Categories) {
-        viewModel = ListViewModel(category: category)
+        self.init(source: .category(category))
     }
 
     init(collection: MoviesCollection) {
-        viewModel = ListViewModel(collection: collection)
+        self.init(source: .collection(collection))
     }
 
     private let columns = [GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading)]
@@ -33,7 +41,7 @@ struct ListView: View {
     var body: some View {
         ScrollView(.vertical) {
             LazyVGrid(columns: columns, alignment: .leading, spacing: 18) {
-                if let movies = viewModel.state.data, !movies.isEmpty {
+                if let movies = store.movies.data, !movies.isEmpty {
                     ForEach(movies) { movie in
                         CardView(movie: movie)
                             .equatable()
@@ -44,17 +52,17 @@ struct ListView: View {
             .padding(.vertical, 18)
             .padding(.horizontal, 36)
 
-            if viewModel.paginationState == .loading {
+            if store.paginationState == .loading {
                 LoadingPaginationStateView()
             }
         }
         .scrollIndicators(.visible, axes: .vertical)
         .onScrollTargetVisibilityChange(idType: MovieSimple.ID.self) { onScreenCards in
-            if viewModel.paginationState == .idle,
-               let movies = viewModel.state.data,
+            if store.paginationState == .idle,
+               let movies = store.movies.data,
                movies.suffix(12).contains(where: { onScreenCards.contains($0.id) })
             {
-                viewModel.loadMore()
+                store.send(.loadMore)
             }
         }
         .viewModifier { view in
@@ -65,42 +73,42 @@ struct ListView: View {
             }
         }
         .overlay {
-            if let error = viewModel.state.error {
+            if let error = store.movies.error {
                 ErrorStateView(error) {
-                    viewModel.load()
+                    store.send(.reload)
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if let movies = viewModel.state.data, movies.isEmpty {
+            } else if let movies = store.movies.data, movies.isEmpty {
                 EmptyStateView(String(localized: "key.nothing_found"), String(localized: "key.filter.empty")) {
-                    viewModel.load()
+                    store.send(.reload)
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if viewModel.state == .loading {
+            } else if store.movies == .loading {
                 LoadingStateView()
                     .padding(.vertical, 18)
                     .padding(.horizontal, 36)
             }
         }
         .transition(.opacity)
-        .navigationTitle(viewModel.title)
+        .navigationTitle(store.title)
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button {
-                    viewModel.load()
+                    store.send(.reload)
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
                 .keyboardShortcut("r", modifiers: .command)
-                .disabled(viewModel.state.data?.isEmpty != false)
+                .disabled(store.movies.data?.isEmpty != false)
             }
 
-            if !viewModel.isCustomMovies, !viewModel.isList {
+            if !store.isCustomMovies, !store.isList {
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
-                        if viewModel.isGenre || viewModel.isCollection || viewModel.isCountry {
-                            Picker("key.filter.select", selection: $viewModel.filter) {
+                        if store.isGenre || store.isCollection || store.isCountry {
+                            Picker("key.filter.select", selection: $store.filter) {
                                 ForEach(Filters.allCases) { filter in
                                     Text(filter.rawValue).tag(filter)
                                 }
@@ -108,8 +116,8 @@ struct ListView: View {
                             .pickerStyle(.inline)
                         }
 
-                        if viewModel.isCategory(.newest) {
-                            Picker("key.filter.select", selection: $viewModel.newFilter) {
+                        if store.state.isCategory(.newest) {
+                            Picker("key.filter.select", selection: $store.newFilter) {
                                 ForEach(NewFilters.allCases) { filter in
                                     Text(filter.rawValue).tag(filter)
                                 }
@@ -117,9 +125,9 @@ struct ListView: View {
                             .pickerStyle(.inline)
                         }
 
-                        if viewModel.isCategory || viewModel.isCountry {
-                            Picker("key.genre.select", selection: $viewModel.filterGenre) {
-                                ForEach(Genres.allCases.filter { $0 != .show || !viewModel.isCategory(.hot) }) { genre in
+                        if store.isCategory || store.isCountry {
+                            Picker("key.genre.select", selection: $store.filterGenre) {
+                                ForEach(Genres.allCases.filter { $0 != .show || !store.state.isCategory(.hot) }) { genre in
                                     Text(genre.rawValue).tag(genre)
                                 }
                             }
@@ -130,26 +138,12 @@ struct ListView: View {
                     }
                     .menuStyle(.button)
                     .menuIndicator(.hidden)
-                    .disabled(viewModel.state == .loading)
+                    .disabled(store.movies == .loading)
                 }
             }
         }
         .onAppear {
-            switch viewModel.state {
-            case .data:
-                break
-            default:
-                viewModel.load()
-            }
-        }
-        .onChange(of: viewModel.filterGenre) {
-            viewModel.load()
-        }
-        .onChange(of: viewModel.filter) {
-            viewModel.load()
-        }
-        .onChange(of: viewModel.newFilter) {
-            viewModel.load()
+            store.send(.onAppear)
         }
         .background(.background)
     }
