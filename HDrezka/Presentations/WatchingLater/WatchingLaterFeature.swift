@@ -35,7 +35,6 @@ struct WatchingLaterFeature {
         Reduce { state, action in
             switch action {
             case .onAppear:
-                // onAppear can fire more than once; only an error warrants loading again while there is no data.
                 guard state.movies.data == nil, !state.hasAppeared || state.movies.error != nil else { return .none }
 
                 state.hasAppeared = true

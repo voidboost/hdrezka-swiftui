@@ -108,7 +108,6 @@ class Downloader {
     }
 
     private func poll() async {
-        // aria2 only runs downloads started by this app (it stops with the process), so there is nothing to poll otherwise.
         guard !downloads.isEmpty else { return }
 
         guard let response: Aria2Response<GlobalStatusResult> = try? await callUseCase(

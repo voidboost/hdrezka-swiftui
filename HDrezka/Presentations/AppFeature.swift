@@ -23,8 +23,6 @@ struct AppFeature {
     struct State: Equatable {
         var selectedTab: Tabs = .home
 
-        /// The navigation stack of the selected tab. macOS TabView rebuilds a tab's NavigationStack whenever it is left
-        /// and routes pushes to whichever stack is on screen, so a single path that resets on tab change mirrors the UI.
         var path = StackState<Path.State>()
 
         var home = HomeFeature.State()
@@ -213,7 +211,6 @@ extension AppFeature.Path.State {
 }
 
 extension AppFeature.Path.Action {
-    /// A route a screen in the stack asked to push programmatically.
     var route: Destinations? {
         switch self {
         case let .details(.delegate(.push(route))), let .comments(.delegate(.push(route))):

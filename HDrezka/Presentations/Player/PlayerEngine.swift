@@ -43,8 +43,6 @@ struct SubtitleOption: Equatable, Hashable, Identifiable, Sendable {
     }
 }
 
-/// AVFoundation side of the player: owns the AVPlayer, its layer, Picture in Picture, Now Playing and remote commands.
-/// `PlayerFeature` drives it with commands and consumes its state changes as `PlayerEvent`s.
 @Observable
 @MainActor
 final class PlayerEngine {
@@ -473,7 +471,6 @@ final class PlayerEngine {
         }
     }
 
-    /// Remote command handlers may be called off the main thread, so they only hand events to the (thread-safe) continuation.
     private func setupRemoteCommands(_ continuation: AsyncStream<PlayerEvent>.Continuation) {
         remoteCommandCenter.playCommand.addTarget { @Sendable _ in
             continuation.yield(.remote(.play))

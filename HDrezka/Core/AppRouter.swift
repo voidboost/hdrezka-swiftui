@@ -7,8 +7,6 @@ enum AppRoute: Equatable, Sendable {
     case commentsRules
 }
 
-/// App-wide presentation requests that can originate anywhere (data layer, player window, sheets).
-/// `AppFeature` consumes `routes()` once for the lifetime of the app.
 struct AppRouter: Sendable {
     var present: @Sendable (AppRoute) -> Void
     var routes: @Sendable () -> AsyncStream<AppRoute>
