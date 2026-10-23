@@ -2,11 +2,11 @@ import AVKit
 import SwiftUI
 
 struct GlowImageView: View {
-    @Environment(PlayerViewModel.self) private var viewModel
+    @Environment(PlayerEngine.self) private var engine
 
     var body: some View {
         Group {
-            if let glowImage = viewModel.glowImage {
+            if let glowImage = engine.glowImage {
                 glowImage
                     .resizable()
                     .scaledToFit()

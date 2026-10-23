@@ -1,56 +1,41 @@
 import AVKit
-import Combine
-import Defaults
-import Dependencies
-import SQLiteData
+import ComposableArchitecture
 import SwiftUI
 
 struct PlayerView: View {
-    @State private var viewModel: PlayerViewModel
+    @State private var engine: PlayerEngine
+    @State private var store: StoreOf<PlayerFeature>
 
     init(data: PlayerData) {
-        viewModel = PlayerViewModel(
-            poster: data.details.poster,
-            name: data.details.nameRussian,
-            favs: data.details.favs,
-            voiceActing: data.selectedActing,
-            seasons: data.seasons,
-            season: data.selectedSeason,
-            episode: data.selectedEpisode,
-            movie: data.movie,
-            quality: data.selectedQuality
-        )
+        let engine = PlayerEngine()
+
+        _engine = State(initialValue: engine)
+        _store = State(initialValue: Store(initialState: PlayerFeature.State(data: data)) { PlayerFeature(engine: engine) })
     }
 
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dismiss) private var dismiss
 
-    @Dependency(\.appRouter) private var appRouter
-
-    @FetchOne private var selectPosition: SelectPosition?
-
     @FocusState private var isFocused: Bool
 
     var body: some View {
         Group {
-            if let error = viewModel.error {
-                ErrorStateView(error) {
-                    viewModel.resetPlayer {
-                        viewModel.setupPlayer(subtitles: viewModel.subtitles)
-                    }
+            if let error = store.error {
+                ErrorStateView(error.error) {
+                    store.send(.retryTapped)
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if let player = viewModel.playerLayer.player {
-                CustomAVPlayerView(playerLayer: viewModel.playerLayer)
+            } else if let player = engine.player {
+                CustomAVPlayerView(playerLayer: engine.playerLayer)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .contentShape(.rect)
                     .gesture(
                         TapGesture(count: 2)
                             .onEnded {
-                                guard player.status == .readyToPlay,
+                                guard store.isReady,
                                       let window = Windows.player.window,
-                                      !viewModel.isPictureInPictureActive || (viewModel.isPictureInPictureActive && window.styleMask.contains(.fullScreen))
+                                      !store.isPictureInPictureActive || (store.isPictureInPictureActive && window.styleMask.contains(.fullScreen))
                                 else {
                                     return
                                 }
@@ -60,46 +45,32 @@ struct PlayerView: View {
                             .exclusively(before:
                                 TapGesture(count: 1)
                                     .onEnded {
-                                        guard player.status == .readyToPlay,
-                                              !viewModel.isPictureInPictureActive,
-                                              !viewModel.isLoading
-                                        else {
-                                            return
-                                        }
-
-                                        if viewModel.isPlaying {
-                                            player.pause()
-                                        } else {
-                                            player.playImmediately(atRate: viewModel.rate)
-                                        }
+                                        store.send(.videoTapped)
                                     })
                     )
                     .overlay(alignment: .top) {
                         TopControlsView(player: player)
-                            .environment(viewModel)
                     }
                     .overlay(alignment: .center) {
-                        MiddleControlsView(player: player)
-                            .environment(viewModel)
+                        MiddleControlsView()
                     }
                     .overlay(alignment: .bottom) {
-                        BottomControlsView(player: player)
-                            .environment(viewModel)
+                        BottomControlsView()
                     }
                     .overlay(alignment: .topTrailing) {
                         NextTimerView()
-                            .environment(viewModel)
                     }
                     .background(alignment: .center) {
                         GlowImageView()
-                            .environment(viewModel)
                     }
-            } else if viewModel.isLoading {
+            } else if store.isLoading {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
-        .navigationTitle(Text(verbatim: "Player - \(viewModel.name)"))
+        .environment(store)
+        .environment(engine)
+        .navigationTitle(Text(verbatim: "Player - \(store.name)"))
         .toolbar(.hidden)
         .frame(minWidth: 900, minHeight: 900 / 16 * 9)
         .ignoresSafeArea()
@@ -111,22 +82,16 @@ struct PlayerView: View {
         .tint(.primary)
         .contentShape(.rect)
         .task {
-            viewModel.dismiss = dismiss
-
-            _ = try? await $selectPosition.load(
-                SelectPosition.where { $0.id.eq(viewModel.voiceActing.voiceId) }
-            )
-
-            viewModel.setupPlayer(subtitles: selectPosition?.subtitles)
+            store.send(.task)
 
             if let window = Windows.player.window,
-               viewModel.playerFullscreen,
+               store.playerFullscreen,
                !window.styleMask.contains(.fullScreen)
             {
                 window.toggleFullScreen(nil)
             }
 
-            if viewModel.hideMainWindow,
+            if store.hideMainWindow,
                let window = Windows.hdrezka.window
             {
                 let animation = window.animationBehavior
@@ -136,9 +101,9 @@ struct PlayerView: View {
             }
         }
         .onDisappear {
-            viewModel.resetPlayer()
+            store.send(.disappeared)
 
-            guard viewModel.hideMainWindow,
+            guard store.hideMainWindow,
                   let window = Windows.hdrezka.window
             else {
                 return
@@ -150,46 +115,31 @@ struct PlayerView: View {
             window.animationBehavior = animation
         }
         .onContinuousHover { phase in
-            viewModel.resetTimer()
-
             switch phase {
             case .active:
-                viewModel.showCursor()
-
-                viewModel.setMask(!viewModel.isPictureInPictureActive)
+                store.send(.hoverChanged(isActive: true), animation: .easeInOut)
             case .ended:
-                viewModel.showCursor()
-
-                viewModel.setMask((viewModel.isLoading || !viewModel.isPlaying) && !viewModel.isPictureInPictureActive)
+                store.send(.hoverChanged(isActive: false), animation: .easeInOut)
             }
         }
         .onChange(of: scenePhase) {
-            guard let player = viewModel.playerLayer.player,
-                  player.status == .readyToPlay
-            else {
-                return
-            }
-
-            switch scenePhase {
-            case .active:
-                break
-            default:
-                if !viewModel.isPictureInPictureActive, viewModel.isPlaying {
-                    player.pause()
-                }
-            }
+            store.send(.scenePhaseChanged(isActive: scenePhase == .active))
         }
-        .onChange(of: viewModel.isFocused) {
-            isFocused = viewModel.isFocused
+        .onChange(of: store.isFocused) {
+            isFocused = store.isFocused
         }
         .onChange(of: isFocused) {
-            viewModel.isFocused = isFocused
+            store.isFocused = isFocused
+        }
+        .onChange(of: store.isDismissed) {
+            if store.isDismissed {
+                dismiss()
+            }
         }
         .onExitCommand {
-            viewModel.resetTimer()
+            store.send(.userActivity)
 
-            guard let player = viewModel.playerLayer.player,
-                  player.status == .readyToPlay,
+            guard store.isReady,
                   let window = Windows.player.window,
                   window.styleMask.contains(.fullScreen)
             else {
@@ -199,30 +149,17 @@ struct PlayerView: View {
             window.toggleFullScreen(nil)
         }
         .onMoveCommand { direction in
-            viewModel.resetTimer()
-
-            guard let player = viewModel.playerLayer.player,
-                  player.status == .readyToPlay,
-                  !viewModel.isPictureInPictureActive
-            else {
-                return
-            }
-
             switch direction {
             case .up:
-                guard player.volume < 1.0 else { return }
-
-                player.volume = min(player.volume + 0.05, 1.0)
+                store.send(.moveCommand(.up))
             case .down:
-                guard player.volume > 0.0 else { return }
-
-                player.volume = max(player.volume - 0.05, 0.0)
+                store.send(.moveCommand(.down))
             case .left:
-                viewModel.skip(player, by: -10.0)
+                store.send(.moveCommand(.left))
             case .right:
-                viewModel.skip(player, by: 10.0)
+                store.send(.moveCommand(.right))
             default:
-                break
+                store.send(.userActivity)
             }
         }
         .gesture(WindowDragGesture())

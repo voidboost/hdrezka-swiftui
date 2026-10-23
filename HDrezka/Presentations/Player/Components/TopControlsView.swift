@@ -1,4 +1,5 @@
 import AVKit
+import ComposableArchitecture
 import SwiftUI
 
 struct TopControlsView: View {
@@ -8,29 +9,30 @@ struct TopControlsView: View {
         self.player = player
     }
 
-    @Environment(PlayerViewModel.self) private var viewModel
+    @Environment(StoreOf<PlayerFeature>.self) private var store
+    @Environment(PlayerEngine.self) private var engine
 
     var body: some View {
         HStack(alignment: .center) {
-            if let pipController = viewModel.pipController, AVPictureInPictureController.isPictureInPictureSupported() {
+            if engine.pipController != nil, AVPictureInPictureController.isPictureInPictureSupported() {
                 Button {
-                    pipController.startPictureInPicture()
+                    store.send(.pictureInPictureTapped)
                 } label: {
                     Image(systemName: "pip.enter")
                         .font(.title2)
                         .contentShape(.circle)
                 }
                 .buttonStyle(.plain)
-                .disabled(viewModel.isPictureInPictureActive || !viewModel.isPictureInPicturePossible)
+                .disabled(store.isPictureInPictureActive || !store.isPictureInPicturePossible)
                 .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
             }
 
-            if viewModel.routesDetected {
+            if store.routesDetected {
                 AirPlayButtonView(player: player) { isPressed in
                     if isPressed {
-                        viewModel.lockMask(true)
+                        store.send(.lockMask(true), animation: .easeInOut)
                     } else {
-                        viewModel.unlockMask(true)
+                        store.send(.unlockMask(true), animation: .easeInOut)
                     }
                 }
                 .frame(width: 35, height: 35)
@@ -40,22 +42,18 @@ struct TopControlsView: View {
             Spacer()
 
             SliderWithoutTextView(value: Binding {
-                viewModel.volume
+                store.volume
             } set: { volume in
-                player.volume = volume
+                store.send(.volumeChanged(volume))
             }, inRange: 0 ... 1, activeFillColor: .primary, fillColor: .primary.opacity(0.7), emptyColor: .primary.opacity(0.3), height: 8)
                 .frame(width: 120, height: 10)
                 .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
 
             VStack(alignment: .center) {
                 Button {
-                    viewModel.resetTimer()
-
-                    if !viewModel.isPictureInPictureActive {
-                        player.isMuted.toggle()
-                    }
+                    store.send(.toggleMuteTapped)
                 } label: {
-                    Image(systemName: viewModel.isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(viewModel.volume))
+                    Image(systemName: store.isMuted ? "speaker.slash.fill" : "speaker.wave.3.fill", variableValue: Double(store.volume))
                         .font(.title2)
                         .contentTransition(.symbolEffect(.replace))
                         .contentShape(.circle)
@@ -68,6 +66,7 @@ struct TopControlsView: View {
         }
         .padding(.top, 36)
         .padding(.horizontal, 36)
-        .opacity(viewModel.isMaskShow ? 1 : 0)
+        .opacity(store.isMaskShow ? 1 : 0)
+        .animation(.easeInOut, value: store.isMaskShow)
     }
 }

@@ -1,48 +1,35 @@
 import AVKit
+import ComposableArchitecture
 import SwiftUI
 
 struct MiddleControlsView: View {
-    private let player: AVPlayer
-
-    init(player: AVPlayer) {
-        self.player = player
-    }
-
-    @Environment(PlayerViewModel.self) private var viewModel
+    @Environment(StoreOf<PlayerFeature>.self) private var store
 
     var body: some View {
         HStack(alignment: .center) {
-            if viewModel.isSeries {
+            if store.isSeries {
                 Button {
-                    viewModel.prevTrack()
+                    store.send(.previousTrackTapped, animation: .easeInOut(duration: 0.15))
                 } label: {
                     Image(systemName: "backward.fill")
                         .font(.title2)
                         .contentShape(.circle)
                 }
                 .buttonStyle(.plain)
-                .disabled(!viewModel.hasPrevoiusEpisode)
+                .disabled(!store.hasPreviousEpisode)
                 .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
             }
 
             Spacer()
 
-            if viewModel.isLoading {
+            if store.isLoading {
                 ProgressView()
                     .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
             } else {
                 Button {
-                    viewModel.resetTimer()
-
-                    if !viewModel.isPictureInPictureActive {
-                        if viewModel.isPlaying {
-                            player.pause()
-                        } else {
-                            player.playImmediately(atRate: viewModel.rate)
-                        }
-                    }
+                    store.send(.playPauseTapped)
                 } label: {
-                    Image(systemName: viewModel.isPlaying ? "pause.fill" : "play.fill")
+                    Image(systemName: store.isPlaying ? "pause.fill" : "play.fill")
                         .font(.largeTitle)
                         .contentTransition(.symbolEffect(.replace))
                         .contentShape(.circle)
@@ -54,20 +41,21 @@ struct MiddleControlsView: View {
 
             Spacer()
 
-            if viewModel.isSeries {
+            if store.isSeries {
                 Button {
-                    viewModel.nextTrack()
+                    store.send(.nextTrackTapped, animation: .easeInOut(duration: 0.15))
                 } label: {
                     Image(systemName: "forward.fill")
                         .font(.title2)
                         .contentShape(.circle)
                 }
                 .buttonStyle(.plain)
-                .disabled(!viewModel.hasNextEpisode)
+                .disabled(!store.hasNextEpisode)
                 .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
             }
         }
         .frame(width: 160)
-        .opacity(viewModel.isMaskShow ? 1 : 0)
+        .opacity(store.isMaskShow ? 1 : 0)
+        .animation(.easeInOut, value: store.isMaskShow)
     }
 }

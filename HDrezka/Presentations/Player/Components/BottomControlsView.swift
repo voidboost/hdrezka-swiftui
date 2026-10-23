@@ -1,15 +1,10 @@
 import AVKit
+import ComposableArchitecture
 import Defaults
 import SwiftUI
 
 struct BottomControlsView: View {
-    private let player: AVPlayer
-
-    init(player: AVPlayer) {
-        self.player = player
-    }
-
-    @Environment(PlayerViewModel.self) private var viewModel
+    @Environment(StoreOf<PlayerFeature>.self) private var store
 
     @Default(.videoGravity) private var videoGravity
     @Default(.ambientLight) private var ambientLight
@@ -20,43 +15,41 @@ struct BottomControlsView: View {
             HStack(alignment: .bottom) {
                 VStack(alignment: .leading) {
                     HStack(alignment: .center) {
-                        if let season = viewModel.season, let episode = viewModel.episode {
+                        if let season = store.season, let episode = store.episode {
                             Text("key.season-\(season.name).episode-\(episode.name)")
                                 .font(.title2.bold())
                                 .lineLimit(1)
                                 .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                         }
 
-                        Text(viewModel.voiceActing.name)
+                        Text(store.voiceActing.name)
                             .font(.title2.bold())
                             .foregroundStyle(.secondary)
                             .lineLimit(1)
                             .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                     }
 
-                    Text(viewModel.name)
+                    Text(store.name)
                         .font(.largeTitle.bold())
                         .lineLimit(1)
-                        .help(viewModel.name)
+                        .help(store.name)
                         .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
                 }
 
                 Spacer()
 
                 HStack(alignment: .center, spacing: 12) {
-                    if !viewModel.subtitlesOptions.isEmpty {
+                    if !store.subtitlesOptions.isEmpty {
                         Menu {
                             Picker("key.subtitles", selection: Binding {
-                                viewModel.subtitles
+                                store.subtitles
                             } set: { subtitles in
-                                viewModel.subtitles = subtitles
-
-                                viewModel.selectSubtitles(subtitles)
+                                store.send(.subtitlesSelected(subtitles))
                             }) {
                                 Text("key.off").tag(nil as String?)
 
-                                ForEach(viewModel.subtitlesOptions, id: \.self) { subtitles in
-                                    Text(subtitles.displayName(with: Locale.current)).tag(subtitles.extendedLanguageTag)
+                                ForEach(store.subtitlesOptions) { subtitles in
+                                    Text(subtitles.displayName).tag(subtitles.tag as String?)
                                 }
                             }
                             .pickerStyle(.inline)
@@ -68,9 +61,9 @@ struct BottomControlsView: View {
                         .buttonStyle(
                             OnPressButtonStyle { isPressed in
                                 if isPressed {
-                                    viewModel.lockMask(true)
+                                    store.send(.lockMask(true), animation: .easeInOut)
                                 } else {
-                                    viewModel.unlockMask(true)
+                                    store.send(.unlockMask(true), animation: .easeInOut)
                                 }
                             },
                         )
@@ -79,15 +72,13 @@ struct BottomControlsView: View {
 
                     Menu {
                         Picker("key.timer", systemImage: "timer", selection: Binding {
-                            viewModel.timer
+                            store.timer
                         } set: {
-                            viewModel.timer = $0
-
-                            viewModel.resetTimer()
+                            store.send(.timerSelected($0))
                         }) {
                             Text("key.off").tag(nil as Int?)
 
-                            ForEach(viewModel.times, id: \.self) { time in
+                            ForEach(store.times, id: \.self) { time in
                                 let name = switch time {
                                 case 900:
                                     String(localized: "key.timer.15m")
@@ -123,25 +114,19 @@ struct BottomControlsView: View {
                         .pickerStyle(.menu)
 
                         Picker("key.speed", systemImage: "gauge.with.needle", selection: $rate) {
-                            ForEach(viewModel.rates, id: \.self) { value in
+                            ForEach(PlayerEngine.rates, id: \.self) { value in
                                 Text(verbatim: "\(value)x").tag(value)
                             }
                         }
                         .pickerStyle(.menu)
 
-                        if !viewModel.movie.getAvailableQualities().isEmpty {
+                        if !store.movie.getAvailableQualities().isEmpty {
                             Picker("key.quality", systemImage: "4k.tv", selection: Binding {
-                                viewModel.quality
+                                store.quality
                             } set: {
-                                viewModel.quality = $0
-
-                                let currentSeek = player.currentTime()
-
-                                viewModel.resetPlayer {
-                                    viewModel.setupPlayer(seek: currentSeek, isPlaying: viewModel.isPlaying, subtitles: viewModel.subtitles)
-                                }
+                                store.send(.qualitySelected($0))
                             }) {
-                                ForEach(viewModel.movie.getAvailableQualities(), id: \.self) { value in
+                                ForEach(store.movie.getAvailableQualities(), id: \.self) { value in
                                     Text(value).tag(value)
                                 }
                             }
@@ -157,9 +142,9 @@ struct BottomControlsView: View {
                     .buttonStyle(
                         OnPressButtonStyle { isPressed in
                             if isPressed {
-                                viewModel.lockMask(true)
+                                store.send(.lockMask(true), animation: .easeInOut)
                             } else {
-                                viewModel.unlockMask(true)
+                                store.send(.unlockMask(true), animation: .easeInOut)
                             }
                         },
                     )
@@ -167,10 +152,11 @@ struct BottomControlsView: View {
                 }
             }
 
-            SeekBarView(player: player)
+            SeekBarView()
         }
         .padding(.horizontal, 36)
         .padding(.bottom, 36)
-        .opacity(viewModel.isMaskShow ? 1 : 0)
+        .opacity(store.isMaskShow ? 1 : 0)
+        .animation(.easeInOut, value: store.isMaskShow)
     }
 }

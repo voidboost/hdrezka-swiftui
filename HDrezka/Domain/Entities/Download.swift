@@ -1,5 +1,4 @@
 import Alamofire
-import Combine
 import Foundation
 
 struct Download: Hashable {

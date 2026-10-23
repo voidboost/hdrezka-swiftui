@@ -1,13 +1,14 @@
+import ComposableArchitecture
 import SwiftUI
 
 struct NextTimerView: View {
-    @Environment(PlayerViewModel.self) private var viewModel
+    @Environment(StoreOf<PlayerFeature>.self) private var store
 
     var body: some View {
         Group {
-            if let nextTimer = viewModel.nextTimer, viewModel.isSeries, let seasons = viewModel.seasons, let season = viewModel.season, let episode = viewModel.episode {
+            if let nextTimer = store.nextTimer, store.isSeries, let seasons = store.seasons, let season = store.season, let episode = store.episode {
                 Button {
-                    viewModel.nextTrack()
+                    store.send(.nextTrackTapped, animation: .easeInOut(duration: 0.15))
                 } label: {
                     HStack(alignment: .center, spacing: 21) {
                         VStack(alignment: .leading) {
