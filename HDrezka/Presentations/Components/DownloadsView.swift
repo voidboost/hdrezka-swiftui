@@ -1,4 +1,3 @@
-import Combine
 import SwiftUI
 
 struct DownloadsView: View {

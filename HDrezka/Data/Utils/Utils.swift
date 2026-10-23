@@ -1,6 +1,5 @@
 import Alamofire
 import AVFoundation
-import Combine
 import Defaults
 import Dependencies
 import FirebaseCrashlytics
@@ -135,20 +134,6 @@ extension Optional {
         }
 
         return self
-    }
-}
-
-extension Publisher {
-    func handleError() -> AnyPublisher<Output, Error> {
-        mapError(HDrezka.handleError)
-            .eraseToAnyPublisher()
-    }
-}
-
-extension Publisher where Output == Error, Failure == Never {
-    func handleError() -> AnyPublisher<Output, Failure> {
-        map(HDrezka.handleError)
-            .eraseToAnyPublisher()
     }
 }
 

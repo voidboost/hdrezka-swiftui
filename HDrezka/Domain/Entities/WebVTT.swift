@@ -1,13 +1,13 @@
 import Foundation
 
-struct WebVTT {
-    struct Cue {
+struct WebVTT: Equatable {
+    struct Cue: Equatable {
         let timing: Timing
         let imageUrl: String?
         let frame: CGRect?
     }
 
-    struct Timing {
+    struct Timing: Equatable {
         let start: Int
         let end: Int
     }
