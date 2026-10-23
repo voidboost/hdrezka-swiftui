@@ -7,7 +7,9 @@ struct HomeFeature {
     struct State: Equatable {
         var categories: DataState<[Category]> = .loading
         var paginationState: DataPaginationState = .idle
-        var isSeriesUpdatesPresented = false
+        var movieDestination: MovieSimple?
+
+        @Presents var seriesUpdates: SeriesUpdatesFeature.State?
 
         fileprivate var nextPage: Categories?
     }
@@ -18,6 +20,8 @@ struct HomeFeature {
         case reload
         case loadMore(reset: Bool = false)
         case categoryLoaded(Categories, isInitial: Bool, Result<[MovieSimple], any Error>)
+        case seriesUpdatesTapped
+        case seriesUpdates(PresentationAction<SeriesUpdatesFeature.Action>)
     }
 
     private enum CancelID { case load }
@@ -82,7 +86,23 @@ struct HomeFeature {
                 }
 
                 return .none
+
+            case .seriesUpdatesTapped:
+                state.seriesUpdates = SeriesUpdatesFeature.State()
+
+                return .none
+
+            case let .seriesUpdates(.presented(.delegate(.openMovie(movie)))):
+                state.movieDestination = movie
+
+                return .none
+
+            case .seriesUpdates:
+                return .none
             }
+        }
+        .ifLet(\.$seriesUpdates, action: \.seriesUpdates) {
+            SeriesUpdatesFeature()
         }
     }
 

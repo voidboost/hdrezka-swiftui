@@ -1,20 +1,9 @@
-import Combine
-import Dependencies
+import ComposableArchitecture
 import FirebaseAnalytics
 import SwiftUI
 
 struct SeriesUpdatesSheetView: View {
-    @Dependency(\.getSeriesUpdatesUseCase) private var getSeriesUpdatesUseCase
-
-    @State private var subscriptions: Set<AnyCancellable> = []
-
-    @State private var state: DataState<[SeriesUpdateGroup]> = .loading
-
-    @Binding private var movieDestination: MovieSimple?
-
-    init(movieDestination: Binding<MovieSimple?>) {
-        _movieDestination = movieDestination
-    }
+    let store: StoreOf<SeriesUpdatesFeature>
 
     @Environment(\.dismiss) private var dismiss
 
@@ -30,13 +19,13 @@ struct SeriesUpdatesSheetView: View {
             }
 
             Group {
-                if let error = state.error {
+                if let error = store.seriesUpdates.error {
                     VStack(alignment: .center, spacing: 9) {
                         Text(error.localizedDescription)
                             .lineLimit(nil)
 
                         Button {
-                            load()
+                            store.send(.reload)
                         } label: {
                             Text("key.retry")
                                 .foregroundStyle(Color.accentColor)
@@ -44,13 +33,13 @@ struct SeriesUpdatesSheetView: View {
                         .buttonStyle(.accessoryBar)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if let seriesUpdates = state.data {
+                } else if let seriesUpdates = store.seriesUpdates.data {
                     if seriesUpdates.isEmpty {
                         VStack(alignment: .center, spacing: 9) {
                             Text("key.empty")
 
                             Button {
-                                load()
+                                store.send(.reload)
                             } label: {
                                 Text("key.retry")
                                     .foregroundStyle(Color.accentColor)
@@ -62,7 +51,9 @@ struct SeriesUpdatesSheetView: View {
                         ScrollView(.vertical) {
                             LazyVStack(alignment: .leading, spacing: 10) {
                                 ForEach(seriesUpdates) { group in
-                                    CustomSection(group: group, dismiss: { dismiss() }, isExpanded: seriesUpdates.firstIndex(of: group) == 0, movieDestination: $movieDestination)
+                                    CustomSection(group: group, isExpanded: seriesUpdates.firstIndex(of: group) == 0) { movie in
+                                        store.send(.movieTapped(movie))
+                                    }
 
                                     if group != seriesUpdates.last {
                                         Divider()
@@ -95,46 +86,23 @@ struct SeriesUpdatesSheetView: View {
         .padding(.bottom, 25)
         .frame(width: 520, height: 520)
         .onAppear {
-            load()
+            store.send(.reload)
         }
         .analyticsScreen(name: "series_updates_sheet", class: "SeriesUpdatesSheetView")
-    }
-
-    private func load() {
-        withAnimation(.easeInOut) {
-            state = .loading
-        }
-
-        getSeriesUpdatesUseCase()
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
-
-                withAnimation(.easeInOut) {
-                    state = .error(error)
-                }
-            } receiveValue: { seriesUpdates in
-                withAnimation(.easeInOut) {
-                    state = .data(seriesUpdates)
-                }
-            }
-            .store(in: &subscriptions)
     }
 
     private struct CustomSection: View {
         private let group: SeriesUpdateGroup
 
-        private let dismiss: () -> Void
 
         @State private var isExpanded: Bool
 
-        @Binding private var movieDestination: MovieSimple?
+        private let onSelect: (MovieSimple) -> Void
 
-        init(group: SeriesUpdateGroup, dismiss: @escaping () -> Void, isExpanded: Bool, movieDestination: Binding<MovieSimple?>) {
+        init(group: SeriesUpdateGroup, isExpanded: Bool, onSelect: @escaping (MovieSimple) -> Void) {
             self.group = group
-            self.dismiss = dismiss
             self.isExpanded = isExpanded
-            _movieDestination = movieDestination
+            self.onSelect = onSelect
         }
 
         var body: some View {
@@ -154,9 +122,7 @@ struct SeriesUpdatesSheetView: View {
                     LazyVStack(alignment: .leading, spacing: 0) {
                         ForEach(group.releasedEpisodes.filter(\.tracked)) { item in
                             Button {
-                                dismiss()
-
-                                movieDestination = .init(movieId: item.seriesId, name: item.seriesName)
+                                onSelect(.init(movieId: item.seriesId, name: item.seriesName))
                             } label: {
                                 HStack(alignment: .center) {
                                     Text(verbatim: "\(item.seriesName) \(item.season)")
@@ -207,9 +173,7 @@ struct SeriesUpdatesSheetView: View {
 
                         ForEach(group.releasedEpisodes.filter { !$0.tracked }) { item in
                             Button {
-                                dismiss()
-
-                                movieDestination = .init(movieId: item.seriesId, name: item.seriesName)
+                                onSelect(.init(movieId: item.seriesId, name: item.seriesName))
                             } label: {
                                 HStack(alignment: .center) {
                                     Text(verbatim: "\(item.seriesName) \(item.season)")

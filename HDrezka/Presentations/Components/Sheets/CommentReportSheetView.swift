@@ -1,29 +1,15 @@
-import Combine
-import Dependencies
+import ComposableArchitecture
 import FirebaseAnalytics
 import SwiftUI
 
 struct CommentReportSheetView: View {
-    private let comment: Comment
-
-    init(comment: Comment) {
-        self.comment = comment
-    }
-
-    @Dependency(\.reportCommentUseCase) private var reportCommentUseCase
-
-    @State private var subscriptions: Set<AnyCancellable> = []
+    @Bindable var store: StoreOf<CommentReportFeature>
 
     @Environment(\.dismiss) private var dismiss
 
-    @State private var state: EmptyState = .data
-
-    @State private var report: Reports?
-    @State private var message: String = ""
-
     var body: some View {
         Group {
-            switch state {
+            switch store.status {
             case .data:
                 VStack(alignment: .center, spacing: 25) {
                     VStack(alignment: .center, spacing: 5) {
@@ -37,59 +23,23 @@ struct CommentReportSheetView: View {
 
                     VStack(alignment: .trailing, spacing: 8) {
                         ForEach(Reports.allCases) { report in
-                            RadioButton(tag: report, selection: $report, message: $message, label: report.rawValue)
+                            RadioButton(tag: report, selection: $store.report, message: $store.message, label: report.rawValue)
                         }
                     }
 
                     VStack(alignment: .center, spacing: 10) {
                         Button {
-                            withAnimation(.easeInOut) {
-                                state = .loading
-                            }
-
-                            let issue = switch report {
-                            case .obscene:
-                                1
-                            case .spoiler:
-                                4
-                            case .insulting:
-                                2
-                            case .flood:
-                                3
-                            case .other:
-                                0
-                            default:
-                                0
-                            }
-
-                            reportCommentUseCase(id: comment.commentId, issue: issue, text: issue == 0 ? message : "")
-                                .receive(on: DispatchQueue.main)
-                                .sink { completion in
-                                    guard case let .failure(error) = completion else { return }
-
-                                    withAnimation(.easeInOut) {
-                                        state = .error(error)
-                                    }
-                                } receiveValue: { success in
-                                    if success {
-                                        dismiss()
-                                    } else {
-                                        withAnimation(.easeInOut) {
-                                            state = .error(NSError())
-                                        }
-                                    }
-                                }
-                                .store(in: &subscriptions)
+                            store.send(.submit, animation: .easeInOut)
                         } label: {
                             Text("key.report")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
                                 .contentShape(.rect(cornerRadius: 6))
-                                .background((report != nil && report != .other) || (report == .other && !message.trim().isEmpty) ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
+                                .background(store.canSubmit ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
-                        .disabled(report == nil || (report == .other && message.trim().isEmpty))
-                        .animation(.easeInOut, value: (report != nil && report != .other) || (report == .other && !message.trim().isEmpty))
+                        .disabled(!store.canSubmit)
+                        .animation(.easeInOut, value: store.canSubmit)
 
                         Button {
                             dismiss()
@@ -122,11 +72,7 @@ struct CommentReportSheetView: View {
 
                     VStack(alignment: .center, spacing: 10) {
                         Button {
-                            subscriptions.flush()
-
-                            withAnimation(.easeInOut) {
-                                state = .data
-                            }
+                            store.send(.cancelRequest, animation: .easeInOut)
                         } label: {
                             Text("key.cancel")
                                 .frame(width: 250, height: 30)
@@ -155,9 +101,7 @@ struct CommentReportSheetView: View {
 
                     VStack(alignment: .center, spacing: 10) {
                         Button {
-                            withAnimation(.easeInOut) {
-                                state = .data
-                            }
+                            store.send(.retry, animation: .easeInOut)
                         } label: {
                             Text("key.retry")
                                 .frame(width: 250, height: 30)

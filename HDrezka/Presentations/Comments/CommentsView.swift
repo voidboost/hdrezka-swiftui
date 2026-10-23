@@ -132,8 +132,8 @@ struct CommentsView: View {
             .frame(width: 650)
             .frame(maxHeight: 520)
         }
-        .sheet(item: $store.reportComment) { comment in
-            CommentReportSheetView(comment: comment)
+        .sheet(item: $store.scope(state: \.reportComment, action: \.reportComment)) { store in
+            CommentReportSheetView(store: store)
         }
         .confirmationDialog($store.scope(state: \.deleteDialog, action: \.deleteDialog))
         .background(.background)

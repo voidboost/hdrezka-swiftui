@@ -49,7 +49,7 @@ struct CommentView: View {
 
                     if !comment.isAdmin {
                         Button {
-                            store.reportComment = comment
+                            store.send(.reportTapped(comment))
                         } label: {
                             Image(systemName: "exclamationmark.bubble.fill")
                                 .foregroundColor(.accentColor)
