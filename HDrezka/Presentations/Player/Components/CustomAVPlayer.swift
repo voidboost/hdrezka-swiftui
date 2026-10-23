@@ -69,7 +69,7 @@ private final class PlaylistResourceLoader: NSObject, AVAssetResourceLoaderDeleg
     }
 
     private func handleMainRequest(_ request: AVAssetResourceLoadingRequest) -> Bool {
-        let request = session.request(urls.first!, method: .get, headers: [.userAgent(Const.userAgent)])
+        _ = session.request(urls.first!, method: .get, headers: [.userAgent(Const.userAgent)])
             .validate(statusCode: 200 ..< 400)
             .interceptor(FallbackInterceptor(urls: urls))
             .responseString(queue: queue) { [weak self] response in
@@ -86,8 +86,6 @@ private final class PlaylistResourceLoader: NSObject, AVAssetResourceLoaderDeleg
                 processPlaylist(string, url)
                 finishRequestWithMainPlaylist(request)
             }
-
-        request.resume()
 
         return true
     }
