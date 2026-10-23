@@ -1,17 +1,11 @@
-import Combine
-import Dependencies
+import ComposableArchitecture
 import FirebaseAnalytics
 import SwiftUI
 
 struct CreateBookmarkSheetView: View {
-    @Dependency(\.createBookmarksCategoryUseCase) private var createBookmarksCategoryUseCase
-
-    @State private var subscriptions: Set<AnyCancellable> = []
+    @Bindable var store: StoreOf<CreateBookmarkFeature>
 
     @Environment(\.dismiss) private var dismiss
-
-    @State private var name: String = ""
-    @State private var state: EmptyState = .data
 
     private enum FocusedField {
         case name
@@ -21,7 +15,7 @@ struct CreateBookmarkSheetView: View {
 
     var body: some View {
         Group {
-            switch state {
+            switch store.status {
             case .data:
                 VStack(alignment: .center, spacing: 25) {
                     VStack(alignment: .center, spacing: 5) {
@@ -43,14 +37,12 @@ struct CreateBookmarkSheetView: View {
                             HStack(alignment: .center, spacing: 8) {
                                 Text("key.name")
 
-                                TextField("key.name", text: $name, prompt: Text(String(localized: "key.name").lowercased()))
+                                TextField("key.name", text: $store.name, prompt: Text(String(localized: "key.name").lowercased()))
                                     .textFieldStyle(.plain)
                                     .multilineTextAlignment(.trailing)
                                     .focused($focusedField, equals: .name)
                                     .onSubmit {
-                                        if !name.trim().isEmpty {
-                                            load()
-                                        }
+                                        store.send(.submit)
                                     }
                             }
                             .padding(.vertical, 10)
@@ -63,17 +55,17 @@ struct CreateBookmarkSheetView: View {
 
                     VStack(alignment: .center, spacing: 10) {
                         Button {
-                            load()
+                            store.send(.submit)
                         } label: {
                             Text("key.create")
                                 .frame(width: 250, height: 30)
                                 .foregroundStyle(.white)
                                 .contentShape(.rect(cornerRadius: 6))
-                                .background(!name.trim().isEmpty ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
+                                .background(store.canSubmit ? Color.accentColor : Color.secondary, in: .rect(cornerRadius: 6))
                         }
                         .buttonStyle(.plain)
-                        .disabled(name.trim().isEmpty)
-                        .animation(.easeInOut, value: !name.trim().isEmpty)
+                        .disabled(!store.canSubmit)
+                        .animation(.easeInOut, value: store.canSubmit)
 
                         Button {
                             dismiss()
@@ -109,11 +101,7 @@ struct CreateBookmarkSheetView: View {
 
                     VStack(alignment: .center, spacing: 10) {
                         Button {
-                            subscriptions.flush()
-
-                            withAnimation(.easeInOut) {
-                                state = .data
-                            }
+                            store.send(.cancelRequest, animation: .easeInOut)
                         } label: {
                             Text("key.cancel")
                                 .frame(width: 250, height: 30)
@@ -143,9 +131,7 @@ struct CreateBookmarkSheetView: View {
 
                     VStack(alignment: .center, spacing: 10) {
                         Button {
-                            withAnimation(.easeInOut) {
-                                state = .data
-                            }
+                            store.send(.retry, animation: .easeInOut)
                         } label: {
                             Text("key.retry")
                                 .frame(width: 250, height: 30)
@@ -174,24 +160,5 @@ struct CreateBookmarkSheetView: View {
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
         .analyticsScreen(name: "create_bookmark_sheet", class: "CreateBookmarkSheetView")
-    }
-
-    private func load() {
-        withAnimation(.easeInOut) {
-            state = .loading
-        }
-
-        createBookmarksCategoryUseCase(name: name.trim())
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
-
-                withAnimation(.easeInOut) {
-                    state = .error(error)
-                }
-            } receiveValue: { _ in
-                dismiss()
-            }
-            .store(in: &subscriptions)
     }
 }

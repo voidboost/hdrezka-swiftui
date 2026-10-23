@@ -24,7 +24,7 @@ struct BookmarksListView: View {
                         .listRowInsets(.init())
                         .contextMenu {
                             Button {
-                                store.renameBookmark = bookmark
+                                store.send(.renameTapped(bookmark))
                             } label: {
                                 Text("key.rename")
                             }
@@ -60,7 +60,7 @@ struct BookmarksListView: View {
                             .tint(.accentColor)
 
                             Button {
-                                store.renameBookmark = bookmark
+                                store.send(.renameTapped(bookmark))
                             } label: {
                                 Image(systemName: "pencil")
                                     .font(.title3)
@@ -111,7 +111,7 @@ struct BookmarksListView: View {
                         .multilineTextAlignment(.center)
 
                     Button {
-                        store.isCreateBookmarkPresented = true
+                        store.send(.createTapped)
                     } label: {
                         Text("key.create")
                             .font(.body)

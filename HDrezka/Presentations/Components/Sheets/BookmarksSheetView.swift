@@ -1,32 +1,13 @@
-import Combine
-import Dependencies
+import ComposableArchitecture
 import FirebaseAnalytics
 import Flow
 import Pow
 import SwiftUI
 
 struct BookmarksSheetView: View {
-    private let id: String
-
-    @Binding private var isCreateBookmarkPresented: Bool
-
-    init(id: String, isCreateBookmarkPresented: Binding<Bool>) {
-        self.id = id
-        _isCreateBookmarkPresented = isCreateBookmarkPresented
-    }
-
-    @Dependency(\.addToBookmarksUseCase) private var addToBookmarksUseCase
-    @Dependency(\.removeFromBookmarksUseCase) private var removeFromBookmarksUseCase
-    @Dependency(\.getMovieBookmarksUseCase) private var getMovieBookmarksUseCase
-
-    @State private var subscriptions: Set<AnyCancellable> = []
+    @Bindable var store: StoreOf<BookmarksSheetFeature>
 
     @Environment(\.dismiss) private var dismiss
-
-    @State private var state: DataState<[Bookmark]> = .loading
-
-    @State private var error: Error?
-    @State private var isErrorPresented: Bool = false
 
     @State private var scrollViewContentSize: CGSize = .zero
 
@@ -47,13 +28,13 @@ struct BookmarksSheetView: View {
             }
 
             Group {
-                if let error = state.error {
+                if let error = store.bookmarks.error {
                     VStack(alignment: .center, spacing: 8) {
                         Text(error.localizedDescription)
                             .lineLimit(nil)
 
                         Button {
-                            load(reset: true)
+                            store.send(.reload, animation: .easeInOut)
                         } label: {
                             Text("key.retry")
                                 .foregroundStyle(Color.accentColor)
@@ -61,13 +42,13 @@ struct BookmarksSheetView: View {
                         .buttonStyle(.accessoryBar)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if var bookmarks = state.data {
+                } else if let bookmarks = store.bookmarks.data {
                     if bookmarks.isEmpty {
                         VStack(alignment: .center, spacing: 8) {
                             Text("key.bookmark.empty")
 
                             Button {
-                                load(reset: true)
+                                store.send(.reload, animation: .easeInOut)
                             } label: {
                                 Text("key.retry")
                                     .foregroundStyle(Color.accentColor)
@@ -83,45 +64,7 @@ struct BookmarksSheetView: View {
                                         let isChecked = bookmark.isChecked ?? false
 
                                         Button {
-                                            if let movieId = id.id {
-                                                if isChecked {
-                                                    removeFromBookmarksUseCase(movies: [movieId], bookmarkUserCategory: bookmark.bookmarkId)
-                                                        .receive(on: DispatchQueue.main)
-                                                        .sink { completion in
-                                                            guard case let .failure(error) = completion else { return }
-
-                                                            self.error = error
-                                                            isErrorPresented = true
-                                                        } receiveValue: { success in
-                                                            if success {
-                                                                bookmarks[index] -= 1
-
-                                                                withAnimation(.easeInOut) {
-                                                                    state = .data(bookmarks)
-                                                                }
-                                                            }
-                                                        }
-                                                        .store(in: &subscriptions)
-                                                } else {
-                                                    addToBookmarksUseCase(movieId: movieId, bookmarkUserCategory: bookmark.bookmarkId)
-                                                        .receive(on: DispatchQueue.main)
-                                                        .sink { completion in
-                                                            guard case let .failure(error) = completion else { return }
-
-                                                            self.error = error
-                                                            isErrorPresented = true
-                                                        } receiveValue: { success in
-                                                            if success {
-                                                                bookmarks[index] += 1
-
-                                                                withAnimation(.easeInOut) {
-                                                                    state = .data(bookmarks)
-                                                                }
-                                                            }
-                                                        }
-                                                        .store(in: &subscriptions)
-                                                }
-                                            }
+                                            store.send(.toggle(bookmark))
                                         } label: {
                                             HStack(alignment: .center) {
                                                 Image(systemName: isChecked ? "bookmark.fill" : "bookmark")
@@ -144,7 +87,7 @@ struct BookmarksSheetView: View {
                                             },
                                             value: bookmark.count
                                         )
-                                        .disabled(id.id == nil)
+                                        .disabled(store.id.id == nil)
                                         .flexibility(.natural)
                                     }
                                 }
@@ -172,7 +115,7 @@ struct BookmarksSheetView: View {
 
             VStack(alignment: .center, spacing: 10) {
                 Button {
-                    isCreateBookmarkPresented = true
+                    store.send(.createTapped)
                 } label: {
                     Text("key.create")
                         .frame(width: 250, height: 30)
@@ -198,44 +141,11 @@ struct BookmarksSheetView: View {
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
         .onAppear {
-            load()
+            store.send(.onAppear)
         }
-        .alert("key.ops", isPresented: $isErrorPresented) {
-            Button(role: .cancel) {
-                dismiss()
-            } label: {
-                Text("key.ok")
-            }
-        } message: {
-            if let error {
-                Text(error.localizedDescription)
-            }
-        }
+        .alert($store.scope(state: \.alert, action: \.alert))
         .dialogSeverity(.critical)
         .particleLayer(name: "rise")
         .analyticsScreen(name: "bookmarks_sheet", class: "BookmarksSheetView")
-    }
-
-    private func load(reset: Bool = false) {
-        if reset {
-            withAnimation(.easeInOut) {
-                state = .loading
-            }
-        }
-
-        getMovieBookmarksUseCase(movieId: id)
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
-
-                withAnimation(.easeInOut) {
-                    state = .error(error)
-                }
-            } receiveValue: { bookmarks in
-                withAnimation(.easeInOut) {
-                    state = .data(bookmarks)
-                }
-            }
-            .store(in: &subscriptions)
     }
 }

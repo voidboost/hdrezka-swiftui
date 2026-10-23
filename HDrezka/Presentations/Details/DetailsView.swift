@@ -12,8 +12,6 @@ struct DetailsView: View {
         _store = State(initialValue: Store(initialState: DetailsFeature.State(id: movie.movieId)) { DetailsFeature() })
     }
 
-    @State private var isBookmarksPresented = false
-    @State private var isCreateBookmarkPresented = false
     @State private var isSchedulePresented = false
 
     @Default(.isLoggedIn) private var isLoggedIn
@@ -86,7 +84,7 @@ struct DetailsView: View {
 
                 if isLoggedIn {
                     Button {
-                        isBookmarksPresented = true
+                        store.send(.bookmarksTapped)
                     } label: {
                         Image(systemName: "bookmark")
                     }
@@ -107,11 +105,11 @@ struct DetailsView: View {
         .onAppear {
             store.send(.onAppear)
         }
-        .sheet(isPresented: $isBookmarksPresented) {
-            BookmarksSheetView(id: store.id, isCreateBookmarkPresented: $isCreateBookmarkPresented)
+        .sheet(item: $store.scope(state: \.destination?.bookmarks, action: \.destination.bookmarks)) { store in
+            BookmarksSheetView(store: store)
         }
-        .sheet(isPresented: $isCreateBookmarkPresented) {
-            CreateBookmarkSheetView()
+        .sheet(item: $store.scope(state: \.destination?.createBookmark, action: \.destination.createBookmark)) { store in
+            CreateBookmarkSheetView(store: store)
         }
         .sheet(isPresented: $isSchedulePresented) {
             if let details = store.details.data, let schedule = details.schedule, !schedule.isEmpty {
@@ -120,9 +118,6 @@ struct DetailsView: View {
         }
         .alert($store.scope(state: \.alert, action: \.alert))
         .dialogSeverity(.critical)
-        .onChange(of: isCreateBookmarkPresented) {
-            isBookmarksPresented = !isCreateBookmarkPresented
-        }
         .background(.background)
     }
 
