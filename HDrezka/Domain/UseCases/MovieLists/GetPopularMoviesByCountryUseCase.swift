@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct GetPopularMoviesByCountryUseCase {
     @Dependency(\.movieListsRepository) private var repository
 
-    func callAsFunction(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        repository.getPopularMoviesByCountry(countryId: countryId, genre: genre, page: page)
+    func callAsFunction(countryId: String, genre: Int, page: Int) async throws -> [MovieSimple] {
+        try await repository.getPopularMoviesByCountry(countryId: countryId, genre: genre, page: page)
     }
 }
 

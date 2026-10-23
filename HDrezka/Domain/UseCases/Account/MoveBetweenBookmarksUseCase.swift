@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct MoveBetweenBookmarksUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction(movies: [String], fromBookmarkUserCategory: Int, toBookmarkUserCategory: Int) -> AnyPublisher<Int, Error> {
-        repository.moveBetweenBookmarks(movies: movies, fromBookmarkUserCategory: fromBookmarkUserCategory, toBookmarkUserCategory: toBookmarkUserCategory)
+    func callAsFunction(movies: [String], fromBookmarkUserCategory: Int, toBookmarkUserCategory: Int) async throws -> Int {
+        try await repository.moveBetweenBookmarks(movies: movies, fromBookmarkUserCategory: fromBookmarkUserCategory, toBookmarkUserCategory: toBookmarkUserCategory)
     }
 }
 

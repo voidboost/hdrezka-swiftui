@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct GetSeriesUpdatesUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction() -> AnyPublisher<[SeriesUpdateGroup], Error> {
-        repository.getSeriesUpdates()
+    func callAsFunction() async throws -> [SeriesUpdateGroup] {
+        try await repository.getSeriesUpdates()
     }
 }
 

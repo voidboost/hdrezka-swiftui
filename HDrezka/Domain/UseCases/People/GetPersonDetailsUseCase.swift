@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct GetPersonDetailsUseCase {
     @Dependency(\.peopleRepository) private var repository
 
-    func callAsFunction(id: String) -> AnyPublisher<PersonDetailed, Error> {
-        repository.getPersonDetails(id: id)
+    func callAsFunction(id: String) async throws -> PersonDetailed {
+        try await repository.getPersonDetails(id: id)
     }
 }
 

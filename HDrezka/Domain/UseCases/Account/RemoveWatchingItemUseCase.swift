@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct RemoveWatchingItemUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction(item: MovieWatchLater) -> AnyPublisher<Bool, Error> {
-        repository.removeWatchingItem(item: item)
+    func callAsFunction(item: MovieWatchLater) async throws -> Bool {
+        try await repository.removeWatchingItem(item: item)
     }
 }
 

@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct GetBookmarksByCategoryAddedUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction(id: Int, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        repository.getBookmarksByCategoryAdded(id: id, genre: genre, page: page)
+    func callAsFunction(id: Int, genre: Int, page: Int) async throws -> [MovieSimple] {
+        try await repository.getBookmarksByCategoryAdded(id: id, genre: genre, page: page)
     }
 }
 

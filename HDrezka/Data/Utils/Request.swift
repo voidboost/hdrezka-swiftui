@@ -1,8 +1,5 @@
 import Alamofire
-import Combine
 import Foundation
-
-let parsingQueue = DispatchQueue(label: "io.silentsea.hdrezka.parsingQueue", qos: .userInitiated, attributes: .concurrent)
 
 struct JSONObject {
     let raw: [String: Any]
@@ -22,54 +19,65 @@ struct JSONObject {
 }
 
 extension Session {
-    func string<T>(_ convertible: URLRequestConvertible, parse: @escaping (String) throws -> T) -> AnyPublisher<T, Error> {
-        request(convertible)
-            .validate(statusCode: 200 ..< 400)
-            .publishString(queue: parsingQueue)
-            .value()
-            .tryMap(parse)
-            .receive(on: DispatchQueue.main)
-            .handleError()
+    @concurrent
+    func string<T>(_ convertible: URLRequestConvertible, parse: (String) throws -> T) async throws -> T {
+        try await handlingErrors {
+            let string = try await request(convertible)
+                .validate(statusCode: 200 ..< 400)
+                .serializingString()
+                .value
+
+            return try parse(string)
+        }
     }
 
-    func json<T>(_ convertible: URLRequestConvertible, function: String, parse: @escaping (JSONObject) throws -> T) -> AnyPublisher<T, Error> {
-        request(convertible)
-            .validate(statusCode: 200 ..< 400)
-            .publishData(queue: parsingQueue)
-            .value()
-            .tryMap { data in
-                guard let raw = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as? [String: Any] else {
-                    throw HDrezkaError.parseJson("json", function)
-                }
+    @concurrent
+    func json<T>(_ convertible: URLRequestConvertible, function: String, parse: (JSONObject) throws -> T) async throws -> T {
+        try await handlingErrors {
+            let data = try await request(convertible)
+                .validate(statusCode: 200 ..< 400)
+                .serializingData()
+                .value
 
-                return try parse(JSONObject(raw: raw, function: function))
+            guard let raw = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as? [String: Any] else {
+                throw HDrezkaError.parseJson("json", function)
             }
-            .receive(on: DispatchQueue.main)
-            .handleError()
+
+            return try parse(JSONObject(raw: raw, function: function))
+        }
     }
 
-    func success(_ convertible: URLRequestConvertible, function: String) -> AnyPublisher<Bool, Error> {
-        json(convertible, function: function) { try $0.require("success") }
+    func success(_ convertible: URLRequestConvertible, function: String) async throws -> Bool {
+        try await json(convertible, function: function) { try $0.require("success") }
     }
 
-    func perform(_ convertible: URLRequestConvertible) -> AnyPublisher<Bool, Error> {
-        request(convertible)
-            .validate(statusCode: 200 ..< 400)
-            .publishUnserialized(queue: parsingQueue)
-            .value()
-            .map { _ in true }
-            .receive(on: DispatchQueue.main)
-            .handleError()
+    @concurrent
+    func perform(_ convertible: URLRequestConvertible) async throws -> Bool {
+        try await handlingErrors {
+            _ = try await request(convertible)
+                .validate(statusCode: 200 ..< 400)
+                .serializingData(emptyResponseCodes: Set(200 ..< 400))
+                .value
+
+            return true
+        }
     }
 }
 
-func invalidInput<T>(
+func handlingErrors<T>(_ operation: () async throws -> T) async throws -> T {
+    do {
+        return try await operation()
+    } catch {
+        throw handleError(error)
+    }
+}
+
+func invalidInput(
     functionName: String = #function,
     lineNumber: Int = #line,
     columnNumber: Int = #column
-) -> AnyPublisher<T, Error> {
-    Fail(error: HDrezkaError.null(functionName, lineNumber, columnNumber))
-        .handleError()
+) -> Error {
+    handleError(HDrezkaError.null(functionName, lineNumber, columnNumber))
 }
 
 extension String {

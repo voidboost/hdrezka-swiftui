@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct GetVersionUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction() -> AnyPublisher<String, Error> {
-        repository.getVersion()
+    func callAsFunction() async throws -> String {
+        try await repository.getVersion()
     }
 }
 

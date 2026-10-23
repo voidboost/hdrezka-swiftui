@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct ReportCommentUseCase {
     @Dependency(\.movieDetailsRepository) private var repository
 
-    func callAsFunction(id: String, issue: Int, text: String) -> AnyPublisher<Bool, Error> {
-        repository.reportComment(id: id, issue: issue, text: text)
+    func callAsFunction(id: String, issue: Int, text: String) async throws -> Bool {
+        try await repository.reportComment(id: id, issue: issue, text: text)
     }
 }
 

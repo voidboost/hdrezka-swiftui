@@ -1,48 +1,47 @@
-import Combine
 import Dependencies
 
 protocol AccountRepository: Sendable {
-    func signIn(login: String, password: String) -> AnyPublisher<Void, Error>
+    func signIn(login: String, password: String) async throws
 
-    func signUp(email: String, login: String, password: String, verifyCode: String, step: Int) -> AnyPublisher<Void, Error>
+    func signUp(email: String, login: String, password: String, verifyCode: String, step: Int) async throws
 
-    func restore(login: String) -> AnyPublisher<String?, Error>
+    func restore(login: String) async throws -> String?
 
-    func logout() -> AnyPublisher<Bool, Error>
+    func logout() async throws -> Bool
 
-    func getWatchingLaterMovies() -> AnyPublisher<[MovieWatchLater], Error>
+    func getWatchingLaterMovies() async throws -> [MovieWatchLater]
 
-    func saveWatchingState(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, position: Int?, total: Int?) -> AnyPublisher<Bool, Error>
+    func saveWatchingState(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, position: Int?, total: Int?) async throws -> Bool
 
-    func switchWatchedItem(item: MovieWatchLater) -> AnyPublisher<Bool, Error>
+    func switchWatchedItem(item: MovieWatchLater) async throws -> Bool
 
-    func removeWatchingItem(item: MovieWatchLater) -> AnyPublisher<Bool, Error>
+    func removeWatchingItem(item: MovieWatchLater) async throws -> Bool
 
-    func getSeriesUpdates() -> AnyPublisher<[SeriesUpdateGroup], Error>
+    func getSeriesUpdates() async throws -> [SeriesUpdateGroup]
 
-    func getBookmarks() -> AnyPublisher<[Bookmark], Error>
+    func getBookmarks() async throws -> [Bookmark]
 
-    func getBookmarksByCategoryAdded(id: Int, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getBookmarksByCategoryAdded(id: Int, genre: Int, page: Int) async throws -> [MovieSimple]
 
-    func getBookmarksByCategoryYear(id: Int, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getBookmarksByCategoryYear(id: Int, genre: Int, page: Int) async throws -> [MovieSimple]
 
-    func getBookmarksByCategoryPopular(id: Int, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getBookmarksByCategoryPopular(id: Int, genre: Int, page: Int) async throws -> [MovieSimple]
 
-    func createBookmarksCategory(name: String) -> AnyPublisher<Bookmark, Error>
+    func createBookmarksCategory(name: String) async throws -> Bookmark
 
-    func changeBookmarksCategoryName(id: Int, newName: String) -> AnyPublisher<Bool, Error>
+    func changeBookmarksCategoryName(id: Int, newName: String) async throws -> Bool
 
-    func deleteBookmarksCategory(id: Int) -> AnyPublisher<Bool, Error>
+    func deleteBookmarksCategory(id: Int) async throws -> Bool
 
-    func addToBookmarks(movieId: String, bookmarkUserCategory: Int) -> AnyPublisher<Bool, Error>
+    func addToBookmarks(movieId: String, bookmarkUserCategory: Int) async throws -> Bool
 
-    func removeFromBookmarks(movies: [String], bookmarkUserCategory: Int) -> AnyPublisher<Bool, Error>
+    func removeFromBookmarks(movies: [String], bookmarkUserCategory: Int) async throws -> Bool
 
-    func moveBetweenBookmarks(movies: [String], fromBookmarkUserCategory: Int, toBookmarkUserCategory: Int) -> AnyPublisher<Int, Error>
+    func moveBetweenBookmarks(movies: [String], fromBookmarkUserCategory: Int, toBookmarkUserCategory: Int) async throws -> Int
 
-    func reorderBookmarksCategories(newOrder: [Bookmark]) -> AnyPublisher<Bool, Error>
+    func reorderBookmarksCategories(newOrder: [Bookmark]) async throws -> Bool
 
-    func getVersion() -> AnyPublisher<String, Error>
+    func getVersion() async throws -> String
 }
 
 private enum AccountRepositoryKey: DependencyKey {

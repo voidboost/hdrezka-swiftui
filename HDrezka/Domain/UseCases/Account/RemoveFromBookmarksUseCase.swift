@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct RemoveFromBookmarksUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction(movies: [String], bookmarkUserCategory: Int) -> AnyPublisher<Bool, Error> {
-        repository.removeFromBookmarks(movies: movies, bookmarkUserCategory: bookmarkUserCategory)
+    func callAsFunction(movies: [String], bookmarkUserCategory: Int) async throws -> Bool {
+        try await repository.removeFromBookmarks(movies: movies, bookmarkUserCategory: bookmarkUserCategory)
     }
 }
 

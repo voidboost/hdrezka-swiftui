@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct SearchUseCase {
     @Dependency(\.searchRepository) private var repository
 
-    func callAsFunction(query: String, page: Int) -> AnyPublisher<[MovieSimple], Error> {
-        repository.search(query: query, page: page)
+    func callAsFunction(query: String, page: Int) async throws -> [MovieSimple] {
+        try await repository.search(query: query, page: page)
     }
 }
 

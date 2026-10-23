@@ -1,34 +1,33 @@
-import Combine
 import Dependencies
 
 protocol MovieDetailsRepository: Sendable {
-    func getMovieDetails(movieId: String) -> AnyPublisher<MovieDetailed, Error>
+    func getMovieDetails(movieId: String) async throws -> MovieDetailed
 
-    func getMovieBookmarks(movieId: String) -> AnyPublisher<[Bookmark], Error>
+    func getMovieBookmarks(movieId: String) async throws -> [Bookmark]
 
-    func getMovieVideo(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, favs: String) -> AnyPublisher<MovieVideo, Error>
+    func getMovieVideo(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, favs: String) async throws -> MovieVideo
 
-    func getMovieThumbnails(path: String) -> AnyPublisher<WebVTT, Error>
+    func getMovieThumbnails(path: String) async throws -> WebVTT
 
-    func getSeriesSeasons(movieId: String, voiceActing: MovieVoiceActing, favs: String) -> AnyPublisher<[MovieSeason], Error>
+    func getSeriesSeasons(movieId: String, voiceActing: MovieVoiceActing, favs: String) async throws -> [MovieSeason]
 
-    func getMovieTrailerId(movieId: String) -> AnyPublisher<String, Error>
+    func getMovieTrailerId(movieId: String) async throws -> String
 
-    func getCommentsPage(movieId: String, page: Int) -> AnyPublisher<[Comment], Error>
+    func getCommentsPage(movieId: String, page: Int) async throws -> [Comment]
 
-    func getComment(movieId: String, commentId: String) -> AnyPublisher<Comment, Error>
+    func getComment(movieId: String, commentId: String) async throws -> Comment
 
-    func toggleLikeComment(id: String) -> AnyPublisher<(Int, Bool), Error>
+    func toggleLikeComment(id: String) async throws -> (Int, Bool)
 
-    func reportComment(id: String, issue: Int, text: String) -> AnyPublisher<Bool, Error>
+    func reportComment(id: String, issue: Int, text: String) async throws -> Bool
 
-    func deleteComment(id: String, hash: String) -> AnyPublisher<(Bool, String?), Error>
+    func deleteComment(id: String, hash: String) async throws -> (Bool, String?)
 
-    func sendComment(id: String?, postId: String, name: String?, text: String, adb: String?, type: String?) -> AnyPublisher<SendCommentResult, Error>
+    func sendComment(id: String?, postId: String, name: String?, text: String, adb: String?, type: String?) async throws -> SendCommentResult
 
-    func getLikes(id: String) -> AnyPublisher<[Like], Error>
+    func getLikes(id: String) async throws -> [Like]
 
-    func rate(id: String, rating: Int) -> AnyPublisher<(Float?, String?)?, Error>
+    func rate(id: String, rating: Int) async throws -> (Float?, String?)?
 }
 
 private enum MovieDetailsRepositoryKey: DependencyKey {

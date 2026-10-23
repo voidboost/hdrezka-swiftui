@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct RestoreUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction(login: String) -> AnyPublisher<String?, Error> {
-        repository.restore(login: login)
+    func callAsFunction(login: String) async throws -> String? {
+        try await repository.restore(login: login)
     }
 }
 

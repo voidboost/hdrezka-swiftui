@@ -1,10 +1,9 @@
-import Combine
 import Dependencies
 
 protocol SearchRepository: Sendable {
-    func search(query: String, page: Int) -> AnyPublisher<[MovieSimple], Error>
+    func search(query: String, page: Int) async throws -> [MovieSimple]
 
-    func categories() -> AnyPublisher<[MovieType], Error>
+    func categories() async throws -> [MovieType]
 }
 
 private enum SearchRepositoryKey: DependencyKey {
