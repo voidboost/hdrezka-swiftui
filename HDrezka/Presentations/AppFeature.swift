@@ -91,35 +91,23 @@ struct AppFeature {
 
                 return .none
 
-            case let .homePath(.element(_, action)):
-                if let route = action.route { state.homePath.append(Path.State(route)) }
+            case let .homePath(action):
+                return push(action, to: &state.homePath)
 
-                return .none
+            case let .searchPath(action):
+                return push(action, to: &state.searchPath)
 
-            case let .searchPath(.element(_, action)):
-                if let route = action.route { state.searchPath.append(Path.State(route)) }
+            case let .categoriesPath(action):
+                return push(action, to: &state.categoriesPath)
 
-                return .none
+            case let .collectionsPath(action):
+                return push(action, to: &state.collectionsPath)
 
-            case let .categoriesPath(.element(_, action)):
-                if let route = action.route { state.categoriesPath.append(Path.State(route)) }
+            case let .watchingLaterPath(action):
+                return push(action, to: &state.watchingLaterPath)
 
-                return .none
-
-            case let .collectionsPath(.element(_, action)):
-                if let route = action.route { state.collectionsPath.append(Path.State(route)) }
-
-                return .none
-
-            case let .watchingLaterPath(.element(_, action)):
-                if let route = action.route { state.watchingLaterPath.append(Path.State(route)) }
-
-                return .none
-
-            case let .bookmarksPath(.element(_, action)):
-                if let route = action.route { state.bookmarksPath.append(Path.State(route)) }
-
-                return .none
+            case let .bookmarksPath(action):
+                return push(action, to: &state.bookmarksPath)
 
             case .appLaunched:
                 return .merge(
@@ -197,9 +185,7 @@ struct AppFeature {
 
                 return .none
 
-            case .binding, .home, .homePath, .search, .searchPath, .categories, .categoriesPath,
-                 .collections, .collectionsPath, .watchingLater, .watchingLaterPath, .bookmarks, .bookmarksPath,
-                 .destination, .alert:
+            case .binding, .home, .search, .categories, .collections, .watchingLater, .bookmarks, .destination, .alert:
                 return .none
             }
         }
@@ -211,6 +197,15 @@ struct AppFeature {
         .forEach(\.bookmarksPath, action: \.bookmarksPath)
         .ifLet(\.$destination, action: \.destination)
         .ifLet(\.$alert, action: \.alert)
+    }
+
+    /// Pushes a route that a screen in the stack requested through its `push` delegate.
+    private func push(_ action: StackActionOf<Path>, to path: inout StackState<Path.State>) -> Effect<Action> {
+        if case let .element(_, action) = action, let route = action.route {
+            path.append(Path.State(route))
+        }
+
+        return .none
     }
 }
 
