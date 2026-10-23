@@ -14,11 +14,9 @@ struct ListFeature {
 
     @ObservableState
     struct State: Equatable {
-        fileprivate var hasAppeared = false
-
         let source: Source
 
-        var movies: DataState<[MovieSimple]> = .loading
+        var movies: DataState<[MovieSimple]> = .idle
         var paginationState: DataPaginationState = .idle
 
         var title: String
@@ -118,9 +116,7 @@ struct ListFeature {
                 return .none
 
             case .onAppear:
-                guard state.movies.data == nil, !state.hasAppeared || state.movies.error != nil else { return .none }
-
-                state.hasAppeared = true
+                guard state.movies.needsLoad else { return .none }
 
                 return .send(.reload)
 

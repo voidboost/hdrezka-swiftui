@@ -1,12 +1,30 @@
 import Foundation
 
 enum DataState<T: Equatable>: Equatable {
+    /// Nothing has been requested yet.
+    case idle
     case data(T)
     case loading
     case error(Error)
 }
 
 extension DataState {
+    /// Whether there is nothing to show yet, either because the first request is in flight or hasn't started.
+    var isLoading: Bool {
+        switch self {
+        case .idle, .loading: true
+        case .data, .error: false
+        }
+    }
+
+    /// Whether content still has to be requested: it never was, or the last attempt failed.
+    var needsLoad: Bool {
+        switch self {
+        case .idle, .error: true
+        case .data, .loading: false
+        }
+    }
+
     var data: T? {
         guard case let .data(data) = self else { return nil }
 
@@ -23,7 +41,7 @@ extension DataState {
         switch (lhs, rhs) {
         case let (.data(lhsData), .data(rhsData)):
             return lhsData == rhsData
-        case (.loading, .loading):
+        case (.idle, .idle), (.loading, .loading):
             return true
         case let (.error(lhsError), .error(rhsError)):
             let lhsNSError = lhsError as NSError?

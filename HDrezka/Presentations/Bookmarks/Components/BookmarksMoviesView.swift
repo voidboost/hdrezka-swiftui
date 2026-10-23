@@ -92,7 +92,7 @@ struct BookmarksMoviesView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(18)
-            } else if store.movies == .loading {
+            } else if store.movies.isLoading {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding(18)

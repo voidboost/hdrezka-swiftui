@@ -5,9 +5,7 @@ import SwiftUI
 struct WatchingLaterFeature {
     @ObservableState
     struct State: Equatable {
-        fileprivate var hasAppeared = false
-
-        var movies: DataState<[MovieWatchLater]> = .loading
+        var movies: DataState<[MovieWatchLater]> = .idle
 
         @Presents var alert: AlertState<Action.Alert>?
     }
@@ -35,9 +33,7 @@ struct WatchingLaterFeature {
         Reduce { state, action in
             switch action {
             case .onAppear:
-                guard state.movies.data == nil, !state.hasAppeared || state.movies.error != nil else { return .none }
-
-                state.hasAppeared = true
+                guard state.movies.needsLoad else { return .none }
 
                 return .send(.reload)
 

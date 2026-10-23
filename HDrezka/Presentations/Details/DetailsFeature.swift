@@ -14,12 +14,10 @@ struct DetailsFeature {
 
     @ObservableState
     struct State: Equatable {
-        fileprivate var hasAppeared = false
-
         let id: String
         let title: String?
 
-        var details: DataState<MovieDetailed> = .loading
+        var details: DataState<MovieDetailed> = .idle
         var trailerId: String?
 
         @Presents var alert: AlertState<Action.Alert>?
@@ -70,9 +68,7 @@ struct DetailsFeature {
                 return .none
 
             case .onAppear:
-                guard state.details.data == nil, !state.hasAppeared || state.details.error != nil else { return .none }
-
-                state.hasAppeared = true
+                guard state.details.needsLoad else { return .none }
 
                 return .send(.reload)
 

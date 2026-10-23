@@ -11,9 +11,7 @@ struct BookmarksFeature {
 
     @ObservableState
     struct State: Equatable {
-        fileprivate var hasAppeared = false
-
-        var bookmarks: DataState<[Bookmark]> = .loading
+        var bookmarks: DataState<[Bookmark]> = .idle
         var movies: DataState<[MovieSimple]> = .data([])
         var paginationState: DataPaginationState = .idle
 
@@ -100,9 +98,7 @@ struct BookmarksFeature {
                 return .none
 
             case .onAppear:
-                guard state.bookmarks.data == nil, !state.hasAppeared || state.bookmarks.error != nil else { return .none }
-
-                state.hasAppeared = true
+                guard state.bookmarks.needsLoad else { return .none }
 
                 return .send(.reloadBookmarks(reset: false))
 

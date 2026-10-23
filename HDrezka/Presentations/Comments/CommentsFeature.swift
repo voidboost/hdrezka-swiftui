@@ -5,14 +5,12 @@ import SwiftUI
 struct CommentsFeature {
     @ObservableState
     struct State: Equatable {
-        fileprivate var hasAppeared = false
-
         let id: String
         let adb: String?
         let type: String?
         let title: String
 
-        var comments: DataState<[Comment]> = .loading
+        var comments: DataState<[Comment]> = .idle
         var paginationState: DataPaginationState = .idle
 
         var reply: String?
@@ -92,9 +90,7 @@ struct CommentsFeature {
                 return .none
 
             case .onAppear:
-                guard state.comments.data == nil, !state.hasAppeared || state.comments.error != nil else { return .none }
-
-                state.hasAppeared = true
+                guard state.comments.needsLoad else { return .none }
 
                 return .send(.reload)
 

@@ -58,7 +58,7 @@ struct CollectionsView: View {
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if store.collections == .loading {
+            } else if store.collections.isLoading {
                 LoadingStateView()
                     .padding(.vertical, 18)
                     .padding(.horizontal, 36)

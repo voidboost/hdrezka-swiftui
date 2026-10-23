@@ -5,12 +5,10 @@ import SwiftUI
 struct PersonFeature {
     @ObservableState
     struct State: Equatable {
-        fileprivate var hasAppeared = false
-
         let id: String
         let name: String
 
-        var details: DataState<PersonDetailed> = .loading
+        var details: DataState<PersonDetailed> = .idle
 
         init(person: PersonSimple) {
             id = person.personId
@@ -32,9 +30,7 @@ struct PersonFeature {
         Reduce { state, action in
             switch action {
             case .onAppear:
-                guard state.details.data == nil, !state.hasAppeared || state.details.error != nil else { return .none }
-
-                state.hasAppeared = true
+                guard state.details.needsLoad else { return .none }
 
                 return .send(.reload)
 

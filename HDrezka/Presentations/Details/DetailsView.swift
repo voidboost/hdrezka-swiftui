@@ -43,7 +43,7 @@ struct DetailsView: View {
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if store.details == .loading {
+            } else if store.details.isLoading {
                 LoadingStateView()
                     .padding(.vertical, 18)
                     .padding(.horizontal, 36)

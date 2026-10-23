@@ -45,7 +45,7 @@ struct CategoriesView: View {
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if store.types == .loading {
+            } else if store.types.isLoading {
                 LoadingStateView()
                     .padding(.vertical, 18)
                     .padding(.horizontal, 36)

@@ -70,7 +70,7 @@ struct CommentsView: View {
                         view
                     }
                 }
-            } else if store.comments == .loading {
+            } else if store.comments.isLoading {
                 LoadingStateView()
                     .padding(.vertical, 18)
                     .padding(.horizontal, 36)
