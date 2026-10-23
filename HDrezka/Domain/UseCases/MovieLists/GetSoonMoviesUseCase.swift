@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct GetSoonMoviesUseCase {
     @Dependency(\.movieListsRepository) private var repository
 
-    func callAsFunction(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error> {
-        repository.getSoonMovies(page: page, genre: genre)
+    func callAsFunction(page: Int, genre: Int) async throws -> [MovieSimple] {
+        try await repository.getSoonMovies(page: page, genre: genre)
     }
 }
 

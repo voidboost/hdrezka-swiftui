@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct GetMovieVideoUseCase {
     @Dependency(\.movieDetailsRepository) private var repository
 
-    func callAsFunction(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, favs: String) -> AnyPublisher<MovieVideo, Error> {
-        repository.getMovieVideo(voiceActing: voiceActing, season: season, episode: episode, favs: favs)
+    func callAsFunction(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, favs: String) async throws -> MovieVideo {
+        try await repository.getMovieVideo(voiceActing: voiceActing, season: season, episode: episode, favs: favs)
     }
 }
 

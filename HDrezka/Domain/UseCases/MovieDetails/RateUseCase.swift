@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct RateUseCase {
     @Dependency(\.movieDetailsRepository) private var repository
 
-    func callAsFunction(id: String, rating: Int) -> AnyPublisher<(Float?, String?)?, Error> {
-        repository.rate(id: id, rating: rating)
+    func callAsFunction(id: String, rating: Int) async throws -> (Float?, String?)? {
+        try await repository.rate(id: id, rating: rating)
     }
 }
 

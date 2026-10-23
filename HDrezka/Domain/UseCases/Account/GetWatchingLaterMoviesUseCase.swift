@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct GetWatchingLaterMoviesUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction() -> AnyPublisher<[MovieWatchLater], Error> {
-        repository.getWatchingLaterMovies()
+    func callAsFunction() async throws -> [MovieWatchLater] {
+        try await repository.getWatchingLaterMovies()
     }
 }
 

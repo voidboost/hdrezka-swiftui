@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct SaveWatchingStateUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, position: Int? = nil, total: Int? = nil) -> AnyPublisher<Bool, Error> {
-        repository.saveWatchingState(voiceActing: voiceActing, season: season, episode: episode, position: position, total: total)
+    func callAsFunction(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, position: Int? = nil, total: Int? = nil) async throws -> Bool {
+        try await repository.saveWatchingState(voiceActing: voiceActing, season: season, episode: episode, position: position, total: total)
     }
 }
 

@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct CategoriesUseCase {
     @Dependency(\.searchRepository) private var repository
 
-    func callAsFunction() -> AnyPublisher<[MovieType], Error> {
-        repository.categories()
+    func callAsFunction() async throws -> [MovieType] {
+        try await repository.categories()
     }
 }
 

@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct SwitchWatchedItemUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction(item: MovieWatchLater) -> AnyPublisher<Bool, Error> {
-        repository.switchWatchedItem(item: item)
+    func callAsFunction(item: MovieWatchLater) async throws -> Bool {
+        try await repository.switchWatchedItem(item: item)
     }
 }
 

@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct DeleteCommentUseCase {
     @Dependency(\.movieDetailsRepository) private var repository
 
-    func callAsFunction(id: String, hash: String) -> AnyPublisher<(Bool, String?), Error> {
-        repository.deleteComment(id: id, hash: hash)
+    func callAsFunction(id: String, hash: String) async throws -> (Bool, String?) {
+        try await repository.deleteComment(id: id, hash: hash)
     }
 }
 

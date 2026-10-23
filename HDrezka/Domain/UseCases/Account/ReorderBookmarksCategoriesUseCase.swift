@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct ReorderBookmarksCategoriesUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction(newOrder: [Bookmark]) -> AnyPublisher<Bool, Error> {
-        repository.reorderBookmarksCategories(newOrder: newOrder)
+    func callAsFunction(newOrder: [Bookmark]) async throws -> Bool {
+        try await repository.reorderBookmarksCategories(newOrder: newOrder)
     }
 }
 

@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct GetBookmarksUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction() -> AnyPublisher<[Bookmark], Error> {
-        repository.getBookmarks()
+    func callAsFunction() async throws -> [Bookmark] {
+        try await repository.getBookmarks()
     }
 }
 

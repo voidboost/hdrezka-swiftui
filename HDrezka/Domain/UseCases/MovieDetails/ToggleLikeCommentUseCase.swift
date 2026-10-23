@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct ToggleLikeCommentUseCase {
     @Dependency(\.movieDetailsRepository) private var repository
 
-    func callAsFunction(id: String) -> AnyPublisher<(Int, Bool), Error> {
-        repository.toggleLikeComment(id: id)
+    func callAsFunction(id: String) async throws -> (Int, Bool) {
+        try await repository.toggleLikeComment(id: id)
     }
 }
 

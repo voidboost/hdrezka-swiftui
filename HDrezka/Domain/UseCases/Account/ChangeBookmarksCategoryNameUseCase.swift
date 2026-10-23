@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct ChangeBookmarksCategoryNameUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction(id: Int, newName: String) -> AnyPublisher<Bool, Error> {
-        repository.changeBookmarksCategoryName(id: id, newName: newName)
+    func callAsFunction(id: Int, newName: String) async throws -> Bool {
+        try await repository.changeBookmarksCategoryName(id: id, newName: newName)
     }
 }
 

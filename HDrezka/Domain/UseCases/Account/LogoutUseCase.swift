@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct LogoutUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction() -> AnyPublisher<Bool, Error> {
-        repository.logout()
+    func callAsFunction() async throws -> Bool {
+        try await repository.logout()
     }
 }
 

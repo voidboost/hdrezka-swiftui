@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct DeleteBookmarksCategoryUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction(id: Int) -> AnyPublisher<Bool, Error> {
-        repository.deleteBookmarksCategory(id: id)
+    func callAsFunction(id: Int) async throws -> Bool {
+        try await repository.deleteBookmarksCategory(id: id)
     }
 }
 

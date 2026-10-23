@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct GetCommentUseCase {
     @Dependency(\.movieDetailsRepository) private var repository
 
-    func callAsFunction(movieId: String, commentId: String) -> AnyPublisher<Comment, Error> {
-        repository.getComment(movieId: movieId, commentId: commentId)
+    func callAsFunction(movieId: String, commentId: String) async throws -> Comment {
+        try await repository.getComment(movieId: movieId, commentId: commentId)
     }
 }
 

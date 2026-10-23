@@ -139,64 +139,64 @@ extension Optional {
 
 extension Publisher {
     func handleError() -> AnyPublisher<Output, Error> {
-        mapError(handleError)
+        mapError(HDrezka.handleError)
             .eraseToAnyPublisher()
     }
 }
 
 extension Publisher where Output == Error, Failure == Never {
     func handleError() -> AnyPublisher<Output, Failure> {
-        map(handleError)
+        map(HDrezka.handleError)
             .eraseToAnyPublisher()
     }
 }
 
-private extension Publisher {
-    func handleError(error: Error) -> Error {
-        if let avError = error as? AVError {
-            recordToCrashlytics(avError)
+func handleError(_ error: Error) -> Error {
+    if error is CancellationError || error.asAFError?.isExplicitlyCancelledError == true {
+        return CancellationError()
+    } else if let avError = error as? AVError {
+        recordToCrashlytics(avError)
 
-            return avError
-        } else if let afError = error.asAFError {
-            if afError.responseCode != nil || afError.isSessionTaskError {
-                if let code = afError.responseCode, code == 403 {
-                    AppState.presentSignIn()
-
-                    return HDrezkaError.loginRequired(Defaults[.mirror])
-                }
-
-                return afError
-            }
-
-            recordToCrashlytics(afError)
-
-            return afError
-        } else if let hdrezkaError = error as? HDrezkaError {
-            if case .mirrorBanned = hdrezkaError {
-                return hdrezkaError
-            } else if case .loginRequired = hdrezkaError {
+        return avError
+    } else if let afError = error.asAFError {
+        if afError.responseCode != nil || afError.isSessionTaskError {
+            if let code = afError.responseCode, code == 403 {
                 AppState.presentSignIn()
 
-                return hdrezkaError
-            } else if case .site = hdrezkaError {
-                return hdrezkaError
+                return HDrezkaError.loginRequired(Defaults[.mirror])
             }
 
-            recordToCrashlytics(hdrezkaError)
+            return afError
+        }
+
+        recordToCrashlytics(afError)
+
+        return afError
+    } else if let hdrezkaError = error as? HDrezkaError {
+        if case .mirrorBanned = hdrezkaError {
+            return hdrezkaError
+        } else if case .loginRequired = hdrezkaError {
+            AppState.presentSignIn()
 
             return hdrezkaError
-        } else if let exception = error as? Exception, case let .Error(type, message) = exception {
-            let hdrezkaError = HDrezkaError.swiftsoup("\(type)", message)
-
-            recordToCrashlytics(hdrezkaError)
-
+        } else if case .site = hdrezkaError {
             return hdrezkaError
         }
 
-        return error
+        recordToCrashlytics(hdrezkaError)
+
+        return hdrezkaError
+    } else if let exception = error as? Exception, case let .Error(type, message) = exception {
+        let hdrezkaError = HDrezkaError.swiftsoup("\(type)", message)
+
+        recordToCrashlytics(hdrezkaError)
+
+        return hdrezkaError
     }
 
-    private func recordToCrashlytics(_ error: Error) {
-        Crashlytics.crashlytics().record(error: error)
-    }
+    return error
+}
+
+private func recordToCrashlytics(_ error: Error) {
+    Crashlytics.crashlytics().record(error: error)
 }

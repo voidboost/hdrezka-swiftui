@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct GetMovieThumbnailsUseCase {
     @Dependency(\.movieDetailsRepository) private var repository
 
-    func callAsFunction(path: String) -> AnyPublisher<WebVTT, Error> {
-        repository.getMovieThumbnails(path: path)
+    func callAsFunction(path: String) async throws -> WebVTT {
+        try await repository.getMovieThumbnails(path: path)
     }
 }
 

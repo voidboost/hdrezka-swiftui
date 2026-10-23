@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct GetLikesUseCase {
     @Dependency(\.movieDetailsRepository) private var repository
 
-    func callAsFunction(id: String) -> AnyPublisher<[Like], Error> {
-        repository.getLikes(id: id)
+    func callAsFunction(id: String) async throws -> [Like] {
+        try await repository.getLikes(id: id)
     }
 }
 

@@ -1,8 +1,7 @@
-import Combine
 import Dependencies
 
 protocol PeopleRepository: Sendable {
-    func getPersonDetails(id: String) -> AnyPublisher<PersonDetailed, Error>
+    func getPersonDetails(id: String) async throws -> PersonDetailed
 }
 
 private enum PeopleRepositoryKey: DependencyKey {

@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct CallUseCase {
     @Dependency(\.aria2Repository) private var repository
 
-    func callAsFunction<D: Decodable & Sendable>(data: some Encodable & Sendable) -> AnyPublisher<Aria2Response<D>, Error> {
-        repository.call(data: data)
+    func callAsFunction<D: Decodable & Sendable>(data: some Encodable & Sendable) async throws -> Aria2Response<D> {
+        try await repository.call(data: data)
     }
 }
 

@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct GetMovieBookmarksUseCase {
     @Dependency(\.movieDetailsRepository) private var repository
 
-    func callAsFunction(movieId: String) -> AnyPublisher<[Bookmark], Error> {
-        repository.getMovieBookmarks(movieId: movieId)
+    func callAsFunction(movieId: String) async throws -> [Bookmark] {
+        try await repository.getMovieBookmarks(movieId: movieId)
     }
 }
 

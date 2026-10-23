@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct GetMovieTrailerIdUseCase {
     @Dependency(\.movieDetailsRepository) private var repository
 
-    func callAsFunction(movieId: String) -> AnyPublisher<String, Error> {
-        repository.getMovieTrailerId(movieId: movieId)
+    func callAsFunction(movieId: String) async throws -> String {
+        try await repository.getMovieTrailerId(movieId: movieId)
     }
 }
 

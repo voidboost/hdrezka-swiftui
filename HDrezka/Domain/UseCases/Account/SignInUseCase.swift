@@ -1,11 +1,10 @@
-import Combine
 import Dependencies
 
 struct SignInUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction(login: String, password: String) -> AnyPublisher<Void, Error> {
-        repository.signIn(login: login, password: password)
+    func callAsFunction(login: String, password: String) async throws {
+        try await repository.signIn(login: login, password: password)
     }
 }
 

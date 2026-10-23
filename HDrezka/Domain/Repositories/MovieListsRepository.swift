@@ -1,42 +1,41 @@
-import Combine
 import Dependencies
 
 protocol MovieListsRepository: Sendable {
-    func getPopularMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getPopularMovies(page: Int, genre: Int) async throws -> [MovieSimple]
 
-//    func getFeaturedMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
+//    func getFeaturedMovies(page: Int, genre: Int) async throws -> [MovieSimple]
 
-    func getWatchingNowMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getWatchingNowMovies(page: Int, genre: Int) async throws -> [MovieSimple]
 
-    func getLatestMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getLatestMovies(page: Int, genre: Int) async throws -> [MovieSimple]
 
-    func getSoonMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getSoonMovies(page: Int, genre: Int) async throws -> [MovieSimple]
 
-    func getHotMovies(genre: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getHotMovies(genre: Int) async throws -> [MovieSimple]
 
-    func getMovieList(listId: String, page: Int) -> AnyPublisher<(String, [MovieSimple]), Error>
+    func getMovieList(listId: String, page: Int) async throws -> (String, [MovieSimple])
 
-    func getPopularMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getPopularMoviesByCountry(countryId: String, genre: Int, page: Int) async throws -> [MovieSimple]
 
-    func getLatestMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getLatestMoviesByCountry(countryId: String, genre: Int, page: Int) async throws -> [MovieSimple]
 
-    func getSoonMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getSoonMoviesByCountry(countryId: String, genre: Int, page: Int) async throws -> [MovieSimple]
 
-    func getWatchingNowMoviesByCountry(countryId: String, genre: Int, page: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getWatchingNowMoviesByCountry(countryId: String, genre: Int, page: Int) async throws -> [MovieSimple]
 
-    func getPopularMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getPopularMoviesByGenre(genreId: String, page: Int) async throws -> [MovieSimple]
 
-    func getLatestMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getLatestMoviesByGenre(genreId: String, page: Int) async throws -> [MovieSimple]
 
-    func getSoonMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getSoonMoviesByGenre(genreId: String, page: Int) async throws -> [MovieSimple]
 
-    func getWatchingNowMoviesByGenre(genreId: String, page: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getWatchingNowMoviesByGenre(genreId: String, page: Int) async throws -> [MovieSimple]
 
-    func getLatestNewestMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getLatestNewestMovies(page: Int, genre: Int) async throws -> [MovieSimple]
 
-    func getPopularNewestMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getPopularNewestMovies(page: Int, genre: Int) async throws -> [MovieSimple]
 
-    func getWatchingNowNewestMovies(page: Int, genre: Int) -> AnyPublisher<[MovieSimple], Error>
+    func getWatchingNowNewestMovies(page: Int, genre: Int) async throws -> [MovieSimple]
 }
 
 private enum MovieListsRepositoryKey: DependencyKey {
