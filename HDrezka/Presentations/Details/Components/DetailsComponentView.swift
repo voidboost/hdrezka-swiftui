@@ -191,6 +191,11 @@ struct DetailsComponentView: View {
         .background {
             DetailsBackdropView(poster: details.poster, height: headerHeight)
         }
+        // The header holds the external player button; the body's other rows appear lazily (LazyVStack),
+        // so the check must run here rather than on a row that may start off screen.
+        .onAppear {
+            hasExternalPlayer = ExternalPlayers.isAnyInstalled
+        }
 
         HStack(alignment: .center, spacing: 18) {
             Text(details.description)
@@ -227,9 +232,6 @@ struct DetailsComponentView: View {
         .padding(.horizontal, 36)
         .onChange(of: trailerId, initial: true) {
             trailer = trailerId.map(makeTrailer)
-        }
-        .onAppear {
-            hasExternalPlayer = ExternalPlayers.isAnyInstalled
         }
 
         if details.franchise != nil || details.schedule != nil {
