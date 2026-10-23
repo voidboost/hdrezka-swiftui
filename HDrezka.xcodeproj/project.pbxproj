@@ -23,6 +23,7 @@
 		DEB035BA2C89E57A004ABFA1 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = DEB035B92C89E57A004ABFA1 /* Defaults */; };
 		DEE64D0B2C8869D0002C2F2F /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = DEE64D0A2C8869D0002C2F2F /* Sparkle */; };
 		DEEDFD71304B26490074D4F4 /* Dependencies in Frameworks */ = {isa = PBXBuildFile; productRef = DEEDFD70304B26490074D4F4 /* Dependencies */; };
+		DEEDFD74304B26490074D4F4 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = DEEDFD73304B26490074D4F4 /* ComposableArchitecture */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -60,6 +61,7 @@
 				043A2B722C036C7C0057721E /* OrderedCollections in Frameworks */,
 				04E9EB462C047F19001CBBCA /* YouTubePlayerKit in Frameworks */,
 				DEEDFD71304B26490074D4F4 /* Dependencies in Frameworks */,
+				DEEDFD74304B26490074D4F4 /* ComposableArchitecture in Frameworks */,
 				04B25FD82BA46F9C00200341 /* Algorithms in Frameworks */,
 				DEB035B52C89E1DB004ABFA1 /* FirebaseAnalytics in Frameworks */,
 				04B3CA8A2BA06CAC0039F76E /* SwiftSoup in Frameworks */,
@@ -177,6 +179,7 @@
 				DE7608D82EB4231600C4A23E /* XCRemoteSwiftPackageReference "LRUCache" */,
 				DE99F0C630471C6C0072416C /* XCRemoteSwiftPackageReference "sqlite-data" */,
 				DEEDFD6F304B26490074D4F4 /* XCRemoteSwiftPackageReference "swift-dependencies" */,
+				DEEDFD72304B26490074D4F4 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 04B3CA752BA06C9C0039F76E /* Products */;
@@ -640,6 +643,14 @@
 				minimumVersion = 0.0.1;
 			};
 		};
+		DEEDFD72304B26490074D4F4 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.23.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -721,6 +732,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DEEDFD6F304B26490074D4F4 /* XCRemoteSwiftPackageReference "swift-dependencies" */;
 			productName = Dependencies;
+		};
+		DEEDFD73304B26490074D4F4 /* ComposableArchitecture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DEEDFD72304B26490074D4F4 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			productName = ComposableArchitecture;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
