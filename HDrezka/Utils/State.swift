@@ -1,7 +1,6 @@
 import Foundation
 
 enum DataState<T: Equatable>: Equatable {
-    /// Nothing has been requested yet.
     case idle
     case data(T)
     case loading
@@ -9,7 +8,6 @@ enum DataState<T: Equatable>: Equatable {
 }
 
 extension DataState {
-    /// Whether there is nothing to show yet, either because the first request is in flight or hasn't started.
     var isLoading: Bool {
         switch self {
         case .idle, .loading: true
@@ -17,7 +15,6 @@ extension DataState {
         }
     }
 
-    /// Whether content still has to be requested: it never was, or the last attempt failed.
     var needsLoad: Bool {
         switch self {
         case .idle, .error: true
