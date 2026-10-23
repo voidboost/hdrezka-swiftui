@@ -54,7 +54,7 @@ struct SearchView: View {
                 EmptyStateView(String(localized: "key.nothing_found"), String(localized: "key.search.empty"))
                     .padding(.vertical, 18)
                     .padding(.horizontal, 36)
-            } else if store.movies == .loading {
+            } else if store.movies.isLoading {
                 LoadingStateView()
                     .padding(.vertical, 18)
                     .padding(.horizontal, 36)

@@ -5,7 +5,7 @@ import SwiftUI
 struct SeriesUpdatesFeature {
     @ObservableState
     struct State: Equatable {
-        var seriesUpdates: DataState<[SeriesUpdateGroup]> = .loading
+        var seriesUpdates: DataState<[SeriesUpdateGroup]> = .idle
     }
 
     enum Action {

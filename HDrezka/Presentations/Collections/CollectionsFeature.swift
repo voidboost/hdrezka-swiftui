@@ -5,9 +5,7 @@ import SwiftUI
 struct CollectionsFeature {
     @ObservableState
     struct State: Equatable {
-        fileprivate var hasAppeared = false
-
-        var collections: DataState<[MoviesCollection]> = .loading
+        var collections: DataState<[MoviesCollection]> = .idle
         var paginationState: DataPaginationState = .idle
 
         fileprivate var page = 1
@@ -28,9 +26,7 @@ struct CollectionsFeature {
         Reduce { state, action in
             switch action {
             case .onAppear:
-                guard state.collections.data == nil, !state.hasAppeared || state.collections.error != nil else { return .none }
-
-                state.hasAppeared = true
+                guard state.collections.needsLoad else { return .none }
 
                 return .send(.reload)
 

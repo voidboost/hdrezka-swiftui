@@ -57,7 +57,7 @@ struct BookmarksView: View {
                 }
                 .menuStyle(.button)
                 .menuIndicator(.hidden)
-                .disabled(store.movies == .loading || store.selectedBookmark == nil)
+                .disabled(store.movies.isLoading || store.selectedBookmark == nil)
             }
         }
         .onAppear {

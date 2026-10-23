@@ -5,8 +5,6 @@ import SwiftUI
 struct SearchFeature {
     @ObservableState
     struct State: Equatable {
-        fileprivate var hasAppeared = false
-
         var movies: DataState<[MovieSimple]> = .data([])
         var paginationState: DataPaginationState = .idle
 
@@ -47,9 +45,7 @@ struct SearchFeature {
                 return .none
 
             case .onAppear:
-                guard state.movies.data == nil, !state.hasAppeared || state.movies.error != nil else { return .none }
-
-                state.hasAppeared = true
+                guard state.movies.needsLoad else { return .none }
 
                 return debounce(force: true)
 

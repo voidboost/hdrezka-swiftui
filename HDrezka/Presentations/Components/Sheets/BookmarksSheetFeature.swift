@@ -7,7 +7,7 @@ struct BookmarksSheetFeature {
     struct State: Equatable {
         let id: String
 
-        var bookmarks: DataState<[Bookmark]> = .loading
+        var bookmarks: DataState<[Bookmark]> = .idle
 
         @Presents var alert: AlertState<Action.Alert>?
     }

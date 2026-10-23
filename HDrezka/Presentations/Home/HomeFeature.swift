@@ -5,9 +5,7 @@ import SwiftUI
 struct HomeFeature {
     @ObservableState
     struct State: Equatable {
-        fileprivate var hasAppeared = false
-
-        var categories: DataState<[Category]> = .loading
+        var categories: DataState<[Category]> = .idle
         var paginationState: DataPaginationState = .idle
         @Presents var seriesUpdates: SeriesUpdatesFeature.State?
 
@@ -49,9 +47,7 @@ struct HomeFeature {
                 return .none
 
             case .onAppear:
-                guard state.categories.data == nil, !state.hasAppeared || state.categories.error != nil else { return .none }
-
-                state.hasAppeared = true
+                guard state.categories.needsLoad else { return .none }
 
                 return .send(.reload)
 

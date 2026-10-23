@@ -62,7 +62,7 @@ struct HomeView: View {
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if store.categories == .loading {
+            } else if store.categories.isLoading {
                 LoadingStateView()
                     .padding(.vertical, 18)
                     .padding(.horizontal, 36)

@@ -5,9 +5,7 @@ import SwiftUI
 struct CategoriesFeature {
     @ObservableState
     struct State: Equatable {
-        fileprivate var hasAppeared = false
-
-        var types: DataState<[MovieType]> = .loading
+        var types: DataState<[MovieType]> = .idle
     }
 
     enum Action {
@@ -24,9 +22,7 @@ struct CategoriesFeature {
         Reduce { state, action in
             switch action {
             case .onAppear:
-                guard state.types.data == nil, !state.hasAppeared || state.types.error != nil else { return .none }
-
-                state.hasAppeared = true
+                guard state.types.needsLoad else { return .none }
 
                 return .send(.reload)
 

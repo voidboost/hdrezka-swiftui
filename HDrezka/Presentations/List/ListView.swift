@@ -53,7 +53,7 @@ struct ListView: View {
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if store.movies == .loading {
+            } else if store.movies.isLoading {
                 LoadingStateView()
                     .padding(.vertical, 18)
                     .padding(.horizontal, 36)
@@ -106,7 +106,7 @@ struct ListView: View {
                     }
                     .menuStyle(.button)
                     .menuIndicator(.hidden)
-                    .disabled(store.movies == .loading)
+                    .disabled(store.movies.isLoading)
                 }
             }
         }
