@@ -7,8 +7,6 @@ struct HomeFeature {
     struct State: Equatable {
         var categories: DataState<[Category]> = .loading
         var paginationState: DataPaginationState = .idle
-        var movieDestination: MovieSimple?
-
         @Presents var seriesUpdates: SeriesUpdatesFeature.State?
 
         fileprivate var nextPage: Categories?
@@ -22,6 +20,11 @@ struct HomeFeature {
         case categoryLoaded(Categories, isInitial: Bool, Result<[MovieSimple], any Error>)
         case seriesUpdatesTapped
         case seriesUpdates(PresentationAction<SeriesUpdatesFeature.Action>)
+        case delegate(Delegate)
+
+        enum Delegate {
+            case push(Destinations)
+        }
     }
 
     private enum CancelID { case load }
@@ -93,11 +96,9 @@ struct HomeFeature {
                 return .none
 
             case let .seriesUpdates(.presented(.delegate(.openMovie(movie)))):
-                state.movieDestination = movie
+                return .send(.delegate(.push(.details(movie))))
 
-                return .none
-
-            case .seriesUpdates:
+            case .seriesUpdates, .delegate:
                 return .none
             }
         }

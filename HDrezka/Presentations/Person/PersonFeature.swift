@@ -6,8 +6,14 @@ struct PersonFeature {
     @ObservableState
     struct State: Equatable {
         let id: String
+        let name: String
 
         var details: DataState<PersonDetailed> = .loading
+
+        init(person: PersonSimple) {
+            id = person.personId
+            name = person.name
+        }
     }
 
     enum Action {

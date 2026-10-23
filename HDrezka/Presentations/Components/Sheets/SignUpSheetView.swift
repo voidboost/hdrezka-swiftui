@@ -1,22 +1,13 @@
-import Combine
+import ComposableArchitecture
 import Defaults
-import Dependencies
 import FirebaseAnalytics
 import SwiftUI
 
 struct SignUpSheetView: View {
-    @Dependency(\.signUpUseCase) private var signUpUseCase
+    @Bindable var store: StoreOf<SignUpFeature>
 
     @Environment(\.dismiss) private var dismiss
 
-    @Environment(AppState.self) private var appState
-
-    @State private var email: String = ""
-    @State private var username: String = ""
-    @State private var password1: String = ""
-    @State private var password2: String = ""
-    @State private var verifyCode: String = ""
-    @State private var state: EmptyState = .data
 
     private enum FocusedField {
         case email, username, password1, password2, verifyCode
@@ -31,25 +22,12 @@ struct SignUpSheetView: View {
     @State private var showConfirmPassword: Bool = false
     @State private var confirmPasswordIsEmpty: Bool = true
 
-    private enum Step: Int, CaseIterable, Identifiable {
-        case first = 1
-        case second
-        case third
-
-        var id: Self {
-            self
-        }
-    }
-
-    @State private var step: Step = .first
 
     @State private var showPremiumWarning: Bool = true
 
-    @State private var subscriptions: Set<AnyCancellable> = []
-
     var body: some View {
         Group {
-            if state.isLoading {
+            if store.status.isLoading {
                 VStack(alignment: .center, spacing: 25) {
                     VStack(alignment: .center, spacing: 5) {
                         Image(systemName: "person.crop.circle.badge.plus")
@@ -69,11 +47,7 @@ struct SignUpSheetView: View {
 
                     VStack(alignment: .center, spacing: 10) {
                         Button {
-                            subscriptions.flush()
-
-                            withAnimation(.easeInOut) {
-                                state = .data
-                            }
+                            store.send(.cancelRequest, animation: .easeInOut)
                         } label: {
                             Text("key.cancel")
                                 .frame(width: 250, height: 30)
@@ -101,11 +75,11 @@ struct SignUpSheetView: View {
 
                     VStack(alignment: .center, spacing: 8) {
                         VStack(spacing: 2.5) {
-                            if step == .first {
+                            if store.step == .first {
                                 HStack(alignment: .center, spacing: 8) {
                                     Text("key.email")
 
-                                    TextField("key.email", text: $email, prompt: Text(String(localized: "key.email").lowercased()))
+                                    TextField("key.email", text: $store.email, prompt: Text(String(localized: "key.email").lowercased()))
                                         .textFieldStyle(.plain)
                                         .multilineTextAlignment(.trailing)
                                         .focused($focusedField, equals: FocusedField.email)
@@ -120,7 +94,7 @@ struct SignUpSheetView: View {
                                 HStack(alignment: .center, spacing: 8) {
                                     Text("key.username")
 
-                                    TextField("key.username", text: $username, prompt: Text(String(localized: "key.username").lowercased()))
+                                    TextField("key.username", text: $store.username, prompt: Text(String(localized: "key.username").lowercased()))
                                         .textFieldStyle(.plain)
                                         .multilineTextAlignment(.trailing)
                                         .focused($focusedField, equals: .username)
@@ -137,7 +111,7 @@ struct SignUpSheetView: View {
 
                                     Group {
                                         if showPassword {
-                                            TextField("key.password", text: $password1, prompt: Text(String(localized: "key.password").lowercased()))
+                                            TextField("key.password", text: $store.password1, prompt: Text(String(localized: "key.password").lowercased()))
                                                 .textFieldStyle(.plain)
                                                 .multilineTextAlignment(.trailing)
                                                 .focused($focusedField, equals: .password1)
@@ -145,7 +119,7 @@ struct SignUpSheetView: View {
                                                     focusedField = .password2
                                                 }
                                         } else {
-                                            SecureField("key.password", text: $password1, prompt: Text(String(localized: "key.password").lowercased()))
+                                            SecureField("key.password", text: $store.password1, prompt: Text(String(localized: "key.password").lowercased()))
                                                 .textFieldStyle(.plain)
                                                 .multilineTextAlignment(.trailing)
                                                 .focused($focusedField, equals: .password1)
@@ -154,23 +128,23 @@ struct SignUpSheetView: View {
                                                 }
                                         }
                                     }
-                                    .task(id: password1) {
+                                    .task(id: store.password1) {
                                         withAnimation(.easeInOut(duration: 0.15)) {
-                                            passwordIsEmpty = password1.isEmpty
+                                            passwordIsEmpty = store.password1.isEmpty
                                         }
 
                                         withAnimation(.easeInOut) {
                                             confirmPasswordValid = nil
                                         }
 
-                                        guard !password1.isEmpty, !password2.isEmpty else { return }
+                                        guard !store.password1.isEmpty, !store.password2.isEmpty else { return }
 
                                         try? await Task.sleep(for: .milliseconds(500))
 
                                         guard !Task.isCancelled else { return }
 
                                         withAnimation(.easeInOut) {
-                                            confirmPasswordValid = password2 == password1
+                                            confirmPasswordValid = store.password2 == store.password1
                                         }
                                     }
 
@@ -203,44 +177,44 @@ struct SignUpSheetView: View {
 
                                     Group {
                                         if showConfirmPassword {
-                                            TextField("key.password.confirm", text: $password2, prompt: Text(String(localized: "key.password.confirm").lowercased()))
+                                            TextField("key.password.confirm", text: $store.password2, prompt: Text(String(localized: "key.password.confirm").lowercased()))
                                                 .textFieldStyle(.plain)
                                                 .multilineTextAlignment(.trailing)
                                                 .focused($focusedField, equals: .password2)
                                                 .onSubmit {
                                                     if confirmPasswordValid == true {
-                                                        load()
+                                                        store.send(.submit)
                                                     }
                                                 }
                                         } else {
-                                            SecureField("key.password.confirm", text: $password2, prompt: Text(String(localized: "key.password.confirm").lowercased()))
+                                            SecureField("key.password.confirm", text: $store.password2, prompt: Text(String(localized: "key.password.confirm").lowercased()))
                                                 .textFieldStyle(.plain)
                                                 .multilineTextAlignment(.trailing)
                                                 .focused($focusedField, equals: .password2)
                                                 .onSubmit {
                                                     if confirmPasswordValid == true {
-                                                        load()
+                                                        store.send(.submit)
                                                     }
                                                 }
                                         }
                                     }
-                                    .task(id: password2) {
+                                    .task(id: store.password2) {
                                         withAnimation(.easeInOut(duration: 0.15)) {
-                                            confirmPasswordIsEmpty = password2.isEmpty
+                                            confirmPasswordIsEmpty = store.password2.isEmpty
                                         }
 
                                         withAnimation(.easeInOut) {
                                             confirmPasswordValid = nil
                                         }
 
-                                        guard !password1.isEmpty, !password2.isEmpty else { return }
+                                        guard !store.password1.isEmpty, !store.password2.isEmpty else { return }
 
                                         try? await Task.sleep(for: .milliseconds(500))
 
                                         guard !Task.isCancelled else { return }
 
                                         withAnimation(.easeInOut) {
-                                            confirmPasswordValid = password2 == password1
+                                            confirmPasswordValid = store.password2 == store.password1
                                         }
                                     }
 
@@ -275,16 +249,16 @@ struct SignUpSheetView: View {
                                 .onAppear {
                                     focusedField = .email
                                 }
-                            } else if step == .third {
+                            } else if store.step == .third {
                                 HStack(alignment: .center, spacing: 8) {
                                     Text("key.verify.code")
 
-                                    TextField("key.verify.code", text: $verifyCode, prompt: Text(String(localized: "key.verify.code").lowercased()))
+                                    TextField("key.verify.code", text: $store.verifyCode, prompt: Text(String(localized: "key.verify.code").lowercased()))
                                         .textFieldStyle(.plain)
                                         .multilineTextAlignment(.trailing)
                                         .focused($focusedField, equals: .verifyCode)
                                         .onSubmit {
-                                            load()
+                                            store.send(.submit)
                                         }
                                 }
                                 .padding(.vertical, 10)
@@ -301,7 +275,7 @@ struct SignUpSheetView: View {
 
                     VStack(alignment: .center, spacing: 10) {
                         Button {
-                            load()
+                            store.send(.submit)
                         } label: {
                             Text("key.sign_up")
                                 .frame(width: 250, height: 30)
@@ -327,9 +301,7 @@ struct SignUpSheetView: View {
                         Text("key.sign_up.sign_in.q").font(.caption)
 
                         Button {
-                            dismiss()
-
-                            appState.isSignInPresented = true
+                            store.send(.signInTapped)
                         } label: {
                             Text(verbatim: "\(String(localized: "key.sign_in"))!")
                                 .font(.caption)
@@ -346,11 +318,9 @@ struct SignUpSheetView: View {
         .fixedSize(horizontal: false, vertical: true)
         .frame(width: 520)
         .analyticsScreen(name: "sign_up_sheet", class: "SignUpSheetView")
-        .alert("key.ops", isPresented: Binding { state.error != nil } set: { _ in }) {
+        .alert("key.ops", isPresented: Binding { store.status.error != nil } set: { _ in }) {
             Button {
-                withAnimation(.easeInOut) {
-                    state = .data
-                }
+                store.send(.retry, animation: .easeInOut)
             } label: {
                 Text("key.retry")
             }
@@ -361,27 +331,25 @@ struct SignUpSheetView: View {
                 Text("key.cancel")
             }
         } message: {
-            if let error = state.error {
+            if let error = store.status.error {
                 Text(error.localizedDescription)
             }
         }
         .dialogSeverity(.critical)
-        .confirmationDialog("key.verify.code", isPresented: Binding { step == .second && state.error == nil } set: { _ in }) {
+        .confirmationDialog("key.verify.code", isPresented: Binding { store.step == .second && store.status.error == nil } set: { _ in }) {
             Button {
-                load()
+                store.send(.submit)
             } label: {
                 Text("key.continue")
             }
 
             Button(role: .cancel) {
-                withAnimation(.easeInOut) {
-                    step = .first
-                }
+                store.send(.cancelVerification, animation: .easeInOut)
             } label: {
                 Text("key.cancel")
             }
         } message: {
-            Text("ket.verify.code-\(email)")
+            Text("ket.verify.code-\(store.email)")
         }
         .alert("key.sign_up.premium", isPresented: $showPremiumWarning) {
             Button(role: .cancel) {} label: {
@@ -391,31 +359,5 @@ struct SignUpSheetView: View {
             Text("key.sign_up.premium.description")
         }
         .dialogSeverity(.critical)
-    }
-
-    private func load() {
-        withAnimation(.easeInOut) {
-            state = .loading
-        }
-
-        signUpUseCase(email: email, login: username, password: password1, verifyCode: verifyCode, step: step.rawValue)
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                guard case let .failure(error) = completion else { return }
-
-                withAnimation(.easeInOut) {
-                    state = .error(error)
-                }
-            } receiveValue: { _ in
-                if step == Step.allCases.last {
-                    dismiss()
-                } else {
-                    withAnimation(.easeInOut) {
-                        step = Step.allCases.element(after: step) ?? .first
-                        state = .data
-                    }
-                }
-            }
-            .store(in: &subscriptions)
     }
 }

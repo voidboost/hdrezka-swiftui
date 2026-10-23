@@ -24,7 +24,7 @@ struct CategoriesTypeView: View {
 
                 Spacer()
 
-                NavigationLink(value: Destinations.genre(.init(name: type.name, genreId: type.typeId))) {
+                NavigationLink(route: .genre(.init(name: type.name, genreId: type.typeId))) {
                     HStack(alignment: .center) {
                         Text("key.see_all")
                             .font(.subheadline)
@@ -40,7 +40,7 @@ struct CategoriesTypeView: View {
 
             HFlow(horizontalAlignment: .leading, verticalAlignment: .center, horizontalSpacing: 6, verticalSpacing: 6, distributeItemsEvenly: true) {
                 ForEach(type.genres) { genre in
-                    NavigationLink(value: Destinations.genre(genre)) {
+                    NavigationLink(route: .genre(genre)) {
                         Text(genre.name)
                             .font(.body)
                             .frame(height: 28)
@@ -76,7 +76,7 @@ struct CategoriesTypeView: View {
                 .labelsHidden()
                 .pickerStyle(.menu)
 
-                NavigationLink(value: Destinations.list(.init(name: type.name, listId: bestGenre.genreId + (bestYear.year != 0 ? "\(bestYear.year)/" : "")))) {
+                NavigationLink(route: .list(.init(name: type.name, listId: bestGenre.genreId + (bestYear.year != 0 ? "\(bestYear.year)/" : "")))) {
                     Text("key.go")
                         .foregroundStyle(.primary)
                 }

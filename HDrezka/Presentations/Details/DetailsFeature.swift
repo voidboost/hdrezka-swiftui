@@ -12,18 +12,18 @@ struct DetailsFeature {
     @ObservableState
     struct State: Equatable {
         let id: String
+        let title: String?
 
         var details: DataState<MovieDetailed> = .loading
         var trailerId: String?
 
-        var countryDestination: MovieCountry?
-        var genreDestination: MovieGenre?
-        var personDestination: PersonSimple?
-        var listDestination: MovieList?
-        var collectionDestination: MoviesCollection?
-
         @Presents var alert: AlertState<Action.Alert>?
         @Presents var destination: Destination.State?
+
+        init(movie: MovieSimple) {
+            id = movie.movieId
+            title = movie.name
+        }
     }
 
     enum Action: BindableAction {
@@ -35,10 +35,16 @@ struct DetailsFeature {
         case rate(Int)
         case rated(Result<(Float?, String?)?, any Error>)
         case bookmarksTapped
+        case push(Destinations)
+        case delegate(Delegate)
         case alert(PresentationAction<Alert>)
         case destination(PresentationAction<Destination.Action>)
 
         enum Alert: Equatable {}
+
+        enum Delegate {
+            case push(Destinations)
+        }
     }
 
     private enum CancelID { case load }
@@ -135,7 +141,10 @@ struct DetailsFeature {
 
                 return .none
 
-            case .alert, .destination:
+            case let .push(route):
+                return .send(.delegate(.push(route)))
+
+            case .alert, .destination, .delegate:
                 return .none
             }
         }

@@ -3,14 +3,7 @@ import Defaults
 import SwiftUI
 
 struct DetailsView: View {
-    private let title: String?
-
-    @State private var store: StoreOf<DetailsFeature>
-
-    init(movie: MovieSimple) {
-        title = movie.name
-        _store = State(initialValue: Store(initialState: DetailsFeature.State(id: movie.movieId)) { DetailsFeature() })
-    }
+    @Bindable var store: StoreOf<DetailsFeature>
 
     @State private var isSchedulePresented = false
 
@@ -19,7 +12,7 @@ struct DetailsView: View {
 
     @State private var topSafeAreaInset: CGFloat = .zero
 
-    private var content: some View {
+    var body: some View {
         ScrollView(.vertical) {
             LazyVStack(alignment: .leading, spacing: 18) {
                 if let details = store.details.data {
@@ -57,7 +50,7 @@ struct DetailsView: View {
             }
         }
         .transition(.opacity)
-        .navigationTitle(store.details.data?.nameRussian ?? title ?? "")
+        .navigationTitle(store.details.data?.nameRussian ?? store.title ?? "")
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button {
@@ -71,7 +64,7 @@ struct DetailsView: View {
 
             ToolbarItemGroup(placement: .primaryAction) {
                 if let details = store.details.data {
-                    NavigationLink(value: Destinations.comments(details)) {
+                    NavigationLink(route: .comments(details)) {
                         HStack(alignment: .center, spacing: 4) {
                             Image(systemName: "bubble.left.and.bubble.right")
 
@@ -119,24 +112,5 @@ struct DetailsView: View {
         .alert($store.scope(state: \.alert, action: \.alert))
         .dialogSeverity(.critical)
         .background(.background)
-    }
-
-    var body: some View {
-        content
-            .navigationDestination(item: $store.countryDestination) {
-                ListView(country: $0)
-            }
-            .navigationDestination(item: $store.genreDestination) {
-                ListView(genre: $0)
-            }
-            .navigationDestination(item: $store.personDestination) {
-                PersonView(person: $0)
-            }
-            .navigationDestination(item: $store.listDestination) {
-                ListView(list: $0)
-            }
-            .navigationDestination(item: $store.collectionDestination) {
-                ListView(collection: $0)
-            }
     }
 }

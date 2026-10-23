@@ -17,7 +17,7 @@ struct PersonMoviesRowView: View {
                 Spacer()
 
                 if movies.count > 10 {
-                    NavigationLink(value: Destinations.customList(movies, title)) {
+                    NavigationLink(route: .customList(movies, title)) {
                         HStack(alignment: .center) {
                             Text("key.see_all")
                                 .font(.subheadline)

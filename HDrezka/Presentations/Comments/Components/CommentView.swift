@@ -111,7 +111,6 @@ private struct CommentLikeButton: View {
 
     @Default(.isLoggedIn) private var isLoggedIn
 
-    @Environment(AppState.self) private var appState
     @Environment(StoreOf<CommentsFeature>.self) private var store
 
     var body: some View {
@@ -121,7 +120,7 @@ private struct CommentLikeButton: View {
             if isLoggedIn {
                 store.send(.likeTapped(comment))
             } else {
-                appState.isSignInPresented = true
+                store.send(.signInRequired)
             }
         } label: {
             HStack(alignment: .center, spacing: 8) {

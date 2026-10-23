@@ -11,7 +11,7 @@ struct MovieSelectionLoader: ViewModifier {
 
     @Environment(\.dismiss) private var dismiss
 
-    @Environment(AppState.self) private var appState
+    @Dependency(\.appRouter) private var appRouter
 
     @FetchOne private var selectPosition: SelectPosition?
 
@@ -183,7 +183,7 @@ struct MovieSelectionLoader: ViewModifier {
                 if movie.needPremium {
                     dismiss()
 
-                    appState.isPremiumPresented = true
+                    appRouter.present(.premium)
                 } else {
                     withAnimation(.easeInOut) {
                         self.movie = movie

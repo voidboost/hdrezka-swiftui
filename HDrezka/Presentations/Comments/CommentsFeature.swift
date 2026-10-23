@@ -8,6 +8,7 @@ struct CommentsFeature {
         let id: String
         let adb: String?
         let type: String?
+        let title: String
 
         var comments: DataState<[Comment]> = .loading
         var paginationState: DataPaginationState = .idle
@@ -16,7 +17,6 @@ struct CommentsFeature {
         var comment: Comment?
         var isCommentPresented = false
         var likes: [String: Likes] = [:]
-        var movieDestination: MovieSimple?
 
         @Presents var alert: AlertState<Action.Alert>?
         @Presents var moderationAlert: AlertState<Action.Alert>?
@@ -29,6 +29,7 @@ struct CommentsFeature {
             id = details.movieId
             adb = details.adb
             type = details.type
+            title = details.commentsCount > 0 ? String(localized: "key.comments-\(details.commentsCount)") : String(localized: "key.comments")
         }
     }
 
@@ -46,6 +47,9 @@ struct CommentsFeature {
         case likesLoaded(commentId: String, Result<[Like], any Error>)
         case sendComment(name: String?, text: String)
         case commentSent(Result<SendCommentResult, any Error>)
+        case movieLinkTapped(MovieSimple)
+        case signInRequired
+        case rulesTapped
         case reportTapped(Comment)
         case reportComment(PresentationAction<CommentReportFeature.Action>)
         case deleteTapped(Comment)
@@ -54,7 +58,13 @@ struct CommentsFeature {
         case moderationAlert(PresentationAction<Alert>)
         case deleteDialog(PresentationAction<DeleteDialog>)
 
+        case delegate(Delegate)
+
         enum Alert: Equatable {}
+
+        enum Delegate {
+            case push(Destinations)
+        }
 
         enum DeleteDialog: Equatable {
             case confirm(Comment)
@@ -69,6 +79,7 @@ struct CommentsFeature {
     @Dependency(\.deleteCommentUseCase) private var deleteCommentUseCase
     @Dependency(\.sendCommentUseCase) private var sendCommentUseCase
     @Dependency(\.getLikesUseCase) private var getLikesUseCase
+    @Dependency(\.appRouter) private var appRouter
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -249,6 +260,15 @@ struct CommentsFeature {
 
                 return .none
 
+            case let .movieLinkTapped(movie):
+                return .send(.delegate(.push(.details(movie))))
+
+            case .signInRequired:
+                return .run { _ in appRouter.present(.signIn) }
+
+            case .rulesTapped:
+                return .run { _ in appRouter.present(.commentsRules) }
+
             case let .reportTapped(comment):
                 state.reportComment = CommentReportFeature.State(comment: comment)
 
@@ -298,7 +318,7 @@ struct CommentsFeature {
 
                 return .none
 
-            case .alert, .moderationAlert, .reportComment, .deleteDialog:
+            case .alert, .moderationAlert, .reportComment, .deleteDialog, .delegate:
                 return .none
             }
         }

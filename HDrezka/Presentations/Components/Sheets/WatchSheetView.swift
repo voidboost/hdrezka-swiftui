@@ -1,4 +1,5 @@
 import Defaults
+import Dependencies
 import FirebaseAnalytics
 import SwiftUI
 
@@ -7,7 +8,7 @@ struct WatchSheetView: View {
     @Environment(\.openWindow) private var openWindow
     @Environment(\.dismissWindow) private var dismissWindow
 
-    @Environment(AppState.self) private var appState
+    @Dependency(\.appRouter) private var appRouter
 
     @Default(.isUserPremium) private var isUserPremium
     @Default(.isLoggedIn) private var isLoggedIn
@@ -100,7 +101,7 @@ struct WatchSheetView: View {
                                                         } else {
                                                             dismiss()
 
-                                                            appState.isPremiumPresented = true
+                                                            appRouter.present(.premium)
                                                         }
                                                     } label: {
                                                         Label {
@@ -306,7 +307,7 @@ struct WatchSheetView: View {
                                                 } else {
                                                     dismiss()
 
-                                                    appState.isPremiumPresented = true
+                                                    appRouter.present(.premium)
                                                 }
                                             } label: {
                                                 Text(quality)
@@ -330,7 +331,7 @@ struct WatchSheetView: View {
                                                 } else if isLoggedIn {
                                                     dismiss()
 
-                                                    appState.isPremiumPresented = true
+                                                    appRouter.present(.premium)
                                                 } else if isUserPremium != nil {
                                                     isLoginPresented = true
                                                 }
@@ -426,7 +427,7 @@ struct WatchSheetView: View {
                 Button(role: .destructive) {
                     dismiss()
 
-                    appState.isSignInPresented = true
+                    appRouter.present(.signIn)
                 } label: {
                     Text("key.sign_in")
                 }
@@ -447,7 +448,7 @@ struct WatchSheetView: View {
             Button {
                 dismiss()
 
-                appState.isSignInPresented = true
+                appRouter.present(.signIn)
             } label: {
                 Text("key.sign_in")
             }

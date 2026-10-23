@@ -4,11 +4,7 @@ import SwiftUI
 struct HomeView: View {
     private let title = String(localized: "key.home")
 
-    @State private var store: StoreOf<HomeFeature>
-
-    init(store: StoreOf<HomeFeature> = Store(initialState: HomeFeature.State()) { HomeFeature() }) {
-        _store = State(initialValue: store)
-    }
+    @Bindable var store: StoreOf<HomeFeature>
 
     var body: some View {
         ScrollView(.vertical) {
@@ -100,9 +96,6 @@ struct HomeView: View {
         .background(.background)
         .sheet(item: $store.scope(state: \.seriesUpdates, action: \.seriesUpdates)) { store in
             SeriesUpdatesSheetView(store: store)
-        }
-        .navigationDestination(item: $store.movieDestination) {
-            DetailsView(movie: $0)
         }
     }
 }

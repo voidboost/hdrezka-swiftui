@@ -2,14 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 struct CommentsView: View {
-    private let title: String
-
-    @State private var store: StoreOf<CommentsFeature>
-
-    init(details: MovieDetailed) {
-        title = details.commentsCount > 0 ? String(localized: "key.comments-\(details.commentsCount)") : String(localized: "key.comments")
-        _store = State(initialValue: Store(initialState: CommentsFeature.State(details: details)) { CommentsFeature() })
-    }
+    @Bindable var store: StoreOf<CommentsFeature>
 
     var body: some View {
         ScrollView(.vertical) {
@@ -84,7 +77,7 @@ struct CommentsView: View {
             }
         }
         .transition(.opacity)
-        .navigationTitle(title)
+        .navigationTitle(store.title)
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button {
@@ -137,8 +130,5 @@ struct CommentsView: View {
         }
         .confirmationDialog($store.scope(state: \.deleteDialog, action: \.deleteDialog))
         .background(.background)
-        .navigationDestination(item: $store.movieDestination) {
-            DetailsView(movie: $0)
-        }
     }
 }

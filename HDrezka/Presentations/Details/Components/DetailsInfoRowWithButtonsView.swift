@@ -27,7 +27,7 @@ struct DetailsInfoRowWithButtonsView<T: Named>: View {
             HStack(alignment: .center, spacing: 4) {
                 HStack(alignment: .center, spacing: 0) {
                     ForEach(data.prefix(2)) { item in
-                        NavigationLink(value: Destinations.fromNamed(item)) {
+                        NavigationLink(route: .fromNamed(item)) {
                             if let person = item as? PersonSimple, !person.photo.isEmpty {
                                 DetailsPersonTextWithPhotoView(person: person)
                                     .contentShape(.rect)
@@ -80,20 +80,7 @@ struct DetailsInfoRowWithButtonsView<T: Named>: View {
                             VStack(alignment: .center, spacing: 0) {
                                 ForEach(data) { item in
                                     Button {
-                                        switch Destinations.fromNamed(item) {
-                                        case let .country(country):
-                                            store.countryDestination = country
-                                        case let .genre(genre):
-                                            store.genreDestination = genre
-                                        case let .person(person):
-                                            store.personDestination = person
-                                        case let .list(list):
-                                            store.listDestination = list
-                                        case let .collection(collection):
-                                            store.collectionDestination = collection
-                                        default:
-                                            fatalError("Need \"named\" implementation")
-                                        }
+                                        store.send(.push(Destinations.fromNamed(item)))
                                     } label: {
                                         if let person = item as? PersonSimple, !person.photo.isEmpty {
                                             HStack(alignment: .center, spacing: 8) {

@@ -5,11 +5,7 @@ import SwiftUI
 struct CollectionsView: View {
     private let title = String(localized: "key.collections")
 
-    @State private var store: StoreOf<CollectionsFeature>
-
-    init(store: StoreOf<CollectionsFeature> = Store(initialState: CollectionsFeature.State()) { CollectionsFeature() }) {
-        _store = State(initialValue: store)
-    }
+    @Bindable var store: StoreOf<CollectionsFeature>
 
     private let columns = [
         GridItem(.adaptive(minimum: 250, maximum: .infinity), spacing: 18, alignment: .topLeading),

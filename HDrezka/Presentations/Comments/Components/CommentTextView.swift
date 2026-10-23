@@ -35,7 +35,7 @@ struct CommentTextView: View {
 
                     return .handled
                 } else {
-                    store.movieDestination = .init(movieId: path)
+                    store.send(.movieLinkTapped(.init(movieId: path)))
 
                     return .handled
                 }

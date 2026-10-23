@@ -2,39 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 struct ListView: View {
-    @State private var store: StoreOf<ListFeature>
-
-    init(store: StoreOf<ListFeature>) {
-        _store = State(initialValue: store)
-    }
-
-    init(source: ListFeature.Source) {
-        self.init(store: Store(initialState: ListFeature.State(source: source)) { ListFeature() })
-    }
-
-    init(movies: [MovieSimple], title: String) {
-        self.init(source: .movies(movies, title: title))
-    }
-
-    init(list: MovieList) {
-        self.init(source: .list(list))
-    }
-
-    init(country: MovieCountry) {
-        self.init(source: .country(country))
-    }
-
-    init(genre: MovieGenre) {
-        self.init(source: .genre(genre))
-    }
-
-    init(category: Categories) {
-        self.init(source: .category(category))
-    }
-
-    init(collection: MoviesCollection) {
-        self.init(source: .collection(collection))
-    }
+    @Bindable var store: StoreOf<ListFeature>
 
     private let columns = [GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading)]
 

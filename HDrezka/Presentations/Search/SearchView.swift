@@ -3,11 +3,7 @@ import Defaults
 import SwiftUI
 
 struct SearchView: View {
-    @State private var store: StoreOf<SearchFeature>
-
-    init(store: StoreOf<SearchFeature> = Store(initialState: SearchFeature.State()) { SearchFeature() }) {
-        _store = State(initialValue: store)
-    }
+    @Bindable var store: StoreOf<SearchFeature>
 
     private let columns = [
         GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading),

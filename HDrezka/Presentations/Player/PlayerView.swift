@@ -1,6 +1,7 @@
 import AVKit
 import Combine
 import Defaults
+import Dependencies
 import SQLiteData
 import SwiftUI
 
@@ -24,7 +25,7 @@ struct PlayerView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dismiss) private var dismiss
 
-    @Environment(AppState.self) private var appState
+    @Dependency(\.appRouter) private var appRouter
 
     @FetchOne private var selectPosition: SelectPosition?
 
