@@ -5,6 +5,8 @@ import SwiftUI
 struct CategoriesFeature {
     @ObservableState
     struct State: Equatable {
+        fileprivate var hasAppeared = false
+
         var types: DataState<[MovieType]> = .loading
     }
 
@@ -22,7 +24,10 @@ struct CategoriesFeature {
         Reduce { state, action in
             switch action {
             case .onAppear:
-                guard state.types.data == nil else { return .none }
+                // onAppear can fire more than once; only an error warrants loading again while there is no data.
+                guard state.types.data == nil, !state.hasAppeared || state.types.error != nil else { return .none }
+
+                state.hasAppeared = true
 
                 return .send(.reload)
 

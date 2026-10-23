@@ -76,9 +76,7 @@ class Downloader {
             "--user-agent=\(Const.userAgent)",
         ]
 
-        process.terminationHandler = { [weak self] _ in
-            guard let self else { return }
-
+        process.terminationHandler = { @Sendable [weak self] _ in
             Task { @MainActor [weak self] in
                 guard let self else { return }
 
@@ -110,6 +108,9 @@ class Downloader {
     }
 
     private func poll() async {
+        // aria2 only runs downloads started by this app (it stops with the process), so there is nothing to poll otherwise.
+        guard !downloads.isEmpty else { return }
+
         guard let response: Aria2Response<GlobalStatusResult> = try? await callUseCase(
             data: Aria2Request(
                 method: .getGlobalStat,

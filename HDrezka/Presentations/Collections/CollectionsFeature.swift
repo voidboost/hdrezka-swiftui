@@ -5,6 +5,8 @@ import SwiftUI
 struct CollectionsFeature {
     @ObservableState
     struct State: Equatable {
+        fileprivate var hasAppeared = false
+
         var collections: DataState<[MoviesCollection]> = .loading
         var paginationState: DataPaginationState = .idle
 
@@ -26,7 +28,10 @@ struct CollectionsFeature {
         Reduce { state, action in
             switch action {
             case .onAppear:
-                guard state.collections.data == nil else { return .none }
+                // onAppear can fire more than once; only an error warrants loading again while there is no data.
+                guard state.collections.data == nil, !state.hasAppeared || state.collections.error != nil else { return .none }
+
+                state.hasAppeared = true
 
                 return .send(.reload)
 

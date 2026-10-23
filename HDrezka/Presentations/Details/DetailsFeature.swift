@@ -14,6 +14,8 @@ struct DetailsFeature {
 
     @ObservableState
     struct State: Equatable {
+        fileprivate var hasAppeared = false
+
         let id: String
         let title: String?
 
@@ -68,7 +70,10 @@ struct DetailsFeature {
                 return .none
 
             case .onAppear:
-                guard state.details.data == nil else { return .none }
+                // onAppear can fire more than once; only an error warrants loading again while there is no data.
+                guard state.details.data == nil, !state.hasAppeared || state.details.error != nil else { return .none }
+
+                state.hasAppeared = true
 
                 return .send(.reload)
 
