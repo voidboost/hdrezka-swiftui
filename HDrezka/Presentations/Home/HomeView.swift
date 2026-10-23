@@ -1,16 +1,21 @@
+import ComposableArchitecture
 import SwiftUI
 
 struct HomeView: View {
     private let title = String(localized: "key.home")
 
-    @State private var viewModel = HomeViewModel()
+    @State private var store: StoreOf<HomeFeature>
+
+    init(store: StoreOf<HomeFeature> = Store(initialState: HomeFeature.State()) { HomeFeature() }) {
+        _store = State(initialValue: store)
+    }
 
     @State private var movieDestination: MovieSimple?
 
     var body: some View {
         ScrollView(.vertical) {
             LazyVStack(alignment: .leading, spacing: 18) {
-                if let categories = viewModel.state.data, !categories.isEmpty {
+                if let categories = store.categories.data, !categories.isEmpty {
                     ForEach(categories) { category in
                         HomeSectionView(category: category)
                             .equatable()
@@ -24,23 +29,23 @@ struct HomeView: View {
             .scrollTargetLayout()
             .padding(.vertical, 18)
 
-            if let error = viewModel.paginationState.error {
+            if let error = store.paginationState.error {
                 ErrorPaginationStateView(error) {
-                    viewModel.loadMore(reset: true)
+                    store.send(.loadMore(reset: true))
                 }
-            } else if viewModel.paginationState == .loading {
+            } else if store.paginationState == .loading {
                 LoadingPaginationStateView()
             }
         }
         .scrollIndicators(.visible, axes: .vertical)
         .onScrollTargetVisibilityChange(idType: Category.ID.self) { onScreenCategories in
-            if viewModel.paginationState == .idle,
-               let categories = viewModel.state.data,
+            if store.paginationState == .idle,
+               let categories = store.categories.data,
                !categories.isEmpty,
                let last = categories.last,
                onScreenCategories.contains(where: { $0 == last.id })
             {
-                viewModel.loadMore()
+                store.send(.loadMore())
             }
         }
         .viewModifier { view in
@@ -51,19 +56,19 @@ struct HomeView: View {
             }
         }
         .overlay {
-            if let error = viewModel.state.error {
+            if let error = store.categories.error {
                 ErrorStateView(error) {
-                    viewModel.load()
+                    store.send(.reload)
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if let categories = viewModel.state.data, categories.isEmpty {
+            } else if let categories = store.categories.data, categories.isEmpty {
                 EmptyStateView(String(localized: "key.home.empty")) {
-                    viewModel.load()
+                    store.send(.reload)
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if viewModel.state == .loading {
+            } else if store.categories == .loading {
                 LoadingStateView()
                     .padding(.vertical, 18)
                     .padding(.horizontal, 36)
@@ -74,33 +79,28 @@ struct HomeView: View {
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button {
-                    viewModel.load()
+                    store.send(.reload)
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
                 .keyboardShortcut("r", modifiers: .command)
-                .disabled(viewModel.state.data?.isEmpty != false)
+                .disabled(store.categories.data?.isEmpty != false)
             }
 
             ToolbarItem(placement: .primaryAction) {
                 Button {
-                    viewModel.isSeriesUpdatesPresented = true
+                    store.isSeriesUpdatesPresented = true
                 } label: {
                     Image(systemName: "bell")
                 }
-                .disabled(viewModel.state.data == nil)
+                .disabled(store.categories.data == nil)
             }
         }
         .onAppear {
-            switch viewModel.state {
-            case .data:
-                break
-            default:
-                viewModel.load()
-            }
+            store.send(.onAppear)
         }
         .background(.background)
-        .sheet(isPresented: $viewModel.isSeriesUpdatesPresented) {
+        .sheet(isPresented: $store.isSeriesUpdatesPresented) {
             SeriesUpdatesSheetView(movieDestination: $movieDestination)
         }
         .navigationDestination(item: $movieDestination) {
