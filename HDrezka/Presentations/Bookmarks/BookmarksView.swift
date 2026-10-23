@@ -33,7 +33,7 @@ struct BookmarksView: View {
                 .disabled(store.bookmarks.data?.isEmpty != false || (store.movies.data?.isEmpty != false && store.selectedBookmark != nil))
 
                 Button {
-                    store.isCreateBookmarkPresented = true
+                    store.send(.createTapped)
                 } label: {
                     Image(systemName: "plus")
                 }
@@ -69,11 +69,11 @@ struct BookmarksView: View {
         }
         .alert($store.scope(state: \.alert, action: \.alert))
         .dialogSeverity(.critical)
-        .sheet(item: $store.renameBookmark) { bookmark in
-            RenameBookmarkSheetView(bookmark: bookmark)
+        .sheet(item: $store.scope(state: \.destination?.renameBookmark, action: \.destination.renameBookmark)) { store in
+            RenameBookmarkSheetView(store: store)
         }
-        .sheet(isPresented: $store.isCreateBookmarkPresented) {
-            CreateBookmarkSheetView()
+        .sheet(item: $store.scope(state: \.destination?.createBookmark, action: \.destination.createBookmark)) { store in
+            CreateBookmarkSheetView(store: store)
         }
         .background(.background)
     }

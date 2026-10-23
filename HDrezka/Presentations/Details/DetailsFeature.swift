@@ -3,6 +3,12 @@ import SwiftUI
 
 @Reducer
 struct DetailsFeature {
+    @Reducer
+    enum Destination {
+        case bookmarks(BookmarksSheetFeature)
+        case createBookmark(CreateBookmarkFeature)
+    }
+
     @ObservableState
     struct State: Equatable {
         let id: String
@@ -17,6 +23,7 @@ struct DetailsFeature {
         var collectionDestination: MoviesCollection?
 
         @Presents var alert: AlertState<Action.Alert>?
+        @Presents var destination: Destination.State?
     }
 
     enum Action: BindableAction {
@@ -27,7 +34,9 @@ struct DetailsFeature {
         case trailerLoaded(String)
         case rate(Int)
         case rated(Result<(Float?, String?)?, any Error>)
+        case bookmarksTapped
         case alert(PresentationAction<Alert>)
+        case destination(PresentationAction<Destination.Action>)
 
         enum Alert: Equatable {}
     }
@@ -109,10 +118,30 @@ struct DetailsFeature {
 
                 return .none
 
-            case .alert:
+            case .bookmarksTapped:
+                state.destination = .bookmarks(BookmarksSheetFeature.State(id: state.id))
+
+                return .none
+
+            case .destination(.presented(.bookmarks(.delegate(.createBookmark)))):
+                state.destination = .createBookmark(CreateBookmarkFeature.State())
+
+                return .none
+
+            case .destination(.dismiss):
+                if case .createBookmark = state.destination {
+                    state.destination = .bookmarks(BookmarksSheetFeature.State(id: state.id))
+                }
+
+                return .none
+
+            case .alert, .destination:
                 return .none
             }
         }
         .ifLet(\.$alert, action: \.alert)
+        .ifLet(\.$destination, action: \.destination)
     }
 }
+
+extension DetailsFeature.Destination.State: Equatable {}

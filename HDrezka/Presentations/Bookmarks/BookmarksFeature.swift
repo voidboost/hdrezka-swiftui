@@ -3,6 +3,12 @@ import SwiftUI
 
 @Reducer
 struct BookmarksFeature {
+    @Reducer
+    enum Destination {
+        case createBookmark(CreateBookmarkFeature)
+        case renameBookmark(RenameBookmarkFeature)
+    }
+
     @ObservableState
     struct State: Equatable {
         var bookmarks: DataState<[Bookmark]> = .loading
@@ -11,8 +17,7 @@ struct BookmarksFeature {
 
         var selectedBookmark: Int?
 
-        var renameBookmark: Bookmark?
-        var isCreateBookmarkPresented = false
+        @Presents var destination: Destination.State?
 
         var genre = Genres.all
         var filter = BookmarkFilters.added
@@ -25,6 +30,9 @@ struct BookmarksFeature {
     enum Action: BindableAction {
         case binding(BindingAction<State>)
         case onAppear
+        case createTapped
+        case renameTapped(Bookmark)
+        case destination(PresentationAction<Destination.Action>)
         case reloadBookmarks(reset: Bool)
         case bookmarksLoaded(Result<[Bookmark], any Error>)
         case reloadMovies
@@ -70,17 +78,23 @@ struct BookmarksFeature {
             case .binding(\.filter), .binding(\.genre):
                 return .send(.reloadMovies)
 
-            case .binding(\.isCreateBookmarkPresented):
-                guard !state.isCreateBookmarkPresented else { return .none }
-
-                return .send(.reloadBookmarks(reset: true))
-
-            case .binding(\.renameBookmark):
-                guard state.renameBookmark == nil else { return .none }
-
-                return .send(.reloadBookmarks(reset: true))
-
             case .binding:
+                return .none
+
+            case .createTapped:
+                state.destination = .createBookmark(CreateBookmarkFeature.State())
+
+                return .none
+
+            case let .renameTapped(bookmark):
+                state.destination = .renameBookmark(RenameBookmarkFeature.State(bookmark: bookmark))
+
+                return .none
+
+            case .destination(.dismiss):
+                return .send(.reloadBookmarks(reset: true))
+
+            case .destination:
                 return .none
 
             case .onAppear:
@@ -279,6 +293,7 @@ struct BookmarksFeature {
             }
         }
         .ifLet(\.$alert, action: \.alert)
+        .ifLet(\.$destination, action: \.destination)
     }
 
     private func loadMovies(id: Int, state: State, isInitial: Bool) -> Effect<Action> {
@@ -299,3 +314,5 @@ struct BookmarksFeature {
         .cancellable(id: CancelID.movies, cancelInFlight: true)
     }
 }
+
+extension BookmarksFeature.Destination.State: Equatable {}
