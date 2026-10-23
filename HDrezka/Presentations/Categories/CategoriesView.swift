@@ -1,14 +1,19 @@
+import ComposableArchitecture
 import SwiftUI
 
 struct CategoriesView: View {
     private let title = String(localized: "key.categories")
 
-    @State private var viewModel = CategoriesViewModel()
+    @State private var store: StoreOf<CategoriesFeature>
+
+    init(store: StoreOf<CategoriesFeature> = Store(initialState: CategoriesFeature.State()) { CategoriesFeature() }) {
+        _store = State(initialValue: store)
+    }
 
     var body: some View {
         ScrollView(.vertical) {
             LazyVStack(alignment: .leading, spacing: 18) {
-                if let types = viewModel.state.data, !types.isEmpty {
+                if let types = store.types.data, !types.isEmpty {
                     ForEach(types) { type in
                         if let typeView = CategoriesTypeView(type: type) {
                             typeView.equatable()
@@ -32,19 +37,19 @@ struct CategoriesView: View {
             }
         }
         .overlay {
-            if let error = viewModel.state.error {
+            if let error = store.types.error {
                 ErrorStateView(error) {
-                    viewModel.load()
+                    store.send(.reload)
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if let types = viewModel.state.data, types.isEmpty {
+            } else if let types = store.types.data, types.isEmpty {
                 EmptyStateView(String(localized: "key.categories.empty")) {
-                    viewModel.load()
+                    store.send(.reload)
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if viewModel.state == .loading {
+            } else if store.types == .loading {
                 LoadingStateView()
                     .padding(.vertical, 18)
                     .padding(.horizontal, 36)
@@ -55,21 +60,16 @@ struct CategoriesView: View {
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button {
-                    viewModel.load()
+                    store.send(.reload)
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
                 .keyboardShortcut("r", modifiers: .command)
-                .disabled(viewModel.state.data?.isEmpty != false)
+                .disabled(store.types.data?.isEmpty != false)
             }
         }
         .onAppear {
-            switch viewModel.state {
-            case .data:
-                break
-            default:
-                viewModel.load()
-            }
+            store.send(.onAppear)
         }
         .background(.background)
     }

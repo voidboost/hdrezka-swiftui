@@ -1,10 +1,15 @@
+import ComposableArchitecture
 import Defaults
 import SwiftUI
 
 struct CollectionsView: View {
     private let title = String(localized: "key.collections")
 
-    @State private var viewModel = CollectionsViewModel()
+    @State private var store: StoreOf<CollectionsFeature>
+
+    init(store: StoreOf<CollectionsFeature> = Store(initialState: CollectionsFeature.State()) { CollectionsFeature() }) {
+        _store = State(initialValue: store)
+    }
 
     private let columns = [
         GridItem(.adaptive(minimum: 250, maximum: .infinity), spacing: 18, alignment: .topLeading),
@@ -13,7 +18,7 @@ struct CollectionsView: View {
     var body: some View {
         ScrollView(.vertical) {
             LazyVGrid(columns: columns, alignment: .leading, spacing: 18) {
-                if let collections = viewModel.state.data, !collections.isEmpty {
+                if let collections = store.collections.data, !collections.isEmpty {
                     ForEach(collections) { collection in
                         CollectionCardView(collection: collection)
                             .equatable()
@@ -24,17 +29,17 @@ struct CollectionsView: View {
             .padding(.vertical, 18)
             .padding(.horizontal, 36)
 
-            if viewModel.paginationState == .loading {
+            if store.paginationState == .loading {
                 LoadingPaginationStateView()
             }
         }
         .scrollIndicators(.visible, axes: .vertical)
         .onScrollTargetVisibilityChange(idType: MoviesCollection.ID.self) { onScreenCards in
-            if viewModel.paginationState == .idle,
-               let collections = viewModel.state.data,
+            if store.paginationState == .idle,
+               let collections = store.collections.data,
                collections.suffix(8).contains(where: { onScreenCards.contains($0.id) })
             {
-                viewModel.loadMore()
+                store.send(.loadMore)
             }
         }
         .viewModifier { view in
@@ -45,19 +50,19 @@ struct CollectionsView: View {
             }
         }
         .overlay {
-            if let error = viewModel.state.error {
+            if let error = store.collections.error {
                 ErrorStateView(error) {
-                    viewModel.load()
+                    store.send(.reload)
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if let collections = viewModel.state.data, collections.isEmpty {
+            } else if let collections = store.collections.data, collections.isEmpty {
                 EmptyStateView(String(localized: "key.collections.empty")) {
-                    viewModel.load()
+                    store.send(.reload)
                 }
                 .padding(.vertical, 18)
                 .padding(.horizontal, 36)
-            } else if viewModel.state == .loading {
+            } else if store.collections == .loading {
                 LoadingStateView()
                     .padding(.vertical, 18)
                     .padding(.horizontal, 36)
@@ -68,21 +73,16 @@ struct CollectionsView: View {
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button {
-                    viewModel.load()
+                    store.send(.reload)
                 } label: {
                     Image(systemName: "arrow.trianglehead.clockwise")
                 }
                 .keyboardShortcut("r", modifiers: .command)
-                .disabled(viewModel.state.data?.isEmpty != false)
+                .disabled(store.collections.data?.isEmpty != false)
             }
         }
         .onAppear {
-            switch viewModel.state {
-            case .data:
-                break
-            default:
-                viewModel.load()
-            }
+            store.send(.onAppear)
         }
         .background(.background)
     }
