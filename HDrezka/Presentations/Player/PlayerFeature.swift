@@ -581,9 +581,9 @@ struct PlayerFeature {
             case let .skip(interval):
                 return skip(by: interval, &state)
             case .previousTrack:
-                return .send(.previousTrackTapped, animation: .easeInOut(duration: 0.15))
+                return .run { send in await send(.previousTrackTapped, animation: .easeInOut(duration: 0.15)) }
             case .nextTrack:
-                return .send(.nextTrackTapped, animation: .easeInOut(duration: 0.15))
+                return .run { send in await send(.nextTrackTapped, animation: .easeInOut(duration: 0.15)) }
             }
         }
     }
