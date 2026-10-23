@@ -5,6 +5,8 @@ import SwiftUI
 struct WatchingLaterFeature {
     @ObservableState
     struct State: Equatable {
+        fileprivate var hasAppeared = false
+
         var movies: DataState<[MovieWatchLater]> = .loading
 
         @Presents var alert: AlertState<Action.Alert>?
@@ -33,7 +35,10 @@ struct WatchingLaterFeature {
         Reduce { state, action in
             switch action {
             case .onAppear:
-                guard state.movies.data == nil else { return .none }
+                // onAppear can fire more than once; only an error warrants loading again while there is no data.
+                guard state.movies.data == nil, !state.hasAppeared || state.movies.error != nil else { return .none }
+
+                state.hasAppeared = true
 
                 return .send(.reload)
 

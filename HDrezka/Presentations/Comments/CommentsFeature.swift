@@ -5,6 +5,8 @@ import SwiftUI
 struct CommentsFeature {
     @ObservableState
     struct State: Equatable {
+        fileprivate var hasAppeared = false
+
         let id: String
         let adb: String?
         let type: String?
@@ -90,7 +92,10 @@ struct CommentsFeature {
                 return .none
 
             case .onAppear:
-                guard state.comments.data == nil else { return .none }
+                // onAppear can fire more than once; only an error warrants loading again while there is no data.
+                guard state.comments.data == nil, !state.hasAppeared || state.comments.error != nil else { return .none }
+
+                state.hasAppeared = true
 
                 return .send(.reload)
 

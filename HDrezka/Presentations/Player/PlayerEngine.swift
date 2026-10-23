@@ -200,7 +200,7 @@ final class PlayerEngine {
         })
 
         setupNowPlaying(configuration, url: configuration.urls.first)
-        setupRemoteCommands()
+        setupRemoteCommands(continuation)
 
         player.volume = configuration.volume
         player.isMuted = configuration.isMuted
@@ -344,18 +344,20 @@ final class PlayerEngine {
         remoteCommandCenter.previousTrackCommand.removeTarget(nil)
         remoteCommandCenter.nextTrackCommand.removeTarget(nil)
 
+        guard let continuation else { return }
+
         switch mode {
         case .none:
             break
         case let .episodes(hasPrevious, hasNext):
-            remoteCommandCenter.previousTrackCommand.addTarget { [weak self] _ in
-                self?.continuation?.yield(.remote(.previousTrack))
+            remoteCommandCenter.previousTrackCommand.addTarget { @Sendable _ in
+                continuation.yield(.remote(.previousTrack))
 
                 return .success
             }
 
-            remoteCommandCenter.nextTrackCommand.addTarget { [weak self] _ in
-                self?.continuation?.yield(.remote(.nextTrack))
+            remoteCommandCenter.nextTrackCommand.addTarget { @Sendable _ in
+                continuation.yield(.remote(.nextTrack))
 
                 return .success
             }
@@ -363,14 +365,14 @@ final class PlayerEngine {
             remoteCommandCenter.previousTrackCommand.isEnabled = hasPrevious
             remoteCommandCenter.nextTrackCommand.isEnabled = hasNext
         case .seeking:
-            remoteCommandCenter.previousTrackCommand.addTarget { [weak self] _ in
-                self?.continuation?.yield(.remote(.skip(-10.0)))
+            remoteCommandCenter.previousTrackCommand.addTarget { @Sendable _ in
+                continuation.yield(.remote(.skip(-10.0)))
 
                 return .success
             }
 
-            remoteCommandCenter.nextTrackCommand.addTarget { [weak self] _ in
-                self?.continuation?.yield(.remote(.skip(10.0)))
+            remoteCommandCenter.nextTrackCommand.addTarget { @Sendable _ in
+                continuation.yield(.remote(.skip(10.0)))
 
                 return .success
             }
@@ -471,53 +473,54 @@ final class PlayerEngine {
         }
     }
 
-    private func setupRemoteCommands() {
-        remoteCommandCenter.playCommand.addTarget { [weak self] _ in
-            self?.continuation?.yield(.remote(.play))
+    /// Remote command handlers may be called off the main thread, so they only hand events to the (thread-safe) continuation.
+    private func setupRemoteCommands(_ continuation: AsyncStream<PlayerEvent>.Continuation) {
+        remoteCommandCenter.playCommand.addTarget { @Sendable _ in
+            continuation.yield(.remote(.play))
 
             return .success
         }
 
-        remoteCommandCenter.pauseCommand.addTarget { [weak self] _ in
-            self?.continuation?.yield(.remote(.pause))
+        remoteCommandCenter.pauseCommand.addTarget { @Sendable _ in
+            continuation.yield(.remote(.pause))
 
             return .success
         }
 
-        remoteCommandCenter.togglePlayPauseCommand.addTarget { [weak self] _ in
-            self?.continuation?.yield(.remote(.togglePlayPause))
+        remoteCommandCenter.togglePlayPauseCommand.addTarget { @Sendable _ in
+            continuation.yield(.remote(.togglePlayPause))
 
             return .success
         }
 
-        remoteCommandCenter.changePlaybackPositionCommand.addTarget { [weak self] event in
+        remoteCommandCenter.changePlaybackPositionCommand.addTarget { @Sendable event in
             guard let event = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
 
-            self?.continuation?.yield(.remote(.changePosition(event.positionTime)))
+            continuation.yield(.remote(.changePosition(event.positionTime)))
 
             return .success
         }
 
-        remoteCommandCenter.changePlaybackRateCommand.addTarget { [weak self] event in
+        remoteCommandCenter.changePlaybackRateCommand.addTarget { @Sendable event in
             guard let event = event as? MPChangePlaybackRateCommandEvent else { return .commandFailed }
 
-            self?.continuation?.yield(.remote(.changeRate(event.playbackRate)))
+            continuation.yield(.remote(.changeRate(event.playbackRate)))
 
             return .success
         }
 
-        remoteCommandCenter.skipBackwardCommand.addTarget { [weak self] event in
+        remoteCommandCenter.skipBackwardCommand.addTarget { @Sendable event in
             guard let event = event as? MPSkipIntervalCommandEvent else { return .commandFailed }
 
-            self?.continuation?.yield(.remote(.skip(-event.interval)))
+            continuation.yield(.remote(.skip(-event.interval)))
 
             return .success
         }
 
-        remoteCommandCenter.skipForwardCommand.addTarget { [weak self] event in
+        remoteCommandCenter.skipForwardCommand.addTarget { @Sendable event in
             guard let event = event as? MPSkipIntervalCommandEvent else { return .commandFailed }
 
-            self?.continuation?.yield(.remote(.skip(event.interval)))
+            continuation.yield(.remote(.skip(event.interval)))
 
             return .success
         }
