@@ -1,7 +1,4 @@
 import ComposableArchitecture
-import Defaults
-import Dependencies
-import SQLiteData
 import SwiftUI
 
 struct WatchingLaterView: View {
@@ -12,8 +9,6 @@ struct WatchingLaterView: View {
     private let columns = [
         GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading),
     ]
-
-    @Dependency(\.defaultDatabase) private var database
 
     var body: some View {
         ScrollView(.vertical) {
@@ -31,17 +26,6 @@ struct WatchingLaterView: View {
 
                                 Button {
                                     store.send(.remove(movie))
-
-                                    if let watchLaterId = movie.watchLaterId.id {
-                                        Task.detached(priority: .utility) {
-                                            try? await database.write { db in
-                                                try PlayerPosition
-                                                    .where { $0.id.id.eq(watchLaterId) }
-                                                    .delete()
-                                                    .execute(db)
-                                            }
-                                        }
-                                    }
                                 } label: {
                                     Text("key.delete")
                                 }
