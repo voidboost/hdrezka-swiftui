@@ -88,7 +88,9 @@ struct DetailsFeature {
 
                     await send(.detailsLoaded(result), awaitingAnimation: .easeInOut)
 
-                    try await send(.trailerLoaded(trailerId), animation: .easeInOut)
+                    if let trailerId = try? await trailerId {
+                        await send(.trailerLoaded(trailerId), animation: .easeInOut)
+                    }
                 }
                 .cancellable(id: CancelID.load, cancelInFlight: true)
 
