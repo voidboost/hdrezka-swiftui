@@ -27,6 +27,10 @@ struct DetailsFeature {
             id = movie.movieId
             title = movie.name
         }
+
+        var movieId: String {
+            details.data?.movieId ?? id
+        }
     }
 
     enum Action: BindableAction {
@@ -148,17 +152,17 @@ struct DetailsFeature {
                 return .none
 
             case .watchTapped:
-                state.destination = .watch(MovieSelectionFeature.State(id: state.details.data?.movieId ?? state.id))
+                state.destination = .watch(MovieSelectionFeature.State(id: state.movieId))
 
                 return .none
 
             case .downloadTapped:
-                state.destination = .download(MovieSelectionFeature.State(id: state.details.data?.movieId ?? state.id))
+                state.destination = .download(MovieSelectionFeature.State(id: state.movieId))
 
                 return .none
 
             case .openExternalPlayerTapped:
-                state.destination = .openExternalPlayer(MovieSelectionFeature.State(id: state.details.data?.movieId ?? state.id))
+                state.destination = .openExternalPlayer(MovieSelectionFeature.State(id: state.movieId))
 
                 return .none
 
