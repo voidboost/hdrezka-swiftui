@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import SQLiteData
 import SwiftUI
 
 @Reducer
@@ -28,6 +29,7 @@ struct WatchingLaterFeature {
     @Dependency(\.getWatchingLaterMoviesUseCase) private var getWatchingLaterMoviesUseCase
     @Dependency(\.switchWatchedItemUseCase) private var switchWatchedItemUseCase
     @Dependency(\.removeWatchingItemUseCase) private var removeWatchingItemUseCase
+    @Dependency(\.defaultDatabase) private var database
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -85,12 +87,23 @@ struct WatchingLaterFeature {
                 }
 
             case let .removed(movie, .success(removed)):
-                guard removed, var movies = state.movies.data else { return .none }
+                guard removed else { return .none }
 
-                movies.removeAll(where: { $0.id == movie.id })
-                state.movies = .data(movies)
+                if var movies = state.movies.data {
+                    movies.removeAll(where: { $0.id == movie.id })
+                    state.movies = .data(movies)
+                }
 
-                return .none
+                guard let watchLaterId = movie.watchLaterId.id else { return .none }
+
+                return .run { _ in
+                    try? await database.write { db in
+                        try PlayerPosition
+                            .where { $0.id.id.eq(watchLaterId) }
+                            .delete()
+                            .execute(db)
+                    }
+                }
 
             case let .watchedSwitched(_, .failure(error)), let .removed(_, .failure(error)):
                 state.alert = .error(error)
