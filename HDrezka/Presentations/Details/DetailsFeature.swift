@@ -77,9 +77,7 @@ struct DetailsFeature {
                 return .send(.reload)
 
             case .reload:
-                if state.details.data == nil {
-                    state.details = .loading
-                }
+                state.details = .loading
 
                 return .run { [id = state.id] send in
                     let result = await Result { try await getMovieDetailsUseCase(movieId: id) }
@@ -106,11 +104,7 @@ struct DetailsFeature {
                 return .none
 
             case let .detailsLoaded(.failure(error)):
-                if state.details.data != nil {
-                    state.alert = .error(error)
-                } else {
-                    state.details = .error(error)
-                }
+                state.details = .error(error)
 
                 return .none
 
