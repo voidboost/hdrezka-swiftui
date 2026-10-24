@@ -71,7 +71,10 @@ struct CommentsFeature {
         }
     }
 
-    private enum CancelID { case load }
+    private enum CancelID: Hashable {
+        case load
+        case likes(String)
+    }
 
     @Dependency(\.getCommentsPageUseCase) private var getCommentsPageUseCase
     @Dependency(\.getCommentUseCase) private var getCommentUseCase
@@ -189,7 +192,9 @@ struct CommentsFeature {
                     return .none
                 }
 
-                guard state.likes[comment.commentId, default: .init()].likes.count != comment.likesCount else { return .none }
+                if let likes = state.likes[comment.commentId], likes.likes.isEmpty || likes.likes.count == comment.likesCount {
+                    return .none
+                }
 
                 state.likes[comment.commentId] = .init()
 
@@ -198,20 +203,21 @@ struct CommentsFeature {
 
                     await send(.likesLoaded(commentId: comment.commentId, result))
                 }
+                .cancellable(id: CancelID.likes(comment.commentId), cancelInFlight: true)
 
-            case let .likesLoaded(commentId, .success(likes)):
-                if likes.isEmpty {
-                    state.likes = [:]
-                    state.alert = .error()
-                } else {
+            case let .likesLoaded(commentId, result):
+                guard state.likes[commentId] != nil else { return .none }
+
+                switch result {
+                case let .success(likes) where !likes.isEmpty:
                     state.likes[commentId] = .init(likes: likes)
+                case .success:
+                    state.likes[commentId] = nil
+                    state.alert = .error()
+                case let .failure(error):
+                    state.likes[commentId] = nil
+                    state.alert = .error(error)
                 }
-
-                return .none
-
-            case let .likesLoaded(commentId, .failure(error)):
-                state.likes[commentId] = nil
-                state.alert = .error(error)
 
                 return .none
 
