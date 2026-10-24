@@ -53,7 +53,7 @@ struct DetailsFeature {
         }
     }
 
-    private enum CancelID { case load }
+    private enum CancelID { case load, rate }
 
     @Dependency(\.getMovieDetailsUseCase) private var getMovieDetailsUseCase
     @Dependency(\.getMovieTrailerIdUseCase) private var getMovieTrailerIdUseCase
@@ -123,6 +123,7 @@ struct DetailsFeature {
 
                     await send(.rated(result), animation: .easeInOut)
                 }
+                .cancellable(id: CancelID.rate, cancelInFlight: true)
 
             case let .rated(.success(rating)):
                 guard let rating, case var .data(details) = state.details else {
