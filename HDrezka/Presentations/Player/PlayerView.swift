@@ -102,6 +102,7 @@ struct PlayerView: View {
         }
         .onDisappear {
             store.send(.disappeared)
+            engine.reset()
 
             guard store.hideMainWindow,
                   let window = Windows.hdrezka.window

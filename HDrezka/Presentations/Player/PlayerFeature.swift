@@ -214,8 +214,7 @@ struct PlayerFeature {
                     .cancel(id: CancelID.defaults),
                     .cancel(id: CancelID.track),
                     .cancel(id: CancelID.hideMask),
-                    .cancel(id: CancelID.sleepTimer),
-                    perform { $0.reset() }
+                    .cancel(id: CancelID.sleepTimer)
                 )
 
             case let .selectPositionLoaded(subtitles):
