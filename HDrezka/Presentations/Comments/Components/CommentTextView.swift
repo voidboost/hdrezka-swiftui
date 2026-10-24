@@ -54,7 +54,7 @@ struct CommentTextView: View {
             TimelineView(.animation(minimumInterval: 1 / 60, paused: !isVisible)) { timeline in
                 text.textRenderer(SpoilerTextRenderer(date: timeline.date))
             }
-            .onScrollVisibilityChange { isVisible in
+            .onScrollVisibilityChange(threshold: 0.01) { isVisible in
                 self.isVisible = isVisible
             }
         }
