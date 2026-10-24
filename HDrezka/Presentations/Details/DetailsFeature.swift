@@ -78,21 +78,24 @@ struct DetailsFeature {
                 return .run { [id = state.id] send in
                     let result = await Result { try await getMovieDetailsUseCase(movieId: id) }
 
-                    await send(.detailsLoaded(result), animation: .easeInOut)
+                    guard case let .success(details) = result, let movieId = details.movieId.id else {
+                        await send(.detailsLoaded(result), animation: .easeInOut)
+
+                        return
+                    }
+
+                    async let trailerId = getMovieTrailerIdUseCase(movieId: movieId)
+
+                    await send(.detailsLoaded(result), awaitingAnimation: .easeInOut)
+
+                    try await send(.trailerLoaded(trailerId), animation: .easeInOut)
                 }
                 .cancellable(id: CancelID.load, cancelInFlight: true)
 
             case let .detailsLoaded(.success(details)):
                 state.details = .data(details)
 
-                guard let movieId = details.movieId.id else { return .none }
-
-                return .run { send in
-                    let trailerId = try await getMovieTrailerIdUseCase(movieId: movieId)
-
-                    await send(.trailerLoaded(trailerId), animation: .easeInOut)
-                }
-                .cancellable(id: CancelID.load)
+                return .none
 
             case let .detailsLoaded(.failure(error)):
                 state.details = .error(error)
