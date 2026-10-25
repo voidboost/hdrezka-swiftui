@@ -9,11 +9,6 @@ class MovieDetailsParser {
     static func parseMovieDetails(from site: SwiftSoup.Document, movieId: String) throws -> MovieDetailed {
         let content = try site.getDetailsContent()
 
-        let nameRussian = try content.getDetailsRussianName()
-        let nameOriginal = try content.getDetailsOriginalName()
-        let hposter = try content.getDetailsHPoster()
-        let poster = try content.getDetailsPoster()
-        let description = try content.getDetailsDescription()
         let isAvailable = try site.isAvailable()
         let isComingSoon = try site.isComingSoon()
         let voiceActing: [MovieVoiceActing]? = if isAvailable, !isComingSoon, let movieId = movieId.id {
@@ -26,105 +21,45 @@ class MovieDetailsParser {
         } else {
             nil
         }
-        let rated = try content.isRatedDetails()
-        let rating = try content.getDetailsRating()
-        let votes = try content.getDetailsVotes()
+        let table = try content.getDetailsTable()
+        let ratings = table["Рейтинги"]
 
-        let schedule = try site.getDetailsSchedule()
-        let franchise = try site.getDetailsFranchise()
-        let voiceActingRating = try !isComingSoon ? site.getDetailsVoiceActingRating() : nil
-        let watchAlsoMovies = try site.getDetailsWatchAlsoMovies()
-        let commentsCount = try site.getCommentsCount()
-        let adb = try site.getAdb()
-        let type = try site.getType()
-        let favs = try site.getFavs()
-
-        var imdbRating: MovieRating?
-        var kpRating: MovieRating?
-        var waRating: MovieRating?
-        var releaseDate: String?
-        var producer: [PersonSimple]?
-        var ageRestriction: String?
-        var actors: [PersonSimple]?
-        var countries: [MovieCountry]?
-        var genres: [MovieGenre]?
-        var lists: [MovieList]?
-        var collections: [MoviesCollection]?
-        var duration: Int?
-        var slogan: String?
-        var year: String?
-
-        try content.getDetailsChunked { chunk in
-            let chunkName = try chunk.getDetailsName()
-
-            switch chunkName {
-            case "Рейтинги":
-                imdbRating = try chunk.getDetailsRating(of: "imdb")
-                kpRating = try chunk.getDetailsRating(of: "kp")
-                waRating = try chunk.getDetailsRating(of: "wa")
-            case "Дата выхода":
-                releaseDate = try chunk.last().orThrow().text()
-            case "Год":
-                year = try chunk.last().orThrow().text()
-            case "Режиссер":
-                producer = try chunk.getDetailsProducers()
-            case "Возраст":
-                ageRestriction = try chunk.getDetailsAgeRestriction()
-            case "Страна":
-                countries = try chunk.last().orThrow().getDetailsCountries()
-            case "Жанр":
-                genres = try chunk.last().orThrow().getDetailsGenres()
-            case "Время":
-                duration = try Int(chunk.last().orThrow().text().trimmingCharacters(in: .decimalDigits.inverted))
-            case "Входит в списки":
-                lists = try chunk.last().orThrow().getDetailsMovieLists()
-            case "Из серии":
-                collections = try chunk.last().orThrow().getDetailsMovieCollections()
-            case "Слоган":
-                slogan = try chunk.last().orThrow().text()
-            default:
-                if let act = try chunk.getDetailsActors() {
-                    actors = act
-                }
-            }
-        }
-
-        return MovieDetailed(
+        return try MovieDetailed(
             movieId: movieId,
-            nameRussian: nameRussian,
-            nameOriginal: nameOriginal,
-            hposter: hposter,
-            poster: poster,
-            duration: duration,
-            description: description,
-            releaseDate: releaseDate,
-            countries: countries,
-            ageRestriction: ageRestriction,
-            rated: rated,
-            rating: rating,
-            votes: votes,
-            imdbRating: imdbRating,
-            kpRating: kpRating,
-            waRating: waRating,
-            genres: genres,
-            lists: lists,
-            collections: collections,
-            slogan: slogan,
-            schedule: schedule,
-            franchise: franchise,
-            producer: producer,
-            actors: actors,
+            nameRussian: content.getDetailsRussianName(),
+            nameOriginal: content.getDetailsOriginalName(),
+            hposter: content.getDetailsHPoster(),
+            poster: content.getDetailsPoster(),
+            duration: table["Время"].flatMap { try Int($0.getDetailsValue().text().trimmingCharacters(in: .decimalDigits.inverted)) },
+            description: content.getDetailsDescription(),
+            releaseDate: table["Дата выхода"]?.getDetailsValue().text(),
+            countries: table["Страна"]?.getDetailsValue().getDetailsCountries(),
+            ageRestriction: table["Возраст"]?.getDetailsAgeRestriction(),
+            rated: content.isRatedDetails(),
+            rating: content.getDetailsRating(),
+            votes: content.getDetailsVotes(),
+            imdbRating: ratings?.getDetailsRating(of: "imdb"),
+            kpRating: ratings?.getDetailsRating(of: "kp"),
+            waRating: ratings?.getDetailsRating(of: "wa"),
+            genres: table["Жанр"]?.getDetailsValue().getDetailsGenres(),
+            lists: table["Входит в списки"]?.getDetailsValue().getDetailsMovieLists(),
+            collections: table["Из серии"]?.getDetailsValue().getDetailsMovieCollections(),
+            slogan: table["Слоган"]?.getDetailsValue().text(),
+            schedule: site.getDetailsSchedule(),
+            franchise: site.getDetailsFranchise(),
+            producer: table["Режиссер"]?.getDetailsProducers(),
+            actors: table.unnamed.compactMap { try $0.getDetailsActors() }.last,
             available: isAvailable,
             comingSoon: isComingSoon,
-            favs: favs,
-            adb: adb,
-            type: type,
+            favs: site.getFavs(),
+            adb: site.getAdb(),
+            type: site.getType(),
             voiceActing: voiceActing,
             series: series,
-            voiceActingRating: voiceActingRating,
-            watchAlsoMovies: watchAlsoMovies,
-            commentsCount: commentsCount,
-            year: year,
+            voiceActingRating: !isComingSoon ? site.getDetailsVoiceActingRating() : nil,
+            watchAlsoMovies: site.getDetailsWatchAlsoMovies(),
+            commentsCount: site.getCommentsCount(),
+            year: table["Год"]?.getDetailsValue().text(),
         )
     }
 
@@ -191,7 +126,22 @@ class MovieDetailsParser {
     }
 }
 
+private struct DetailsTable {
+    static let names: Set = ["Рейтинги", "Дата выхода", "Год", "Режиссер", "Возраст", "Страна", "Жанр", "Время", "Входит в списки", "Из серии", "Слоган"]
+
+    var rows: [String: Elements] = [:]
+    var unnamed: [Elements] = []
+
+    subscript(name: String) -> Elements? {
+        rows[name]
+    }
+}
+
 private extension Elements {
+    func getDetailsValue() throws -> Element {
+        try last().orThrow()
+    }
+
     func getDetailsName() throws -> String? {
         try select(".l").first()?.text().trimmingCharacters(in: .letters.inverted)
     }
@@ -378,16 +328,22 @@ private extension Element {
         try select(".b-post__rating .votes span").first()?.text().shortNumber
     }
 
-    func getDetailsChunked(onGot: (Elements) throws -> Void) throws {
-        try select(".b-post__info").first().orThrow()
-            .select("tbody")
-            .forEach { tr in
-                for tableItem in try tr.select("tr") {
-                    try tableItem.select("td").chunks(ofCount: 2).forEach { chunk in
-                        try onGot(chunk.base)
-                    }
-                }
+    func getDetailsTable() throws -> DetailsTable {
+        var table = DetailsTable()
+
+        for row in try select(".b-post__info").first().orThrow().select("tbody tr") {
+            let cells = try row.select("td")
+
+            guard !cells.isEmpty() else { continue }
+
+            if let name = try cells.getDetailsName(), DetailsTable.names.contains(name) {
+                table.rows[name] = cells
+            } else {
+                table.unnamed.append(cells)
             }
+        }
+
+        return table
     }
 
     func getDetailsCountries() throws -> [MovieCountry] {
