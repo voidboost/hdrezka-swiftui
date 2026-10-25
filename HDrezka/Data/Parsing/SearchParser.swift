@@ -2,9 +2,8 @@ import Foundation
 import SwiftSoup
 
 class SearchParser {
-    static func parseCategories(from: String) throws -> [MovieType] {
-        try from.parseHTML()
-            .checker()
+    static func parseCategories(from site: Document) throws -> [MovieType] {
+        try site
             .getTypes()
             .map { type in
                 try MovieType(

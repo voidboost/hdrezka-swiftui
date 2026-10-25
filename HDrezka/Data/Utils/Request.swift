@@ -1,5 +1,7 @@
 import Alamofire
+import Defaults
 import Foundation
+import SwiftSoup
 
 struct JSONObject {
     let raw: [String: Any]
@@ -36,6 +38,18 @@ extension Session {
                 .value
 
             return try parse(string)
+        }
+    }
+
+    @concurrent
+    func page<T>(_ convertible: URLRequestConvertible, parse: (Document) throws -> T) async throws -> T {
+        try await string(convertible) { string in
+            let page = try string.parseHTML()
+
+            try page.checkPage()
+            Defaults[.isUserPremium] = try page.getPremiumDays()
+
+            return try parse(page)
         }
     }
 

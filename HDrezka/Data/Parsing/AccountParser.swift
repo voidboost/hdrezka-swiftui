@@ -2,9 +2,8 @@ import Foundation
 import SwiftSoup
 
 class AccountParser {
-    static func parseWatchingLaterMovies(from: String) throws -> [MovieWatchLater] {
-        try from.parseHTML()
-            .checker()
+    static func parseWatchingLaterMovies(from site: Document) throws -> [MovieWatchLater] {
+        try site
             .getWatchingLaterMovies()
             .map { movie in
                 try MovieWatchLater(
@@ -21,9 +20,8 @@ class AccountParser {
             }
     }
 
-    static func parseSeriesUpdates(from: String) throws -> [SeriesUpdateGroup] {
-        try from.parseHTML()
-            .checker()
+    static func parseSeriesUpdates(from site: Document) throws -> [SeriesUpdateGroup] {
+        try site
             .getSeriesUpdateGroups()
             .compactMap { group in
                 let date = try group.getSeriesUpdateGroupDate()
@@ -58,9 +56,8 @@ class AccountParser {
         return try site.select(".b-info__message b").first()?.text()
     }
 
-    static func parseBookmarks(from: String) throws -> [Bookmark] {
-        try from.parseHTML()
-            .checker()
+    static func parseBookmarks(from site: Document) throws -> [Bookmark] {
+        try site
             .getBookmarksCategories()
             .map { category in
                 try Bookmark(

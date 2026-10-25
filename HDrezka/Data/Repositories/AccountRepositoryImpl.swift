@@ -47,7 +47,7 @@ struct AccountRepositoryImpl: AccountRepository {
     }
 
     func getWatchingLaterMovies() async throws -> [MovieWatchLater] {
-        try await session.string(AccountService.getWatchingLaterMovies, parse: AccountParser.parseWatchingLaterMovies)
+        try await session.page(AccountService.getWatchingLaterMovies, parse: AccountParser.parseWatchingLaterMovies)
     }
 
     func saveWatchingState(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, position: Int?, total: Int?) async throws {
@@ -63,15 +63,15 @@ struct AccountRepositoryImpl: AccountRepository {
     }
 
     func getSeriesUpdates() async throws -> [SeriesUpdateGroup] {
-        try await session.string(AccountService.getSeriesUpdates, parse: AccountParser.parseSeriesUpdates)
+        try await session.page(AccountService.getSeriesUpdates, parse: AccountParser.parseSeriesUpdates)
     }
 
     func getBookmarks() async throws -> [Bookmark] {
-        try await session.string(AccountService.getBookmarks, parse: AccountParser.parseBookmarks)
+        try await session.page(AccountService.getBookmarks, parse: AccountParser.parseBookmarks)
     }
 
     func getBookmarksByCategory(id: Int, filter: BookmarkFilters, genre: Int, page: Int) async throws -> [MovieSimple] {
-        try await session.string(AccountService.getBookmarksByCategory(id: id, filter: filter.query, genre: genre, page: page), parse: MovieListsParser.parseMovies)
+        try await session.page(AccountService.getBookmarksByCategory(id: id, filter: filter.query, genre: genre, page: page), parse: MovieListsParser.parseMovies)
     }
 
     func createBookmarksCategory(name: String) async throws -> Bookmark {

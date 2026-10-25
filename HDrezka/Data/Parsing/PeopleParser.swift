@@ -2,8 +2,7 @@ import Foundation
 import SwiftSoup
 
 class PeopleParser {
-    static func parse(from: String) throws -> PersonDetailed {
-        let site = try from.parseHTML().checker()
+    static func parse(from site: Document) throws -> PersonDetailed {
         let details = try site.getPeopleDetails()
 
         return try PersonDetailed(

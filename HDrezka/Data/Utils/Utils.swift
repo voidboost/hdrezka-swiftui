@@ -7,7 +7,7 @@ import Foundation
 import SwiftSoup
 
 extension SwiftSoup.Document {
-    func checker() throws -> SwiftSoup.Document {
+    func checkPage() throws {
         let body = try body().orThrow()
 
         guard try body.select("#check-form").isEmpty() else {
@@ -17,10 +17,10 @@ extension SwiftSoup.Document {
         guard try !body.select("#wrapper").isEmpty() else {
             throw HDrezkaError.mirrorBanned(Defaults[.mirror])
         }
+    }
 
-        Defaults[.isUserPremium] = try Int(body.select(".b-tophead-premuser b").text().trimmingCharacters(in: .decimalDigits.inverted))
-
-        return self
+    func getPremiumDays() throws -> Int? {
+        try Int(select(".b-tophead-premuser b").text().trimmingCharacters(in: .decimalDigits.inverted))
     }
 }
 
