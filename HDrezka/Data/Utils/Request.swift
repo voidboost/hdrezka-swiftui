@@ -16,6 +16,14 @@ struct JSONObject {
 
         return value
     }
+
+    var failure: HDrezkaError {
+        if let message: String = self["message"], !message.isEmpty {
+            .site([message])
+        } else {
+            .unknown
+        }
+    }
 }
 
 extension Session {
@@ -47,19 +55,21 @@ extension Session {
         }
     }
 
-    func success(_ convertible: URLRequestConvertible, function: String) async throws -> Bool {
-        try await json(convertible, function: function) { try $0.require("success") }
+    func success(_ convertible: URLRequestConvertible, function: String) async throws {
+        try await json(convertible, function: function) { json in
+            guard try json.require("success") as Bool else {
+                throw json.failure
+            }
+        }
     }
 
     @concurrent
-    func perform(_ convertible: URLRequestConvertible) async throws -> Bool {
+    func perform(_ convertible: URLRequestConvertible) async throws {
         try await handlingErrors {
             _ = try await request(convertible)
                 .validate(statusCode: 200 ..< 400)
                 .serializingData(emptyResponseCodes: Set(200 ..< 400))
                 .value
-
-            return true
         }
     }
 }

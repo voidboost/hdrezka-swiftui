@@ -7,15 +7,15 @@ protocol AccountRepository: Sendable {
 
     func restore(login: String) async throws -> String?
 
-    func logout() async throws -> Bool
+    func logout() async throws
 
     func getWatchingLaterMovies() async throws -> [MovieWatchLater]
 
-    func saveWatchingState(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, position: Int?, total: Int?) async throws -> Bool
+    func saveWatchingState(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, position: Int?, total: Int?) async throws
 
-    func switchWatchedItem(item: MovieWatchLater) async throws -> Bool
+    func switchWatchedItem(item: MovieWatchLater) async throws
 
-    func removeWatchingItem(item: MovieWatchLater) async throws -> Bool
+    func removeWatchingItem(item: MovieWatchLater) async throws
 
     func getSeriesUpdates() async throws -> [SeriesUpdateGroup]
 
@@ -25,17 +25,17 @@ protocol AccountRepository: Sendable {
 
     func createBookmarksCategory(name: String) async throws -> Bookmark
 
-    func changeBookmarksCategoryName(id: Int, newName: String) async throws -> Bool
+    func changeBookmarksCategoryName(id: Int, newName: String) async throws
 
-    func deleteBookmarksCategory(id: Int) async throws -> Bool
+    func deleteBookmarksCategory(id: Int) async throws
 
-    func addToBookmarks(movieId: String, bookmarkUserCategory: Int) async throws -> Bool
+    func addToBookmarks(movieId: String, bookmarkUserCategory: Int) async throws
 
-    func removeFromBookmarks(movies: [String], bookmarkUserCategory: Int) async throws -> Bool
+    func removeFromBookmarks(movies: [String], bookmarkUserCategory: Int) async throws
 
     func moveBetweenBookmarks(movies: [String], fromBookmarkUserCategory: Int, toBookmarkUserCategory: Int) async throws -> Int
 
-    func reorderBookmarksCategories(newOrder: [Bookmark]) async throws -> Bool
+    func reorderBookmarksCategories(newOrder: [Bookmark]) async throws
 
     func getVersion() async throws -> String
 }

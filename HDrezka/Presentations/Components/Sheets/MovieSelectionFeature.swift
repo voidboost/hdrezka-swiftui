@@ -181,7 +181,7 @@ struct MovieSelectionFeature {
 
                 return .run { [selectedSeason = state.selectedSeason, selectedEpisode = state.selectedEpisode] _ in
                     if Defaults[.isLoggedIn] {
-                        _ = try? await saveWatchingStateUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode)
+                        try? await saveWatchingStateUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode)
                     }
 
                     try? await database.write { db in

@@ -25,7 +25,7 @@ struct RenameBookmarkFeature {
         case submit
         case cancelRequest
         case retry
-        case renamed(Result<Bool, any Error>)
+        case renamed(Result<Void, any Error>)
     }
 
     private enum CancelID { case request }
@@ -58,13 +58,8 @@ struct RenameBookmarkFeature {
 
                 return .cancel(id: CancelID.request)
 
-            case .renamed(.success(true)):
+            case .renamed(.success):
                 return .run { _ in await dismiss() }
-
-            case .renamed(.success(false)):
-                state.status = .error(HDrezkaError.unknown)
-
-                return .none
 
             case let .renamed(.failure(error)):
                 state.status = .error(error)

@@ -3,7 +3,7 @@ import Dependencies
 struct LogoutUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction() async throws -> Bool {
+    func callAsFunction() async throws {
         try await repository.logout()
     }
 }

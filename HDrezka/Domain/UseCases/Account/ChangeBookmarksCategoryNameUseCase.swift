@@ -3,7 +3,7 @@ import Dependencies
 struct ChangeBookmarksCategoryNameUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction(id: Int, newName: String) async throws -> Bool {
+    func callAsFunction(id: Int, newName: String) async throws {
         try await repository.changeBookmarksCategoryName(id: id, newName: newName)
     }
 }

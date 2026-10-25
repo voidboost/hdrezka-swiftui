@@ -21,7 +21,7 @@ struct CommentReportFeature {
         case submit
         case cancelRequest
         case retry
-        case reported(Result<Bool, any Error>)
+        case reported(Result<Void, any Error>)
     }
 
     private enum CancelID { case request }
@@ -62,13 +62,8 @@ struct CommentReportFeature {
 
                 return .cancel(id: CancelID.request)
 
-            case .reported(.success(true)):
+            case .reported(.success):
                 return .run { _ in await dismiss() }
-
-            case .reported(.success(false)):
-                state.status = .error(HDrezkaError.unknown)
-
-                return .none
 
             case let .reported(.failure(error)):
                 state.status = .error(error)

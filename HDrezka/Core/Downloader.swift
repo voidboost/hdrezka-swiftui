@@ -325,7 +325,7 @@ class Downloader {
 
         if Defaults[.isLoggedIn] {
             Task {
-                _ = try? await saveWatchingStateUseCase(voiceActing: data.acting, season: season, episode: episode)
+                try? await saveWatchingStateUseCase(voiceActing: data.acting, season: season, episode: episode)
             }
         }
 

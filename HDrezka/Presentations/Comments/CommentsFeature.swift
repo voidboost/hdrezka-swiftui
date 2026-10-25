@@ -53,7 +53,7 @@ struct CommentsFeature {
         case reportTapped(Comment)
         case reportComment(PresentationAction<CommentReportFeature.Action>)
         case deleteTapped(Comment)
-        case commentDeleted(Comment, Result<(Bool, String?), any Error>)
+        case commentDeleted(Comment, Result<Void, any Error>)
         case alert(PresentationAction<Alert>)
         case moderationAlert(PresentationAction<Alert>)
         case deleteDialog(PresentationAction<DeleteDialog>)
@@ -284,13 +284,7 @@ struct CommentsFeature {
                     await send(.commentDeleted(comment, result), animation: .easeInOut)
                 }
 
-            case let .commentDeleted(comment, .success((success, message))):
-                guard success else {
-                    state.alert = .error(message: message)
-
-                    return .none
-                }
-
+            case let .commentDeleted(comment, .success):
                 if var comments = state.comments.data {
                     if comments.contains(where: { $0.commentId == comment.commentId }) {
                         comments.removeAll(where: { $0.commentId == comment.commentId })

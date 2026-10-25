@@ -17,7 +17,7 @@ struct BookmarksSheetFeature {
         case reload
         case bookmarksLoaded(Result<[Bookmark], any Error>)
         case toggle(Bookmark)
-        case toggled(Bookmark, isAdded: Bool, Result<Bool, any Error>)
+        case toggled(Bookmark, isAdded: Bool, Result<Void, any Error>)
         case createTapped
         case alert(PresentationAction<Alert>)
         case delegate(Delegate)
@@ -76,8 +76,8 @@ struct BookmarksSheetFeature {
                     await send(.toggled(bookmark, isAdded: !isChecked, result), animation: .easeInOut)
                 }
 
-            case let .toggled(bookmark, isAdded, .success(success)):
-                guard success, var bookmarks = state.bookmarks.data, let index = bookmarks.firstIndex(where: { $0.bookmarkId == bookmark.bookmarkId }) else { return .none }
+            case let .toggled(bookmark, isAdded, .success):
+                guard var bookmarks = state.bookmarks.data, let index = bookmarks.firstIndex(where: { $0.bookmarkId == bookmark.bookmarkId }) else { return .none }
 
                 if isAdded {
                     bookmarks[index] += 1

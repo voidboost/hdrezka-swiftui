@@ -53,7 +53,7 @@ struct AppFeature {
         case routeReceived(AppRoute)
         case signInTapped
         case signOutConfirmed
-        case loggedOut(Result<Bool, any Error>)
+        case loggedOut(Result<Void, any Error>)
         case loggedInChanged(Bool)
         case destination(PresentationAction<Destination.Action>)
         case alert(PresentationAction<Alert>)
@@ -136,12 +136,7 @@ struct AppFeature {
                     await send(.loggedOut(result))
                 }
 
-            case .loggedOut(.success(true)):
-                return .none
-
-            case .loggedOut(.success(false)):
-                state.alert = .error()
-
+            case .loggedOut(.success):
                 return .none
 
             case let .loggedOut(.failure(error)):

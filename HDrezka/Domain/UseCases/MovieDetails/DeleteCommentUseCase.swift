@@ -3,7 +3,7 @@ import Dependencies
 struct DeleteCommentUseCase {
     @Dependency(\.movieDetailsRepository) private var repository
 
-    func callAsFunction(id: String, hash: String) async throws -> (Bool, String?) {
+    func callAsFunction(id: String, hash: String) async throws {
         try await repository.deleteComment(id: id, hash: hash)
     }
 }

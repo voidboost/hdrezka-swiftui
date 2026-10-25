@@ -3,7 +3,7 @@ import Dependencies
 struct DeleteBookmarksCategoryUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction(id: Int) async throws -> Bool {
+    func callAsFunction(id: Int) async throws {
         try await repository.deleteBookmarksCategory(id: id)
     }
 }
