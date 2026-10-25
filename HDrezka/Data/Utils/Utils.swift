@@ -138,7 +138,7 @@ extension Optional {
 }
 
 func handleError(_ error: Error) -> Error {
-    @Dependency(\.appRouter) var appRouter
+    @Dependency(\.sessionEvents) var sessionEvents
 
     if error is CancellationError || error.asAFError?.isExplicitlyCancelledError == true {
         return CancellationError()
@@ -148,7 +148,7 @@ func handleError(_ error: Error) -> Error {
         return avError
     } else if let afError = error.asAFError {
         if afError.responseCode == 403 {
-            appRouter.present(.signIn)
+            sessionEvents.send(.loginRequired)
 
             return HDrezkaError.loginRequired(Defaults[.mirror])
         }
@@ -161,7 +161,7 @@ func handleError(_ error: Error) -> Error {
     } else if let hdrezkaError = error as? HDrezkaError {
         switch hdrezkaError {
         case .loginRequired:
-            appRouter.present(.signIn)
+            sessionEvents.send(.loginRequired)
         case .mirrorBanned, .site:
             break
         default:
