@@ -6,9 +6,7 @@ struct CollectionsFeature {
     @ObservableState
     struct State: Equatable {
         var collections: DataState<[MoviesCollection]> = .idle
-        var paginationState: DataPaginationState = .idle
-
-        fileprivate var page = 1
+        var pagination = Pagination()
     }
 
     enum Action {
@@ -32,24 +30,18 @@ struct CollectionsFeature {
 
             case .reload:
                 state.collections = .loading
-                state.paginationState = .idle
-                state.page = 1
+                state.pagination.reset()
 
-                return load(page: state.page, isInitial: true)
+                return load(page: state.pagination.page, isInitial: true)
 
             case .loadMore:
-                guard state.paginationState == .idle else { return .none }
+                guard state.pagination.startLoadingMore() else { return .none }
 
-                state.paginationState = .loading
-
-                return load(page: state.page, isInitial: false)
+                return load(page: state.pagination.page, isInitial: false)
 
             case let .collectionsLoaded(isInitial, result):
-                if case .success = result {
-                    state.page += 1
-                }
-
-                state.paginationState = state.collections.receivePage(result, isInitial: isInitial)
+                let paginationState = state.collections.receivePage(result, isInitial: isInitial)
+                state.pagination.update(paginationState, after: result)
 
                 return .none
             }

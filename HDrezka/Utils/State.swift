@@ -108,6 +108,32 @@ extension DataPaginationState {
     }
 }
 
+struct Pagination: Equatable {
+    private(set) var page = 1
+    var state: DataPaginationState = .idle
+
+    mutating func reset() {
+        page = 1
+        state = .idle
+    }
+
+    mutating func startLoadingMore() -> Bool {
+        guard state == .idle else { return false }
+
+        state = .loading
+
+        return true
+    }
+
+    mutating func update(_ state: DataPaginationState, after result: Result<some Any, any Error>) {
+        if case .success = result {
+            page += 1
+        }
+
+        self.state = state
+    }
+}
+
 enum EmptyState: Equatable {
     case data
     case loading

@@ -13,7 +13,7 @@ struct BookmarksFeature {
     struct State: Equatable {
         var bookmarks: DataState<[Bookmark]> = .idle
         var movies: DataState<[MovieSimple]> = .data([])
-        var paginationState: DataPaginationState = .idle
+        var pagination = Pagination()
 
         var selectedBookmark: Int?
 
@@ -23,8 +23,6 @@ struct BookmarksFeature {
         var filter = BookmarkFilters.added
 
         @Presents var alert: AlertState<Action.Alert>?
-
-        fileprivate var page = 1
     }
 
     enum Action: BindableAction {
@@ -107,8 +105,7 @@ struct BookmarksFeature {
 
                 state.bookmarks = .loading
                 state.movies = .data([])
-                state.paginationState = .idle
-                state.page = 1
+                state.pagination.reset()
 
                 return .merge(
                     .cancel(id: CancelID.movies),
@@ -134,24 +131,18 @@ struct BookmarksFeature {
                 guard let selectedBookmark = state.selectedBookmark else { return .none }
 
                 state.movies = .loading
-                state.paginationState = .idle
-                state.page = 1
+                state.pagination.reset()
 
                 return loadMovies(id: selectedBookmark, state: state, isInitial: true)
 
             case .loadMore:
-                guard state.paginationState == .idle, let selectedBookmark = state.selectedBookmark else { return .none }
-
-                state.paginationState = .loading
+                guard let selectedBookmark = state.selectedBookmark, state.pagination.startLoadingMore() else { return .none }
 
                 return loadMovies(id: selectedBookmark, state: state, isInitial: false)
 
             case let .moviesLoaded(isInitial, result):
-                if case .success = result {
-                    state.page += 1
-                }
-
-                state.paginationState = state.movies.receivePage(result, isInitial: isInitial, emptyPageIsError: true)
+                let paginationState = state.movies.receivePage(result, isInitial: isInitial, emptyPageIsError: true)
+                state.pagination.update(paginationState, after: result)
 
                 return .none
 
@@ -279,7 +270,7 @@ struct BookmarksFeature {
     }
 
     private func loadMovies(id: Int, state: State, isInitial: Bool) -> Effect<Action> {
-        .run { [filter = state.filter, genre = state.genre.genreCode, page = state.page] send in
+        .run { [filter = state.filter, genre = state.genre.genreCode, page = state.pagination.page] send in
             let result = await Result {
                 try await getBookmarksByCategoryUseCase(id: id, filter: filter, genre: genre, page: page)
             }
