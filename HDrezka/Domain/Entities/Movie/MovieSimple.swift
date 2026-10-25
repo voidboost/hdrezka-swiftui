@@ -51,15 +51,7 @@ extension MovieSimple {
 
         var rating: Float? {
             switch self {
-            case let .film(rating):
-                rating
-            case let .series(rating):
-                rating
-            case let .anime(rating):
-                rating
-            case let .cartoon(rating):
-                rating
-            case let .show(rating):
+            case let .film(rating), let .series(rating), let .anime(rating), let .cartoon(rating), let .show(rating):
                 rating
             }
         }
