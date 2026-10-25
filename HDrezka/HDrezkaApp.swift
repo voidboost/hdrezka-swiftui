@@ -25,20 +25,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         UNUserNotificationCenter.current().delegate = self
 
         NSWindow.allowsAutomaticWindowTabbing = false
-
-        UserDefaults.standard.register(
-            defaults: ["NSApplicationCrashOnExceptions": true]
-        )
-
-        FirebaseApp.configure()
-        Crashlytics.crashlytics().setUserID(Const.deviceUUID)
-        Analytics.setUserID(Const.deviceUUID)
-
-        #if DEBUG
-            Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(false)
-            FirebaseConfiguration.shared.setLoggerLevel(.min)
-            Analytics.setAnalyticsCollectionEnabled(false)
-        #endif
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
@@ -139,8 +125,8 @@ extension AppDelegate: SPUUpdaterDelegate, SPUStandardUserDriverDelegate {
 struct HDrezkaApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @State private var store: StoreOf<AppFeature>
-    @State private var downloader: Downloader = .shared
-    @State private var cookiesManager: CookiesManager = .shared
+    @State private var downloader: Downloader
+    @State private var cookiesManager: CookiesManager
     @Environment(\.openWindow) private var openWindow
 
     @Default(.theme) private var theme
@@ -148,9 +134,26 @@ struct HDrezkaApp: App {
     @Default(.mirror) private var mirror
 
     init() {
+        UserDefaults.standard.register(
+            defaults: ["NSApplicationCrashOnExceptions": true]
+        )
+
+        FirebaseApp.configure()
+        Crashlytics.crashlytics().setUserID(Const.deviceUUID)
+        Analytics.setUserID(Const.deviceUUID)
+
+        #if DEBUG
+            Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(false)
+            FirebaseConfiguration.shared.setLoggerLevel(.min)
+            Analytics.setAnalyticsCollectionEnabled(false)
+        #endif
+
         prepareDependencies {
-            $0.defaultDatabase = try! Self.appDatabase()
+            $0.defaultDatabase = Self.appDatabase()
         }
+
+        _downloader = State(initialValue: .shared)
+        _cookiesManager = State(initialValue: .shared)
 
         let store = Store(initialState: AppFeature.State()) { AppFeature() }
         store.send(.appLaunched)
@@ -335,11 +338,34 @@ struct HDrezkaApp: App {
         }
     }
 
-    private static func appDatabase() throws -> any DatabaseWriter {
-        let configuration = Configuration()
+    private static func appDatabase() -> any DatabaseWriter {
+        do {
+            let database = try defaultDatabase(path: Const.dbPath)
 
-        let database = try defaultDatabase(path: Const.dbPath, configuration: configuration)
+            try migrate(database)
 
+            return database
+        } catch {
+            Crashlytics.crashlytics().record(error: error)
+        }
+
+        do {
+            var configuration = Configuration()
+            configuration.prepareDatabase { db in
+                db.add(collation: .canonical)
+            }
+
+            let database = try DatabaseQueue(configuration: configuration)
+
+            try migrate(database)
+
+            return database
+        } catch {
+            fatalError("Failed to create an in-memory database: \(error)")
+        }
+    }
+
+    private static func migrate(_ database: any DatabaseWriter) throws {
         var migrator = DatabaseMigrator()
 
         #if DEBUG
@@ -367,7 +393,5 @@ struct HDrezkaApp: App {
         }
 
         try migrator.migrate(database)
-
-        return database
     }
 }
