@@ -1,10 +1,9 @@
-import Defaults
 import Foundation
 import SwiftSoup
 
 class AccountParser {
     static func parseWatchingLaterMovies(from: String) throws -> [MovieWatchLater] {
-        try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString)
+        try from.parseHTML()
             .checker()
             .getWatchingLaterMovies()
             .map { movie in
@@ -23,7 +22,7 @@ class AccountParser {
     }
 
     static func parseSeriesUpdates(from: String) throws -> [SeriesUpdateGroup] {
-        try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString)
+        try from.parseHTML()
             .checker()
             .getSeriesUpdateGroups()
             .compactMap { group in
@@ -52,7 +51,7 @@ class AccountParser {
     }
 
     static func checkRestore(from: String) throws -> String? {
-        let site = try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString)
+        let site = try from.parseHTML()
 
         guard try site.select(".b-info__title").text().contains("Запрос успешно принят") else { return nil }
 
@@ -60,7 +59,7 @@ class AccountParser {
     }
 
     static func parseBookmarks(from: String) throws -> [Bookmark] {
-        try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString)
+        try from.parseHTML()
             .checker()
             .getBookmarksCategories()
             .map { category in

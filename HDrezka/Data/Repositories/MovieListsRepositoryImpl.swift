@@ -6,7 +6,7 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     @Dependency(\.session) private var session
 
     private func movies(_ convertible: MovieListsService) async throws -> [MovieSimple] {
-        try await session.string(convertible) { try MovieListsParser.parse(from: $0).1 }
+        try await session.string(convertible, parse: MovieListsParser.parseMovies)
     }
 
     private func moviesByCountry(countryId: String, genre: Int, page: Int, filter: String, function: String = #function) async throws -> [MovieSimple] {

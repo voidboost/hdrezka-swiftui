@@ -45,11 +45,9 @@ class WebVTTParser {
             let block = parseBlock(inHeader: false)
 
             if case let .cue(start, end, text)? = block {
-                let imageUrl = CueTextParser(string: text, vttUrl: vttUrl).parseImageUrl()
-                let frame = CueTextParser(string: text, vttUrl: vttUrl).parseFrame()
-                let timing = WebVTT.Timing(start: start, end: end)
+                let cueText = CueTextParser(string: text, vttUrl: vttUrl)
 
-                cues.append(WebVTT.Cue(timing: timing, imageUrl: imageUrl, frame: frame))
+                cues.append(WebVTT.Cue(timing: WebVTT.Timing(start: start, end: end), imageUrl: cueText.parseImageUrl(), frame: cueText.parseFrame()))
             }
 
             scanner.scanCharacters(from: WebVTTParser.newlineSet)

@@ -1,5 +1,4 @@
 import Alamofire
-import Defaults
 import Foundation
 
 enum CollectionsService {
@@ -7,11 +6,7 @@ enum CollectionsService {
     case getMoviesInCollectionWithFilter(collectionId: String, page: Int, filter: String)
 }
 
-extension CollectionsService: URLRequestConvertible {
-    var baseURL: URL {
-        Defaults[.mirror]
-    }
-
+extension CollectionsService: Endpoint {
     var path: String {
         switch self {
         case let .getCollections(page):
@@ -21,22 +16,12 @@ extension CollectionsService: URLRequestConvertible {
         }
     }
 
-    var method: HTTPMethod {
-        .get
-    }
-
-    func asURLRequest() throws -> URLRequest {
-        let url = baseURL.appending(path: path, directoryHint: .notDirectory)
-
-        var request = URLRequest(url: url)
-        request.method = method
-        request.headers = Const.headers
-
+    func encode(_ request: URLRequest) throws -> URLRequest {
         switch self {
+        case .getCollections:
+            request
         case let .getMoviesInCollectionWithFilter(_, _, filter):
-            return try URLEncoding.queryString.encode(request, with: ["filter": filter])
-        default:
-            return request
+            try request.query(["filter": filter])
         }
     }
 }

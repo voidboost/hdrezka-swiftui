@@ -1,22 +1,18 @@
-import Defaults
 import Foundation
 import SwiftSoup
 
 class MovieListsParser {
     static func parse(from: String) throws -> (String, [MovieSimple]) {
-        let site = try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString)
-            .checker()
+        let site = try from.parseHTML().checker()
 
-        return try (
-            site.select(".b-content__htitle").text(),
-            site.getMovies()
-                .map { try $0.getMovie() },
-        )
+        return try (site.select(".b-content__htitle").text(), site.getMovies())
+    }
+
+    static func parseMovies(from: String) throws -> [MovieSimple] {
+        try from.parseHTML().checker().getMovies()
     }
 
     static func parseHotMovies(from: String) throws -> [MovieSimple] {
-        try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString)
-            .getMovies()
-            .map { try $0.getMovie() }
+        try from.parseHTML().getMovies()
     }
 }

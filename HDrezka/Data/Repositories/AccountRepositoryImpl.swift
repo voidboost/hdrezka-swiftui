@@ -1,5 +1,4 @@
 import Alamofire
-import Defaults
 import Dependencies
 import Foundation
 import SwiftSoup
@@ -12,13 +11,8 @@ struct AccountRepositoryImpl: AccountRepository {
             let success: Bool = try json.require("success")
 
             guard success else {
-                if let message = try? json.require("message") as String,
-                   !message.isEmpty
-                {
-                    if let document = try? SwiftSoup.parseHTML(
-                        message,
-                        Defaults[.mirror].absoluteString
-                    ) {
+                if let message: String = json["message"], !message.isEmpty {
+                    if let document = try? message.parseHTML() {
                         if let messages = try? document.select("ul").first()?.select("li").map({ li in try li.text() }), !messages.isEmpty {
                             throw HDrezkaError.site(messages)
                         } else if let messages = try? document.text().split(whereSeparator: \.isNewline).map(String.init), !messages.isEmpty {
@@ -27,7 +21,7 @@ struct AccountRepositoryImpl: AccountRepository {
                     }
 
                     throw HDrezkaError.site(message.split(whereSeparator: \.isNewline).map(String.init))
-                } else if let messages = try? json.require("message") as [String: String], !messages.isEmpty {
+                } else if let messages: [String: String] = json["message"], !messages.isEmpty {
                     throw HDrezkaError.site(Array(messages.values))
                 } else {
                     throw HDrezkaError.unknown
@@ -37,7 +31,7 @@ struct AccountRepositoryImpl: AccountRepository {
     }
 
     private func bookmarksByCategory(id: Int, filter: String, genre: Int, page: Int) async throws -> [MovieSimple] {
-        try await session.string(AccountService.getBookmarksByCategory(id: id, filter: filter, genre: genre, page: page)) { try MovieListsParser.parse(from: $0).1 }
+        try await session.string(AccountService.getBookmarksByCategory(id: id, filter: filter, genre: genre, page: page), parse: MovieListsParser.parseMovies)
     }
 
     func signIn(login: String, password: String) async throws {

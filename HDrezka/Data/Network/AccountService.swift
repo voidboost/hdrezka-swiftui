@@ -24,7 +24,7 @@ enum AccountService {
     case getVersion
 }
 
-extension AccountService: URLRequestConvertible {
+extension AccountService: Endpoint {
     var baseURL: URL {
         switch self {
         case .getVersion:
@@ -74,57 +74,44 @@ extension AccountService: URLRequestConvertible {
         }
     }
 
-    func asURLRequest() throws -> URLRequest {
-        let url = baseURL.appending(path: path, directoryHint: .notDirectory)
-
-        var request = URLRequest(url: url)
-        request.method = method
-        request.headers = Const.headers
-
+    func encode(_ request: URLRequest) throws -> URLRequest {
         switch self {
         case let .signIn(login, password):
-            return try URLEncoding.httpBody.encode(request, with: ["login_name": login, "login_password": password, "login_not_save": 0])
+            return try request.body(["login_name": login, "login_password": password, "login_not_save": 0])
         case let .signUp(email, login, password, verifyCode, step):
-            return try URLEncoding.httpBody.encode(request, with: ["email": email, "login": login, "password": password, "rules": 1, "verify_code": verifyCode, "step": step])
+            return try request.body(["email": email, "login": login, "password": password, "rules": 1, "verify_code": verifyCode, "step": step])
         case let .restore(login):
-            return try URLEncoding.httpBody.encode(URLEncoding.queryString.encode(request, with: ["do": "lostpassword"]), with: ["lostname": login, "sumbit": 1, "submit_lost": "submit_lost"])
+            return try request.query(["do": "lostpassword"]).body(["lostname": login, "sumbit": 1, "submit_lost": "submit_lost"])
         case let .sendWatching(postId, translatorId, season, episode, currentTime, duration):
-            var params: Parameters = [:]
-            params["post_id"] = postId
-            params["translator_id"] = translatorId
-            params["season"] = season ?? "0"
-            params["episode"] = episode ?? "0"
+            var params: Parameters = ["post_id": postId, "translator_id": translatorId, "season": season ?? "0", "episode": episode ?? "0"]
             params["current_time"] = currentTime
             params["duration"] = duration
 
-            return try URLEncoding.httpBody.encode(URLEncoding.queryString.encode(request, with: ["t": Int(Date().timeIntervalSince1970 * 1000)]), with: params)
-        case let .switchWatchedItem(id):
-            return try URLEncoding.httpBody.encode(request, with: ["id": id])
-        case let .removeWatchingItem(id):
-            return try URLEncoding.httpBody.encode(request, with: ["id": id])
+            return try request.timestamped().body(params)
+        case let .switchWatchedItem(id), let .removeWatchingItem(id):
+            return try request.body(["id": id])
         case let .getBookmarksByCategory(_, filter, genre, _):
-            var params: Parameters = [:]
-            params["filter"] = filter
+            var params: Parameters = ["filter": filter]
             if genre != 0 {
                 params["genre"] = genre
             }
 
-            return try URLEncoding.queryString.encode(request, with: params)
+            return try request.query(params)
         case let .createBookmarkCategory(name):
-            return try URLEncoding.httpBody.encode(request, with: ["name": name, "action": "add_cat"])
+            return try request.body(["name": name, "action": "add_cat"])
         case let .changeBookmarkCategoryName(newName, catId):
-            return try URLEncoding.httpBody.encode(request, with: ["name": newName, "cat_id": catId, "action": "change_cat_name"])
+            return try request.body(["name": newName, "cat_id": catId, "action": "change_cat_name"])
         case let .deleteBookmarkCategory(catId):
-            return try URLEncoding.httpBody.encode(request, with: ["cat_id": catId, "action": "remove_cat"])
+            return try request.body(["cat_id": catId, "action": "remove_cat"])
         case let .addToBookmarks(movieId, catId):
-            return try URLEncoding.httpBody.encode(request, with: ["post_id": movieId, "cat_id": catId, "action": "add_post"])
+            return try request.body(["post_id": movieId, "cat_id": catId, "action": "add_post"])
         case let .removeFromBookmarks(movies, catId):
-            return try URLEncoding.httpBody.encode(request, with: ["items": movies, "cat_id": catId, "action": "remove_items"])
+            return try request.body(["items": movies, "cat_id": catId, "action": "remove_items"])
         case let .moveBetweenBookmarks(movies, fromCatId, toCatId):
-            return try URLEncoding.httpBody.encode(request, with: ["from_cat_id": fromCatId, "to_cat_id": toCatId, "items": movies, "action": "change_items_cat"])
+            return try request.body(["from_cat_id": fromCatId, "to_cat_id": toCatId, "items": movies, "action": "change_items_cat"])
         case let .reorderBookmarksCategories(newOrder):
-            return try URLEncoding.httpBody.encode(request, with: ["cats": newOrder.map(\.bookmarkId), "action": "sort_cats"])
-        default:
+            return try request.body(["cats": newOrder.map(\.bookmarkId), "action": "sort_cats"])
+        case .logout, .getWatchingLaterMovies, .getSeriesUpdates, .getBookmarks, .getVersion:
             return request
         }
     }

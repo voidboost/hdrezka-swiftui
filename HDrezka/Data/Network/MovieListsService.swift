@@ -1,5 +1,4 @@
 import Alamofire
-import Defaults
 import Foundation
 
 enum MovieListsService {
@@ -11,31 +10,15 @@ enum MovieListsService {
     case getHotMovies(genre: Int)
 }
 
-extension MovieListsService: URLRequestConvertible {
-    var baseURL: URL {
-        Defaults[.mirror]
-    }
-
+extension MovieListsService: Endpoint {
     var path: String {
         switch self {
         case let .getMovieList1(page, _, _):
             "".page(page)
         case let .getMovieList2(type, listType, genre, year, page):
-            if let genre, let year {
-                "\(type)/\(listType)/\(genre)/\(year)/".page(page)
-            } else if let genre {
-                "\(type)/\(listType)/\(genre)/".page(page)
-            } else if let year {
-                "\(type)/\(listType)/\(year)/".page(page)
-            } else {
-                "\(type)/\(listType)/".page(page)
-            }
+            ([type, listType, genre, year].compactMap(\.self).joined(separator: "/") + "/").page(page)
         case let .getMovieList3(type, genre, page, _):
-            if let genre {
-                "\(type)/\(genre)/".page(page)
-            } else {
-                "\(type)/".page(page)
-            }
+            ([type, genre].compactMap(\.self).joined(separator: "/") + "/").page(page)
         case let .getMovieList4(type, category, page, _, _):
             "\(type)/\(category)/".page(page)
         case let .getNewestMovies(page, _, _):
@@ -54,37 +37,20 @@ extension MovieListsService: URLRequestConvertible {
         }
     }
 
-    func asURLRequest() throws -> URLRequest {
-        let url = baseURL.appending(path: path, directoryHint: .notDirectory)
-
-        var request = URLRequest(url: url)
-        request.method = method
-        request.headers = Const.headers
-
+    func encode(_ request: URLRequest) throws -> URLRequest {
         switch self {
-        case let .getMovieList1(_, filter, genre):
-            var params: Parameters = [:]
-            params["filter"] = filter
-            params["genre"] = genre != 0 ? genre : nil
+        case let .getMovieList1(_, filter, genre), let .getMovieList4(_, _, _, genre, filter), let .getNewestMovies(_, filter, genre):
+            var params: Parameters = ["filter": filter]
+            if genre != 0 {
+                params["genre"] = genre
+            }
 
-            return try URLEncoding.queryString.encode(request, with: params)
+            return try request.query(params)
         case let .getMovieList3(_, _, _, filter):
-            return try URLEncoding.queryString.encode(request, with: ["filter": filter])
-        case let .getMovieList4(_, _, _, genre, filter):
-            var params: Parameters = [:]
-            params["filter"] = filter
-            params["genre"] = genre != 0 ? genre : nil
-
-            return try URLEncoding.queryString.encode(request, with: params)
-        case let .getNewestMovies(_, filter, genre):
-            var params: Parameters = [:]
-            params["filter"] = filter
-            params["genre"] = genre != 0 ? genre : nil
-
-            return try URLEncoding.queryString.encode(request, with: params)
+            return try request.query(["filter": filter])
         case let .getHotMovies(genre):
-            return try URLEncoding.httpBody.encode(request, with: ["id": genre])
-        default:
+            return try request.body(["id": genre])
+        case .getMovieList2:
             return request
         }
     }

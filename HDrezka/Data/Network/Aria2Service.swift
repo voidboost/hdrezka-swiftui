@@ -1,5 +1,4 @@
 import Alamofire
-import Defaults
 import Foundation
 
 enum Aria2Service<E: Encodable & Sendable> {
@@ -7,7 +6,7 @@ enum Aria2Service<E: Encodable & Sendable> {
     case multicall(data: [E])
 }
 
-extension Aria2Service: URLRequestConvertible {
+extension Aria2Service: Endpoint {
     var baseURL: URL {
         Const.rpc
     }
@@ -20,18 +19,16 @@ extension Aria2Service: URLRequestConvertible {
         .post
     }
 
-    func asURLRequest() throws -> URLRequest {
-        let url = baseURL.appending(path: path, directoryHint: .notDirectory)
+    var headers: HTTPHeaders {
+        [.contentType("application/json-rpc")]
+    }
 
-        var request = URLRequest(url: url)
-        request.method = method
-        request.headers = HTTPHeaders([.contentType("application/json-rpc")])
-
+    func encode(_ request: URLRequest) throws -> URLRequest {
         switch self {
         case let .call(data):
-            return try JSONParameterEncoder.default.encode(data, into: request)
+            try JSONParameterEncoder.default.encode(data, into: request)
         case let .multicall(data):
-            return try JSONParameterEncoder.default.encode(data, into: request)
+            try JSONParameterEncoder.default.encode(data, into: request)
         }
     }
 }

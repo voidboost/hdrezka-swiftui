@@ -1,5 +1,4 @@
 import Alamofire
-import Defaults
 import Foundation
 
 enum MovieDetailsService {
@@ -23,9 +22,16 @@ enum MovieDetailsService {
     case rate(id: String, rating: Int)
 }
 
-extension MovieDetailsService: URLRequestConvertible {
-    var baseURL: URL {
-        Defaults[.mirror]
+extension MovieDetailsService: Endpoint {
+    private var directPath: String? {
+        switch self {
+        case let .getMovieVideo(voiceActing, _, episode, _):
+            episode?.url ?? voiceActing.url
+        case let .getSeriesSeasons(_, voiceActing, _):
+            voiceActing.url
+        default:
+            nil
+        }
     }
 
     var path: String {
@@ -34,18 +40,8 @@ extension MovieDetailsService: URLRequestConvertible {
             "\(type)/\(genre)/\(name)"
         case .getMovieTrailer:
             "engine/ajax/gettrailervideo.php"
-        case let .getSeriesSeasons(_, voiceActing, _):
-            if let path = voiceActing.url {
-                path
-            } else {
-                "ajax/get_cdn_series/"
-            }
-        case let .getMovieVideo(voiceActing, _, episode, _):
-            if let path = episode?.url ?? voiceActing.url {
-                path
-            } else {
-                "ajax/get_cdn_series/"
-            }
+        case .getSeriesSeasons, .getMovieVideo:
+            directPath ?? "ajax/get_cdn_series/"
         case let .getMovieThumbnails(path):
             path.substringBeforeLast("/", includeSeparator: true).substringAfter("/")
         case .getComments:
@@ -69,42 +65,23 @@ extension MovieDetailsService: URLRequestConvertible {
         switch self {
         case .getMovieTrailer, .toggleCommentLike, .reportComment, .sendComment, .getlikes, .rate:
             .post
-        case let .getMovieVideo(voiceActing, _, episode, _):
-            if episode?.url == nil, voiceActing.url == nil {
-                .post
-            } else {
-                .get
-            }
-        case let .getSeriesSeasons(_, voiceActing, _):
-            if voiceActing.url == nil {
-                .post
-            } else {
-                .get
-            }
+        case .getMovieVideo, .getSeriesSeasons:
+            directPath == nil ? .post : .get
         default:
             .get
         }
     }
 
-    func asURLRequest() throws -> URLRequest {
-        let url = baseURL.appending(path: path, directoryHint: .notDirectory)
-
-        var request = URLRequest(url: url)
-        request.method = method
-        request.headers = Const.headers
-
+    func encode(_ request: URLRequest) throws -> URLRequest {
         switch self {
         case let .getMovieTrailer(id):
-            return try URLEncoding.httpBody.encode(request, with: ["id": id])
+            return try request.body(["id": id])
         case let .getMovieVideo(voiceActing, season, episode, favs):
-            guard episode?.url == nil, voiceActing.url == nil else {
+            guard directPath == nil else {
                 return request
             }
 
-            var params: Parameters = [:]
-            params["id"] = voiceActing.voiceId
-            params["translator_id"] = voiceActing.translatorId
-            params["favs"] = favs
+            var params: Parameters = ["id": voiceActing.voiceId, "translator_id": voiceActing.translatorId, "favs": favs]
 
             if !voiceActing.isCamrip.isEmpty {
                 params["is_camrip"] = voiceActing.isCamrip
@@ -124,48 +101,42 @@ extension MovieDetailsService: URLRequestConvertible {
                 params["action"] = "get_movie"
             }
 
-            return try URLEncoding.httpBody.encode(URLEncoding.queryString.encode(request, with: ["t": Int(Date().timeIntervalSince1970 * 1000)]), with: params)
+            return try request.timestamped().body(params)
         case .getMovieThumbnails:
-            return try URLEncoding.queryString.encode(request, with: ["t": Int(Date().timeIntervalSince1970 * 1000)])
+            return try request.timestamped()
         case let .getSeriesSeasons(movieId, voiceActing, favs):
-            guard voiceActing.url == nil else {
+            guard directPath == nil else {
                 return request
             }
 
-            return try URLEncoding.httpBody.encode(URLEncoding.queryString.encode(request, with: ["t": Int(Date().timeIntervalSince1970 * 1000)]), with: ["id": movieId, "translator_id": voiceActing.translatorId, "action": "get_episodes", "favs": favs])
+            return try request.timestamped().body(["id": movieId, "translator_id": voiceActing.translatorId, "action": "get_episodes", "favs": favs])
         case let .getComments(movieId, page, type, commentId, skin):
-            var params: Parameters = [:]
-            params["news_id"] = movieId
-            params["cstart"] = page ?? 1
-            params["t"] = Int(Date().timeIntervalSince1970 * 1000)
-            params["type"] = type ?? 0
-            params["comment_id"] = commentId ?? 0
-            params["skin"] = skin ?? "hdrezka"
-
-            return try URLEncoding.queryString.encode(request, with: params)
+            return try request.query([
+                "news_id": movieId,
+                "cstart": page ?? 1,
+                "t": Int.timestamp,
+                "type": type ?? 0,
+                "comment_id": commentId ?? 0,
+                "skin": skin ?? "hdrezka",
+            ])
         case let .toggleCommentLike(id):
-            return try URLEncoding.httpBody.encode(request, with: ["id": id])
+            return try request.body(["id": id])
         case let .reportComment(id, issue, text):
-            return try URLEncoding.httpBody.encode(request, with: ["id": id, "issue_id": issue, "text": text, "action": "comments"])
+            return try request.body(["id": id, "issue_id": issue, "text": text, "action": "comments"])
         case let .deleteComment(id, hash):
-            return try URLEncoding.queryString.encode(request, with: ["id": id, "dle_allow_hash": hash, "type": 0, "area": "ajax"])
+            return try request.query(["id": id, "dle_allow_hash": hash, "type": 0, "area": "ajax"])
         case let .sendComment(id, postId, name, text, adb, type):
-            var params: Parameters = [:]
-            params["parent"] = id ?? 0
+            var params: Parameters = ["parent": id ?? 0, "post_id": postId, "comments": text, "has_adb": adb ?? 1, "g_recaptcha_response": ""]
             params["replyto_id"] = id
-            params["post_id"] = postId
             params["name"] = name
-            params["comments"] = text
             params["type"] = type
-            params["has_adb"] = adb ?? 1
-            params["g_recaptcha_response"] = ""
 
-            return try URLEncoding.httpBody.encode(request, with: params)
+            return try request.body(params)
         case let .getlikes(id):
-            return try URLEncoding.httpBody.encode(request, with: ["comment_id": id])
+            return try request.body(["comment_id": id])
         case let .rate(id, rating):
-            return try URLEncoding.httpBody.encode(request, with: ["news_id": id, "go_rate": rating, "skin": "hdrezka"])
-        default:
+            return try request.body(["news_id": id, "go_rate": rating, "skin": "hdrezka"])
+        case .getMovieDetails:
             return request
         }
     }
