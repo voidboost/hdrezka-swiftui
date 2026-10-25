@@ -16,3 +16,18 @@ extension View {
         body(self)
     }
 }
+
+extension View {
+    func onScrollNearEnd<Item: Identifiable>(
+        of items: [Item]?,
+        threshold: Int = 1,
+        isEnabled: Bool,
+        perform action: @escaping () -> Void
+    ) -> some View {
+        onScrollTargetVisibilityChange(idType: Item.ID.self) { visibleIds in
+            if isEnabled, let items, items.suffix(threshold).contains(where: { visibleIds.contains($0.id) }) {
+                action()
+            }
+        }
+    }
+}
