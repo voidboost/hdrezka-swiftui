@@ -1,6 +1,6 @@
 import Foundation
 
-func decrypt(encrypted: String) -> String {
+func decrypt(encrypted: String) throws -> String {
     guard encrypted.hasPrefix("#") else { return encrypted }
 
     var cache: [[UInt8]: [UInt8]] = [:]
@@ -23,7 +23,9 @@ func decrypt(encrypted: String) -> String {
 
     let decrypted = decryptRecursive(Array(encrypted.utf8.dropFirst(2)))
 
-    guard let data = Data(base64Encoded: Data(decrypted)), let string = String(data: data, encoding: .utf8) else { return "" }
+    guard let data = Data(base64Encoded: Data(decrypted)), let string = String(data: data, encoding: .utf8), !string.isEmpty else {
+        throw HDrezkaError.decryption(encrypted)
+    }
 
     return string
 }
