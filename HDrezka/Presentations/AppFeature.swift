@@ -51,6 +51,7 @@ struct AppFeature {
         case bookmarks(BookmarksFeature.Action)
         case appLaunched
         case routeReceived(AppRoute)
+        case sessionEventReceived(SessionEvent)
         case signInTapped
         case signOutConfirmed
         case loggedOut(Result<Void, any Error>)
@@ -62,6 +63,7 @@ struct AppFeature {
     }
 
     @Dependency(\.appRouter) private var appRouter
+    @Dependency(\.sessionEvents) private var sessionEvents
     @Dependency(\.getVersionUseCase) private var getVersionUseCase
     @Dependency(\.logoutUseCase) private var logoutUseCase
 
@@ -103,6 +105,11 @@ struct AppFeature {
                             await send(.routeReceived(route))
                         }
                     },
+                    .run { send in
+                        for await event in sessionEvents.events() {
+                            await send(.sessionEventReceived(event))
+                        }
+                    },
                     .run { _ in
                         let version = try await getVersionUseCase()
 
@@ -110,7 +117,7 @@ struct AppFeature {
                     }
                 )
 
-            case .routeReceived(.signIn), .signInTapped:
+            case .routeReceived(.signIn), .sessionEventReceived(.loginRequired), .signInTapped:
                 if case .signIn = state.destination {
                     return .none
                 }
