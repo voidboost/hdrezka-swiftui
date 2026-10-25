@@ -15,9 +15,11 @@ class Const {
 
     static let fakeUpdate = URL(string: "https://api.hdrezka.tech/")!
 
-    static let rpc = URL(string: "http://127.0.0.1:6800/")!
+    static let rpcPort = freePort() ?? 6800
 
-    static let token = "HDrezka"
+    static let rpc = URL(string: "http://127.0.0.1:\(rpcPort)/")!
+
+    static let token = UUID().uuidString
 
     static let lastHdrezkaAppVersion = "2.2.2"
 
@@ -69,6 +71,32 @@ class Const {
                 .userAgent(userAgent),
             ] : [.userAgent(userAgent)]
         )
+    }
+
+    private static func freePort() -> Int? {
+        let socket = Darwin.socket(AF_INET, SOCK_STREAM, 0)
+
+        guard socket >= 0 else { return nil }
+
+        defer { close(socket) }
+
+        var address = sockaddr_in()
+        address.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
+        address.sin_family = sa_family_t(AF_INET)
+        address.sin_addr.s_addr = inet_addr("127.0.0.1")
+        address.sin_port = 0
+
+        var length = socklen_t(MemoryLayout<sockaddr_in>.size)
+
+        let bound = withUnsafeMutablePointer(to: &address) { pointer in
+            pointer.withMemoryRebound(to: sockaddr.self, capacity: 1) {
+                bind(socket, $0, length) == 0 && getsockname(socket, $0, &length) == 0
+            }
+        }
+
+        guard bound else { return nil }
+
+        return Int(UInt16(bigEndian: address.sin_port))
     }
 
     static var dbPath: String {
