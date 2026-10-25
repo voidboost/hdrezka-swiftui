@@ -99,42 +99,24 @@ struct MovieSelectionFeature {
 
                 let available = acting.filter { Defaults[.isUserPremium] != nil || !$0.isPremium }
 
-                state.selectedActing = if !Defaults[.isLoggedIn],
-                                          let position = selectPosition,
-                                          let first = available.first(where: { $0.translatorId == position.acting })
-                {
-                    first
-                } else if let series = details.series,
-                          let first = available.first(where: { $0.translatorId == series.acting })
-                {
-                    first
-                } else if let first = available.first(where: { $0.isSelected }) {
-                    first
-                } else if let first = available.first {
-                    first
-                } else {
-                    acting.first
-                }
+                state.selectedActing = available.preferred(
+                    saved: Defaults[.isLoggedIn] ? nil : selectPosition?.acting,
+                    series: details.series?.acting,
+                    id: \.translatorId,
+                    isSelected: \.isSelected
+                ) ?? acting.first
 
                 return actingChanged(&state)
 
             case let .seasonsLoaded(.success(seasons)):
                 state.seasons = seasons
 
-                state.selectedSeason = if !Defaults[.isLoggedIn],
-                                          let position = state.selectPosition,
-                                          let first = seasons.first(where: { $0.seasonId == position.season })
-                {
-                    first
-                } else if let series = state.details?.series,
-                          let first = seasons.first(where: { $0.seasonId == series.season })
-                {
-                    first
-                } else if let first = seasons.first(where: { $0.isSelected }) {
-                    first
-                } else {
-                    seasons.first
-                }
+                state.selectedSeason = seasons.preferred(
+                    saved: Defaults[.isLoggedIn] ? nil : state.selectPosition?.season,
+                    series: state.details?.series?.season,
+                    id: \.seasonId,
+                    isSelected: \.isSelected
+                )
 
                 return seasonChanged(&state)
 
@@ -218,6 +200,7 @@ struct MovieSelectionFeature {
         }
 
         guard let movieId = details.movieId.id else {
+            state.error = EquatableError(HDrezkaError.unknown)
             state.isErrorPresented = true
 
             return cancel
@@ -238,18 +221,12 @@ struct MovieSelectionFeature {
         state.selectedQuality = nil
         state.movie = nil
 
-        let position = Defaults[.isLoggedIn] ? nil : state.selectPosition
-        let episodes = state.selectedSeason?.episodes
-
-        state.selectedEpisode = if let position, let first = episodes?.first(where: { $0.episodeId == position.episode }) {
-            first
-        } else if let series = state.details?.series, let first = episodes?.first(where: { $0.episodeId == series.episode }) {
-            first
-        } else if let first = episodes?.first(where: { $0.isSelected }) {
-            first
-        } else {
-            episodes?.first
-        }
+        state.selectedEpisode = state.selectedSeason?.episodes.preferred(
+            saved: Defaults[.isLoggedIn] ? nil : state.selectPosition?.episode,
+            series: state.details?.series?.episode,
+            id: \.episodeId,
+            isSelected: \.isSelected
+        )
 
         return episodeChanged(&state)
     }
@@ -276,5 +253,14 @@ struct MovieSelectionFeature {
             await send(.videoLoaded(result), animation: .easeInOut)
         }
         .cancellable(id: CancelID.video, cancelInFlight: true)
+    }
+}
+
+private extension Array {
+    func preferred(saved: String?, series: String?, id: (Element) -> String, isSelected: (Element) -> Bool) -> Element? {
+        first { saved != nil && id($0) == saved }
+            ?? first { series != nil && id($0) == series }
+            ?? first(where: isSelected)
+            ?? first
     }
 }
