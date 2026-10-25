@@ -30,21 +30,17 @@ extension DataResponse {
 
         let networkDuration = metrics.map { "\($0.taskInterval.duration.formatted(.number.grouping(.never).precision(.fractionLength(10))))s" } ?? "None"
 
+        let description = """
+        \(requestDescription)
+        \(responseDescription)
+        [Network Duration]: \(networkDuration)
+        [Serialization Duration]: \(serializationDuration.formatted(.number.grouping(.never).precision(.fractionLength(10))))s
+        """
+
         if case let .failure(error) = result {
-            return """
-            \(requestDescription)
-            \(responseDescription)
-            [Network Duration]: \(networkDuration)
-            [Serialization Duration]: \(serializationDuration.formatted(.number.grouping(.never).precision(.fractionLength(10))))s
-            [Error]: \(error.localizedDescription)
-            """
+            return "\(description)\n[Error]: \(error.localizedDescription)"
         } else {
-            return """
-            \(requestDescription)
-            \(responseDescription)
-            [Network Duration]: \(networkDuration)
-            [Serialization Duration]: \(serializationDuration.formatted(.number.grouping(.never).precision(.fractionLength(10))))s
-            """
+            return description
         }
     }
 }

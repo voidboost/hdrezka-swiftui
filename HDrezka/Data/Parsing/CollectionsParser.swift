@@ -1,10 +1,9 @@
-import Defaults
 import Foundation
 import SwiftSoup
 
 class CollectionsParser {
     static func parseCollections(from: String) throws -> [MoviesCollection] {
-        try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString)
+        try from.parseHTML()
             .checker()
             .getCollections()
             .map { collection in
@@ -15,13 +14,6 @@ class CollectionsParser {
                     count: collection.getCollectionCountOfMovies(),
                 )
             }
-    }
-
-    static func parseMoviesInCollection(from: String) throws -> [MovieSimple] {
-        try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString)
-            .checker()
-            .getMovies()
-            .map { try $0.getMovie() }
     }
 }
 

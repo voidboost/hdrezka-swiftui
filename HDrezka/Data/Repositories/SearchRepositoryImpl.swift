@@ -6,7 +6,7 @@ struct SearchRepositoryImpl: SearchRepository {
     @Dependency(\.session) private var session
 
     func search(query: String, page: Int) async throws -> [MovieSimple] {
-        try await session.string(SearchService.search(query: query, page: page), parse: SearchParser.parseSearch)
+        try await session.string(SearchService.search(query: query, page: page), parse: MovieListsParser.parseMovies)
     }
 
     func categories() async throws -> [MovieType] {

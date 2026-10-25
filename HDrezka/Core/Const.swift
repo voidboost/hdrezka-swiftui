@@ -26,7 +26,7 @@ class Const {
         .init(red: 138.0 / 255.0, green: 0.0, blue: 173.0 / 255.0),
     ], startPoint: .leading, endPoint: .trailing)
 
-    static var userAgent: String {
+    static let userAgent: String = {
         let appName = Bundle.main.infoDictionary?["CFBundleName"] as? String ?? "HDrezka"
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
         let appBundle = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
@@ -39,8 +39,8 @@ class Const {
         sysctlbyname("hw.model", &model, &size, nil, 0)
         let deviceModel = String(utf8String: model) ?? "Unknown"
 
-        return "\(appName)/\(appVersion)(\(appBundle)) (\(deviceModel); \(osName) \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion); \(Self.deviceUUID))"
-    }
+        return "\(appName)/\(appVersion)(\(appBundle)) (\(deviceModel); \(osName) \(osVersion.majorVersion).\(osVersion.minorVersion).\(osVersion.patchVersion); \(Const.deviceUUID))"
+    }()
 
     static var deviceUUID: String {
         let service = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("IOPlatformExpertDevice"))

@@ -147,31 +147,26 @@ func handleError(_ error: Error) -> Error {
 
         return avError
     } else if let afError = error.asAFError {
-        if afError.responseCode != nil || afError.isSessionTaskError {
-            if let code = afError.responseCode, code == 403 {
-                appRouter.present(.signIn)
+        if afError.responseCode == 403 {
+            appRouter.present(.signIn)
 
-                return HDrezkaError.loginRequired(Defaults[.mirror])
-            }
-
-            return afError
+            return HDrezkaError.loginRequired(Defaults[.mirror])
         }
 
-        recordToCrashlytics(afError)
+        if afError.responseCode == nil, !afError.isSessionTaskError {
+            recordToCrashlytics(afError)
+        }
 
         return afError
     } else if let hdrezkaError = error as? HDrezkaError {
-        if case .mirrorBanned = hdrezkaError {
-            return hdrezkaError
-        } else if case .loginRequired = hdrezkaError {
+        switch hdrezkaError {
+        case .loginRequired:
             appRouter.present(.signIn)
-
-            return hdrezkaError
-        } else if case .site = hdrezkaError {
-            return hdrezkaError
+        case .mirrorBanned, .site:
+            break
+        default:
+            recordToCrashlytics(hdrezkaError)
         }
-
-        recordToCrashlytics(hdrezkaError)
 
         return hdrezkaError
     } else if let exception = error as? Exception, case let .Error(type, message) = exception {

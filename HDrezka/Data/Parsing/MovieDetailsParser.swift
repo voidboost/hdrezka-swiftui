@@ -7,7 +7,7 @@ import SwiftUI
 
 class MovieDetailsParser {
     static func parseMovieDetails(from: String, movieId: String) throws -> MovieDetailed {
-        let site = try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).checker()
+        let site = try from.parseHTML().checker()
         let content = try site.getDetailsContent()
 
         let nameRussian = try content.getDetailsRussianName()
@@ -60,21 +60,9 @@ class MovieDetailsParser {
 
             switch chunkName {
             case "Рейтинги":
-                imdbRating = try MovieRating(
-                    value: chunk.getDetailsImdbRating(),
-                    votesCount: chunk.getDetailsImdbVotes(),
-                    link: chunk.getDetailsImdbLink(),
-                )
-                kpRating = try MovieRating(
-                    value: chunk.getDetailsKpRating(),
-                    votesCount: chunk.getDetailsKpVotes(),
-                    link: chunk.getDetailsKpLink(),
-                )
-                waRating = try MovieRating(
-                    value: chunk.getDetailsWaRating(),
-                    votesCount: chunk.getDetailsWaVotes(),
-                    link: chunk.getDetailsWaLink(),
-                )
+                imdbRating = try chunk.getDetailsRating(of: "imdb")
+                kpRating = try chunk.getDetailsRating(of: "kp")
+                waRating = try chunk.getDetailsRating(of: "wa")
             case "Дата выхода":
                 releaseDate = try chunk.last().orThrow().text()
             case "Год":
@@ -142,11 +130,15 @@ class MovieDetailsParser {
     }
 
     static func parseBookmarks(from: String) throws -> [Bookmark] {
-        try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).checker().getBookmarks()
+        try from.parseHTML().checker().getBookmarks()
     }
 
-    static func parseTrailerId(from: String) throws -> String {
-        try from.getTrailerId()
+    static func parseTrailerId(code: String) throws -> String {
+        try code.parseHTML()
+            .select("iframe").first().orThrow()
+            .attr("src")
+            .substringAfter("https://www.youtube.com/embed/")
+            .substringBefore("?")
     }
 
     static func parseMovieVideo(from: String) throws -> MovieVideo {
@@ -154,19 +146,19 @@ class MovieDetailsParser {
     }
 
     static func parseSeriesSeasons(from: String) throws -> [MovieSeason] {
-        guard let json = try? JSONSerialization.jsonObject(with: from.data(using: .utf8).orThrow(), options: .allowFragments) as? [String: Any] else {
-            guard let seasons = try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).getSeasons() else {
+        guard let json = from.jsonObject else {
+            guard let seasons = try from.parseHTML().getSeasons() else {
                 throw HDrezkaError.parseJson("json", "parseSeriesSeasons")
             }
 
             return seasons
         }
 
-        guard let seasonsString = json["seasons"] as? String, let seasons = try SwiftSoup.parseHTML(seasonsString, Defaults[.mirror].absoluteString).body() else {
+        guard let seasonsString = json["seasons"] as? String, let seasons = try seasonsString.parseHTML().body() else {
             throw HDrezkaError.parseJson("seasons", "parseSeriesSeasons")
         }
 
-        guard let episodeString = json["episodes"] as? String, let episodes = try SwiftSoup.parseHTML(episodeString, Defaults[.mirror].absoluteString).body() else {
+        guard let episodeString = json["episodes"] as? String, let episodes = try episodeString.parseHTML().body() else {
             throw HDrezkaError.parseJson("episodes", "parseSeriesSeasons")
         }
 
@@ -187,20 +179,16 @@ class MovieDetailsParser {
             }
     }
 
-    static func parseComments(from: String) throws -> [Comment] {
-        guard let json = try? JSONSerialization.jsonObject(with: from.data(using: .utf8).orThrow(), options: .allowFragments) as? [String: Any] else {
-            throw HDrezkaError.parseJson("json", "parseComments")
-        }
-
-        guard let html = json["comments"] as? String else {
+    static func parseComments(html: String?) throws -> [Comment] {
+        guard let html else {
             return []
         }
 
-        return try SwiftSoup.parseHTML(html, Defaults[.mirror].absoluteString).getComments()
+        return try html.parseHTML().getComments()
     }
 
     static func parseLikes(from: String) throws -> [Like] {
-        try SwiftSoup.parseHTML(from, Defaults[.mirror].absoluteString).getLikes()
+        try from.parseHTML().getLikes()
     }
 }
 
@@ -209,71 +197,25 @@ private extension Elements {
         try select(".l").first()?.text().trimmingCharacters(in: .letters.inverted)
     }
 
-    func getDetailsImdbLink() throws -> String? {
-        guard let base64 = try last()?.select(".b-post__info_rates.imdb a").first()?.attr("href").substringBeforeLast("/").substringAfterLast("/") else {
+    func getDetailsRating(of source: String) throws -> MovieRating? {
+        guard let rates = try last()?.select(".b-post__info_rates.\(source)").first() else {
             return nil
         }
 
-        return base64.base64Decoded.removingPercentEncoding
-    }
+        let link = try rates.select("a").first()?.attr("href").substringBeforeLast("/").substringAfterLast("/").base64Decoded.removingPercentEncoding
 
-    func getDetailsImdbRating() throws -> Float? {
-        try Float(last()?.select(".b-post__info_rates.imdb .bold").first()?.text() ?? "")
-    }
-
-    func getDetailsImdbVotes() throws -> String? {
-        try last()?.select(".b-post__info_rates.imdb i").first()?.text().shortNumber
-    }
-
-    func getDetailsKpLink() throws -> String? {
-        guard let base64 = try last()?.select(".b-post__info_rates.kp a").first()?.attr("href").substringBeforeLast("/").substringAfterLast("/") else {
-            return nil
-        }
-
-        return base64.base64Decoded.removingPercentEncoding
-    }
-
-    func getDetailsKpRating() throws -> Float? {
-        try Float(last()?.select(".b-post__info_rates.kp .bold").first()?.text() ?? "")
-    }
-
-    func getDetailsKpVotes() throws -> String? {
-        try last()?.select(".b-post__info_rates.kp i").first()?.text().shortNumber
-    }
-
-    func getDetailsWaLink() throws -> String? {
-        guard let base64 = try last()?.select(".b-post__info_rates.wa a").first()?.attr("href").substringBeforeLast("/").substringAfterLast("/") else {
-            return nil
-        }
-
-        return base64.base64Decoded.removingPercentEncoding
-    }
-
-    func getDetailsWaRating() throws -> Float? {
-        try Float(last()?.select(".b-post__info_rates.wa .bold").first()?.text() ?? "")
-    }
-
-    func getDetailsWaVotes() throws -> String? {
-        try last()?.select(".b-post__info_rates.wa i").first()?.text().shortNumber
+        return try MovieRating(
+            value: Float(rates.select(".bold").first()?.text() ?? ""),
+            votesCount: rates.select("i").first()?.text().shortNumber,
+            link: link,
+        )
     }
 
     func getDetailsProducers() throws -> [PersonSimple] {
         try last().orThrow()
             .select(".persons-list-holder").first().orThrow()
             .select(".item")
-            .compactMap {
-                guard try !$0.select("a").isEmpty() else { return nil }
-
-                let link = try $0.select("a").attr("href").cleanPath.orThrow()
-                let name = try $0.select("a").text()
-                let photo = try $0.select(".person-name-item").attr("data-photo")
-
-                return PersonSimple(
-                    personId: link,
-                    name: name,
-                    photo: photo == "null" ? "" : photo,
-                )
-            }
+            .getPersons()
     }
 
     func getDetailsAgeRestriction() throws -> String {
@@ -285,19 +227,23 @@ private extension Elements {
             .select("div")
             .first()?
             .select(".item")
-            .compactMap {
-                guard try !$0.select("a").isEmpty() else { return nil }
+            .getPersons()
+    }
 
-                let link = try $0.select("a").attr("href").cleanPath.orThrow()
-                let name = try $0.select("a").text()
-                let photo = try $0.select(".person-name-item").attr("data-photo")
+    func getPersons() throws -> [PersonSimple] {
+        try compactMap {
+            let link = try $0.select("a")
 
-                return PersonSimple(
-                    personId: link,
-                    name: name,
-                    photo: photo == "null" ? "" : photo,
-                )
-            }
+            guard !link.isEmpty() else { return nil }
+
+            let photo = try $0.select(".person-name-item").attr("data-photo")
+
+            return try PersonSimple(
+                personId: link.attr("href").cleanPath.orThrow(),
+                name: link.text(),
+                photo: photo == "null" ? "" : photo,
+            )
+        }
     }
 }
 
@@ -374,21 +320,35 @@ private extension Element {
     }
 
     func getComments(depth: Int = 0) throws -> [Comment] {
-        try select(".comments-tree-item[data-indent=\"\(depth)\"]").map {
-            try Comment(
-                commentId: $0.attr("data-id"),
-                date: $0.select(".date").first().orThrow().text().replacingOccurrences(of: "оставлен ", with: ""),
-                author: $0.select(".name").first().orThrow().text(),
-                photo: $0.select("img").first().orThrow().attr("src"),
-                text: $0.select(".text").first().orThrow().getComment(),
-                replies: $0.getComments(depth: depth + 1),
-                likesCount: Int($0.select(".b-comment__like_it").first()?.attr("data-likes_num") ?? "0").orThrow(),
-                isLiked: $0.select(".b-comment__like_it").first()?.hasClass("disabled") == true,
-                selfComment: $0.select(".b-comment__like_it").first()?.hasClass("self-disabled") == true,
-                isAdmin: $0.select(".b-comment").first()?.hasClass("b-comment__admin") == true,
-                deleteHash: $0.select(".actions").first()?.select(".edit li a").first(where: { try $0.text().contains("Удалить") })?.attr("onclick").substringAfterLast("(").substringBefore(")").components(separatedBy: ",").filter { !$0.isEmpty }.first(where: { $0.contains("'") })?.trimmingCharacters(in: .alphanumerics.inverted),
+        try select(".comments-tree-item[data-indent=\"\(depth)\"]").map { item in
+            let like = try item.select(".b-comment__like_it").first()
+
+            return try Comment(
+                commentId: item.attr("data-id"),
+                date: item.select(".date").first().orThrow().text().replacingOccurrences(of: "оставлен ", with: ""),
+                author: item.select(".name").first().orThrow().text(),
+                photo: item.select("img").first().orThrow().attr("src"),
+                text: item.select(".text").first().orThrow().getComment(),
+                replies: item.getComments(depth: depth + 1),
+                likesCount: Int(like?.attr("data-likes_num") ?? "0").orThrow(),
+                isLiked: like?.hasClass("disabled") == true,
+                selfComment: like?.hasClass("self-disabled") == true,
+                isAdmin: item.select(".b-comment").first()?.hasClass("b-comment__admin") == true,
+                deleteHash: item.getCommentDeleteHash(),
             )
         }
+    }
+
+    func getCommentDeleteHash() throws -> String? {
+        try select(".actions").first()?
+            .select(".edit li a")
+            .first { try $0.text().contains("Удалить") }?
+            .attr("onclick")
+            .substringAfterLast("(")
+            .substringBefore(")")
+            .components(separatedBy: ",")
+            .first { $0.contains("'") }?
+            .trimmingCharacters(in: .alphanumerics.inverted)
     }
 
     func getDetailsRussianName() throws -> String {
@@ -456,7 +416,7 @@ private extension Element {
             .components(separatedBy: "<br />")
             .filter { !$0.isEmpty }
             .map {
-                let listItem = try SwiftSoup.parseHTML($0, Defaults[.mirror].absoluteString).body().orThrow()
+                let listItem = try $0.parseHTML().body().orThrow()
 
                 return try MovieList(
                     name: listItem.select("a").first().orThrow().text(),
@@ -511,7 +471,7 @@ private extension SwiftSoup.Document {
     }
 
     func getDetailsWatchAlsoMovies() throws -> [MovieSimple] {
-        try select(".b-sidelist__holder .b-content__inline_item").map { try $0.getMovie() }
+        try select(".b-sidelist__holder .b-content__inline_item").getMovies()
     }
 
     func getBookmarks() throws -> [Bookmark] {
@@ -530,7 +490,7 @@ private extension SwiftSoup.Document {
             return nil
         }
 
-        let items = try SwiftSoup.parseHTML(Parser.unescapeEntities(popup.attr("title"), false), Defaults[.mirror].absoluteString).body().orThrow().select(".inner")
+        let items = try Parser.unescapeEntities(popup.attr("title"), false).parseHTML().body().orThrow().select(".inner")
 
         return try items.map {
             try MovieVoiceActingRating(
@@ -655,26 +615,25 @@ private extension SwiftSoup.Document {
     }
 
     func getDetailsSchedule() throws -> [SeriesScheduleGroup]? {
-        if try select(".b-post__schedule_block").isEmpty() {
+        let blocks = try select(".b-post__schedule_block")
+
+        guard !blocks.isEmpty() else {
             return nil
         }
 
-        return try select(".b-post__schedule_block").map { block in
+        return try blocks.map { block in
             let blockTitle = try block.select(".b-post__schedule_block_title .title").text()
 
             let items = try block
                 .select("tr")
                 .map { item in
-                    let title = try item.select(".td-1").text()
-                    let russianEpisodeName = try item.select(".td-2 b").text()
-                    let originalEpisodeName = try item.select(".td-2 span").text().isEmpty ? nil : try item.select(".td-2 span").text()
-                    let releaseDate = try item.select(".td-4").text()
+                    let originalEpisodeName = try item.select(".td-2 span").text()
 
-                    return SeriesScheduleItem(
-                        title: title,
-                        russianEpisodeName: russianEpisodeName,
-                        originalEpisodeName: originalEpisodeName,
-                        releaseDate: releaseDate,
+                    return try SeriesScheduleItem(
+                        title: item.select(".td-1").text(),
+                        russianEpisodeName: item.select(".td-2 b").text(),
+                        originalEpisodeName: originalEpisodeName.isEmpty ? nil : originalEpisodeName,
+                        releaseDate: item.select(".td-4").text(),
                     )
                 }
                 .filter { !$0.title.isEmpty }
@@ -684,11 +643,13 @@ private extension SwiftSoup.Document {
     }
 
     func getDetailsFranchise() throws -> [MovieFranchisePart]? {
-        if try select(".b-post__partcontent_item").isEmpty() {
+        let parts = try select(".b-post__partcontent_item")
+
+        guard !parts.isEmpty() else {
             return nil
         }
 
-        return try select(".b-post__partcontent_item")
+        return try parts
             .map { item in
                 let name = try item.select(".td.title").text()
                 let id = try item.attr("data-url").cleanPath
@@ -711,27 +672,8 @@ private extension SwiftSoup.Document {
 }
 
 private extension String {
-    func getTrailerId() throws -> String {
-        guard let jsonObject = try? JSONSerialization.jsonObject(with: data(using: .utf8).orThrow(), options: .allowFragments) as? [String: Any] else {
-            throw HDrezkaError.parseJson("json", "getTrailerLink")
-        }
-
-        guard let code = jsonObject["code"] as? String else {
-            throw HDrezkaError.parseJson("code", "getTrailerLink")
-        }
-
-        return try SwiftSoup.parseHTML(code, Defaults[.mirror].absoluteString)
-            .select("iframe").first().orThrow()
-            .attr("src")
-            .substringAfter("https://www.youtube.com/embed/")
-            .substringBefore("?")
-    }
-
     func getMovieVideo() throws -> MovieVideo {
-        guard let jsonObject =
-            (try? JSONSerialization.jsonObject(with: data(using: .utf8).orThrow(), options: .allowFragments) as? [String: Any]) ??
-            (try? JSONSerialization.jsonObject(with: substringAfter("{\"id\":", includeSeparator: true).substringBefore("); });").data(using: .utf8).orThrow(), options: .allowFragments) as? [String: Any])
-        else {
+        guard let jsonObject = self.jsonObject ?? substringAfter("{\"id\":", includeSeparator: true).substringBefore("); });").jsonObject else {
             throw HDrezkaError.parseJson("json", "getMovieVideo")
         }
 
@@ -746,7 +688,7 @@ private extension String {
         let streams = decrypt(encrypted: url)
 
         let videos = try streams.components(separatedBy: ",").filter { !$0.isEmpty }.map { stream in
-            let nameElement = try SwiftSoup.parseHTML(stream.substringAfter("[").substringBefore("]"), Defaults[.mirror].absoluteString)
+            let nameElement = try stream.substringAfter("[").substringBefore("]").parseHTML()
             let name = try nameElement.text()
             let videos = stream.substringAfter("]").components(separatedBy: " or ").filter { !$0.isEmpty }
             let links = videos.map { $0.substringBeforeLast(".mp4", includeSeparator: true) }.uniqued().filter { $0 != "null" }.compactMap { URL(string: $0) }

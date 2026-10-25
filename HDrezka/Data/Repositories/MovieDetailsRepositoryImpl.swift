@@ -52,16 +52,20 @@ struct MovieDetailsRepositoryImpl: MovieDetailsRepository {
     }
 
     func getMovieTrailerId(movieId: String) async throws -> String {
-        try await session.string(MovieDetailsService.getMovieTrailer(id: movieId), parse: MovieDetailsParser.parseTrailerId)
+        try await session.json(MovieDetailsService.getMovieTrailer(id: movieId), function: "getMovieTrailerId") { json in
+            try MovieDetailsParser.parseTrailerId(code: json.require("code"))
+        }
     }
 
     func getCommentsPage(movieId: String, page: Int) async throws -> [Comment] {
-        try await session.string(MovieDetailsService.getComments(movieId: movieId, page: page, type: nil, commentId: nil, skin: nil), parse: MovieDetailsParser.parseComments)
+        try await session.json(MovieDetailsService.getComments(movieId: movieId, page: page, type: nil, commentId: nil, skin: nil), function: "getCommentsPage") { json in
+            try MovieDetailsParser.parseComments(html: json["comments"])
+        }
     }
 
     func getComment(movieId: String, commentId: String) async throws -> Comment {
-        try await session.string(MovieDetailsService.getComments(movieId: movieId, page: nil, type: nil, commentId: commentId, skin: nil)) { res in
-            try MovieDetailsParser.parseComments(from: res).lazy.compactMap { $0.findComment(commentId) }.first.orThrow()
+        try await session.json(MovieDetailsService.getComments(movieId: movieId, page: nil, type: nil, commentId: commentId, skin: nil), function: "getComment") { json in
+            try MovieDetailsParser.parseComments(html: json["comments"]).lazy.compactMap { $0.findComment(commentId) }.first.orThrow()
         }
     }
 

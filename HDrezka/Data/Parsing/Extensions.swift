@@ -1,42 +1,63 @@
+import Defaults
 import Foundation
 import SwiftSoup
 
+extension String {
+    func parseHTML() throws -> Document {
+        try SwiftSoup.parseHTML(self, Defaults[.mirror].absoluteString)
+    }
+
+    var jsonObject: [String: Any]? {
+        guard let data = data(using: .utf8) else { return nil }
+
+        return try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed) as? [String: Any]
+    }
+}
+
 extension Document {
-    func getMovies() throws -> Elements {
-        try select(".b-content__inline_item")
+    func getMovies() throws -> [MovieSimple] {
+        try select(".b-content__inline_item").getMovies()
+    }
+}
+
+extension Elements {
+    func getMovies() throws -> [MovieSimple] {
+        try map { try $0.getMovie() }
     }
 }
 
 extension Element {
     func getMovie() throws -> MovieSimple {
-        try MovieSimple(
+        let cover = try select(".b-content__inline_item-cover a").first().orThrow()
+
+        return try MovieSimple(
             movieId: getId(),
             name: getName(),
             details: getDetails(),
-            poster: getPoster(),
-            cat: getCat(),
-            info: getInfo(),
+            poster: cover.getPoster(),
+            cat: cover.getCat(),
+            info: cover.getInfo(),
         )
     }
 
-    func getId() throws -> String {
+    private func getId() throws -> String {
         try attr("data-url").cleanPath.orThrow()
     }
 
-    func getName() throws -> String {
+    private func getName() throws -> String {
         try select(".b-content__inline_item-link a").first().orThrow().text()
     }
 
-    func getDetails() throws -> String {
+    private func getDetails() throws -> String {
         try select(".b-content__inline_item-link div").first().orThrow().text()
     }
 
-    func getPoster() throws -> String {
-        try select(".b-content__inline_item-cover a img").first().orThrow().attr("src")
+    private func getPoster() throws -> String {
+        try select("img").first().orThrow().attr("src")
     }
 
-    func getCat() throws -> MovieSimple.Cat? {
-        let span = try select(".b-content__inline_item-cover a .cat").first().orThrow()
+    private func getCat() throws -> MovieSimple.Cat? {
+        let span = try select(".cat").first().orThrow()
 
         let rating = try Float(span.select(".b-category-bestrating").first()?.text().trimmingCharacters(in: .decimalDigits.inverted) ?? "")
 
@@ -56,24 +77,21 @@ extension Element {
         }
     }
 
-    func getInfo() throws -> MovieSimple.Info? {
-        let info = try select(".b-content__inline_item-cover a").first().orThrow().select(".info").first()?.html() ?? ""
+    private func getInfo() throws -> MovieSimple.Info? {
+        let info = try select(".info").first()?.html() ?? ""
 
         if info.contains("Завершен") {
             return .completed
         } else if info.contains("В ожидании") {
             return .wait
         } else if info.contains("сезон"), info.contains("серия") {
-            let parts = info.contains(",") ? info.components(separatedBy: ", ").filter { !$0.isEmpty } : info.components(separatedBy: "<br />").filter { !$0.isEmpty }
+            let parts = info.components(separatedBy: info.contains(",") ? ", " : "<br />").filter { !$0.isEmpty }
 
-            if parts.count == 2 {
-                let season = Int(parts[0].trimmingCharacters(in: .decimalDigits.inverted))
-
-                let episode = Int(parts[1].trimmingCharacters(in: .decimalDigits.inverted))
-
-                if let season, let episode {
-                    return .series(season, episode)
-                }
+            if parts.count == 2,
+               let season = Int(parts[0].trimmingCharacters(in: .decimalDigits.inverted)),
+               let episode = Int(parts[1].trimmingCharacters(in: .decimalDigits.inverted))
+            {
+                return .series(season, episode)
             }
         }
 
