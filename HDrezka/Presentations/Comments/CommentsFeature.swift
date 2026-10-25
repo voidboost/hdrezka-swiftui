@@ -11,7 +11,7 @@ struct CommentsFeature {
         let title: String
 
         var comments: DataState<[Comment]> = .idle
-        var paginationState: DataPaginationState = .idle
+        var pagination = Pagination()
 
         var reply: String?
         var comment: Comment?
@@ -22,8 +22,6 @@ struct CommentsFeature {
         @Presents var moderationAlert: AlertState<Action.Alert>?
         @Presents var reportComment: CommentReportFeature.State?
         @Presents var deleteDialog: ConfirmationDialogState<Action.DeleteDialog>?
-
-        fileprivate var page = 1
 
         init(details: MovieDetailed) {
             id = details.movieId
@@ -98,9 +96,8 @@ struct CommentsFeature {
                 return .send(.reload)
 
             case .reload:
-                state.paginationState = .idle
+                state.pagination.reset()
                 state.comments = .loading
-                state.page = 1
 
                 guard let movieId = state.id.id else {
                     state.comments = .error(HDrezkaError.unknown)
@@ -108,27 +105,24 @@ struct CommentsFeature {
                     return .cancel(id: CancelID.load)
                 }
 
-                return load(movieId: movieId, page: state.page, isInitial: true)
+                return load(movieId: movieId, page: state.pagination.page, isInitial: true)
 
             case .loadMore:
-                guard state.paginationState == .idle else { return .none }
+                guard state.pagination.state == .idle else { return .none }
 
                 guard let movieId = state.id.id else {
-                    state.paginationState = .error(HDrezkaError.unknown)
+                    state.pagination.state = .error(HDrezkaError.unknown)
 
                     return .none
                 }
 
-                state.paginationState = .loading
+                state.pagination.state = .loading
 
-                return load(movieId: movieId, page: state.page, isInitial: false)
+                return load(movieId: movieId, page: state.pagination.page, isInitial: false)
 
             case let .commentsLoaded(isInitial, result):
-                if case .success = result {
-                    state.page += 1
-                }
-
-                state.paginationState = state.comments.receivePage(result, isInitial: isInitial, emptyPageIsError: true)
+                let paginationState = state.comments.receivePage(result, isInitial: isInitial, emptyPageIsError: true)
+                state.pagination.update(paginationState, after: result)
 
                 return .none
 

@@ -6,13 +6,12 @@ struct SearchFeature {
     @ObservableState
     struct State: Equatable {
         var movies: DataState<[MovieSimple]> = .data([])
-        var paginationState: DataPaginationState = .idle
+        var pagination = Pagination()
 
         var title = String(localized: "key.search")
 
         var query = ""
 
-        fileprivate var page = 1
         fileprivate var loadedQuery = ""
     }
 
@@ -58,8 +57,7 @@ struct SearchFeature {
                 guard force || query != state.loadedQuery || state.movies.error != nil else { return .none }
 
                 state.loadedQuery = query
-                state.paginationState = .idle
-                state.page = 1
+                state.pagination.reset()
 
                 guard !query.isEmpty else {
                     state.title = String(localized: "key.search")
@@ -71,21 +69,16 @@ struct SearchFeature {
                 state.movies = .loading
                 state.title = String(localized: "key.search.result-\(query)")
 
-                return load(query: query, page: state.page, isInitial: true)
+                return load(query: query, page: state.pagination.page, isInitial: true)
 
             case .loadMore:
-                guard state.paginationState == .idle, !state.loadedQuery.isEmpty else { return .none }
+                guard !state.loadedQuery.isEmpty, state.pagination.startLoadingMore() else { return .none }
 
-                state.paginationState = .loading
-
-                return load(query: state.loadedQuery, page: state.page, isInitial: false)
+                return load(query: state.loadedQuery, page: state.pagination.page, isInitial: false)
 
             case let .moviesLoaded(isInitial, result):
-                if case .success = result {
-                    state.page += 1
-                }
-
-                state.paginationState = state.movies.receivePage(result, isInitial: isInitial, emptyPageIsError: true)
+                let paginationState = state.movies.receivePage(result, isInitial: isInitial, emptyPageIsError: true)
+                state.pagination.update(paginationState, after: result)
 
                 return .none
             }

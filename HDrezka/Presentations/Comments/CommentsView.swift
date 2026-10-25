@@ -26,13 +26,13 @@ struct CommentsView: View {
             .padding(.vertical, 18)
             .padding(.horizontal, 36)
 
-            if store.paginationState == .loading {
+            if store.pagination.state == .loading {
                 LoadingPaginationStateView()
             }
         }
         .scrollIndicators(.visible, axes: .vertical)
         .onScrollTargetVisibilityChange(idType: Comment.ID.self) { onScreenComments in
-            if store.paginationState == .idle,
+            if store.pagination.state == .idle,
                let comments = store.comments.data,
                !comments.isEmpty,
                let last = comments.last,

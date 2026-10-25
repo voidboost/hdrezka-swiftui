@@ -17,15 +17,13 @@ struct ListFeature {
         let source: Source
 
         var movies: DataState<[MovieSimple]> = .idle
-        var paginationState: DataPaginationState = .idle
+        var pagination = Pagination()
 
         var title: String
 
         var filterGenre = Genres.all
         var filter = Filters.latest
         var newFilter = NewFilters.latest
-
-        fileprivate var page = 1
 
         init(source: Source) {
             self.source = source
@@ -108,28 +106,22 @@ struct ListFeature {
 
             case .reload:
                 state.movies = .loading
-                state.paginationState = .idle
-                state.page = 1
+                state.pagination.reset()
 
                 return load(state, isInitial: true)
 
             case .loadMore:
-                guard state.paginationState == .idle, !state.isCustomMovies, !state.isCategory(.hot) else { return .none }
-
-                state.paginationState = .loading
+                guard !state.isCustomMovies, !state.isCategory(.hot), state.pagination.startLoadingMore() else { return .none }
 
                 return load(state, isInitial: false)
 
             case let .moviesLoaded(isInitial, result):
-                if case let .success((title, _)) = result {
-                    state.page += 1
-
-                    if isInitial, let title, !title.isEmpty {
-                        state.title = title
-                    }
+                if isInitial, case let .success((title, _)) = result, let title, !title.isEmpty {
+                    state.title = title
                 }
 
-                state.paginationState = state.movies.receivePage(result.map(\.1), isInitial: isInitial)
+                let paginationState = state.movies.receivePage(result.map(\.1), isInitial: isInitial)
+                state.pagination.update(paginationState, after: result)
 
                 return .none
             }
@@ -137,7 +129,7 @@ struct ListFeature {
     }
 
     private func load(_ state: State, isInitial: Bool) -> Effect<Action> {
-        .run { [source = state.source, page = state.page, filterGenre = state.filterGenre, filter = state.filter, newFilter = state.newFilter] send in
+        .run { [source = state.source, page = state.pagination.page, filterGenre = state.filterGenre, filter = state.filter, newFilter = state.newFilter] send in
             let result = await Result {
                 try await movies(source: source, page: page, filterGenre: filterGenre, filter: filter, newFilter: newFilter)
             }

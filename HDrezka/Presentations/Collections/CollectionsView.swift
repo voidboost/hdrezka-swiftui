@@ -25,13 +25,13 @@ struct CollectionsView: View {
             .padding(.vertical, 18)
             .padding(.horizontal, 36)
 
-            if store.paginationState == .loading {
+            if store.pagination.state == .loading {
                 LoadingPaginationStateView()
             }
         }
         .scrollIndicators(.visible, axes: .vertical)
         .onScrollTargetVisibilityChange(idType: MoviesCollection.ID.self) { onScreenCards in
-            if store.paginationState == .idle,
+            if store.pagination.state == .idle,
                let collections = store.collections.data,
                collections.suffix(8).contains(where: { onScreenCards.contains($0.id) })
             {
