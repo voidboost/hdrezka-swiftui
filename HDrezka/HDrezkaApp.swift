@@ -39,6 +39,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             FirebaseConfiguration.shared.setLoggerLevel(.min)
             Analytics.setAnalyticsCollectionEnabled(false)
         #endif
+
+        LaunchErrors.flush()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
@@ -343,7 +345,7 @@ struct HDrezkaApp: App {
 
             return database
         } catch {
-            Crashlytics.crashlytics().record(error: error)
+            LaunchErrors.record(error)
         }
 
         do {

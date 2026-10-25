@@ -183,3 +183,21 @@ func handleError(_ error: Error) -> Error {
 private func recordToCrashlytics(_ error: Error) {
     Crashlytics.crashlytics().record(error: error)
 }
+
+@MainActor
+enum LaunchErrors {
+    private static var pending: [any Error]? = []
+
+    static func record(_ error: any Error) {
+        if pending != nil {
+            pending?.append(error)
+        } else {
+            Crashlytics.crashlytics().record(error: error)
+        }
+    }
+
+    static func flush() {
+        pending?.forEach { Crashlytics.crashlytics().record(error: $0) }
+        pending = nil
+    }
+}

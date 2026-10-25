@@ -1,6 +1,5 @@
 import Defaults
 import Dependencies
-import FirebaseCrashlytics
 import SQLiteData
 import SwiftUI
 import UserNotifications
@@ -85,7 +84,7 @@ class Downloader {
         }
 
         guard aria2URL != nil else {
-            Crashlytics.crashlytics().record(error: HDrezkaError.null("aria2c", #line, #column))
+            LaunchErrors.record(HDrezkaError.null("aria2c", #line, #column))
 
             return
         }
@@ -97,7 +96,7 @@ class Downloader {
                 self.isRunning = true
             }
         } catch {
-            Crashlytics.crashlytics().record(error: error)
+            LaunchErrors.record(error)
 
             return
         }
