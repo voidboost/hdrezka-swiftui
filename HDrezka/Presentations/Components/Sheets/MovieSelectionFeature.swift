@@ -179,7 +179,7 @@ struct MovieSelectionFeature {
             case .rememberSelection:
                 guard let selectedActing = state.selectedActing else { return .none }
 
-                return .run { [selectedSeason = state.selectedSeason, selectedEpisode = state.selectedEpisode] _ in
+                return .run { [selectedSeason = state.selectedSeason, selectedEpisode = state.selectedEpisode, subtitles = state.selectedSubtitles?.lang.replacingOccurrences(of: "ua", with: "uk")] _ in
                     if Defaults[.isLoggedIn] {
                         try? await saveWatchingStateUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode)
                     }
@@ -191,7 +191,8 @@ struct MovieSelectionFeature {
                                     id: selectedActing.voiceId,
                                     acting: selectedActing.translatorId,
                                     season: selectedSeason?.seasonId,
-                                    episode: selectedEpisode?.episodeId
+                                    episode: selectedEpisode?.episodeId,
+                                    subtitles: subtitles
                                 )
                             }
                             .execute(db)
