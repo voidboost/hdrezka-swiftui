@@ -31,15 +31,8 @@ struct CommentsView: View {
             }
         }
         .scrollIndicators(.visible, axes: .vertical)
-        .onScrollTargetVisibilityChange(idType: Comment.ID.self) { onScreenComments in
-            if store.pagination.state == .idle,
-               let comments = store.comments.data,
-               !comments.isEmpty,
-               let last = comments.last,
-               onScreenComments.contains(where: { $0 == last.id })
-            {
-                store.send(.loadMore)
-            }
+        .onScrollNearEnd(of: store.comments.data, isEnabled: store.pagination.state == .idle) {
+            store.send(.loadMore)
         }
         .viewModifier { view in
             if #available(macOS 26, *) {

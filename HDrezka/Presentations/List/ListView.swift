@@ -4,34 +4,9 @@ import SwiftUI
 struct ListView: View {
     @Bindable var store: StoreOf<ListFeature>
 
-    private let columns = [GridItem(.adaptive(minimum: 150, maximum: .infinity), spacing: 18, alignment: .topLeading)]
-
     var body: some View {
-        ScrollView(.vertical) {
-            LazyVGrid(columns: columns, alignment: .leading, spacing: 18) {
-                if let movies = store.movies.data, !movies.isEmpty {
-                    ForEach(movies) { movie in
-                        CardView(movie: movie)
-                            .equatable()
-                    }
-                }
-            }
-            .scrollTargetLayout()
-            .padding(.vertical, 18)
-            .padding(.horizontal, 36)
-
-            if store.pagination.state == .loading {
-                LoadingPaginationStateView()
-            }
-        }
-        .scrollIndicators(.visible, axes: .vertical)
-        .onScrollTargetVisibilityChange(idType: MovieSimple.ID.self) { onScreenCards in
-            if store.pagination.state == .idle,
-               let movies = store.movies.data,
-               movies.suffix(12).contains(where: { onScreenCards.contains($0.id) })
-            {
-                store.send(.loadMore)
-            }
+        MoviesGridView(store.movies.data, pagination: store.pagination.state) {
+            store.send(.loadMore)
         }
         .viewModifier { view in
             if #available(macOS 26, *) {
@@ -40,24 +15,8 @@ struct ListView: View {
                 view
             }
         }
-        .overlay {
-            if let error = store.movies.error {
-                ErrorStateView(error) {
-                    store.send(.reload)
-                }
-                .padding(.vertical, 18)
-                .padding(.horizontal, 36)
-            } else if let movies = store.movies.data, movies.isEmpty {
-                EmptyStateView(String(localized: "key.nothing_found"), String(localized: "key.filter.empty")) {
-                    store.send(.reload)
-                }
-                .padding(.vertical, 18)
-                .padding(.horizontal, 36)
-            } else if store.movies.isLoading {
-                LoadingStateView()
-                    .padding(.vertical, 18)
-                    .padding(.horizontal, 36)
-            }
+        .dataStateOverlay(store.movies, empty: String(localized: "key.nothing_found"), String(localized: "key.filter.empty")) {
+            store.send(.reload)
         }
         .transition(.opacity)
         .navigationTitle(store.title)

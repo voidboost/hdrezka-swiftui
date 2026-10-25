@@ -32,15 +32,8 @@ struct HomeView: View {
             }
         }
         .scrollIndicators(.visible, axes: .vertical)
-        .onScrollTargetVisibilityChange(idType: Category.ID.self) { onScreenCategories in
-            if store.paginationState == .idle,
-               let categories = store.categories.data,
-               !categories.isEmpty,
-               let last = categories.last,
-               onScreenCategories.contains(where: { $0 == last.id })
-            {
-                store.send(.loadMore())
-            }
+        .onScrollNearEnd(of: store.categories.data, isEnabled: store.paginationState == .idle) {
+            store.send(.loadMore())
         }
         .viewModifier { view in
             if #available(macOS 26, *) {
@@ -49,24 +42,8 @@ struct HomeView: View {
                 view
             }
         }
-        .overlay {
-            if let error = store.categories.error {
-                ErrorStateView(error) {
-                    store.send(.reload)
-                }
-                .padding(.vertical, 18)
-                .padding(.horizontal, 36)
-            } else if let categories = store.categories.data, categories.isEmpty {
-                EmptyStateView(String(localized: "key.home.empty")) {
-                    store.send(.reload)
-                }
-                .padding(.vertical, 18)
-                .padding(.horizontal, 36)
-            } else if store.categories.isLoading {
-                LoadingStateView()
-                    .padding(.vertical, 18)
-                    .padding(.horizontal, 36)
-            }
+        .dataStateOverlay(store.categories, empty: String(localized: "key.home.empty")) {
+            store.send(.reload)
         }
         .transition(.opacity)
         .navigationTitle(title)

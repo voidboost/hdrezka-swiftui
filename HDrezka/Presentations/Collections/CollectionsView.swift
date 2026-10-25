@@ -30,13 +30,8 @@ struct CollectionsView: View {
             }
         }
         .scrollIndicators(.visible, axes: .vertical)
-        .onScrollTargetVisibilityChange(idType: MoviesCollection.ID.self) { onScreenCards in
-            if store.pagination.state == .idle,
-               let collections = store.collections.data,
-               collections.suffix(8).contains(where: { onScreenCards.contains($0.id) })
-            {
-                store.send(.loadMore)
-            }
+        .onScrollNearEnd(of: store.collections.data, threshold: 8, isEnabled: store.pagination.state == .idle) {
+            store.send(.loadMore)
         }
         .viewModifier { view in
             if #available(macOS 26, *) {
@@ -45,24 +40,8 @@ struct CollectionsView: View {
                 view
             }
         }
-        .overlay {
-            if let error = store.collections.error {
-                ErrorStateView(error) {
-                    store.send(.reload)
-                }
-                .padding(.vertical, 18)
-                .padding(.horizontal, 36)
-            } else if let collections = store.collections.data, collections.isEmpty {
-                EmptyStateView(String(localized: "key.collections.empty")) {
-                    store.send(.reload)
-                }
-                .padding(.vertical, 18)
-                .padding(.horizontal, 36)
-            } else if store.collections.isLoading {
-                LoadingStateView()
-                    .padding(.vertical, 18)
-                    .padding(.horizontal, 36)
-            }
+        .dataStateOverlay(store.collections, empty: String(localized: "key.collections.empty")) {
+            store.send(.reload)
         }
         .transition(.opacity)
         .navigationTitle(title)
