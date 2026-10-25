@@ -412,16 +412,27 @@ private extension Element {
     }
 
     func getDetailsMovieLists() throws -> [MovieList] {
-        try html()
-            .components(separatedBy: "<br />")
-            .filter { !$0.isEmpty }
-            .map {
-                let listItem = try $0.parseHTML().body().orThrow()
+        try getChildNodes()
+            .split { ($0 as? Element)?.tagName() == "br" }
+            .compactMap { nodes in
+                var link: Element?
+                var text = ""
+
+                for node in nodes {
+                    if let element = node as? Element {
+                        link = try link ?? (element.tagName() == "a" ? element : element.select("a").first())
+                        text += try element.text()
+                    } else if let textNode = node as? TextNode {
+                        text += textNode.text()
+                    }
+                }
+
+                guard let link else { return nil }
 
                 return try MovieList(
-                    name: listItem.select("a").first().orThrow().text(),
-                    listId: listItem.select("a").first().orThrow().attr("href").cleanPath.orThrow(),
-                    moviePosition: Int(listItem.text().substringAfterLast("(").trimmingCharacters(in: .decimalDigits.inverted)).orThrow(),
+                    name: link.text(),
+                    listId: link.attr("href").cleanPath.orThrow(),
+                    moviePosition: Int(text.substringAfterLast("(").trimmingCharacters(in: .decimalDigits.inverted)).orThrow(),
                 )
             }
     }
