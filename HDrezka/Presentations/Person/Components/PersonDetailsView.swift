@@ -123,67 +123,11 @@ struct PersonDetailsView: View {
         }
         .padding(.horizontal, 36)
 
-        if let actorMovies = details.actorMovies, !actorMovies.isEmpty {
+        ForEach(details.filmography) { career in
             Divider()
                 .padding(.horizontal, 36)
 
-            PersonMoviesRowView(String(localized: "key.person.actor"), actorMovies)
-        }
-
-        if let actressMovies = details.actressMovies, !actressMovies.isEmpty {
-            Divider()
-                .padding(.horizontal, 36)
-
-            PersonMoviesRowView(String(localized: "key.person.actress"), actressMovies)
-        }
-
-        if let artistMovies = details.artistMovies, !artistMovies.isEmpty {
-            Divider()
-                .padding(.horizontal, 36)
-
-            PersonMoviesRowView(String(localized: "key.person.artist"), artistMovies)
-        }
-
-        if let directorMovies = details.directorMovies, !directorMovies.isEmpty {
-            Divider()
-                .padding(.horizontal, 36)
-
-            PersonMoviesRowView(String(localized: "key.person.director"), directorMovies)
-        }
-
-        if let editorMovies = details.editorMovies, !editorMovies.isEmpty {
-            Divider()
-                .padding(.horizontal, 36)
-
-            PersonMoviesRowView(String(localized: "key.person.editor"), editorMovies)
-        }
-
-        if let operatorMovies = details.operatorMovies, !operatorMovies.isEmpty {
-            Divider()
-                .padding(.horizontal, 36)
-
-            PersonMoviesRowView(String(localized: "key.person.operator"), operatorMovies)
-        }
-
-        if let producerMovies = details.producerMovies, !producerMovies.isEmpty {
-            Divider()
-                .padding(.horizontal, 36)
-
-            PersonMoviesRowView(String(localized: "key.person.producer"), producerMovies)
-        }
-
-        if let screenwriterMovies = details.screenwriterMovies, !screenwriterMovies.isEmpty {
-            Divider()
-                .padding(.horizontal, 36)
-
-            PersonMoviesRowView(String(localized: "key.person.screenwriter"), screenwriterMovies)
-        }
-
-        if let composerMovies = details.composerMovies, !composerMovies.isEmpty {
-            Divider()
-                .padding(.horizontal, 36)
-
-            PersonMoviesRowView(String(localized: "key.person.composer"), composerMovies)
+            PersonMoviesRowView(career.role.title, career.movies)
         }
     }
 }

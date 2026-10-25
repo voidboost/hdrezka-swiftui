@@ -5,7 +5,6 @@ class PeopleParser {
     static func parse(from: String) throws -> PersonDetailed {
         let site = try from.parseHTML().checker()
         let details = try site.getPeopleDetails()
-        let movies = try site.getPeopleMovies()
 
         return try PersonDetailed(
             nameRu: site.getPeopleNameRussian(),
@@ -18,15 +17,7 @@ class PeopleParser {
             deathDate: details["Дата смерти"],
             deathPlace: details["Место смерти"],
             height: details["Рост"],
-            actorMovies: movies["akter"]?.getMovies(),
-            actressMovies: movies["aktrisa"]?.getMovies(),
-            directorMovies: movies["rezhisser"]?.getMovies(),
-            producerMovies: movies["prodyuser"]?.getMovies(),
-            screenwriterMovies: movies["scenarist"]?.getMovies(),
-            operatorMovies: movies["operator"]?.getMovies(),
-            editorMovies: movies["montazher"]?.getMovies(),
-            artistMovies: movies["hudozhnik"]?.getMovies(),
-            composerMovies: movies["kompozitor"]?.getMovies(),
+            filmography: site.getPeopleFilmography(),
         )
     }
 }
@@ -68,13 +59,46 @@ private extension Document {
         return details
     }
 
-    func getPeopleMovies() throws -> [String: Elements] {
-        var movies: [String: Elements] = [:]
+    func getPeopleFilmography() throws -> [PersonDetailed.Career] {
+        var sections: [PersonDetailed.Role: Elements] = [:]
 
         for career in try select(".b-person__career") {
-            try movies[career.select("h2").attr("id")] = career.select(".b-content__inline_item")
+            if let role = try PersonDetailed.Role(sectionId: career.select("h2").attr("id")) {
+                sections[role] = try career.select(".b-content__inline_item")
+            }
         }
 
-        return movies
+        return try PersonDetailed.Role.allCases.compactMap { role in
+            guard let movies = try sections[role]?.getMovies(), !movies.isEmpty else { return nil }
+
+            return PersonDetailed.Career(role: role, movies: movies)
+        }
+    }
+}
+
+private extension PersonDetailed.Role {
+    init?(sectionId: String) {
+        switch sectionId {
+        case "akter":
+            self = .actor
+        case "aktrisa":
+            self = .actress
+        case "hudozhnik":
+            self = .artist
+        case "rezhisser":
+            self = .director
+        case "montazher":
+            self = .editor
+        case "operator":
+            self = .operator
+        case "prodyuser":
+            self = .producer
+        case "scenarist":
+            self = .screenwriter
+        case "kompozitor":
+            self = .composer
+        default:
+            return nil
+        }
     }
 }
