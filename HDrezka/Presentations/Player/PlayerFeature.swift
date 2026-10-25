@@ -445,7 +445,7 @@ struct PlayerFeature {
             updateNextTimer(&state)
 
             return .merge(
-                .run { [voiceActing = state.voiceActing, season = state.season, episode = state.episode] _ in
+                .run { [voiceActing = state.voiceActing, season = state.season, episode = state.episode, subtitles = state.subtitles] _ in
                     if Defaults[.isLoggedIn] {
                         try? await saveWatchingStateUseCase(voiceActing: voiceActing, season: season, episode: episode)
                     }
@@ -457,7 +457,8 @@ struct PlayerFeature {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: season?.seasonId,
-                                    episode: episode?.episodeId
+                                    episode: episode?.episodeId,
+                                    subtitles: subtitles
                                 )
                             }
                             .execute(db)
