@@ -2543,6 +2543,28 @@
         }
       }
     },
+    "key.errors.decryption-%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to decrypt video links (%@)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось расшифровать ссылки на видео (%@)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не вдалося розшифрувати посилання на відео (%@)"
+          }
+        }
+      }
+    },
     "key.errors.links-%@" : {
       "localizations" : {
         "en" : {

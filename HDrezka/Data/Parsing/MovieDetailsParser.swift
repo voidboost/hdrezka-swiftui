@@ -651,7 +651,7 @@ private extension String {
             }
         }
 
-        let streams = decrypt(encrypted: url)
+        let streams = try decrypt(encrypted: url)
 
         let videos = try streams.components(separatedBy: ",").filter { !$0.isEmpty }.map { stream in
             let nameElement = try stream.substringAfter("[").substringBefore("]").parseHTML()

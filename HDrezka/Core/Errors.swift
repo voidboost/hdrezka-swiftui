@@ -7,6 +7,7 @@ enum HDrezkaError: Error {
     case parseJson(String, String)
     case null(String, Int, Int)
     case swiftsoup(String, String)
+    case decryption(String)
     case unknown
     case site([String])
 }
@@ -26,6 +27,8 @@ extension HDrezkaError: LocalizedError {
             String(localized: "key.errors.null-\(functionName)-\(lineNumber)-\(columnNumber)")
         case let .swiftsoup(type, message):
             String(localized: "key.errors.swiftsoup-\(type)-\(message)")
+        case let .decryption(encrypted):
+            String(localized: "key.errors.decryption-\(encrypted)")
         case .unknown:
             String(localized: "key.errors.unknown")
         case let .site(messages):
