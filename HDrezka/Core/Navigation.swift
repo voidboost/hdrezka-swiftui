@@ -101,22 +101,6 @@ enum Destinations: Hashable, Identifiable {
     case person(PersonSimple)
     case comments(MovieDetailed)
 
-    static func fromNamed(_ item: some Named) -> Destinations {
-        if let country = item as? MovieCountry {
-            return .country(country)
-        } else if let genre = item as? MovieGenre {
-            return .genre(genre)
-        } else if let person = item as? PersonSimple {
-            return .person(person)
-        } else if let list = item as? MovieList {
-            return .list(list)
-        } else if let collection = item as? MoviesCollection {
-            return .collection(collection)
-        }
-
-        fatalError("Need \"named\" implementation")
-    }
-
     var name: String {
         switch self {
         case .details:
@@ -145,5 +129,39 @@ enum Destinations: Hashable, Identifiable {
 
     var id: Self {
         self
+    }
+}
+
+protocol Routable: Named {
+    var route: Destinations { get }
+}
+
+extension MovieCountry: Routable {
+    var route: Destinations {
+        .country(self)
+    }
+}
+
+extension MovieGenre: Routable {
+    var route: Destinations {
+        .genre(self)
+    }
+}
+
+extension PersonSimple: Routable {
+    var route: Destinations {
+        .person(self)
+    }
+}
+
+extension MovieList: Routable {
+    var route: Destinations {
+        .list(self)
+    }
+}
+
+extension MoviesCollection: Routable {
+    var route: Destinations {
+        .collection(self)
     }
 }

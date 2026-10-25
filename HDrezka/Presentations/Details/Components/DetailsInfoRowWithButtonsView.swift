@@ -2,7 +2,7 @@ import ComposableArchitecture
 import Kingfisher
 import SwiftUI
 
-struct DetailsInfoRowWithButtonsView<T: Named>: View {
+struct DetailsInfoRowWithButtonsView<T: Routable>: View {
     private let title: String
     private let description: String
     private let data: [T]
@@ -27,7 +27,7 @@ struct DetailsInfoRowWithButtonsView<T: Named>: View {
             HStack(alignment: .center, spacing: 4) {
                 HStack(alignment: .center, spacing: 0) {
                     ForEach(data.prefix(2)) { item in
-                        NavigationLink(route: .fromNamed(item)) {
+                        NavigationLink(route: item.route) {
                             if let person = item as? PersonSimple, !person.photo.isEmpty {
                                 DetailsPersonTextWithPhotoView(person: person)
                                     .contentShape(.rect)
@@ -80,7 +80,7 @@ struct DetailsInfoRowWithButtonsView<T: Named>: View {
                             VStack(alignment: .center, spacing: 0) {
                                 ForEach(data) { item in
                                     Button {
-                                        store.send(.push(Destinations.fromNamed(item)))
+                                        store.send(.push(item.route))
                                     } label: {
                                         if let person = item as? PersonSimple, !person.photo.isEmpty {
                                             HStack(alignment: .center, spacing: 8) {
