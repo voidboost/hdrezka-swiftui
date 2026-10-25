@@ -31,11 +31,8 @@ struct HomeFeature {
 
     @Dependency(\.getHotMoviesUseCase) private var getHotMoviesUseCase
 //    @Dependency(\.getFeaturedMoviesUseCase) private var getFeaturedMoviesUseCase
-    @Dependency(\.getWatchingNowMoviesUseCase) private var getWatchingNowMoviesUseCase
-    @Dependency(\.getLatestMoviesUseCase) private var getLatestMoviesUseCase
-    @Dependency(\.getLatestNewestMoviesUseCase) private var getLatestNewestMoviesUseCase
-    @Dependency(\.getPopularMoviesUseCase) private var getPopularMoviesUseCase
-    @Dependency(\.getSoonMoviesUseCase) private var getSoonMoviesUseCase
+    @Dependency(\.getMoviesUseCase) private var getMoviesUseCase
+    @Dependency(\.getNewestMoviesUseCase) private var getNewestMoviesUseCase
     @Dependency(\.uuid) private var uuid
 
     var body: some ReducerOf<Self> {
@@ -109,11 +106,11 @@ struct HomeFeature {
         switch category {
         case .hot: try await getHotMoviesUseCase(genre: 0)
 //        case .featured: try await getFeaturedMoviesUseCase(page: 1, genre: 0)
-        case .watchingNow: try await getWatchingNowMoviesUseCase(page: 1, genre: 0)
-        case .latest: try await getLatestMoviesUseCase(page: 1, genre: 0)
-        case .newest: try await getLatestNewestMoviesUseCase(page: 1, genre: 0)
-        case .popular: try await getPopularMoviesUseCase(page: 1, genre: 0)
-        case .soon: try await getSoonMoviesUseCase(page: 1, genre: 0)
+        case .watchingNow: try await getMoviesUseCase(filter: .watching, genre: 0, page: 1)
+        case .latest: try await getMoviesUseCase(filter: .latest, genre: 0, page: 1)
+        case .newest: try await getNewestMoviesUseCase(filter: .latest, genre: 0, page: 1)
+        case .popular: try await getMoviesUseCase(filter: .popular, genre: 0, page: 1)
+        case .soon: try await getMoviesUseCase(filter: .soon, genre: 0, page: 1)
         }
     }
 }

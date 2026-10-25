@@ -21,11 +21,7 @@ protocol AccountRepository: Sendable {
 
     func getBookmarks() async throws -> [Bookmark]
 
-    func getBookmarksByCategoryAdded(id: Int, genre: Int, page: Int) async throws -> [MovieSimple]
-
-    func getBookmarksByCategoryYear(id: Int, genre: Int, page: Int) async throws -> [MovieSimple]
-
-    func getBookmarksByCategoryPopular(id: Int, genre: Int, page: Int) async throws -> [MovieSimple]
+    func getBookmarksByCategory(id: Int, filter: BookmarkFilters, genre: Int, page: Int) async throws -> [MovieSimple]
 
     func createBookmarksCategory(name: String) async throws -> Bookmark
 

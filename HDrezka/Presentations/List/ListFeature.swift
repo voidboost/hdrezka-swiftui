@@ -83,26 +83,12 @@ struct ListFeature {
 
 //    @Dependency(\.getFeaturedMoviesUseCase) private var getFeaturedMoviesUseCase
     @Dependency(\.getHotMoviesUseCase) private var getHotMoviesUseCase
-    @Dependency(\.getLatestMoviesByCountryUseCase) private var getLatestMoviesByCountryUseCase
-    @Dependency(\.getLatestMoviesByGenreUseCase) private var getLatestMoviesByGenreUseCase
-    @Dependency(\.getLatestMoviesUseCase) private var getLatestMoviesUseCase
-    @Dependency(\.getLatestNewestMoviesUseCase) private var getLatestNewestMoviesUseCase
     @Dependency(\.getMovieListUseCase) private var getMovieListUseCase
-    @Dependency(\.getPopularMoviesByCountryUseCase) private var getPopularMoviesByCountryUseCase
-    @Dependency(\.getPopularMoviesByGenreUseCase) private var getPopularMoviesByGenreUseCase
-    @Dependency(\.getPopularMoviesUseCase) private var getPopularMoviesUseCase
-    @Dependency(\.getPopularNewestMoviesUseCase) private var getPopularNewestMoviesUseCase
-    @Dependency(\.getSoonMoviesByCountryUseCase) private var getSoonMoviesByCountryUseCase
-    @Dependency(\.getSoonMoviesByGenreUseCase) private var getSoonMoviesByGenreUseCase
-    @Dependency(\.getSoonMoviesUseCase) private var getSoonMoviesUseCase
-    @Dependency(\.getWatchingNowMoviesByCountryUseCase) private var getWatchingNowMoviesByCountryUseCase
-    @Dependency(\.getWatchingNowMoviesByGenreUseCase) private var getWatchingNowMoviesByGenreUseCase
-    @Dependency(\.getWatchingNowMoviesUseCase) private var getWatchingNowMoviesUseCase
-    @Dependency(\.getWatchingNowNewestMoviesUseCase) private var getWatchingNowNewestMoviesUseCase
-    @Dependency(\.getLatestMoviesInCollectionUseCase) private var getLatestMoviesInCollectionUseCase
-    @Dependency(\.getSoonMoviesInCollectionUseCase) private var getSoonMoviesInCollectionUseCase
-    @Dependency(\.getPopularMoviesInCollectionUseCase) private var getPopularMoviesInCollectionUseCase
-    @Dependency(\.getWatchingNowMoviesInCollectionUseCase) private var getWatchingNowMoviesInCollectionUseCase
+    @Dependency(\.getMoviesByCountryUseCase) private var getMoviesByCountryUseCase
+    @Dependency(\.getMoviesByGenreUseCase) private var getMoviesByGenreUseCase
+    @Dependency(\.getMoviesInCollectionUseCase) private var getMoviesInCollectionUseCase
+    @Dependency(\.getMoviesUseCase) private var getMoviesUseCase
+    @Dependency(\.getNewestMoviesUseCase) private var getNewestMoviesUseCase
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -168,39 +154,13 @@ struct ListFeature {
         case let .list(list):
             return try await getMovieListUseCase(listId: list.listId, page: page)
         case let .country(country):
-            return try await (nil, movies(country: country, page: page, filterGenre: filterGenre, filter: filter))
+            return try await (nil, getMoviesByCountryUseCase(countryId: country.countryId, filter: filter, genre: filterGenre.genreCode, page: page))
         case let .genre(genre):
-            return try await (nil, movies(genre: genre, page: page, filter: filter))
+            return try await (nil, getMoviesByGenreUseCase(genreId: genre.genreId, filter: filter, page: page))
         case let .category(category):
             return try await (nil, movies(category: category, page: page, filterGenre: filterGenre, newFilter: newFilter))
         case let .collection(collection):
-            return try await (nil, movies(collection: collection, page: page, filter: filter))
-        }
-    }
-
-    private func movies(country: MovieCountry, page: Int, filterGenre: Genres, filter: Filters) async throws -> [MovieSimple] {
-        switch filter {
-        case .latest:
-            try await getLatestMoviesByCountryUseCase(countryId: country.countryId, genre: filterGenre.genreCode, page: page)
-        case .popular:
-            try await getPopularMoviesByCountryUseCase(countryId: country.countryId, genre: filterGenre.genreCode, page: page)
-        case .soon:
-            try await getSoonMoviesByCountryUseCase(countryId: country.countryId, genre: filterGenre.genreCode, page: page)
-        case .watching:
-            try await getWatchingNowMoviesByCountryUseCase(countryId: country.countryId, genre: filterGenre.genreCode, page: page)
-        }
-    }
-
-    private func movies(genre: MovieGenre, page: Int, filter: Filters) async throws -> [MovieSimple] {
-        switch filter {
-        case .latest:
-            try await getLatestMoviesByGenreUseCase(genreId: genre.genreId, page: page)
-        case .popular:
-            try await getPopularMoviesByGenreUseCase(genreId: genre.genreId, page: page)
-        case .soon:
-            try await getSoonMoviesByGenreUseCase(genreId: genre.genreId, page: page)
-        case .watching:
-            try await getWatchingNowMoviesByGenreUseCase(genreId: genre.genreId, page: page)
+            return try await (nil, getMoviesInCollectionUseCase(collectionId: collection.collectionId, filter: filter, page: page))
         }
     }
 
@@ -211,35 +171,15 @@ struct ListFeature {
 //        case .featured:
 //            try await getFeaturedMoviesUseCase(page: page, genre: filterGenre.genreCode)
         case .watchingNow:
-            try await getWatchingNowMoviesUseCase(page: page, genre: filterGenre.genreCode)
+            try await getMoviesUseCase(filter: .watching, genre: filterGenre.genreCode, page: page)
         case .newest:
-            switch newFilter {
-            case .latest:
-                try await getLatestNewestMoviesUseCase(page: page, genre: filterGenre.genreCode)
-            case .popular:
-                try await getPopularNewestMoviesUseCase(page: page, genre: filterGenre.genreCode)
-            case .watching:
-                try await getWatchingNowNewestMoviesUseCase(page: page, genre: filterGenre.genreCode)
-            }
+            try await getNewestMoviesUseCase(filter: newFilter, genre: filterGenre.genreCode, page: page)
         case .latest:
-            try await getLatestMoviesUseCase(page: page, genre: filterGenre.genreCode)
+            try await getMoviesUseCase(filter: .latest, genre: filterGenre.genreCode, page: page)
         case .popular:
-            try await getPopularMoviesUseCase(page: page, genre: filterGenre.genreCode)
+            try await getMoviesUseCase(filter: .popular, genre: filterGenre.genreCode, page: page)
         case .soon:
-            try await getSoonMoviesUseCase(page: page, genre: filterGenre.genreCode)
-        }
-    }
-
-    private func movies(collection: MoviesCollection, page: Int, filter: Filters) async throws -> [MovieSimple] {
-        switch filter {
-        case .latest:
-            try await getLatestMoviesInCollectionUseCase(collectionId: collection.collectionId, page: page)
-        case .popular:
-            try await getPopularMoviesInCollectionUseCase(collectionId: collection.collectionId, page: page)
-        case .soon:
-            try await getSoonMoviesInCollectionUseCase(collectionId: collection.collectionId, page: page)
-        case .watching:
-            try await getWatchingNowMoviesInCollectionUseCase(collectionId: collection.collectionId, page: page)
+            try await getMoviesUseCase(filter: .soon, genre: filterGenre.genreCode, page: page)
         }
     }
 }

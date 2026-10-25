@@ -6,15 +6,7 @@ struct MovieVideo: Identifiable, Codable, Hashable {
     let subtitles: [MovieSubtitles]
     let needPremium: Bool
     let thumbnails: String?
-    let id: UUID
-
-    init(videos: [Video], subtitles: [MovieSubtitles], needPremium: Bool, thumbnails: String?, id: UUID = .init()) {
-        self.videos = videos
-        self.subtitles = subtitles
-        self.needPremium = needPremium
-        self.thumbnails = thumbnails
-        self.id = id
-    }
+    var id = UUID()
 
     func getMaxQuality() -> [URL]? {
         videos.last(where: { !$0.needAccount && !$0.needPremium })?.urls
@@ -45,14 +37,6 @@ struct MovieVideo: Identifiable, Codable, Hashable {
         let urls: [URL]
         let needAccount: Bool
         let needPremium: Bool
-        let id: UUID
-
-        init(quality: String, urls: [URL], needAccount: Bool, needPremium: Bool, id: UUID = .init()) {
-            self.quality = quality
-            self.urls = urls
-            self.needAccount = needAccount
-            self.needPremium = needPremium
-            self.id = id
-        }
+        var id = UUID()
     }
 }

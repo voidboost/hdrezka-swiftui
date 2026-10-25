@@ -57,9 +57,7 @@ struct BookmarksFeature {
     }
 
     @Dependency(\.getBookmarksUseCase) private var getBookmarksUseCase
-    @Dependency(\.getBookmarksByCategoryAddedUseCase) private var getBookmarksByCategoryAddedUseCase
-    @Dependency(\.getBookmarksByCategoryPopularUseCase) private var getBookmarksByCategoryPopularUseCase
-    @Dependency(\.getBookmarksByCategoryYearUseCase) private var getBookmarksByCategoryYearUseCase
+    @Dependency(\.getBookmarksByCategoryUseCase) private var getBookmarksByCategoryUseCase
     @Dependency(\.deleteBookmarksCategoryUseCase) private var deleteBookmarksCategoryUseCase
     @Dependency(\.moveBetweenBookmarksUseCase) private var moveBetweenBookmarksUseCase
     @Dependency(\.reorderBookmarksCategoriesUseCase) private var reorderBookmarksCategoriesUseCase
@@ -285,14 +283,7 @@ struct BookmarksFeature {
     private func loadMovies(id: Int, state: State, isInitial: Bool) -> Effect<Action> {
         .run { [filter = state.filter, genre = state.genre.genreCode, page = state.page] send in
             let result = await Result {
-                switch filter {
-                case .added:
-                    try await getBookmarksByCategoryAddedUseCase(id: id, genre: genre, page: page)
-                case .year:
-                    try await getBookmarksByCategoryYearUseCase(id: id, genre: genre, page: page)
-                case .popular:
-                    try await getBookmarksByCategoryPopularUseCase(id: id, genre: genre, page: page)
-                }
+                try await getBookmarksByCategoryUseCase(id: id, filter: filter, genre: genre, page: page)
             }
 
             await send(.moviesLoaded(isInitial: isInitial, result), animation: .easeInOut)

@@ -53,16 +53,10 @@ struct Comment: Identifiable, Hashable {
 
     func findComment(_ commentId: String) -> Comment? {
         if self.commentId == commentId {
-            return self
+            self
         } else {
-            for reply in replies {
-                if let comment = reply.findComment(commentId) {
-                    return comment
-                }
-            }
+            replies.lazy.compactMap { $0.findComment(commentId) }.first
         }
-
-        return nil
     }
 
     mutating func deleteComment(_ commentId: String) {
