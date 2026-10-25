@@ -3,7 +3,7 @@ import Dependencies
 struct RemoveWatchingItemUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction(item: MovieWatchLater) async throws -> Bool {
+    func callAsFunction(item: MovieWatchLater) async throws {
         try await repository.removeWatchingItem(item: item)
     }
 }

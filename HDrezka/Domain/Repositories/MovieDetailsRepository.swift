@@ -19,9 +19,9 @@ protocol MovieDetailsRepository: Sendable {
 
     func toggleLikeComment(id: String) async throws -> (Int, Bool)
 
-    func reportComment(id: String, issue: Int, text: String) async throws -> Bool
+    func reportComment(id: String, issue: Int, text: String) async throws
 
-    func deleteComment(id: String, hash: String) async throws -> (Bool, String?)
+    func deleteComment(id: String, hash: String) async throws
 
     func sendComment(id: String?, postId: String, name: String?, text: String, adb: String?, type: String?) async throws -> SendCommentResult
 

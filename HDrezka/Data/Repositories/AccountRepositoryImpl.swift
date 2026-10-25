@@ -42,7 +42,7 @@ struct AccountRepositoryImpl: AccountRepository {
         try await session.string(AccountService.restore(login: login.trim()), parse: AccountParser.checkRestore)
     }
 
-    func logout() async throws -> Bool {
+    func logout() async throws {
         try await session.perform(AccountService.logout)
     }
 
@@ -50,15 +50,15 @@ struct AccountRepositoryImpl: AccountRepository {
         try await session.string(AccountService.getWatchingLaterMovies, parse: AccountParser.parseWatchingLaterMovies)
     }
 
-    func saveWatchingState(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, position: Int?, total: Int?) async throws -> Bool {
+    func saveWatchingState(voiceActing: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?, position: Int?, total: Int?) async throws {
         try await session.success(AccountService.sendWatching(postId: voiceActing.voiceId, translatorId: voiceActing.translatorId, season: season?.seasonId, episode: episode?.episodeId, currentTime: position, duration: total != 1 ? total : nil), function: "saveWatchingState")
     }
 
-    func switchWatchedItem(item: MovieWatchLater) async throws -> Bool {
+    func switchWatchedItem(item: MovieWatchLater) async throws {
         try await session.success(AccountService.switchWatchedItem(id: item.dataId), function: "switchWatchedItem")
     }
 
-    func removeWatchingItem(item: MovieWatchLater) async throws -> Bool {
+    func removeWatchingItem(item: MovieWatchLater) async throws {
         try await session.success(AccountService.removeWatchingItem(id: item.dataId), function: "removeWatchingItem")
     }
 
@@ -80,19 +80,19 @@ struct AccountRepositoryImpl: AccountRepository {
         }
     }
 
-    func changeBookmarksCategoryName(id: Int, newName: String) async throws -> Bool {
+    func changeBookmarksCategoryName(id: Int, newName: String) async throws {
         try await session.success(AccountService.changeBookmarkCategoryName(newName: newName, catId: id), function: "changeBookmarksCategoryName")
     }
 
-    func deleteBookmarksCategory(id: Int) async throws -> Bool {
+    func deleteBookmarksCategory(id: Int) async throws {
         try await session.perform(AccountService.deleteBookmarkCategory(catId: id))
     }
 
-    func addToBookmarks(movieId: String, bookmarkUserCategory: Int) async throws -> Bool {
+    func addToBookmarks(movieId: String, bookmarkUserCategory: Int) async throws {
         try await session.success(AccountService.addToBookmarks(movieId: movieId, catId: bookmarkUserCategory), function: "addToBookmarks")
     }
 
-    func removeFromBookmarks(movies: [String], bookmarkUserCategory: Int) async throws -> Bool {
+    func removeFromBookmarks(movies: [String], bookmarkUserCategory: Int) async throws {
         try await session.success(AccountService.removeFromBookmarks(movies: movies, catId: bookmarkUserCategory), function: "removeFromBookmarks")
     }
 
@@ -102,7 +102,7 @@ struct AccountRepositoryImpl: AccountRepository {
         }
     }
 
-    func reorderBookmarksCategories(newOrder: [Bookmark]) async throws -> Bool {
+    func reorderBookmarksCategories(newOrder: [Bookmark]) async throws {
         try await session.success(AccountService.reorderBookmarksCategories(newOrder: newOrder), function: "reorderBookmarksCategories")
     }
 

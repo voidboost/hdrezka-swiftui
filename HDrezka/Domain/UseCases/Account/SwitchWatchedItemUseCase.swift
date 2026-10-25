@@ -3,7 +3,7 @@ import Dependencies
 struct SwitchWatchedItemUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction(item: MovieWatchLater) async throws -> Bool {
+    func callAsFunction(item: MovieWatchLater) async throws {
         try await repository.switchWatchedItem(item: item)
     }
 }

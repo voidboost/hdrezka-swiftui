@@ -3,7 +3,7 @@ import Dependencies
 struct RemoveFromBookmarksUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction(movies: [String], bookmarkUserCategory: Int) async throws -> Bool {
+    func callAsFunction(movies: [String], bookmarkUserCategory: Int) async throws {
         try await repository.removeFromBookmarks(movies: movies, bookmarkUserCategory: bookmarkUserCategory)
     }
 }

@@ -447,7 +447,7 @@ struct PlayerFeature {
             return .merge(
                 .run { [voiceActing = state.voiceActing, season = state.season, episode = state.episode] _ in
                     if Defaults[.isLoggedIn] {
-                        _ = try? await saveWatchingStateUseCase(voiceActing: voiceActing, season: season, episode: episode)
+                        try? await saveWatchingStateUseCase(voiceActing: voiceActing, season: season, episode: episode)
                     }
 
                     try? await database.write { db in

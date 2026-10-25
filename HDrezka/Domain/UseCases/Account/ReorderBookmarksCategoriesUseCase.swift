@@ -3,7 +3,7 @@ import Dependencies
 struct ReorderBookmarksCategoriesUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction(newOrder: [Bookmark]) async throws -> Bool {
+    func callAsFunction(newOrder: [Bookmark]) async throws {
         try await repository.reorderBookmarksCategories(newOrder: newOrder)
     }
 }

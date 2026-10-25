@@ -3,7 +3,7 @@ import Dependencies
 struct ReportCommentUseCase {
     @Dependency(\.movieDetailsRepository) private var repository
 
-    func callAsFunction(id: String, issue: Int, text: String) async throws -> Bool {
+    func callAsFunction(id: String, issue: Int, text: String) async throws {
         try await repository.reportComment(id: id, issue: issue, text: text)
     }
 }

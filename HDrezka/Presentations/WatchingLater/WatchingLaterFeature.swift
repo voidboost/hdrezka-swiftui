@@ -16,9 +16,9 @@ struct WatchingLaterFeature {
         case reload
         case moviesLoaded(Result<[MovieWatchLater], any Error>)
         case switchWatched(MovieWatchLater)
-        case watchedSwitched(MovieWatchLater, Result<Bool, any Error>)
+        case watchedSwitched(MovieWatchLater, Result<Void, any Error>)
         case remove(MovieWatchLater)
-        case removed(MovieWatchLater, Result<Bool, any Error>)
+        case removed(MovieWatchLater, Result<Void, any Error>)
         case alert(PresentationAction<Alert>)
 
         enum Alert: Equatable {}
@@ -66,8 +66,8 @@ struct WatchingLaterFeature {
                     await send(.watchedSwitched(movie, result), animation: .easeInOut)
                 }
 
-            case let .watchedSwitched(movie, .success(switched)):
-                guard switched, var movies = state.movies.data, let index = movies.firstIndex(of: movie) else { return .none }
+            case let .watchedSwitched(movie, .success):
+                guard var movies = state.movies.data, let index = movies.firstIndex(of: movie) else { return .none }
 
                 movies[index].watched.toggle()
 
@@ -86,9 +86,7 @@ struct WatchingLaterFeature {
                     await send(.removed(movie, result), animation: .easeInOut)
                 }
 
-            case let .removed(movie, .success(removed)):
-                guard removed else { return .none }
-
+            case let .removed(movie, .success):
                 if var movies = state.movies.data {
                     movies.removeAll(where: { $0.id == movie.id })
                     state.movies = .data(movies)

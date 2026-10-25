@@ -39,13 +39,13 @@ struct BookmarksFeature {
         case loadMore
         case moviesLoaded(isInitial: Bool, Result<[MovieSimple], any Error>)
         case deleteBookmark(Bookmark)
-        case bookmarkDeleted(Bookmark, Result<Bool, any Error>)
+        case bookmarkDeleted(Bookmark, Result<Void, any Error>)
         case moveMovies([MovieSimple], to: Bookmark)
         case moviesMoved([MovieSimple], from: Int, to: Bookmark, Result<Int, any Error>)
         case reorderBookmarks(fromOffsets: IndexSet, toOffset: Int)
-        case bookmarksReordered([Bookmark], Result<Bool, any Error>)
+        case bookmarksReordered([Bookmark], Result<Void, any Error>)
         case removeMovies([String])
-        case moviesRemoved([String], from: Int, Result<Bool, any Error>)
+        case moviesRemoved([String], from: Int, Result<Void, any Error>)
         case alert(PresentationAction<Alert>)
 
         enum Alert: Equatable {}
@@ -162,8 +162,8 @@ struct BookmarksFeature {
                     await send(.bookmarkDeleted(bookmark, result), animation: .easeInOut)
                 }
 
-            case let .bookmarkDeleted(bookmark, .success(deleted)):
-                guard deleted, var bookmarks = state.bookmarks.data else { return .none }
+            case let .bookmarkDeleted(bookmark, .success):
+                guard var bookmarks = state.bookmarks.data else { return .none }
 
                 bookmarks.removeAll(where: { $0.bookmarkId == bookmark.bookmarkId })
                 state.bookmarks = .data(bookmarks)
@@ -201,7 +201,7 @@ struct BookmarksFeature {
 
                 if var bookmarks = state.bookmarks.data {
                     if let from = bookmarks.firstIndex(where: { $0.bookmarkId == fromBookmark }) {
-                        bookmarks[from] -= 1
+                        bookmarks[from] -= moved
                     }
 
                     if let to = bookmarks.firstIndex(where: { $0.bookmarkId == toBookmark.bookmarkId }) {
@@ -227,10 +227,8 @@ struct BookmarksFeature {
                     await send(.bookmarksReordered(newOrder, result), animation: .easeInOut)
                 }
 
-            case let .bookmarksReordered(newOrder, .success(reordered)):
-                if reordered {
-                    state.bookmarks = .data(newOrder)
-                }
+            case let .bookmarksReordered(newOrder, .success):
+                state.bookmarks = .data(newOrder)
 
                 return .none
 
@@ -243,8 +241,8 @@ struct BookmarksFeature {
                     await send(.moviesRemoved(ids, from: selectedBookmark, result), animation: .easeInOut)
                 }
 
-            case let .moviesRemoved(ids, fromBookmark, .success(removed)):
-                guard removed, var movies = state.movies.data else { return .none }
+            case let .moviesRemoved(ids, fromBookmark, .success):
+                guard var movies = state.movies.data else { return .none }
 
                 movies.removeAll(where: {
                     if let movieId = $0.movieId.id {
@@ -257,7 +255,7 @@ struct BookmarksFeature {
                 state.movies = .data(movies)
 
                 if var bookmarks = state.bookmarks.data, let index = bookmarks.firstIndex(where: { $0.bookmarkId == fromBookmark }) {
-                    bookmarks[index] -= 1
+                    bookmarks[index] -= ids.count
 
                     state.bookmarks = .data(bookmarks)
                 }

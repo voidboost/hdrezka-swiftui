@@ -3,7 +3,7 @@ import Dependencies
 struct AddToBookmarksUseCase {
     @Dependency(\.accountRepository) private var repository
 
-    func callAsFunction(movieId: String, bookmarkUserCategory: Int) async throws -> Bool {
+    func callAsFunction(movieId: String, bookmarkUserCategory: Int) async throws {
         try await repository.addToBookmarks(movieId: movieId, bookmarkUserCategory: bookmarkUserCategory)
     }
 }
