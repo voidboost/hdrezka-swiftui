@@ -14,7 +14,7 @@ extension PlayerFeature {
             subtitles: state.movie.subtitles,
             title: state.name,
             album: state.voiceActing.name,
-            artist: state.season.flatMap { season in state.episode.map { "Season \(season.name) Episode \($0.name)" } },
+            artist: state.season.flatMap { season in state.episode.map { String(localized: "key.season-\(season.name).episode-\($0.name)") } },
             poster: state.poster,
             videoGravity: state.videoGravity,
             ambientLight: state.isAmbientLightVisible,

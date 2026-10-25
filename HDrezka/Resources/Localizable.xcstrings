@@ -1,28 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "ket.verify.code-%@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Attention! A verification code will be sent to your email address: %@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Внимание! На вашу почту %@ будет отправлено письмо с проверочным кодом"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Увага! На вашу електронну адресу %@ буде надіслано лист із кодом підтвердження"
-          }
-        }
-      }
-    },
     "key.2k" : {
       "localizations" : {
         "en" : {
@@ -6977,6 +6955,28 @@
         }
       }
     },
+    "key.spoiler" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spoiler!"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Спойлер!"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Спойлер!"
+          }
+        }
+      }
+    },
     "key.subtitles" : {
       "localizations" : {
         "en" : {
@@ -7413,6 +7413,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Код підтвердження"
+          }
+        }
+      }
+    },
+    "key.verify.code-%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attention! A verification code will be sent to your email address: %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Внимание! На вашу почту %@ будет отправлено письмо с проверочным кодом"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Увага! На вашу електронну адресу %@ буде надіслано лист із кодом підтвердження"
           }
         }
       }
