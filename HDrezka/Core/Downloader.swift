@@ -1,5 +1,6 @@
 import Defaults
 import Dependencies
+import FirebaseCrashlytics
 import SQLiteData
 import SwiftUI
 import UserNotifications
@@ -18,7 +19,7 @@ class Downloader {
 
     @ObservationIgnored @Dependency(\.defaultDatabase) private var database
 
-    @ObservationIgnored private let process: Process
+    @ObservationIgnored private let process = Process()
 
     var isRunning: Bool = false
 
@@ -48,22 +49,17 @@ class Downloader {
         UNUserNotificationCenter.current().setNotificationCategories([openCategory, cancelCategory, retryCategory, needPremiumCategory])
 
         #if arch(arm64)
-            guard let aria2URL = Bundle.main.url(forResource: "aria2c-arm64", withExtension: nil) else {
-                fatalError("aria2c binary not found in bundle")
-            }
+            let aria2URL = Bundle.main.url(forResource: "aria2c-arm64", withExtension: nil)
         #elseif arch(x86_64)
-            guard let aria2URL = Bundle.main.url(forResource: "aria2c-x86_64", withExtension: nil) else {
-                fatalError("aria2c binary not found in bundle")
-            }
+            let aria2URL = Bundle.main.url(forResource: "aria2c-x86_64", withExtension: nil)
         #else
-            fatalError("Failed to start aria2 process: unknown architecture")
+            let aria2URL: URL? = nil
         #endif
 
-        process = Process()
         process.executableURL = aria2URL
         process.arguments = [
             "--enable-rpc=true",
-            "--rpc-listen-port=6800",
+            "--rpc-listen-port=\(Const.rpcPort)",
             "--rpc-secret=\(Const.token)",
             "--min-split-size=1M",
             "--max-connection-per-server=16",
@@ -88,6 +84,12 @@ class Downloader {
             }
         }
 
+        guard aria2URL != nil else {
+            Crashlytics.crashlytics().record(error: HDrezkaError.null("aria2c", #line, #column))
+
+            return
+        }
+
         do {
             try process.run()
 
@@ -95,7 +97,9 @@ class Downloader {
                 self.isRunning = true
             }
         } catch {
-            fatalError("Failed to start aria2 process: \(error)")
+            Crashlytics.crashlytics().record(error: error)
+
+            return
         }
 
         pollingTask = Task { [weak self] in
@@ -512,6 +516,8 @@ class Downloader {
     }
 
     func terminate() {
+        guard process.isRunning else { return }
+
         process.terminate()
     }
 }
