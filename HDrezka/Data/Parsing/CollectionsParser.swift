@@ -2,9 +2,8 @@ import Foundation
 import SwiftSoup
 
 class CollectionsParser {
-    static func parseCollections(from: String) throws -> [MoviesCollection] {
-        try from.parseHTML()
-            .checker()
+    static func parseCollections(from site: Document) throws -> [MoviesCollection] {
+        try site
             .getCollections()
             .map { collection in
                 try MoviesCollection(

@@ -1,18 +1,19 @@
 import Alamofire
 import Dependencies
 import Foundation
+import SwiftSoup
 
 struct MovieDetailsRepositoryImpl: MovieDetailsRepository {
     @Dependency(\.session) private var session
 
-    private func movieDetailsPage<T>(movieId: String, function: String = #function, parse: (String) throws -> T) async throws -> T {
+    private func movieDetailsPage<T>(movieId: String, function: String = #function, parse: (Document) throws -> T) async throws -> T {
         let parts = movieId.pathParts
 
         guard parts.count == 3 else {
             throw invalidInput(functionName: function)
         }
 
-        return try await session.string(MovieDetailsService.getMovieDetails(type: parts[0], genre: parts[1], name: parts[2]), parse: parse)
+        return try await session.page(MovieDetailsService.getMovieDetails(type: parts[0], genre: parts[1], name: parts[2]), parse: parse)
     }
 
     func getMovieDetails(movieId: String) async throws -> MovieDetailed {

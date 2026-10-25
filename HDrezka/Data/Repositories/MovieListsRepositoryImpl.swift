@@ -6,7 +6,7 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
     @Dependency(\.session) private var session
 
     private func movies(_ convertible: MovieListsService) async throws -> [MovieSimple] {
-        try await session.string(convertible, parse: MovieListsParser.parseMovies)
+        try await session.page(convertible, parse: MovieListsParser.parseMovies)
     }
 
     func getMovies(filter: Filters, genre: Int, page: Int) async throws -> [MovieSimple] {
@@ -33,7 +33,7 @@ struct MovieListsRepositoryImpl: MovieListsRepository {
         let genre = list.count > 2 && !list[2].isNumber ? list[2] : nil
         let year = list.count > 3 ? list[3] : (list.count > 2 && list[2].isNumber ? list[2] : nil)
 
-        return try await session.string(MovieListsService.getMovieList2(type: type, listType: listType, genre: genre, year: year, page: page), parse: MovieListsParser.parse)
+        return try await session.page(MovieListsService.getMovieList2(type: type, listType: listType, genre: genre, year: year, page: page), parse: MovieListsParser.parse)
     }
 
     func getMoviesByCountry(countryId: String, filter: Filters, genre: Int, page: Int) async throws -> [MovieSimple] {

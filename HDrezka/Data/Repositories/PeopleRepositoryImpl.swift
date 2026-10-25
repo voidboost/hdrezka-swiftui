@@ -6,6 +6,6 @@ struct PeopleRepositoryImpl: PeopleRepository {
     @Dependency(\.session) private var session
 
     func getPersonDetails(id: String) async throws -> PersonDetailed {
-        try await session.string(PeopleService.getPersonDetails(id: id.replacingOccurrences(of: "person/", with: "").replacingOccurrences(of: "/", with: "")), parse: PeopleParser.parse)
+        try await session.page(PeopleService.getPersonDetails(id: id.replacingOccurrences(of: "person/", with: "").replacingOccurrences(of: "/", with: "")), parse: PeopleParser.parse)
     }
 }

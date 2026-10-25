@@ -6,8 +6,7 @@ import SwiftSoup
 import SwiftUI
 
 class MovieDetailsParser {
-    static func parseMovieDetails(from: String, movieId: String) throws -> MovieDetailed {
-        let site = try from.parseHTML().checker()
+    static func parseMovieDetails(from site: SwiftSoup.Document, movieId: String) throws -> MovieDetailed {
         let content = try site.getDetailsContent()
 
         let nameRussian = try content.getDetailsRussianName()
@@ -129,8 +128,8 @@ class MovieDetailsParser {
         )
     }
 
-    static func parseBookmarks(from: String) throws -> [Bookmark] {
-        try from.parseHTML().checker().getBookmarks()
+    static func parseBookmarks(from site: SwiftSoup.Document) throws -> [Bookmark] {
+        try site.getBookmarks()
     }
 
     static func parseTrailerId(code: String) throws -> String {
