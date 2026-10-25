@@ -25,6 +25,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         UNUserNotificationCenter.current().delegate = self
 
         NSWindow.allowsAutomaticWindowTabbing = false
+
+        UserDefaults.standard.register(
+            defaults: ["NSApplicationCrashOnExceptions": true]
+        )
+
+        FirebaseApp.configure()
+        Crashlytics.crashlytics().setUserID(Const.deviceUUID)
+        Analytics.setUserID(Const.deviceUUID)
+
+        #if DEBUG
+            Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(false)
+            FirebaseConfiguration.shared.setLoggerLevel(.min)
+            Analytics.setAnalyticsCollectionEnabled(false)
+        #endif
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
@@ -125,8 +139,8 @@ extension AppDelegate: SPUUpdaterDelegate, SPUStandardUserDriverDelegate {
 struct HDrezkaApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @State private var store: StoreOf<AppFeature>
-    @State private var downloader: Downloader
-    @State private var cookiesManager: CookiesManager
+    @State private var downloader: Downloader = .shared
+    @State private var cookiesManager: CookiesManager = .shared
     @Environment(\.openWindow) private var openWindow
 
     @Default(.theme) private var theme
@@ -134,26 +148,9 @@ struct HDrezkaApp: App {
     @Default(.mirror) private var mirror
 
     init() {
-        UserDefaults.standard.register(
-            defaults: ["NSApplicationCrashOnExceptions": true]
-        )
-
-        FirebaseApp.configure()
-        Crashlytics.crashlytics().setUserID(Const.deviceUUID)
-        Analytics.setUserID(Const.deviceUUID)
-
-        #if DEBUG
-            Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(false)
-            FirebaseConfiguration.shared.setLoggerLevel(.min)
-            Analytics.setAnalyticsCollectionEnabled(false)
-        #endif
-
         prepareDependencies {
             $0.defaultDatabase = Self.appDatabase()
         }
-
-        _downloader = State(initialValue: .shared)
-        _cookiesManager = State(initialValue: .shared)
 
         let store = Store(initialState: AppFeature.State()) { AppFeature() }
         store.send(.appLaunched)
