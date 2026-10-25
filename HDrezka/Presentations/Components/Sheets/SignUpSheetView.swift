@@ -349,7 +349,7 @@ struct SignUpSheetView: View {
                 Text("key.cancel")
             }
         } message: {
-            Text("ket.verify.code-\(store.email)")
+            Text("key.verify.code-\(store.email)")
         }
         .alert("key.sign_up.premium", isPresented: $showPremiumWarning) {
             Button(role: .cancel) {} label: {

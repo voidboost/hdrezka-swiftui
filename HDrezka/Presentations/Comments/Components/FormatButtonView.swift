@@ -110,7 +110,7 @@ struct FormatButtonView: View {
                     .background(.tertiary.opacity(0.05), in: .capsule)
                     .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
             } else {
-                Text("Spoiler!".uppercased())
+                Text(String(localized: "key.spoiler").uppercased())
                     .font(.system(.title3, design: .rounded, weight: .bold))
                     .frame(height: 28)
                     .padding(.horizontal, 16)
