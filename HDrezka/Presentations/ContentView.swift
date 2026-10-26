@@ -201,20 +201,19 @@ private struct PathView: View {
     let store: StoreOf<AppFeature.Path>
 
     var body: some View {
-        let analytics = store.state.analytics
-
-        Group {
-            switch store.case {
-            case let .details(store):
-                DetailsView(store: store)
-            case let .list(store):
-                ListView(store: store)
-            case let .person(store):
-                PersonView(store: store)
-            case let .comments(store):
-                CommentsView(store: store)
-            }
+        switch store.case {
+        case let .details(store):
+            DetailsView(store: store)
+                .analyticsScreen(name: "details", class: "DetailsView")
+        case let .list(store):
+            ListView(store: store)
+                .analyticsScreen(name: "list", class: "ListView")
+        case let .person(store):
+            PersonView(store: store)
+                .analyticsScreen(name: "person", class: "PersonView")
+        case let .comments(store):
+            CommentsView(store: store)
+                .analyticsScreen(name: "comments", class: "CommentsView")
         }
-        .analyticsScreen(name: analytics.name, class: analytics.className)
     }
 }

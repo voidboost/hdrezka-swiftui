@@ -201,15 +201,6 @@ extension AppFeature.Path.State {
         case let .comments(details): .comments(CommentsFeature.State(details: details))
         }
     }
-
-    var analytics: (name: String, className: String) {
-        switch self {
-        case .details: ("details", "DetailsView")
-        case .list: ("list", "ListView")
-        case .person: ("person", "PersonView")
-        case .comments: ("comments", "CommentsView")
-        }
-    }
 }
 
 extension AppFeature.Path.Action {

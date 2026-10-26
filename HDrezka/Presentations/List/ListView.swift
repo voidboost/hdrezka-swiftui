@@ -43,7 +43,7 @@ struct ListView: View {
                             .pickerStyle(.inline)
                         }
 
-                        if store.state.isCategory(.newest) {
+                        if store.source == .category(.newest) {
                             Picker("key.filter.select", selection: $store.newFilter) {
                                 ForEach(NewFilters.allCases) { filter in
                                     Text(filter.rawValue).tag(filter)
@@ -54,7 +54,7 @@ struct ListView: View {
 
                         if store.isCategory || store.isCountry {
                             Picker("key.genre.select", selection: $store.filterGenre) {
-                                ForEach(Genres.allCases.filter { $0 != .show || !store.state.isCategory(.hot) }) { genre in
+                                ForEach(Genres.allCases.filter { $0 != .show || store.source != .category(.hot) }) { genre in
                                     Text(genre.rawValue).tag(genre)
                                 }
                             }
