@@ -51,11 +51,11 @@ struct SeriesUpdatesSheetView: View {
                         ScrollView(.vertical) {
                             LazyVStack(alignment: .leading, spacing: 10) {
                                 ForEach(seriesUpdates) { group in
-                                    CustomSection(group: group, isExpanded: seriesUpdates.firstIndex(of: group) == 0) { movie in
+                                    CustomSection(group: group, isExpanded: group.id == seriesUpdates.first?.id) { movie in
                                         store.send(.movieTapped(movie))
                                     }
 
-                                    if group != seriesUpdates.last {
+                                    if group.id != seriesUpdates.last?.id {
                                         Divider()
                                     }
                                 }
@@ -93,7 +93,7 @@ struct SeriesUpdatesSheetView: View {
 
     private struct CustomSection: View {
         private let group: SeriesUpdateGroup
-
+        private let episodes: [SeriesUpdateItem]
 
         @State private var isExpanded: Bool
 
@@ -101,6 +101,7 @@ struct SeriesUpdatesSheetView: View {
 
         init(group: SeriesUpdateGroup, isExpanded: Bool, onSelect: @escaping (MovieSimple) -> Void) {
             self.group = group
+            episodes = group.releasedEpisodes.filter(\.tracked) + group.releasedEpisodes.filter { !$0.tracked }
             self.isExpanded = isExpanded
             self.onSelect = onSelect
         }
@@ -120,7 +121,7 @@ struct SeriesUpdatesSheetView: View {
 
                 if isExpanded {
                     LazyVStack(alignment: .leading, spacing: 0) {
-                        ForEach(group.releasedEpisodes.filter(\.tracked)) { item in
+                        ForEach(episodes) { item in
                             Button {
                                 onSelect(.init(movieId: item.seriesId, name: item.seriesName))
                             } label: {
@@ -166,58 +167,7 @@ struct SeriesUpdatesSheetView: View {
                             }
                             .buttonStyle(.plain)
 
-                            if item != group.releasedEpisodes.filter(\.tracked).last || !group.releasedEpisodes.filter({ !$0.tracked }).isEmpty {
-                                Divider()
-                            }
-                        }
-
-                        ForEach(group.releasedEpisodes.filter { !$0.tracked }) { item in
-                            Button {
-                                onSelect(.init(movieId: item.seriesId, name: item.seriesName))
-                            } label: {
-                                HStack(alignment: .center) {
-                                    Text(verbatim: "\(item.seriesName) \(item.season)")
-                                        .font(.body)
-                                        .lineLimit(nil)
-
-                                    Spacer()
-
-                                    VStack(alignment: .trailing, spacing: 2) {
-                                        Text(item.releasedEpisode).font(.subheadline).foregroundStyle(.secondary)
-                                            .multilineTextAlignment(.trailing)
-
-                                        if !item.chosenVoiceActing.isEmpty {
-                                            HStack(spacing: 3) {
-                                                if item.isChosenVoiceActingPremium {
-                                                    Image(.premium)
-                                                        .font(.subheadline)
-                                                        .foregroundStyle(.white.opacity(0.8))
-                                                }
-
-                                                Text(item.chosenVoiceActing)
-                                                    .font(.subheadline)
-                                                    .foregroundStyle(item.isChosenVoiceActingPremium ? .white.opacity(0.8) : .secondary)
-                                                    .multilineTextAlignment(.trailing)
-                                            }
-                                            .viewModifier { view in
-                                                if item.isChosenVoiceActingPremium {
-                                                    view
-                                                        .padding(.vertical, 2)
-                                                        .padding(.horizontal, 6)
-                                                        .background(Const.premiumGradient, in: .capsule)
-                                                } else {
-                                                    view
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                .padding(.vertical, 8)
-                                .contentShape(.rect)
-                            }
-                            .buttonStyle(.plain)
-
-                            if item != group.releasedEpisodes.filter({ !$0.tracked }).last {
+                            if item.id != episodes.last?.id {
                                 Divider()
                             }
                         }
