@@ -13,10 +13,8 @@ struct SliderWithTextView<T: BinaryFloatingPoint>: View {
     let thumbnails: WebVTT?
     let onEditingChanged: (Bool) -> Void
 
-    @State private var localRealProgress: T = 0
-    @State private var localTempProgress: T = 0
+    @State private var dragProgress: T?
     @GestureState private var isActive: Bool = false
-    @State private var progressDuration: T = 0
 
     @State private var showSeekImage: Bool = false
     @State private var unitSeekImage: CGFloat = .zero
@@ -43,7 +41,13 @@ struct SliderWithTextView<T: BinaryFloatingPoint>: View {
         self.onEditingChanged = onEditingChanged
     }
 
+    private var progress: T {
+        dragProgress ?? getPrgPercentage(value)
+    }
+
     var body: some View {
+        let progress = self.progress
+
         ZStack(alignment: .center) {
             VStack {
                 GeometryReader { geometry in
@@ -51,7 +55,7 @@ struct SliderWithTextView<T: BinaryFloatingPoint>: View {
                         emptyColor
                         (isActive ? activeFillColor : fillColor)
                             .mask(alignment: .leading) {
-                                Color.black.frame(width: max(geometry.size.width * CGFloat(localRealProgress + localTempProgress), 0))
+                                Color.black.frame(width: max(geometry.size.width * CGFloat(progress), 0))
                             }
 
                         ForEach(buffers, id: \.self) { buffer in
@@ -61,11 +65,11 @@ struct SliderWithTextView<T: BinaryFloatingPoint>: View {
                                         let duration = if isActive {
                                             max(Double(end / inRange.upperBound) - Double(start / inRange.upperBound), 0)
                                         } else {
-                                            max(Double(end / inRange.upperBound) - Double(localRealProgress + localTempProgress), 0)
+                                            max(Double(end / inRange.upperBound) - Double(progress), 0)
                                         }
 
                                         let point = CGPoint(
-                                            x: isActive ? max(geometry.size.width * (Double(start / inRange.upperBound) + duration * 0.5), 0) : max(geometry.size.width * (Double(localRealProgress + localTempProgress) + duration * 0.5), 0),
+                                            x: isActive ? max(geometry.size.width * (Double(start / inRange.upperBound) + duration * 0.5), 0) : max(geometry.size.width * (Double(progress) + duration * 0.5), 0),
                                             y: (isActive ? height * 1.25 : height) * 0.5,
                                         )
 
@@ -86,18 +90,12 @@ struct SliderWithTextView<T: BinaryFloatingPoint>: View {
                                 state = true
                             }
                             .onChanged { gesture in
-                                localRealProgress = max(min(T(gesture.location.x / geometry.size.width), 1), 0)
-                                let prg = max(min(localRealProgress + localTempProgress, 1), 0)
-                                progressDuration = inRange.upperBound * prg
+                                dragProgress = max(min(T(gesture.location.x / geometry.size.width), 1), 0)
                                 value = max(min(getPrgValue(), inRange.upperBound), inRange.lowerBound)
 
                                 withAnimation(.easeInOut) {
                                     unitSeekImage = gesture.location.x / geometry.size.width
                                 }
-                            }.onEnded { _ in
-                                localRealProgress = max(min(localRealProgress + localTempProgress, 1), 0)
-                                localTempProgress = 0
-                                progressDuration = inRange.upperBound * localRealProgress
                             },
                     )
                     .onContinuousHover { phase in
@@ -143,9 +141,9 @@ struct SliderWithTextView<T: BinaryFloatingPoint>: View {
                 }
 
                 HStack {
-                    Text(progressDuration.asTimeString)
+                    Text((inRange.upperBound * progress).asTimeString)
                     Spacer(minLength: 0)
-                    Text("-" + (inRange.upperBound - progressDuration).asTimeString)
+                    Text("-" + (inRange.upperBound - inRange.upperBound * progress).asTimeString)
                 }
                 .font(.caption.monospacedDigit())
                 .foregroundColor(isActive ? fillColor : emptyColor)
@@ -156,14 +154,9 @@ struct SliderWithTextView<T: BinaryFloatingPoint>: View {
             value = max(min(getPrgValue(), inRange.upperBound), inRange.lowerBound)
             onEditingChanged(isActive)
         }
-        .onAppear {
-            localRealProgress = getPrgPercentage(value)
-            progressDuration = inRange.upperBound * localRealProgress
-        }
         .onChange(of: value) {
-            if !isActive {
-                localRealProgress = getPrgPercentage(value)
-                progressDuration = inRange.upperBound * localRealProgress
+            if !isActive, dragProgress != nil {
+                dragProgress = nil
             }
         }
     }
@@ -175,7 +168,7 @@ struct SliderWithTextView<T: BinaryFloatingPoint>: View {
     }
 
     private func getPrgValue() -> T {
-        ((localRealProgress + localTempProgress) * (inRange.upperBound - inRange.lowerBound)) + inRange.lowerBound
+        (progress * (inRange.upperBound - inRange.lowerBound)) + inRange.lowerBound
     }
 }
 
