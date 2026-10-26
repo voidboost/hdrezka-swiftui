@@ -8,8 +8,40 @@ struct WatchingLaterCardView: View {
         self.movie = movie
     }
 
-    @State private var innerHeight: CGFloat = 1
-    @State private var outerHeight: CGFloat = 1
+    private var info: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            if !movie.watchingInfo.isEmpty {
+                VStack(alignment: .leading) {
+                    Text(movie.watchingInfo.substringAfter("(").substringBeforeLast(")").trim())
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(movie.buttonText != nil && !movie.watched ? Color.secondary : Color.primary)
+                        .lineLimit(1)
+
+                    if movie.watchingInfo.contains("(") {
+                        Text(movie.watchingInfo.substringBefore("(").trim())
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(movie.buttonText != nil && !movie.watched ? Color.secondary : Color.primary)
+                            .lineLimit(1)
+                    }
+                }
+            }
+
+            if let text = movie.buttonText, !text.isEmpty, !movie.watched {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(text.split(separator: " ", maxSplits: 2).dropLast().joined(separator: " ").firstLetterUppercased)
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.primary)
+
+                    if let last = text.split(separator: " ", maxSplits: 2).last {
+                        Text(last)
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(.primary)
+                    }
+                }
+            }
+        }
+        .padding(6)
+    }
 
     var body: some View {
         NavigationLink(route: .details(MovieSimple(movieId: movie.watchLaterId, name: movie.name, poster: movie.cover))) {
@@ -29,57 +61,17 @@ struct WatchingLaterCardView: View {
                         UnevenRoundedRectangle(bottomLeadingRadius: 6, bottomTrailingRadius: 6)
                             .fill(.ultraThickMaterial)
                             .mask {
-                                LinearGradient(stops: [
-                                    .init(color: .clear, location: ((outerHeight - innerHeight) / outerHeight) * 0.75),
-                                    .init(color: .black, location: (outerHeight - innerHeight) / outerHeight),
-                                ],
-                                startPoint: .top,
-                                endPoint: .bottom)
+                                BottomFadeLayout {
+                                    LinearGradient(colors: [.clear, .black], startPoint: .top, endPoint: .bottom)
+
+                                    Color.black
+
+                                    info.hidden()
+                                }
                             }
                     }
                     .overlay(alignment: .bottomLeading) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            if !movie.watchingInfo.isEmpty {
-                                VStack(alignment: .leading) {
-                                    Text(movie.watchingInfo.substringAfter("(").substringBeforeLast(")").trim())
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundStyle(movie.buttonText != nil && !movie.watched ? Color.secondary : Color.primary)
-                                        .lineLimit(1)
-
-                                    if movie.watchingInfo.contains("(") {
-                                        Text(movie.watchingInfo.substringBefore("(").trim())
-                                            .font(.caption.weight(.semibold))
-                                            .foregroundStyle(movie.buttonText != nil && !movie.watched ? Color.secondary : Color.primary)
-                                            .lineLimit(1)
-                                    }
-                                }
-                            }
-
-                            if let text = movie.buttonText, !text.isEmpty, !movie.watched {
-                                VStack(alignment: .leading, spacing: 0) {
-                                    Text(text.split(separator: " ", maxSplits: 2).dropLast().joined(separator: " ").firstLetterUppercased)
-                                        .font(.caption.weight(.medium))
-                                        .foregroundStyle(.primary)
-
-                                    if let last = text.split(separator: " ", maxSplits: 2).last {
-                                        Text(last)
-                                            .font(.caption.weight(.medium))
-                                            .foregroundStyle(.primary)
-                                    }
-                                }
-                            }
-                        }
-                        .padding(6)
-                        .onGeometryChange(for: CGFloat.self) { geometry in
-                            geometry.size.height
-                        } action: { height in
-                            innerHeight = height
-                        }
-                    }
-                    .onGeometryChange(for: CGFloat.self) { geometry in
-                        geometry.size.height
-                    } action: { height in
-                        outerHeight = height
+                        info
                     }
 
                 VStack(alignment: .leading) {
@@ -108,5 +100,23 @@ struct WatchingLaterCardView: View {
 extension WatchingLaterCardView: Equatable {
     nonisolated static func == (lhs: WatchingLaterCardView, rhs: WatchingLaterCardView) -> Bool {
         lhs.movie.id == rhs.movie.id && lhs.movie.watched == rhs.movie.watched
+    }
+}
+
+private struct BottomFadeLayout: Layout {
+    func sizeThatFits(proposal: ProposedViewSize, subviews _: Subviews, cache _: inout ()) -> CGSize {
+        proposal.replacingUnspecifiedDimensions()
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal _: ProposedViewSize, subviews: Subviews, cache _: inout ()) {
+        guard subviews.count == 3 else { return }
+
+        let content = subviews[2].sizeThatFits(ProposedViewSize(bounds.size))
+        let top = max(bounds.height - content.height, 0)
+        let fade = top * 0.25
+
+        subviews[0].place(at: CGPoint(x: bounds.minX, y: bounds.minY + top - fade), proposal: ProposedViewSize(width: bounds.width, height: fade))
+        subviews[1].place(at: CGPoint(x: bounds.minX, y: bounds.minY + top), proposal: ProposedViewSize(width: bounds.width, height: content.height))
+        subviews[2].place(at: CGPoint(x: bounds.minX, y: bounds.minY + top), proposal: ProposedViewSize(content))
     }
 }
