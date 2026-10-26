@@ -36,7 +36,13 @@ struct BookmarksListView: View {
                             }
                         }
                         .viewModifier { view in
-                            if store.selectedBookmark != bookmark.bookmarkId {
+                            if #available(macOS 26, *) {
+                                view.dropDestination(for: MovieSimple.self, isEnabled: store.selectedBookmark != bookmark.bookmarkId) { movies, _ in
+                                    if !movies.isEmpty, !movies.compactMap(\.movieId.id).isEmpty {
+                                        store.send(.moveMovies(movies, to: bookmark))
+                                    }
+                                }
+                            } else if store.selectedBookmark != bookmark.bookmarkId {
                                 view.dropDestination(for: MovieSimple.self) { movies, _ in
                                     if !movies.isEmpty, !movies.compactMap(\.movieId.id).isEmpty {
                                         store.send(.moveMovies(movies, to: bookmark))
