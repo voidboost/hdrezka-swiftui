@@ -6,12 +6,7 @@ struct CommentsView: View {
 
     var body: some View {
         ScrollView(.vertical) {
-            if store.comments.data?.isEmpty == false, store.reply == nil {
-                CommentTextAreaView()
-                    .padding(.top, 18)
-                    .padding(.horizontal, 36)
-                    .environment(store)
-            }
+            CommentsTopTextArea(store: store)
 
             LazyVStack(alignment: .leading, spacing: 16) {
                 if let comments = store.comments.data, !comments.isEmpty {
@@ -123,5 +118,18 @@ struct CommentsView: View {
         }
         .confirmationDialog($store.scope(state: \.deleteDialog, action: \.deleteDialog))
         .background(.background)
+    }
+}
+
+private struct CommentsTopTextArea: View {
+    let store: StoreOf<CommentsFeature>
+
+    var body: some View {
+        if store.comments.data?.isEmpty == false, store.reply == nil {
+            CommentTextAreaView()
+                .padding(.top, 18)
+                .padding(.horizontal, 36)
+                .environment(store)
+        }
     }
 }
