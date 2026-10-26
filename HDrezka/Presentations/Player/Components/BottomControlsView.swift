@@ -120,13 +120,15 @@ struct BottomControlsView: View {
                         }
                         .pickerStyle(.menu)
 
-                        if !store.movie.getAvailableQualities().isEmpty {
+                        let qualities = store.movie.getAvailableQualities()
+
+                        if !qualities.isEmpty {
                             Picker("key.quality", systemImage: "4k.tv", selection: Binding {
                                 store.quality
                             } set: {
                                 store.send(.qualitySelected($0))
                             }) {
-                                ForEach(store.movie.getAvailableQualities(), id: \.self) { value in
+                                ForEach(qualities, id: \.self) { value in
                                     Text(value).tag(value)
                                 }
                             }
