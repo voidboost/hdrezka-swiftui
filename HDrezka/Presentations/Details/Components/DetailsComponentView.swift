@@ -9,8 +9,6 @@ struct DetailsComponentView: View {
     private let topSafeAreaInset: CGFloat
     @Binding private var isSchedulePresented: Bool
 
-    @Environment(Downloader.self) private var downloader
-
     init(details: MovieDetailed,
          trailerId: String?,
          topSafeAreaInset: CGFloat,
@@ -22,24 +20,12 @@ struct DetailsComponentView: View {
         _isSchedulePresented = isSchedulePresented
     }
 
-    @Environment(StoreOf<DetailsFeature>.self) private var store
-
-    @State private var franchiseExpanded: Bool = false
-
-    @State private var hasExternalPlayer: Bool = false
-
-    @State private var trailer: YouTubePlayer?
-
     @State private var headerHeight = DetailsHeaderHeight()
 
-    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.openWindow) private var openWindow
-    @Environment(\.openURL) private var openURL
     @Environment(\.dismissWindow) private var dismissWindow
 
     var body: some View {
-        @Bindable var store = store
-
         VStack(spacing: 18) {
             VStack(spacing: 18) {
                 HStack(alignment: .bottom, spacing: 27) {
@@ -88,88 +74,7 @@ struct DetailsComponentView: View {
                             }
                         }
 
-                        HStack(alignment: .center, spacing: 12) {
-                            if details.available {
-                                Button {
-                                    store.send(.watchTapped)
-                                } label: {
-                                    Label("key.watch", systemImage: "play.fill")
-                                        .font(.body)
-                                        .foregroundStyle(.white)
-                                        .padding(.horizontal, 14)
-                                        .padding(.vertical, 7)
-                                        .lineLimit(1)
-                                        .contentShape(.capsule)
-                                        .background(Color.accentColor, in: .capsule)
-                                }
-                                .buttonStyle(.plain)
-                                .sheet(item: $store.scope(state: \.destination?.watch, action: \.destination.watch)) { store in
-                                    WatchSheetView(store: store)
-                                }
-
-                                if downloader.isRunning {
-                                    Button {
-                                        store.send(.downloadTapped)
-                                    } label: {
-                                        Label("key.download", systemImage: "arrow.down.circle")
-                                            .font(.body)
-                                            .foregroundStyle(Color.accentColor)
-                                            .padding(.horizontal, 14)
-                                            .padding(.vertical, 7)
-                                            .lineLimit(1)
-                                            .contentShape(.capsule)
-                                            .background(.tertiary.opacity(0.05), in: .capsule)
-                                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
-                                    }
-                                    .buttonStyle(.plain)
-                                    .sheet(item: $store.scope(state: \.destination?.download, action: \.destination.download)) { store in
-                                        DownloadSheetView(store: store)
-                                    }
-                                }
-
-                                if hasExternalPlayer {
-                                    Button {
-                                        store.send(.openExternalPlayerTapped)
-                                    } label: {
-                                        Label("key.open.external", systemImage: "arrow.up.forward.app")
-                                            .font(.body)
-                                            .foregroundStyle(Color.accentColor)
-                                            .padding(.horizontal, 14)
-                                            .padding(.vertical, 7)
-                                            .lineLimit(1)
-                                            .contentShape(.capsule)
-                                            .background(.tertiary.opacity(0.05), in: .capsule)
-                                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
-                                    }
-                                    .buttonStyle(.plain)
-                                    .sheet(item: $store.scope(state: \.destination?.openExternalPlayer, action: \.destination.openExternalPlayer)) { store in
-                                        OpenExternalPlayerSheetView(store: store)
-                                    }
-                                }
-                            } else if details.comingSoon {
-                                Button {} label: {
-                                    Label("key.soon", systemImage: "clock")
-                                        .font(.body)
-                                        .foregroundStyle(.white)
-                                        .padding(.horizontal, 14)
-                                        .padding(.vertical, 7)
-                                        .background(Color.accentColor, in: .capsule)
-                                }
-                                .buttonStyle(.plain)
-                                .disabled(true)
-                            } else {
-                                Button {} label: {
-                                    Label("key.unavailable", systemImage: "network.slash")
-                                        .font(.body)
-                                        .foregroundStyle(.white)
-                                        .padding(.horizontal, 14)
-                                        .padding(.vertical, 7)
-                                        .background(Color.accentColor, in: .capsule)
-                                }
-                                .buttonStyle(.plain)
-                                .disabled(true)
-                            }
-                        }
+                        DetailsActionsView(available: details.available, comingSoon: details.comingSoon)
 
                         DetailsInfoRowsView(details: details)
                     }
@@ -191,12 +96,151 @@ struct DetailsComponentView: View {
         .background {
             DetailsBackdropView(poster: details.poster, height: headerHeight)
         }
+
+        DetailsDescriptionView(description: details.description, trailerId: trailerId)
+
+        if details.franchise != nil || details.schedule != nil {
+            Divider()
+                .padding(.horizontal, 36)
+
+            HStack(alignment: .top, spacing: 36) {
+                if let franchise = details.franchise, !franchise.isEmpty {
+                    DetailsFranchiseView(franchise: franchise)
+                        .equatable()
+                }
+
+                if let schedule = details.schedule, let first = schedule.first {
+                    DetailsScheduleView(schedule: schedule, first: first, isSchedulePresented: $isSchedulePresented)
+                }
+            }
+            .padding(.horizontal, 36)
+        }
+
+        Divider()
+            .padding(.horizontal, 36)
+
+        DetailsWatchAlsoView(movies: details.watchAlsoMovies)
+            .equatable()
+    }
+}
+
+extension DetailsComponentView: Equatable {
+    nonisolated static func == (lhs: DetailsComponentView, rhs: DetailsComponentView) -> Bool {
+        lhs.details == rhs.details && lhs.trailerId == rhs.trailerId && lhs.topSafeAreaInset == rhs.topSafeAreaInset
+    }
+}
+
+private struct DetailsActionsView: View {
+    let available: Bool
+    let comingSoon: Bool
+
+    @Environment(StoreOf<DetailsFeature>.self) private var store
+    @Environment(Downloader.self) private var downloader
+
+    @State private var hasExternalPlayer: Bool = false
+
+    var body: some View {
+        @Bindable var store = store
+
+        HStack(alignment: .center, spacing: 12) {
+            if available {
+                Button {
+                    store.send(.watchTapped)
+                } label: {
+                    Label("key.watch", systemImage: "play.fill")
+                        .font(.body)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 7)
+                        .lineLimit(1)
+                        .contentShape(.capsule)
+                        .background(Color.accentColor, in: .capsule)
+                }
+                .buttonStyle(.plain)
+                .sheet(item: $store.scope(state: \.destination?.watch, action: \.destination.watch)) { store in
+                    WatchSheetView(store: store)
+                }
+
+                if downloader.isRunning {
+                    Button {
+                        store.send(.downloadTapped)
+                    } label: {
+                        Label("key.download", systemImage: "arrow.down.circle")
+                            .font(.body)
+                            .foregroundStyle(Color.accentColor)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 7)
+                            .lineLimit(1)
+                            .contentShape(.capsule)
+                            .background(.tertiary.opacity(0.05), in: .capsule)
+                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
+                    }
+                    .buttonStyle(.plain)
+                    .sheet(item: $store.scope(state: \.destination?.download, action: \.destination.download)) { store in
+                        DownloadSheetView(store: store)
+                    }
+                }
+
+                if hasExternalPlayer {
+                    Button {
+                        store.send(.openExternalPlayerTapped)
+                    } label: {
+                        Label("key.open.external", systemImage: "arrow.up.forward.app")
+                            .font(.body)
+                            .foregroundStyle(Color.accentColor)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 7)
+                            .lineLimit(1)
+                            .contentShape(.capsule)
+                            .background(.tertiary.opacity(0.05), in: .capsule)
+                            .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
+                    }
+                    .buttonStyle(.plain)
+                    .sheet(item: $store.scope(state: \.destination?.openExternalPlayer, action: \.destination.openExternalPlayer)) { store in
+                        OpenExternalPlayerSheetView(store: store)
+                    }
+                }
+            } else if comingSoon {
+                Button {} label: {
+                    Label("key.soon", systemImage: "clock")
+                        .font(.body)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 7)
+                        .background(Color.accentColor, in: .capsule)
+                }
+                .buttonStyle(.plain)
+                .disabled(true)
+            } else {
+                Button {} label: {
+                    Label("key.unavailable", systemImage: "network.slash")
+                        .font(.body)
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 7)
+                        .background(Color.accentColor, in: .capsule)
+                }
+                .buttonStyle(.plain)
+                .disabled(true)
+            }
+        }
         .onAppear {
             hasExternalPlayer = ExternalPlayers.isAnyInstalled
         }
+    }
+}
 
+private struct DetailsDescriptionView: View {
+    let description: String
+    let trailerId: String?
+
+    @State private var trailer: YouTubePlayer?
+
+    @Environment(\.openURL) private var openURL
+
+    var body: some View {
         HStack(alignment: .center, spacing: 18) {
-            Text(details.description)
+            Text(description)
                 .font(.title3)
                 .textSelection(.enabled)
 
@@ -231,220 +275,6 @@ struct DetailsComponentView: View {
         .onChange(of: trailerId, initial: true) {
             trailer = trailerId.map(makeTrailer)
         }
-
-        if details.franchise != nil || details.schedule != nil {
-            Divider()
-                .padding(.horizontal, 36)
-
-            HStack(alignment: .top, spacing: 36) {
-                if let franchise = details.franchise, !franchise.isEmpty {
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack {
-                            Text("key.franchise")
-                                .font(.title2.bold())
-
-                            Spacer()
-                        }
-
-                        LazyVStack(alignment: .leading, spacing: 0) {
-                            ForEach(franchise.prefix(franchiseExpanded ? franchise.count : 5)) { fr in
-                                if !fr.current, let movieId = fr.franchiseId {
-                                    NavigationLink(route: .details(MovieSimple(movieId: movieId, name: fr.name))) {
-                                        HStack(alignment: .center, spacing: 4) {
-                                            ZStack(alignment: .center) {
-                                                ZStack(alignment: .center) {
-                                                    Text(verbatim: "\(fr.position)")
-                                                        .font(.subheadline)
-                                                        .foregroundStyle(.white)
-                                                }
-                                                .frame(width: 19, height: 19)
-                                                .background(LinearGradient(colors: [.secondary.opacity(colorScheme == .dark ? 1 : 0.5), .secondary.opacity(colorScheme == .dark ? 0.5 : 1)], startPoint: .top, endPoint: .bottom), in: .rect(cornerRadius: 6))
-                                            }
-                                            .frame(width: 24, height: 24)
-
-                                            VStack(alignment: .leading) {
-                                                Text(fr.name).font(.body)
-                                                    .lineLimit(1)
-
-                                                if let rating = fr.rating {
-                                                    let color = Color.red.mix(with: .green, by: Double(rating / 10.0))
-                                                    let rating = Text(verbatim: "\(rating)").foregroundStyle(color)
-                                                    let star = Text(Image(systemName: "star.fill")).foregroundStyle(color)
-
-                                                    Text("key.franchise.year-\(fr.year)-\(rating)-\(star)")
-                                                        .font(.subheadline)
-                                                        .foregroundStyle(.secondary)
-                                                } else {
-                                                    Text("key.franchise.year-\(fr.year)").font(.subheadline).foregroundStyle(.secondary)
-                                                }
-                                            }
-
-                                            Spacer()
-
-                                            Image(systemName: "chevron.right").font(.body)
-                                        }
-                                        .contentShape(.rect)
-                                    }
-                                    .buttonStyle(.plain)
-                                    .padding(.vertical, 8)
-                                } else {
-                                    HStack(alignment: .center, spacing: 4) {
-                                        ZStack(alignment: .center) {
-                                            ZStack(alignment: .center) {
-                                                Text(String(fr.position))
-                                                    .font(.subheadline)
-                                                    .foregroundStyle(.white)
-                                            }
-                                            .frame(width: 19, height: 19)
-                                            .background(LinearGradient(colors: [Color.accentColor.opacity(colorScheme == .dark ? 1 : 0.5), Color.accentColor.opacity(colorScheme == .dark ? 0.5 : 1)], startPoint: .top, endPoint: .bottom), in: .rect(cornerRadius: 6))
-                                        }
-                                        .frame(width: 24, height: 24)
-
-                                        VStack(alignment: .leading) {
-                                            Text(fr.name).font(.body)
-                                                .lineLimit(1)
-
-                                            if let rating = fr.rating {
-                                                let color = Color.red.mix(with: .green, by: Double(rating / 10.0))
-                                                let rating = Text(verbatim: "\(rating)").foregroundStyle(color)
-                                                let star = Text(Image(systemName: "star.fill")).foregroundStyle(color)
-
-                                                Text("key.franchise.year-\(fr.year)-\(rating)-\(star)")
-                                                    .font(.subheadline)
-                                                    .foregroundStyle(.secondary)
-                                            } else {
-                                                Text("key.franchise.year-\(fr.year)").font(.subheadline).foregroundStyle(.secondary)
-                                            }
-                                        }
-
-                                        Spacer()
-                                    }
-                                    .padding(.vertical, 8)
-                                }
-
-                                if fr != franchise.last || franchise.count > 5 {
-                                    Divider()
-                                }
-                            }
-
-                            if franchise.count > 5 {
-                                HStack {
-                                    Spacer()
-
-                                    Button {
-                                        withAnimation(.easeInOut) {
-                                            franchiseExpanded.toggle()
-                                        }
-                                    } label: {
-                                        Text(franchiseExpanded ? String(localized: "key.hide").lowercased() : String(localized: "key.view_more").lowercased())
-                                            .font(.body)
-                                            .foregroundStyle(.primary)
-                                    }
-                                    .buttonStyle(.accessoryBar)
-
-                                    Spacer()
-                                }
-                                .padding(.vertical, 8)
-                            }
-                        }
-                        .padding(.horizontal, 10)
-                        .background(.quinary, in: .rect(cornerRadius: 6))
-                        .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
-                    }
-                }
-
-                if let schedule = details.schedule, let first = schedule.first {
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack {
-                            Text("key.schedule")
-                                .font(.title2.bold())
-
-                            Spacer()
-                        }
-
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text(first.name)
-                                .font(.title3.bold())
-
-                            LazyVStack(alignment: .leading, spacing: 0) {
-                                ForEach(first.items.prefix(5)) { item in
-                                    HStack(alignment: .center) {
-                                        VStack(alignment: .leading) {
-                                            Text(item.russianEpisodeName)
-                                                .font(.body)
-                                                .lineLimit(1)
-
-                                            if let originalEpisodeName = item.originalEpisodeName {
-                                                Text(originalEpisodeName)
-                                                    .font(.body)
-                                                    .lineLimit(1)
-                                                    .foregroundStyle(.secondary)
-                                            }
-                                        }
-
-                                        Spacer()
-
-                                        VStack(alignment: .trailing) {
-                                            Text(item.releaseDate).font(.body).foregroundStyle(.secondary)
-
-                                            Text(item.title).font(.subheadline).foregroundStyle(.secondary)
-                                        }
-                                    }
-                                    .padding(.vertical, 8)
-
-                                    if item != first.items.prefix(5).last || schedule.count > 1 || first.items.count > 5 {
-                                        Divider()
-                                    }
-                                }
-
-                                if schedule.count > 1 || first.items.count > 5 {
-                                    HStack {
-                                        Spacer()
-
-                                        Button {
-                                            isSchedulePresented = true
-                                        } label: {
-                                            Text(String(localized: "key.view_more").lowercased())
-                                                .font(.body)
-                                                .foregroundStyle(.primary)
-                                        }
-                                        .buttonStyle(.accessoryBar)
-
-                                        Spacer()
-                                    }
-                                    .padding(.vertical, 8)
-                                }
-                            }
-                            .padding(.horizontal, 10)
-                            .background(.quinary, in: .rect(cornerRadius: 6))
-                            .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
-                        }
-                    }
-                }
-            }
-            .padding(.horizontal, 36)
-        }
-
-        Divider()
-            .padding(.horizontal, 36)
-
-        VStack(alignment: .leading, spacing: 18) {
-            Text("key.watch_also").font(.title.bold())
-                .padding(.horizontal, 36)
-
-            ScrollView(.horizontal) {
-                LazyHStack(alignment: .top, spacing: 18) {
-                    ForEach(details.watchAlsoMovies) { movie in
-                        CardView(movie: movie, reservesSpace: true)
-                            .equatable()
-                            .frame(width: 150)
-                    }
-                }
-                .padding(.horizontal, 36)
-            }
-            .scrollIndicators(.never)
-        }
-        .padding(.bottom, 18)
     }
 
     private func makeTrailer(id: String) -> YouTubePlayer {
@@ -469,6 +299,241 @@ struct DetailsComponentView: View {
             ),
             isLoggingEnabled: isLoggingEnabled
         )
+    }
+}
+
+private struct DetailsFranchiseView: View {
+    let franchise: [MovieFranchisePart]
+
+    @State private var franchiseExpanded: Bool = false
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("key.franchise")
+                    .font(.title2.bold())
+
+                Spacer()
+            }
+
+            LazyVStack(alignment: .leading, spacing: 0) {
+                ForEach(franchise.prefix(franchiseExpanded ? franchise.count : 5)) { fr in
+                    if !fr.current, let movieId = fr.franchiseId {
+                        NavigationLink(route: .details(MovieSimple(movieId: movieId, name: fr.name))) {
+                            HStack(alignment: .center, spacing: 4) {
+                                ZStack(alignment: .center) {
+                                    ZStack(alignment: .center) {
+                                        Text(verbatim: "\(fr.position)")
+                                            .font(.subheadline)
+                                            .foregroundStyle(.white)
+                                    }
+                                    .frame(width: 19, height: 19)
+                                    .background(LinearGradient(colors: [.secondary.opacity(colorScheme == .dark ? 1 : 0.5), .secondary.opacity(colorScheme == .dark ? 0.5 : 1)], startPoint: .top, endPoint: .bottom), in: .rect(cornerRadius: 6))
+                                }
+                                .frame(width: 24, height: 24)
+
+                                VStack(alignment: .leading) {
+                                    Text(fr.name).font(.body)
+                                        .lineLimit(1)
+
+                                    if let rating = fr.rating {
+                                        let color = Color.red.mix(with: .green, by: Double(rating / 10.0))
+                                        let rating = Text(verbatim: "\(rating)").foregroundStyle(color)
+                                        let star = Text(Image(systemName: "star.fill")).foregroundStyle(color)
+
+                                        Text("key.franchise.year-\(fr.year)-\(rating)-\(star)")
+                                            .font(.subheadline)
+                                            .foregroundStyle(.secondary)
+                                    } else {
+                                        Text("key.franchise.year-\(fr.year)").font(.subheadline).foregroundStyle(.secondary)
+                                    }
+                                }
+
+                                Spacer()
+
+                                Image(systemName: "chevron.right").font(.body)
+                            }
+                            .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.vertical, 8)
+                    } else {
+                        HStack(alignment: .center, spacing: 4) {
+                            ZStack(alignment: .center) {
+                                ZStack(alignment: .center) {
+                                    Text(String(fr.position))
+                                        .font(.subheadline)
+                                        .foregroundStyle(.white)
+                                }
+                                .frame(width: 19, height: 19)
+                                .background(LinearGradient(colors: [Color.accentColor.opacity(colorScheme == .dark ? 1 : 0.5), Color.accentColor.opacity(colorScheme == .dark ? 0.5 : 1)], startPoint: .top, endPoint: .bottom), in: .rect(cornerRadius: 6))
+                            }
+                            .frame(width: 24, height: 24)
+
+                            VStack(alignment: .leading) {
+                                Text(fr.name).font(.body)
+                                    .lineLimit(1)
+
+                                if let rating = fr.rating {
+                                    let color = Color.red.mix(with: .green, by: Double(rating / 10.0))
+                                    let rating = Text(verbatim: "\(rating)").foregroundStyle(color)
+                                    let star = Text(Image(systemName: "star.fill")).foregroundStyle(color)
+
+                                    Text("key.franchise.year-\(fr.year)-\(rating)-\(star)")
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                } else {
+                                    Text("key.franchise.year-\(fr.year)").font(.subheadline).foregroundStyle(.secondary)
+                                }
+                            }
+
+                            Spacer()
+                        }
+                        .padding(.vertical, 8)
+                    }
+
+                    if fr != franchise.last || franchise.count > 5 {
+                        Divider()
+                    }
+                }
+
+                if franchise.count > 5 {
+                    HStack {
+                        Spacer()
+
+                        Button {
+                            withAnimation(.easeInOut) {
+                                franchiseExpanded.toggle()
+                            }
+                        } label: {
+                            Text(franchiseExpanded ? String(localized: "key.hide").lowercased() : String(localized: "key.view_more").lowercased())
+                                .font(.body)
+                                .foregroundStyle(.primary)
+                        }
+                        .buttonStyle(.accessoryBar)
+
+                        Spacer()
+                    }
+                    .padding(.vertical, 8)
+                }
+            }
+            .padding(.horizontal, 10)
+            .background(.quinary, in: .rect(cornerRadius: 6))
+            .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+        }
+    }
+}
+
+extension DetailsFranchiseView: Equatable {
+    nonisolated static func == (lhs: DetailsFranchiseView, rhs: DetailsFranchiseView) -> Bool {
+        lhs.franchise == rhs.franchise
+    }
+}
+
+private struct DetailsScheduleView: View {
+    let schedule: [SeriesScheduleGroup]
+    let first: SeriesScheduleGroup
+    @Binding var isSchedulePresented: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("key.schedule")
+                    .font(.title2.bold())
+
+                Spacer()
+            }
+
+            VStack(alignment: .leading, spacing: 10) {
+                Text(first.name)
+                    .font(.title3.bold())
+
+                LazyVStack(alignment: .leading, spacing: 0) {
+                    ForEach(first.items.prefix(5)) { item in
+                        HStack(alignment: .center) {
+                            VStack(alignment: .leading) {
+                                Text(item.russianEpisodeName)
+                                    .font(.body)
+                                    .lineLimit(1)
+
+                                if let originalEpisodeName = item.originalEpisodeName {
+                                    Text(originalEpisodeName)
+                                        .font(.body)
+                                        .lineLimit(1)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+
+                            Spacer()
+
+                            VStack(alignment: .trailing) {
+                                Text(item.releaseDate).font(.body).foregroundStyle(.secondary)
+
+                                Text(item.title).font(.subheadline).foregroundStyle(.secondary)
+                            }
+                        }
+                        .padding(.vertical, 8)
+
+                        if item != first.items.prefix(5).last || schedule.count > 1 || first.items.count > 5 {
+                            Divider()
+                        }
+                    }
+
+                    if schedule.count > 1 || first.items.count > 5 {
+                        HStack {
+                            Spacer()
+
+                            Button {
+                                isSchedulePresented = true
+                            } label: {
+                                Text(String(localized: "key.view_more").lowercased())
+                                    .font(.body)
+                                    .foregroundStyle(.primary)
+                            }
+                            .buttonStyle(.accessoryBar)
+
+                            Spacer()
+                        }
+                        .padding(.vertical, 8)
+                    }
+                }
+                .padding(.horizontal, 10)
+                .background(.quinary, in: .rect(cornerRadius: 6))
+                .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+            }
+        }
+    }
+}
+
+private struct DetailsWatchAlsoView: View {
+    let movies: [MovieSimple]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            Text("key.watch_also").font(.title.bold())
+                .padding(.horizontal, 36)
+
+            ScrollView(.horizontal) {
+                LazyHStack(alignment: .top, spacing: 18) {
+                    ForEach(movies) { movie in
+                        CardView(movie: movie, reservesSpace: true)
+                            .equatable()
+                            .frame(width: 150)
+                    }
+                }
+                .padding(.horizontal, 36)
+            }
+            .scrollIndicators(.never)
+        }
+        .padding(.bottom, 18)
+    }
+}
+
+extension DetailsWatchAlsoView: Equatable {
+    nonisolated static func == (lhs: DetailsWatchAlsoView, rhs: DetailsWatchAlsoView) -> Bool {
+        lhs.movies == rhs.movies
     }
 }
 
