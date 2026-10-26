@@ -72,7 +72,7 @@ final class PlayerEngine {
 
     private(set) var player: AVPlayer?
     private(set) var pipController: AVPictureInPictureController?
-    private(set) var glowImage: Image?
+    private(set) var glow: GlowRenderer.Frame?
 
     @ObservationIgnored @Dependency(\.notificationCenter) private var notificationCenter
 
@@ -116,15 +116,15 @@ final class PlayerEngine {
 
         routeDetector.isRouteDetectionEnabled = true
 
-        glowRenderer.onImage = { [weak self] cgImage in
+        glowRenderer.onFrame = { [weak self] frame in
             guard let self, self.isAmbientLightVisible, self.playerLayer.player != nil else { return }
 
-            if self.glowImage == nil {
-                withAnimation(.easeInOut(duration: 0.15)) {
-                    self.glowImage = Image(decorative: cgImage, scale: 1.0)
+            if self.glow == nil {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    self.glow = frame
                 }
             } else {
-                self.glowImage = Image(decorative: cgImage, scale: 1.0)
+                self.glow = frame
             }
         }
 
@@ -227,6 +227,8 @@ final class PlayerEngine {
         lastTime = nil
         lastPositionTick = nil
 
+        glowRenderer.stop()
+
         nowPlayingInfoCenter.playbackState = .stopped
         nowPlayingInfoCenter.nowPlayingInfo = nil
 
@@ -256,7 +258,7 @@ final class PlayerEngine {
             playerLayer.player = nil
             player = nil
             pipController = nil
-            glowImage = nil
+            glow = nil
         }
     }
 
@@ -413,10 +415,6 @@ final class PlayerEngine {
 
         continuation?.yield(.time(time.seconds))
 
-        if isAmbientLightVisible {
-            glowRenderer.render(at: CMTime(seconds: time.seconds + 0.1, preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
-        }
-
         let now = ContinuousClock.now
 
         guard lastPositionTick.map({ now - $0 >= .seconds(1) }) ?? true else { return }
@@ -442,9 +440,12 @@ final class PlayerEngine {
 
         if isVisible {
             item.add(glowRenderer.videoOutput)
+            glowRenderer.start(item: item)
         } else {
-            withAnimation(.easeInOut(duration: 0.15)) {
-                glowImage = nil
+            glowRenderer.stop()
+
+            withAnimation(.easeInOut(duration: 0.3)) {
+                glow = nil
             }
         }
     }
