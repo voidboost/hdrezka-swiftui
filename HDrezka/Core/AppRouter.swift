@@ -21,11 +21,6 @@ extension AppRouter: DependencyKey {
             routes: { stream }
         )
     }()
-
-    static let testValue = Self(
-        present: unimplemented("AppRouter.present"),
-        routes: unimplemented("AppRouter.routes", placeholder: .finished)
-    )
 }
 
 extension DependencyValues {

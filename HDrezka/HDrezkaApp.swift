@@ -142,7 +142,6 @@ struct HDrezkaApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @State private var store: StoreOf<AppFeature>
     @State private var downloader: Downloader = .shared
-    @State private var cookiesManager: CookiesManager = .shared
     @Environment(\.openWindow) private var openWindow
 
     @Default(.theme) private var theme
@@ -177,7 +176,6 @@ struct HDrezkaApp: App {
         WindowGroup(id: Windows.hdrezka.id) {
             ContentView(store: store)
                 .environment(downloader)
-                .environment(cookiesManager)
                 .preferredColorScheme(theme.scheme)
         }
         .windowResizability(.contentMinSize)
@@ -227,7 +225,6 @@ struct HDrezkaApp: App {
         Settings {
             SettingsView(updater: delegate.updaterController.updater)
                 .environment(downloader)
-                .environment(cookiesManager)
                 .preferredColorScheme(theme.scheme)
                 .analyticsScreen(name: "settings", class: "SettingsView")
         }
