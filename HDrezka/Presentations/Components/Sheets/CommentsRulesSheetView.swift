@@ -1,11 +1,12 @@
 import Defaults
+import Dependencies
 import FirebaseAnalytics
 import SwiftUI
 
 struct CommentsRulesSheetView: View {
     @Environment(\.dismiss) private var dismiss
 
-    @Environment(CookiesManager.self) private var cookiesManager
+    @Dependency(\.cookiesClient) private var cookiesClient
 
     var body: some View {
         VStack(alignment: .center, spacing: 25) {
@@ -121,7 +122,7 @@ struct CommentsRulesSheetView: View {
 
             VStack(alignment: .center, spacing: 10) {
                 Button {
-                    cookiesManager.allowComments()
+                    cookiesClient.allowComments()
 
                     dismiss()
                 } label: {

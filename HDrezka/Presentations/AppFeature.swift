@@ -64,6 +64,7 @@ struct AppFeature {
 
     @Dependency(\.appRouter) private var appRouter
     @Dependency(\.sessionEvents) private var sessionEvents
+    @Dependency(\.cookiesClient) private var cookiesClient
     @Dependency(\.getVersionUseCase) private var getVersionUseCase
     @Dependency(\.logoutUseCase) private var logoutUseCase
 
@@ -109,6 +110,9 @@ struct AppFeature {
                         for await event in sessionEvents.events() {
                             await send(.sessionEventReceived(event))
                         }
+                    },
+                    .run { _ in
+                        await cookiesClient.observe()
                     },
                     .run { _ in
                         let version = try await getVersionUseCase()

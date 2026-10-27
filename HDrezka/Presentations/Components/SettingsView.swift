@@ -20,8 +20,8 @@ struct SettingsView: View {
     @Default(.mediaControlButtonIsSeeking) private var mediaControlButtonIsSeeking
 
     @Environment(Downloader.self) private var downloader
-    @Environment(CookiesManager.self) private var cookiesManager
 
+    @Dependency(\.cookiesClient) private var cookiesClient
     @Dependency(\.defaultDatabase) private var database
     @FetchOne(PlayerPosition.count(), animation: .easeInOut) private var playerPositionsCount: Int = 0
     @FetchOne(SelectPosition.count(), animation: .easeInOut) private var selectPositionsCount: Int = 0
@@ -77,7 +77,7 @@ struct SettingsView: View {
 
                         if !_mirror.isDefaultValue {
                             Button {
-                                cookiesManager.setMirror(_mirror.defaultValue)
+                                cookiesClient.setMirror(_mirror.defaultValue)
 
                                 withAnimation(.easeInOut) {
                                     hostValid = nil
@@ -106,7 +106,7 @@ struct SettingsView: View {
                             urlComponents.password = nil
 
                             if let newMirror = urlComponents.url {
-                                cookiesManager.setMirror(newMirror)
+                                cookiesClient.setMirror(newMirror)
                             }
 
                             withAnimation(.easeInOut) {
