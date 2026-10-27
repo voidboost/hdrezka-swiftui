@@ -141,7 +141,7 @@ func handleError(_ error: Error) -> Error {
     @Dependency(\.sessionEvents) var sessionEvents
 
     if error is CancellationError || error.asAFError?.isExplicitlyCancelledError == true {
-        return CancellationError()
+        return error
     } else if let avError = error as? AVError {
         recordToCrashlytics(avError)
 
