@@ -41,6 +41,7 @@ struct CollectionCardView: View {
                     .multilineTextAlignment(.center)
             }
             .contentShape(.rect(topLeadingRadius: 6, topTrailingRadius: 6))
+            .snowSurface(in: .rect(cornerRadius: 6))
         }
         .buttonStyle(.plain)
     }

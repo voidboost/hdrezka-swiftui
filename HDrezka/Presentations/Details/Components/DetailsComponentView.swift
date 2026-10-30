@@ -57,6 +57,7 @@ struct DetailsComponentView: View {
                             .frame(width: 300)
                             .contentShape(.rect(cornerRadius: 6))
                             .clipShape(.rect(cornerRadius: 6))
+                            .snowSurface(in: .rect(cornerRadius: 6))
                     }
                     .buttonStyle(.plain)
 
@@ -155,6 +156,7 @@ private struct DetailsActionsView: View {
                         .lineLimit(1)
                         .contentShape(.capsule)
                         .background(Color.accentColor, in: .capsule)
+                        .snowSurface(in: .capsule)
                 }
                 .buttonStyle(.plain)
                 .sheet(item: $store.scope(state: \.destination?.watch, action: \.destination.watch)) { store in
@@ -174,6 +176,7 @@ private struct DetailsActionsView: View {
                             .contentShape(.capsule)
                             .background(.tertiary.opacity(0.05), in: .capsule)
                             .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
+                            .snowSurface(in: .capsule)
                     }
                     .buttonStyle(.plain)
                     .sheet(item: $store.scope(state: \.destination?.download, action: \.destination.download)) { store in
@@ -194,6 +197,7 @@ private struct DetailsActionsView: View {
                             .contentShape(.capsule)
                             .background(.tertiary.opacity(0.05), in: .capsule)
                             .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
+                            .snowSurface(in: .capsule)
                     }
                     .buttonStyle(.plain)
                     .sheet(item: $store.scope(state: \.destination?.openExternalPlayer, action: \.destination.openExternalPlayer)) { store in
@@ -208,6 +212,7 @@ private struct DetailsActionsView: View {
                         .padding(.horizontal, 14)
                         .padding(.vertical, 7)
                         .background(Color.accentColor, in: .capsule)
+                        .snowSurface(in: .capsule)
                 }
                 .buttonStyle(.plain)
                 .disabled(true)
@@ -219,6 +224,7 @@ private struct DetailsActionsView: View {
                         .padding(.horizontal, 14)
                         .padding(.vertical, 7)
                         .background(Color.accentColor, in: .capsule)
+                        .snowSurface(in: .capsule)
                 }
                 .buttonStyle(.plain)
                 .disabled(true)
@@ -262,6 +268,7 @@ private struct DetailsDescriptionView: View {
                 .frame(maxWidth: .infinity)
                 .contentShape(.rect(cornerRadius: 6))
                 .clipShape(.rect(cornerRadius: 6))
+                .snowSurface(in: .rect(cornerRadius: 6))
                 .onScrollVisibilityChange { isVisible in
                     if !isVisible, trailer.isPlaying {
                         Task { @MainActor in
@@ -422,6 +429,7 @@ private struct DetailsFranchiseView: View {
             .padding(.horizontal, 10)
             .background(.quinary, in: .rect(cornerRadius: 6))
             .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+            .snowSurface(in: .rect(cornerRadius: 6))
         }
     }
 }
@@ -502,6 +510,7 @@ private struct DetailsScheduleView: View {
                 .padding(.horizontal, 10)
                 .background(.quinary, in: .rect(cornerRadius: 6))
                 .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                .snowSurface(in: .rect(cornerRadius: 6))
             }
         }
     }
@@ -526,6 +535,7 @@ private struct DetailsWatchAlsoView: View {
                 .padding(.horizontal, 36)
             }
             .scrollIndicators(.never)
+            .snowHeadroom()
         }
         .padding(.bottom, 18)
     }

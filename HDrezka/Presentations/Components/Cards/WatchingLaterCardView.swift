@@ -90,6 +90,7 @@ struct WatchingLaterCardView: View {
                 }
             }
             .contentShape(.rect(topLeadingRadius: 6, topTrailingRadius: 6))
+            .snowSurface(in: .rect(cornerRadius: 6))
         }
         .buttonStyle(.plain)
         .opacity(movie.watched ? 0.6 : 1)

@@ -66,6 +66,7 @@ struct CommentTextAreaView: View {
         }
         .padding(12)
         .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+        .snowSurface(in: .rect(cornerRadius: 6))
         .onChange(of: feedback) {
             if !allowedComments, !feedback.trim().isEmpty {
                 store.send(.rulesTapped)

@@ -49,6 +49,7 @@ struct CategoriesTypeView: View {
                             .contentShape(.rect(cornerRadius: 6))
                             .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
                             .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                            .snowSurface(in: .rect(cornerRadius: 6))
                     }
                     .buttonStyle(.plain)
                     .flexibility(.natural)
@@ -86,6 +87,7 @@ struct CategoriesTypeView: View {
             .padding(.horizontal, 16)
             .background(.tertiary.opacity(0.05), in: .rect(cornerRadius: 6))
             .overlay(.tertiary.opacity(0.2), in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+            .snowSurface(in: .rect(cornerRadius: 6))
         }
     }
 }

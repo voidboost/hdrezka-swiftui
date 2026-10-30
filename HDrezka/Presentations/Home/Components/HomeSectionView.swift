@@ -20,6 +20,7 @@ struct HomeSectionView: View {
                 .padding(.horizontal, 36)
             }
             .scrollIndicators(.never)
+            .snowHeadroom()
         } header: {
             HStack(alignment: .center, spacing: 9) {
                 Text(category.title).font(.system(.title, weight: .semibold))

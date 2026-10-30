@@ -94,6 +94,7 @@ struct CardView: View {
                     view
                 }
             }
+            .snowSurface(in: .rect(cornerRadius: 6))
         }
         .buttonStyle(.plain)
     }
