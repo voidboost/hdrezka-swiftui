@@ -96,8 +96,20 @@ final class SnowMetalView: MTKView {
     override func setFrameSize(_ newSize: NSSize) {
         super.setFrameSize(newSize)
 
-        drawableSize = newSize
+        updateDrawableSize()
         simulation.resize(width: Float(newSize.width), height: Float(newSize.height))
+    }
+
+    override func viewDidChangeBackingProperties() {
+        super.viewDidChangeBackingProperties()
+
+        updateDrawableSize()
+    }
+
+    private func updateDrawableSize() {
+        let scale = window?.backingScaleFactor ?? 2
+
+        drawableSize = CGSize(width: bounds.width * scale, height: bounds.height * scale)
     }
 
     override func viewDidMoveToWindow() {
