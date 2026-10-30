@@ -17,11 +17,12 @@ struct ContentView: View {
 
     @State private var showDays = false
     @State private var snowSurfaces = SnowSurfaces()
+    @State private var isSnowFading = false
 
-    private var isSnowing: Bool {
+    private var isSnowShown: Bool {
         let weekOfYear = Calendar.current.component(.weekOfYear, from: .now)
 
-        return snow && (weekOfYear <= 2 || weekOfYear >= 51 || forceSnow)
+        return (snow || isSnowFading) && (weekOfYear <= 2 || weekOfYear >= 51 || forceSnow)
     }
 
     private var tabs: some View {
@@ -119,13 +120,16 @@ struct ContentView: View {
             .padding(.vertical, 5)
         }
         .frame(minWidth: 1100, minHeight: 600)
-        .environment(\.snowSurfaces, isSnowing && snowOnSurfaces ? snowSurfaces : nil)
+        .environment(\.snowSurfaces, isSnowShown && snowOnSurfaces ? snowSurfaces : nil)
     }
 
     var body: some View {
         tabs
         .onChange(of: isLoggedIn) {
             store.send(.loggedInChanged(isLoggedIn))
+        }
+        .onChange(of: snow) {
+            isSnowFading = !snow
         }
         .sheet(item: $store.scope(state: \.destination?.signIn, action: \.destination.signIn)) { store in
             SignInSheetView(store: store)
@@ -168,8 +172,10 @@ struct ContentView: View {
         }
         .dialogSeverity(.critical)
         .overlay {
-            if isSnowing {
-                SnowView(snowSurfaces: snowOnSurfaces ? snowSurfaces : nil)
+            if isSnowShown {
+                SnowView(snowSurfaces: snowOnSurfaces ? snowSurfaces : nil, isEnabled: snow) {
+                    isSnowFading = false
+                }
                     .allowsHitTesting(false)
                     .ignoresSafeArea()
             }

@@ -29,6 +29,7 @@ private struct Flake {
     var swayRate: Float
     var swayAmount: Float
     var settles: Bool
+    var blown: Float = 0
 }
 
 private struct Grain {
@@ -37,6 +38,7 @@ private struct Grain {
     var area: Float
     var size: Float
     var lump: Float = 0
+    var blown = false
 }
 
 private struct Mote {
@@ -69,6 +71,7 @@ final class SnowSimulation {
         var intensity: SnowIntensity = .steady
         var accumulates = true
         var melts = true
+        var isEnabled = true
     }
 
     enum Pace {
@@ -98,11 +101,19 @@ final class SnowSimulation {
     private let maxGrains = 12000
     private let maxMotes = 1500
     private let phaseWrap: Float = 20 * .pi
+    private let gustSweep: Float = 0.6
+    private let gustLength: Float = 2.2
+    private let gustWind: Float = 1000
+    private let gustLag: Float = 0.3
     private let bucketWidth: Float = 64
 
     var configuration = Configuration() {
         didSet {
             guard configuration != oldValue else { return }
+
+            if configuration.isEnabled != oldValue.isEnabled {
+                gust = configuration.isEnabled ? nil : (clock, breeze() < 0 ? -1 : 1)
+            }
 
             if configuration.intensity == .variable, oldValue.intensity != .variable {
                 nextShift = clock
@@ -143,6 +154,7 @@ final class SnowSimulation {
     private var strength: Float = 1
     private var strengthTarget: Float = 1
     private var nextShift: Double = 0
+    private var gust: (start: Double, direction: Float)?
 
     init() {
         var seed = RandomSource()
@@ -155,6 +167,10 @@ final class SnowSimulation {
             phases: (seed.range(0, 2 * .pi), seed.range(0, 2 * .pi)),
         )
         layers = [ground]
+    }
+
+    var isIdle: Bool {
+        !configuration.isEnabled && gust == nil && flakes.isEmpty && grains.isEmpty && motes.isEmpty && layers.allSatisfy { $0.top <= 0.05 }
     }
 
     var spriteCount: Int {
@@ -202,7 +218,7 @@ final class SnowSimulation {
 
             layer.resize(columns: geometry.columns)
             layer.origin = geometry.origin
-            layer.shapeCorners(radius: Float(surface.cornerRadius))
+            layer.shapeCorners(radius: Float(surface.cornerRadius), exponent: Float(surface.cornerExponent))
             layer.updateVisibility(clip: geometry.clip)
         }
 
@@ -227,7 +243,7 @@ final class SnowSimulation {
                 phases: (random.range(0, 2 * .pi), random.range(0, 2 * .pi)),
             )
 
-            layer.shapeCorners(radius: Float(surface.cornerRadius))
+            layer.shapeCorners(radius: Float(surface.cornerRadius), exponent: Float(surface.cornerExponent))
             layer.updateVisibility(clip: geometry.clip)
             self.ledges[id] = layer
             isChanged = true
@@ -251,6 +267,7 @@ final class SnowSimulation {
         updateBuckets()
         vary(dt: dt)
         trackCursor(point, dt: dt)
+        blow(dt: dt)
         advanceFlakes(dt: dt)
         advanceGrains(dt: dt)
         advanceMotes(dt: dt)
@@ -284,7 +301,7 @@ final class SnowSimulation {
                 position: grain.position,
                 velocity: grain.velocity,
                 size: grain.size,
-                alpha: grain.lump > 0 ? 0.97 : 0.95,
+                alpha: grain.lump > 0 ? 0.97 : grain.blown ? 0.8 : 0.95,
                 soft: grain.lump > 0 ? 0.2 : 0.3,
                 lump: grain.lump,
             )
@@ -711,7 +728,12 @@ final class SnowSimulation {
         while i >= 0 {
             var flake = flakes[i]
 
-            flake.velocity.x += (wind * (0.35 + 0.65 * flake.depth) - flake.velocity.x) * follow
+            if flake.blown != 0 {
+                flake.velocity.x += (flake.blown * gustWind * (1.3 + 1.3 * flake.depth) - flake.velocity.x) * min(1, dt * 2.5)
+            } else {
+                flake.velocity.x += (wind * (0.35 + 0.65 * flake.depth) - flake.velocity.x) * follow
+            }
+
             flake.velocity.y += (-flake.fallSpeed - flake.velocity.y) * settle
 
             if wakeActive {
@@ -737,13 +759,19 @@ final class SnowSimulation {
             flake.position.x += (flake.velocity.x + sway) * dt
             flake.position.y += flake.velocity.y * flutter * dt
 
+            if flake.blown != 0, flake.position.x < -30 || flake.position.x > width + 30 {
+                recycle(i)
+                i -= 1
+                continue
+            }
+
             if flake.position.x < -30 {
                 flake.position.x += width + 60
             } else if flake.position.x > width + 30 {
                 flake.position.x -= width + 60
             }
 
-            if flake.settles, accumulates {
+            if flake.settles, accumulates, flake.blown == 0 {
                 if let hit = landing(x: flake.position.x, from: previousY, to: flake.position.y) {
                     hit.layer.deposit(flake.size * flake.size * deposition * hit.layer.fill(hit.index), at: flake.position.x)
                     recycle(i)
@@ -771,13 +799,19 @@ final class SnowSimulation {
             var grain = grains[i]
             let previousY = grain.position.y
 
-            grain.velocity.y -= gravity * dt
-            grain.velocity *= damping
+            if grain.blown {
+                grain.velocity.x += ((grain.velocity.x < 0 ? -gustWind : gustWind) * 1.6 - grain.velocity.x) * min(1, dt * 2)
+                grain.velocity.y -= gravity * 0.08 * dt
+            } else {
+                grain.velocity.y -= gravity * dt
+                grain.velocity *= damping
+            }
+
             grain.position += grain.velocity * dt
 
             if grain.position.x < -10 || grain.position.x > width + 10 || grain.position.y < -10 {
                 removeGrain(i)
-            } else if grain.velocity.y <= 0, let hit = landing(x: grain.position.x, from: previousY, to: grain.position.y) {
+            } else if !grain.blown, grain.velocity.y <= 0, let hit = landing(x: grain.position.x, from: previousY, to: grain.position.y) {
                 if grain.lump > 0 {
                     burst(grain, into: hit.layer)
                 } else {
@@ -799,7 +833,7 @@ final class SnowSimulation {
         guard !motes.isEmpty else { return }
 
         let damping = exp(-3.2 * dt)
-        let drift = breeze() * 0.4
+        let drift = (breeze() + gustSpeed()) * 0.4
         var i = motes.count - 1
 
         while i >= 0 {
@@ -853,7 +887,7 @@ final class SnowSimulation {
 
         return Flake(
             position: SIMD2(random.range(-30, width + 30), y),
-            velocity: SIMD2(breeze() * (0.35 + 0.65 * depth), -fallSpeed),
+            velocity: SIMD2((breeze() + gustSpeed()) * (0.35 + 0.65 * depth), -fallSpeed),
             fallSpeed: fallSpeed,
             size: near ? random.range(8, 13) : 1.4 + depth * 4.4 + random.range(0, 1),
             depth: depth,
@@ -863,6 +897,95 @@ final class SnowSimulation {
             swayRate: random.range(0.5, 1.4),
             swayAmount: near ? random.range(10, 20) : random.range(4, 9) + depth * 10,
             settles: !near,
+        )
+    }
+
+    private func blow(dt: Float) {
+        guard let gust else { return }
+
+        let age = Float(clock - gust.start)
+
+        if age >= gustLength, !flakes.contains(where: { $0.blown != 0 }) {
+            self.gust = nil
+            return
+        }
+
+        let direction = gust.direction
+        let front = gustFront(age: age, direction: direction)
+        let trailing = gustFront(age: age - gustLag, direction: direction)
+        let isFinishing = age > gustSweep + 0.8
+
+        for i in flakes.indices where flakes[i].blown == 0 {
+            if isFinishing || (trailing - flakes[i].position.x) * direction > flakes[i].phase / phaseWrap * 240 {
+                flakes[i].blown = direction
+            }
+        }
+
+        for layer in layers {
+            var dust: Float = 0
+
+            for i in 0 ..< layer.count where layer.heights[i] > 0 {
+                let x = layer.centerX(i)
+
+                guard isFinishing || (front - x) * direction > 0 else { continue }
+
+                let h = layer.heights[i]
+                let surface = layer.surface(i)
+                let loss = isFinishing ? h : min(h, (h * 8 + 50) * dt)
+
+                layer.set(i, h - loss)
+
+                guard layer.visible[i] else { continue }
+
+                dust += loss * columnWidth
+
+                while dust >= 3.5 {
+                    lift(at: SIMD2(x, surface), direction: direction)
+                    dust -= 3.5
+                }
+            }
+        }
+    }
+
+    private func gustFront(age: Float, direction: Float) -> Float {
+        let margin: Float = 40
+        let t = min(max(age / gustSweep, 0), 1)
+        let travel = (width + 2 * margin) * (1 - (1 - t) * (1 - t))
+
+        return direction > 0 ? -margin + travel : width + margin - travel
+    }
+
+    private func gustSpeed() -> Float {
+        guard let gust else { return 0 }
+
+        let age = Float(clock - gust.start)
+
+        return gust.direction * gustWind * smoothstep(0, 0.12, age) * (1 - smoothstep(0.9, gustLength, age))
+    }
+
+    private func lift(at position: SIMD2<Float>, direction: Float) {
+        guard grains.count < maxGrains else { return }
+
+        grains.append(
+            Grain(
+                position: position + SIMD2(random.range(-1, 1), -random.range(0, 3)),
+                velocity: SIMD2(direction * random.range(800, 1800), random.range(60, 420)),
+                area: 0,
+                size: random.range(1.1, 2.6),
+                blown: true,
+            ),
+        )
+
+        guard random.next() < 0.35, motes.count < maxMotes else { return }
+
+        motes.append(
+            Mote(
+                position: position,
+                velocity: SIMD2(direction * random.range(200, 600), random.range(20, 120)),
+                size: random.range(6, 14),
+                alpha: random.range(0.06, 0.14),
+                life: random.range(0.6, 1.3),
+            ),
         )
     }
 
@@ -920,7 +1043,7 @@ final class SnowSimulation {
     }
 
     private func updateTarget() {
-        targetFlakes = Int(flakesPerMegapoint * strength * width * height / 1_000_000)
+        targetFlakes = configuration.isEnabled ? Int(flakesPerMegapoint * strength * width * height / 1_000_000) : 0
     }
 }
 

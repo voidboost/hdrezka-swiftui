@@ -15,17 +15,26 @@ private struct SnowUniforms {
     var surfaceWidth: Float = 0
     var cornerRadius: Float = 0
     var ledge: Float = 0
-    var padding: Float = 0
+    var cornerExponent: Float = 2
 }
 
 final class SnowMetalView: MTKView {
     private static let framesInFlight = 3
 
     var snowSurfaces: SnowSurfaces?
+    var onIdle: (() -> Void)?
 
     var configuration: SnowSimulation.Configuration {
         get { simulation.configuration }
-        set { simulation.configuration = newValue }
+        set {
+            simulation.configuration = newValue
+
+            if newValue.isEnabled {
+                isIdle = false
+            }
+
+            updatePause()
+        }
     }
 
     private let simulation = SnowSimulation()
@@ -41,6 +50,7 @@ final class SnowMetalView: MTKView {
     private var slot = 0
     private var lastTime: CFTimeInterval = 0
     private var lastDark: Float = -1
+    private var isIdle = false
     private var observations: [Task<Void, Never>] = []
 
     init() {
@@ -134,11 +144,13 @@ final class SnowMetalView: MTKView {
     private func updatePause() {
         let isVisible = window?.occlusionState.contains(.visible) ?? false
 
-        if isPaused, isVisible {
+        let isRunning = isVisible && !isIdle
+
+        if isPaused, isRunning {
             lastTime = 0
         }
 
-        isPaused = !isVisible
+        isPaused = !isRunning
     }
 
     private var cursorLocation: SIMD2<Float>? {
@@ -217,6 +229,12 @@ final class SnowMetalView: MTKView {
         commandBuffer.present(drawable)
         commandBuffer.addCompletedHandler(Self.completion(signaling: semaphore))
         commandBuffer.commit()
+
+        if simulation.isIdle {
+            isIdle = true
+            updatePause()
+            onIdle?()
+        }
     }
 
     private func drawLedges(into commandBuffer: MTLCommandBuffer, pipeline: MTLRenderPipelineState, heights: MTLBuffer, offset: Int, uniforms: SnowUniforms) {
@@ -262,6 +280,7 @@ final class SnowMetalView: MTKView {
                 uniforms.pileBottom = -cornerRadius
                 uniforms.surfaceWidth = Float(view.bounds.width)
                 uniforms.cornerRadius = cornerRadius
+                uniforms.cornerExponent = Float(ledge.surface?.cornerExponent ?? 2)
                 uniforms.ledge = 1
 
                 layer.writeSmoothed(into: values + offset)
@@ -331,11 +350,13 @@ final class SnowMetalView: MTKView {
 private struct SnowMetalViewRepresentable: NSViewRepresentable {
     let snowSurfaces: SnowSurfaces?
     let configuration: SnowSimulation.Configuration
+    let onIdle: () -> Void
 
     func makeNSView(context _: Context) -> SnowMetalView {
         let view = SnowMetalView()
         view.snowSurfaces = snowSurfaces
         view.configuration = configuration
+        view.onIdle = onIdle
 
         return view
     }
@@ -343,11 +364,14 @@ private struct SnowMetalViewRepresentable: NSViewRepresentable {
     func updateNSView(_ view: SnowMetalView, context _: Context) {
         view.snowSurfaces = snowSurfaces
         view.configuration = configuration
+        view.onIdle = onIdle
     }
 }
 
 struct SnowView: View {
     let snowSurfaces: SnowSurfaces?
+    let isEnabled: Bool
+    let onIdle: () -> Void
 
     @Default(.snowIntensity) private var snowIntensity
     @Default(.snowAccumulates) private var snowAccumulates
@@ -356,7 +380,8 @@ struct SnowView: View {
     var body: some View {
         SnowMetalViewRepresentable(
             snowSurfaces: snowSurfaces,
-            configuration: .init(intensity: snowIntensity, accumulates: snowAccumulates, melts: snowMelts),
+            configuration: .init(intensity: snowIntensity, accumulates: snowAccumulates, melts: snowMelts, isEnabled: isEnabled),
+            onIdle: onIdle,
         )
         .onGeometryChange(for: CGRect.self) { proxy in
             proxy.frame(in: .global)
