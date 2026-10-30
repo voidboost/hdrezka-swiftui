@@ -30,4 +30,8 @@ extension Defaults.Keys {
 
     static let snow = Key<Bool>("snow", default: true)
     static let forceSnow = Key<Bool>("force_snow", default: false)
+    static let snowIntensity = Key<SnowIntensity>("snow_intensity", default: .steady)
+    static let snowAccumulates = Key<Bool>("snow_accumulates", default: true)
+    static let snowMelts = Key<Bool>("snow_melts", default: true)
+    static let snowOnSurfaces = Key<Bool>("snow_on_surfaces", default: true)
 }

@@ -13,8 +13,16 @@ struct ContentView: View {
     @Default(.isFirstLaunch) private var isFirstLaunch
     @Default(.snow) private var snow
     @Default(.forceSnow) private var forceSnow
+    @Default(.snowOnSurfaces) private var snowOnSurfaces
 
     @State private var showDays = false
+    @State private var snowSurfaces = SnowSurfaces()
+
+    private var isSnowing: Bool {
+        let weekOfYear = Calendar.current.component(.weekOfYear, from: .now)
+
+        return snow && (weekOfYear <= 2 || weekOfYear >= 51 || forceSnow)
+    }
 
     private var tabs: some View {
         TabView(selection: $store.selectedTab) {
@@ -111,6 +119,7 @@ struct ContentView: View {
             .padding(.vertical, 5)
         }
         .frame(minWidth: 1100, minHeight: 600)
+        .environment(\.snowSurfaces, isSnowing && snowOnSurfaces ? snowSurfaces : nil)
     }
 
     var body: some View {
@@ -159,10 +168,8 @@ struct ContentView: View {
         }
         .dialogSeverity(.critical)
         .overlay {
-            let weekOfYear = Calendar.current.component(.weekOfYear, from: .now)
-
-            if snow, weekOfYear <= 2 || weekOfYear >= 51 || forceSnow {
-                SnowflakesView()
+            if isSnowing {
+                SnowView(snowSurfaces: snowOnSurfaces ? snowSurfaces : nil)
                     .allowsHitTesting(false)
                     .ignoresSafeArea()
             }
@@ -173,8 +180,10 @@ struct ContentView: View {
         NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
             root(for: tab)
                 .analyticsScreen(name: tab.name, class: tab.className)
+                .snowScreen()
         } destination: { store in
             PathView(store: store)
+                .snowScreen()
         }
     }
 

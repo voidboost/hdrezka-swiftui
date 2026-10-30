@@ -44,6 +44,7 @@ struct PersonMoviesRowView: View {
                 .padding(.horizontal, 36)
             }
             .scrollIndicators(.never)
+            .snowHeadroom()
         }
     }
 }

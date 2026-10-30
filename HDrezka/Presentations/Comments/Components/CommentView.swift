@@ -59,6 +59,7 @@ struct CommentView: View {
                                 .contentShape(.capsule)
                                 .background(.tertiary.opacity(0.05), in: .capsule)
                                 .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
+                                .snowSurface(in: .capsule)
                         }
                         .buttonStyle(.plain)
                     }
@@ -145,6 +146,7 @@ private struct CommentLikeButton: View {
             .padding(.horizontal, 16)
             .background(.tertiary.opacity(0.05), in: .capsule)
             .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
+            .snowSurface(in: .capsule)
         }
         .buttonStyle(.plain)
         .disabled(comment.selfComment)
@@ -225,6 +227,7 @@ private struct CommentReplyButton: View {
             .contentShape(.capsule)
             .background(.tertiary.opacity(0.05), in: .capsule)
             .overlay(.tertiary.opacity(0.2), in: .capsule.stroke(lineWidth: 1))
+            .snowSurface(in: .capsule)
         }
         .buttonStyle(.plain)
     }

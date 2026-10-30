@@ -17,6 +17,10 @@ struct SettingsView: View {
     @Default(.cache) private var cache
     @Default(.snow) private var snow
     @Default(.forceSnow) private var forceSnow
+    @Default(.snowIntensity) private var snowIntensity
+    @Default(.snowAccumulates) private var snowAccumulates
+    @Default(.snowMelts) private var snowMelts
+    @Default(.snowOnSurfaces) private var snowOnSurfaces
     @Default(.mediaControlButtonIsSeeking) private var mediaControlButtonIsSeeking
 
     @Environment(Downloader.self) private var downloader
@@ -370,6 +374,67 @@ struct SettingsView: View {
                             Spacer()
 
                             Toggle("key.forceSnow", isOn: $forceSnow)
+                                .toggleStyle(.switch)
+                                .labelsHidden()
+                        }
+                        .frame(height: 40)
+                    }
+
+                    if snow {
+                        Divider()
+
+                        HStack(alignment: .center, spacing: 8) {
+                            Text("key.snow.intensity")
+
+                            Spacer()
+
+                            Text(snowIntensity.localizedKey)
+                                .foregroundStyle(.secondary)
+
+                            Slider(value: Binding { Double(snowIntensity.rawValue) } set: { value in snowIntensity = SnowIntensity(rawValue: Int(value.rounded())) ?? .steady }, in: 0 ... Double(SnowIntensity.allCases.count - 1), step: 1) {
+                                Text("key.snow.intensity")
+                            }
+                            .labelsHidden()
+                            .controlSize(.large)
+                            .frame(width: 200)
+                        }
+                        .frame(height: 40)
+
+                        Divider()
+
+                        HStack(alignment: .center, spacing: 8) {
+                            Text("key.snow.accumulates")
+
+                            Spacer()
+
+                            Toggle("key.snow.accumulates", isOn: $snowAccumulates)
+                                .toggleStyle(.switch)
+                                .labelsHidden()
+                        }
+                        .frame(height: 40)
+
+                        Divider()
+
+                        HStack(alignment: .center, spacing: 8) {
+                            Text("key.snow.melts")
+
+                            Spacer()
+
+                            Toggle("key.snow.melts", isOn: $snowMelts)
+                                .toggleStyle(.switch)
+                                .labelsHidden()
+                        }
+                        .frame(height: 40)
+                        .disabled(!snowAccumulates)
+
+                        Divider()
+
+                        HStack(alignment: .center, spacing: 8) {
+                            Text("key.snow.on_surfaces")
+
+                            Spacer()
+
+                            Toggle("key.snow.on_surfaces", isOn: $snowOnSurfaces)
                                 .toggleStyle(.switch)
                                 .labelsHidden()
                         }
