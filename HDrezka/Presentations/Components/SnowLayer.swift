@@ -297,16 +297,6 @@ final class SnowLayer {
         rendered = heights
     }
 
-    func smoothed() -> [Float] {
-        [Float](unsafeUninitializedCapacity: heights.count * 2) { buffer, initialized in
-            if let base = buffer.baseAddress {
-                writeSmoothed(into: base)
-            }
-
-            initialized = heights.count * 2
-        }
-    }
-
     func writeSmoothed(into buffer: UnsafeMutablePointer<Float>) {
         let count = heights.count
 

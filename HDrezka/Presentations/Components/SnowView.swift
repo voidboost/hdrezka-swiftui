@@ -193,26 +193,22 @@ final class SnowMetalView: MTKView {
             scale: Float(drawableSize.width / max(bounds.width, 1)),
             dark: effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua ? 1 : 0,
         )
-        let uniformsLength = MemoryLayout<SnowUniforms>.stride
 
         if let ground {
-            uniforms.origin = ground.origin
-            uniforms.columnCount = Int32(ground.count)
-            uniforms.pileTop = ground.top + 2
-            uniforms.pileBottom = ground.bottom
+            var pile = uniforms
+            pile.origin = ground.origin
+            pile.columnCount = Int32(ground.count)
+            pile.pileTop = ground.top + 2
+            pile.pileBottom = ground.bottom
 
-            encoder.setRenderPipelineState(pilePipeline)
-            encoder.setVertexBytes(&uniforms, length: uniformsLength, index: 0)
-            encoder.setFragmentBuffer(heightBuffer, offset: 0, index: 0)
-            encoder.setFragmentBytes(&uniforms, length: uniformsLength, index: 1)
-            encoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)
+            encodePile(into: encoder, pipeline: pilePipeline, uniforms: pile, heights: heightBuffer, offset: 0)
         }
 
         if sprites > 0 {
             encoder.setRenderPipelineState(spritePipeline)
             encoder.setVertexBuffer(spriteBuffer, offset: 0, index: 0)
-            encoder.setVertexBytes(&uniforms, length: uniformsLength, index: 1)
-            encoder.setFragmentBytes(&uniforms, length: uniformsLength, index: 0)
+            encoder.setVertexBytes(&uniforms, length: MemoryLayout<SnowUniforms>.stride, index: 1)
+            encoder.setFragmentBytes(&uniforms, length: MemoryLayout<SnowUniforms>.stride, index: 0)
             encoder.drawPrimitives(type: .point, vertexStart: 0, vertexCount: sprites)
         }
 
@@ -269,12 +265,7 @@ final class SnowMetalView: MTKView {
                 uniforms.ledge = 1
 
                 layer.writeSmoothed(into: values + offset)
-
-                encoder.setRenderPipelineState(pipeline)
-                encoder.setVertexBytes(&uniforms, length: MemoryLayout<SnowUniforms>.stride, index: 0)
-                encoder.setFragmentBuffer(heights, offset: offset * MemoryLayout<Float>.stride, index: 0)
-                encoder.setFragmentBytes(&uniforms, length: MemoryLayout<SnowUniforms>.stride, index: 1)
-                encoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)
+                encodePile(into: encoder, pipeline: pipeline, uniforms: uniforms, heights: heights, offset: offset)
 
                 offset += layer.count * 2
             }
@@ -284,6 +275,16 @@ final class SnowMetalView: MTKView {
             view.needsRedraw = false
             layer.markRendered()
         }
+    }
+
+    private func encodePile(into encoder: MTLRenderCommandEncoder, pipeline: MTLRenderPipelineState, uniforms: SnowUniforms, heights: MTLBuffer, offset: Int) {
+        var uniforms = uniforms
+
+        encoder.setRenderPipelineState(pipeline)
+        encoder.setVertexBytes(&uniforms, length: MemoryLayout<SnowUniforms>.stride, index: 0)
+        encoder.setFragmentBuffer(heights, offset: offset * MemoryLayout<Float>.stride, index: 0)
+        encoder.setFragmentBytes(&uniforms, length: MemoryLayout<SnowUniforms>.stride, index: 1)
+        encoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)
     }
 
     private func updateFrameRate() {

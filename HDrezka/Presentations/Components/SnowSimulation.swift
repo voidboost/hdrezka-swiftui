@@ -98,6 +98,7 @@ final class SnowSimulation {
     private let maxGrains = 12000
     private let maxMotes = 1500
     private let phaseWrap: Float = 20 * .pi
+    private let bucketWidth: Float = 64
 
     var configuration = Configuration() {
         didSet {
@@ -125,6 +126,7 @@ final class SnowSimulation {
     private let ground: SnowLayer
     private var ledges: [ObjectIdentifier: SnowLayer] = [:]
     private var ledgeList: [SnowLayer] = []
+    private var buckets: [[SnowLayer]] = []
     private var removedLedges: [ObjectIdentifier] = []
     private var layers: [SnowLayer]
     private var heldLayers: [SnowLayer] = []
@@ -246,6 +248,7 @@ final class SnowSimulation {
 
         clock += Double(dt)
 
+        updateBuckets()
         vary(dt: dt)
         trackCursor(point, dt: dt)
         advanceFlakes(dt: dt)
@@ -638,18 +641,44 @@ final class SnowSimulation {
         return area
     }
 
+    private func updateBuckets() {
+        let count = Int(width / bucketWidth) + 1
+
+        if buckets.count != count {
+            buckets = Array(repeating: [], count: count)
+        } else {
+            for i in buckets.indices {
+                buckets[i].removeAll(keepingCapacity: true)
+            }
+        }
+
+        for ledge in ledgeList where ledge.isVisible {
+            let lower = max(0, Int((ledge.origin.x / bucketWidth).rounded(.down)))
+            let upper = min(count - 1, Int(((ledge.origin.x + ledge.width) / bucketWidth).rounded(.down)))
+
+            guard lower <= upper else { continue }
+
+            for i in lower ... upper {
+                buckets[i].append(ledge)
+            }
+        }
+    }
+
     private func landing(x: Float, from: Float, to: Float) -> (layer: SnowLayer, index: Int)? {
         var hit: (layer: SnowLayer, index: Int)?
         var highest = -Float.greatestFiniteMagnitude
+        let bucket = Int((x / bucketWidth).rounded(.down))
 
-        for ledge in ledgeList {
-            guard let i = ledge.index(at: x), ledge.visible[i] else { continue }
+        if bucket >= 0, bucket < buckets.count {
+            for ledge in buckets[bucket] {
+                guard let i = ledge.index(at: x), ledge.visible[i] else { continue }
 
-            let surface = ledge.surface(i)
+                let surface = ledge.surface(i)
 
-            if from >= ledge.previousBaseY + ledge.bed[i], to <= surface, surface > highest {
-                hit = (ledge, i)
-                highest = surface
+                if from >= ledge.previousBaseY + ledge.bed[i], to <= surface, surface > highest {
+                    hit = (ledge, i)
+                    highest = surface
+                }
             }
         }
 
@@ -676,6 +705,7 @@ final class SnowSimulation {
 
         let wakeCenter = cursor ?? SIMD2(-10000, -10000)
         let wakeActive = wakeSpeed > 20
+        let accumulates = configuration.accumulates
         var i = flakes.count - 1
 
         while i >= 0 {
@@ -713,7 +743,7 @@ final class SnowSimulation {
                 flake.position.x -= width + 60
             }
 
-            if flake.settles, configuration.accumulates {
+            if flake.settles, accumulates {
                 if let hit = landing(x: flake.position.x, from: previousY, to: flake.position.y) {
                     hit.layer.deposit(flake.size * flake.size * deposition * hit.layer.fill(hit.index), at: flake.position.x)
                     recycle(i)
