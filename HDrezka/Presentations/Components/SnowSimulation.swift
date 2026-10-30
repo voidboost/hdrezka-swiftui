@@ -833,7 +833,7 @@ final class SnowSimulation {
         guard !motes.isEmpty else { return }
 
         let damping = exp(-3.2 * dt)
-        let drift = (breeze() + gustSpeed()) * 0.4
+        let drift = wind() * 0.4
         var i = motes.count - 1
 
         while i >= 0 {
@@ -887,7 +887,7 @@ final class SnowSimulation {
 
         return Flake(
             position: SIMD2(random.range(-30, width + 30), y),
-            velocity: SIMD2((breeze() + gustSpeed()) * (0.35 + 0.65 * depth), -fallSpeed),
+            velocity: SIMD2(wind() * (0.35 + 0.65 * depth), -fallSpeed),
             fallSpeed: fallSpeed,
             size: near ? random.range(8, 13) : 1.4 + depth * 4.4 + random.range(0, 1),
             depth: depth,
@@ -987,6 +987,10 @@ final class SnowSimulation {
                 life: random.range(0.6, 1.3),
             ),
         )
+    }
+
+    private func wind() -> Float {
+        breeze() + gustSpeed()
     }
 
     private func breeze() -> Float {

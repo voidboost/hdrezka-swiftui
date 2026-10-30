@@ -16,6 +16,10 @@ struct ContentView: View {
     @State private var showDays = false
     @State private var snowSurfaces = SnowSurfaces()
 
+    private var isSnowShown: Bool {
+        store.snow != .hidden
+    }
+
     private var tabs: some View {
         TabView(selection: $store.selectedTab) {
             ForEach(Tabs.allCases.filter { !$0.needAccount }) { tab in
@@ -111,7 +115,7 @@ struct ContentView: View {
             .padding(.vertical, 5)
         }
         .frame(minWidth: 1100, minHeight: 600)
-        .environment(\.snowSurfaces, store.snow != .hidden && snowOnSurfaces ? snowSurfaces : nil)
+        .environment(\.snowSurfaces, isSnowShown && snowOnSurfaces ? snowSurfaces : nil)
     }
 
     var body: some View {
@@ -160,12 +164,12 @@ struct ContentView: View {
         }
         .dialogSeverity(.critical)
         .overlay {
-            if store.snow != .hidden {
+            if isSnowShown {
                 SnowView(snowSurfaces: snowOnSurfaces ? snowSurfaces : nil, isEnabled: store.snow == .falling) {
                     store.send(.snowSettled)
                 }
-                    .allowsHitTesting(false)
-                    .ignoresSafeArea()
+                .allowsHitTesting(false)
+                .ignoresSafeArea()
             }
         }
     }
