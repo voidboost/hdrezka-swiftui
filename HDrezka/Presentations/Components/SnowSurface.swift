@@ -15,6 +15,15 @@ enum SnowSurfaceShape: Equatable {
         }
     }
 
+    var cornerExponent: CGFloat {
+        switch self {
+        case .rect:
+            2.5
+        case .capsule:
+            2
+        }
+    }
+
     func path(in rect: CGRect) -> Path {
         switch self {
         case let .rect(cornerRadius):
@@ -29,6 +38,7 @@ struct SnowSurface: Equatable {
     var frame: CGRect
     var clip: CGRect
     var cornerRadius: CGFloat
+    var cornerExponent: CGFloat
 }
 
 @MainActor
@@ -213,7 +223,7 @@ private struct SnowSurfaceModifier: ViewModifier {
                         clip.size.height = bounds.height
                     }
 
-                    return SnowSurface(frame: frame, clip: clip, cornerRadius: shape.cornerRadius(in: frame.size))
+                    return SnowSurface(frame: frame, clip: clip, cornerRadius: shape.cornerRadius(in: frame.size), cornerExponent: shape.cornerExponent)
                 } action: { surface in
                     ledge.surface = surface
 

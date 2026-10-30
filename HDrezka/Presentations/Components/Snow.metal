@@ -15,7 +15,7 @@ struct SnowUniforms {
     float surfaceWidth;
     float cornerRadius;
     float ledge;
-    float padding;
+    float cornerExponent;
 };
 
 struct SnowSprite {
@@ -162,7 +162,7 @@ static float4 snowShade(float y, float level, float bed, float underside, float 
     return float4(color * coverage, coverage);
 }
 
-static float snowCorner(float x, float width, float radius) {
+static float snowCorner(float x, float width, float radius, float exponent) {
     float inset = min(x, width - x);
 
     if (radius <= 0.0 || inset >= radius) {
@@ -171,7 +171,7 @@ static float snowCorner(float x, float width, float radius) {
 
     float u = 1.0 - inset / radius;
 
-    return -radius * (1.0 - sqrt(max(0.0, 1.0 - u * u)));
+    return -radius * (1.0 - pow(max(0.0, 1.0 - pow(u, exponent)), 1.0 / exponent));
 }
 
 fragment float4 snowPileFragment(
@@ -189,7 +189,7 @@ fragment float4 snowPileFragment(
         float thickness = max(level - bed, 0.0);
         float edge = saturate(min(x, u.surfaceWidth - x) / u.columnWidth);
 
-        bed = snowCorner(x, u.surfaceWidth, u.cornerRadius);
+        bed = snowCorner(x, u.surfaceWidth, u.cornerRadius, u.cornerExponent);
         level = bed + thickness * edge;
         underside = -1e4;
     }

@@ -21,6 +21,7 @@ final class SnowLayer {
     private let phases: (Float, Float)
     private var capacity: [Float] = []
     private var cornerRadius: Float = 0
+    private var cornerExponent: Float = 2
     private var supported: [Bool]
     private var supportedRange: ClosedRange<Int>?
     private var parity = false
@@ -80,10 +81,11 @@ final class SnowLayer {
         invalidate(i, i)
     }
 
-    func shapeCorners(radius: Float) {
-        guard radius != cornerRadius else { return }
+    func shapeCorners(radius: Float, exponent: Float) {
+        guard radius != cornerRadius || exponent != cornerExponent else { return }
 
         cornerRadius = radius
+        cornerExponent = exponent
         updateBed()
         invalidate(0, heights.count - 1)
     }
@@ -91,7 +93,18 @@ final class SnowLayer {
     func resize(columns: Int) {
         guard columns != heights.count else { return }
 
-        heights = Array(heights.prefix(columns)) + Array(repeating: 0, count: max(0, columns - heights.count))
+        let old = heights
+
+        heights = (0 ..< columns).map { i in
+            guard !old.isEmpty else { return 0 }
+
+            let at = (Float(i) + 0.5) * Float(old.count) / Float(columns) - 0.5
+            let lower = min(max(Int(at.rounded(.down)), 0), old.count - 1)
+            let upper = min(lower + 1, old.count - 1)
+
+            return old[lower] + (old[upper] - old[lower]) * min(max(at - Float(lower), 0), 1)
+        }
+
         visible = Array(repeating: true, count: columns)
         supported = Array(repeating: false, count: columns)
         supportedRange = nil
@@ -321,6 +334,7 @@ final class SnowLayer {
 
     private func updateBed() {
         let radius = cornerRadius
+        let exponent = cornerExponent
         let span = width
 
         bed = (0 ..< heights.count).map { i in
@@ -333,7 +347,7 @@ final class SnowLayer {
 
             let u = 1 - inset / radius
 
-            return -radius * (1 - max(0, 1 - u * u).squareRoot())
+            return -radius * (1 - pow(max(0, 1 - pow(u, exponent)), 1 / exponent))
         }
 
         bedDepth = -(bed.min() ?? 0)
