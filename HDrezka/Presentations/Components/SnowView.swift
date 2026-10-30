@@ -156,9 +156,12 @@ final class SnowMetalView: MTKView {
     private var cursorLocation: SIMD2<Float>? {
         guard let window else { return nil }
 
-        let point = convert(window.mouseLocationOutsideOfEventStream, from: nil)
+        let location = NSEvent.mouseLocation
+        let point = convert(window.convertPoint(fromScreen: location), from: nil)
 
-        guard bounds.contains(point) else { return nil }
+        guard bounds.contains(point),
+              NSWindow.windowNumber(at: location, belowWindowWithWindowNumber: 0) == window.windowNumber
+        else { return nil }
 
         return SIMD2(Float(point.x), Float(point.y))
     }
