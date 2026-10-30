@@ -11,19 +11,10 @@ struct ContentView: View {
     @Default(.mirror) private var mirror
     @Default(.isUserPremium) private var isUserPremium
     @Default(.isFirstLaunch) private var isFirstLaunch
-    @Default(.snow) private var snow
-    @Default(.forceSnow) private var forceSnow
     @Default(.snowOnSurfaces) private var snowOnSurfaces
 
     @State private var showDays = false
     @State private var snowSurfaces = SnowSurfaces()
-    @State private var isSnowFading = false
-
-    private var isSnowShown: Bool {
-        let weekOfYear = Calendar.current.component(.weekOfYear, from: .now)
-
-        return (snow || isSnowFading) && (weekOfYear <= 2 || weekOfYear >= 51 || forceSnow)
-    }
 
     private var tabs: some View {
         TabView(selection: $store.selectedTab) {
@@ -120,16 +111,13 @@ struct ContentView: View {
             .padding(.vertical, 5)
         }
         .frame(minWidth: 1100, minHeight: 600)
-        .environment(\.snowSurfaces, isSnowShown && snowOnSurfaces ? snowSurfaces : nil)
+        .environment(\.snowSurfaces, store.snow != .hidden && snowOnSurfaces ? snowSurfaces : nil)
     }
 
     var body: some View {
         tabs
         .onChange(of: isLoggedIn) {
             store.send(.loggedInChanged(isLoggedIn))
-        }
-        .onChange(of: snow) {
-            isSnowFading = !snow
         }
         .sheet(item: $store.scope(state: \.destination?.signIn, action: \.destination.signIn)) { store in
             SignInSheetView(store: store)
@@ -172,9 +160,9 @@ struct ContentView: View {
         }
         .dialogSeverity(.critical)
         .overlay {
-            if isSnowShown {
-                SnowView(snowSurfaces: snowOnSurfaces ? snowSurfaces : nil, isEnabled: snow) {
-                    isSnowFading = false
+            if store.snow != .hidden {
+                SnowView(snowSurfaces: snowOnSurfaces ? snowSurfaces : nil, isEnabled: store.snow == .falling) {
+                    store.send(.snowSettled)
                 }
                     .allowsHitTesting(false)
                     .ignoresSafeArea()
