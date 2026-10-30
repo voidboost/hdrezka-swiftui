@@ -307,7 +307,7 @@ final class SnowLayer {
     }
 
     func markRendered() {
-        rendered = heights
+        rendered = heights.map { $0 }
     }
 
     func writeSmoothed(into buffer: UnsafeMutablePointer<Float>) {
