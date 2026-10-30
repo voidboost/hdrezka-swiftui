@@ -278,7 +278,7 @@ struct HDrezkaApp: App {
 
                 let credits = NSMutableAttributedString(attachment: imageAttachment)
                 credits.addAttribute(.link, value: Const.helpUkraine, range: NSRange(location: 0, length: credits.length))
-                credits.append(NSAttributedString(string: "\n\n© 2025 "))
+                credits.append(NSAttributedString(string: "\n\n© 2025-2026 "))
                 credits.append(NSAttributedString(string: "HDrezka macOS", attributes: [.link: Const.github]))
                 credits.append(NSAttributedString(string: "\n\n\(String(localized: "key.id-\(Const.deviceUUID)"))"))
                 credits.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSRange(location: 0, length: credits.length))
