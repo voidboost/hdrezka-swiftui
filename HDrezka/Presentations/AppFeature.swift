@@ -19,6 +19,12 @@ struct AppFeature {
         case restore(RestoreFeature)
     }
 
+    enum Snow: Equatable {
+        case hidden
+        case falling
+        case fading
+    }
+
     @ObservableState
     struct State: Equatable {
         var selectedTab: Tabs = .home
@@ -35,6 +41,8 @@ struct AppFeature {
         var isSignOutPresented = false
         var isPremiumPresented = false
         var isCommentsRulesPresented = false
+
+        var snow = Snow.hidden
 
         @Presents var destination: Destination.State?
         @Presents var alert: AlertState<Action.Alert>?
@@ -56,6 +64,8 @@ struct AppFeature {
         case signOutConfirmed
         case loggedOut(Result<Void, any Error>)
         case loggedInChanged(Bool)
+        case snowSettingsChanged(isEnabled: Bool, isForced: Bool)
+        case snowSettled
         case destination(PresentationAction<Destination.Action>)
         case alert(PresentationAction<Alert>)
 
@@ -67,6 +77,8 @@ struct AppFeature {
     @Dependency(\.cookiesClient) private var cookiesClient
     @Dependency(\.getVersionUseCase) private var getVersionUseCase
     @Dependency(\.logoutUseCase) private var logoutUseCase
+    @Dependency(\.date.now) private var now
+    @Dependency(\.calendar) private var calendar
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -114,6 +126,11 @@ struct AppFeature {
                     .run { _ in
                         await cookiesClient.observe()
                     },
+                    .run { send in
+                        for await (snow, forceSnow) in Defaults.updates(.snow, .forceSnow, initial: true) {
+                            await send(.snowSettingsChanged(isEnabled: snow, isForced: forceSnow))
+                        }
+                    },
                     .run { _ in
                         let version = try await getVersionUseCase()
 
@@ -158,6 +175,24 @@ struct AppFeature {
             case let .loggedInChanged(isLoggedIn):
                 if !isLoggedIn, state.selectedTab.needAccount {
                     state.selectedTab = .home
+                }
+
+                return .none
+
+            case let .snowSettingsChanged(isEnabled, isForced):
+                let weekOfYear = calendar.component(.weekOfYear, from: now)
+
+                if isEnabled, isForced || weekOfYear <= 2 || weekOfYear >= 51 {
+                    state.snow = .falling
+                } else if state.snow != .hidden {
+                    state.snow = .fading
+                }
+
+                return .none
+
+            case .snowSettled:
+                if state.snow == .fading {
+                    state.snow = .hidden
                 }
 
                 return .none
@@ -218,8 +253,8 @@ extension AppFeature.Path.Action {
     }
 }
 
+@MainActor
 extension NavigationLink where Destination == Never {
-    @MainActor
     init<L: View>(route: Destinations, @ViewBuilder label: () -> L) where Label == _NavigationLinkStoreContent<AppFeature.Path.State, L> {
         self.init(state: AppFeature.Path.State(route), label: label)
     }
