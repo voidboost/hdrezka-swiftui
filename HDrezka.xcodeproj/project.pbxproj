@@ -11,7 +11,6 @@
 		04B25FD82BA46F9C00200341 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 04B25FD72BA46F9C00200341 /* Algorithms */; };
 		04B3CA8A2BA06CAC0039F76E /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 04B3CA892BA06CAC0039F76E /* SwiftSoup */; };
 		04E5DC0A2C120C4200BF1B7A /* Flow in Frameworks */ = {isa = PBXBuildFile; productRef = 04E5DC092C120C4200BF1B7A /* Flow */; };
-		04E9EB462C047F19001CBBCA /* YouTubePlayerKit in Frameworks */ = {isa = PBXBuildFile; productRef = 04E9EB452C047F19001CBBCA /* YouTubePlayerKit */; };
 		DE188EE52CA6AB3100E7B1AE /* Pow in Frameworks */ = {isa = PBXBuildFile; productRef = DE188EE42CA6AB3100E7B1AE /* Pow */; };
 		DE2D67382DC3D5E900A9187C /* LicensesList in Frameworks */ = {isa = PBXBuildFile; productRef = DE2D67372DC3D5E900A9187C /* LicensesList */; };
 		DE3EF0392CFF04CA0022C311 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DE3EF0382CFF04CA0022C311 /* Alamofire */; };
@@ -58,7 +57,6 @@
 			files = (
 				DEB035BA2C89E57A004ABFA1 /* Defaults in Frameworks */,
 				043A2B722C036C7C0057721E /* OrderedCollections in Frameworks */,
-				04E9EB462C047F19001CBBCA /* YouTubePlayerKit in Frameworks */,
 				DEEDFD71304B26490074D4F4 /* Dependencies in Frameworks */,
 				DEEDFD74304B26490074D4F4 /* ComposableArchitecture in Frameworks */,
 				04B25FD82BA46F9C00200341 /* Algorithms in Frameworks */,
@@ -119,7 +117,6 @@
 				04B3CA892BA06CAC0039F76E /* SwiftSoup */,
 				04B25FD72BA46F9C00200341 /* Algorithms */,
 				043A2B712C036C7C0057721E /* OrderedCollections */,
-				04E9EB452C047F19001CBBCA /* YouTubePlayerKit */,
 				04E5DC092C120C4200BF1B7A /* Flow */,
 				DEE64D0A2C8869D0002C2F2F /* Sparkle */,
 				DEB035B42C89E1DB004ABFA1 /* FirebaseAnalytics */,
@@ -166,7 +163,6 @@
 				04B3CA882BA06CAC0039F76E /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 				04B25FD62BA46F9C00200341 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 				043A2B702C036C7C0057721E /* XCRemoteSwiftPackageReference "swift-collections" */,
-				04E9EB442C047F19001CBBCA /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */,
 				04E5DC082C120C4200BF1B7A /* XCRemoteSwiftPackageReference "SwiftUI-Flow" */,
 				DEE64D092C8869D0002C2F2F /* XCRemoteSwiftPackageReference "Sparkle" */,
 				DEB035B32C89E1DB004ABFA1 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
@@ -548,15 +544,6 @@
 				minimumVersion = 0.0.1;
 			};
 		};
-		04E9EB442C047F19001CBBCA /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SvenTiigi/YouTubePlayerKit.git";
-			requirement = {
-				kind = versionRange;
-				maximumVersion = 999.0.0;
-				minimumVersion = 0.0.1;
-			};
-		};
 		DE188EE32CA6AB3100E7B1AE /* XCRemoteSwiftPackageReference "Pow" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/EmergeTools/Pow.git";
@@ -663,11 +650,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 04E5DC082C120C4200BF1B7A /* XCRemoteSwiftPackageReference "SwiftUI-Flow" */;
 			productName = Flow;
-		};
-		04E9EB452C047F19001CBBCA /* YouTubePlayerKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 04E9EB442C047F19001CBBCA /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */;
-			productName = YouTubePlayerKit;
 		};
 		DE188EE42CA6AB3100E7B1AE /* Pow */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -1,7 +1,6 @@
 import ComposableArchitecture
 import Kingfisher
 import SwiftUI
-import YouTubePlayerKit
 
 struct DetailsComponentView: View {
     private let details: MovieDetailed
@@ -240,8 +239,6 @@ private struct DetailsDescriptionView: View {
     let description: String
     let trailerId: String?
 
-    @State private var trailer: YouTubePlayer?
-
     @Environment(\.openURL) private var openURL
 
     var body: some View {
@@ -250,62 +247,41 @@ private struct DetailsDescriptionView: View {
                 .font(.title3)
                 .textSelection(.enabled)
 
-            if let trailer {
-                YouTubePlayerView(trailer, transaction: .init(animation: .easeInOut)) { state in
-                    if state.isIdle {
-                        ProgressView()
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    } else if let error = state.error {
-                        switch error {
-                        case .embeddedVideoPlayingNotAllowed:
-                            EmptyView()
-                        default:
-                            Text("key.youtube.error")
+            if let trailerId,
+               let url = URL(string: "https://www.youtube.com/watch?v=\(trailerId)"),
+               let thumbnail = URL(string: "https://i.ytimg.com/vi/\(trailerId)/maxresdefault.jpg"),
+               let fallbackThumbnail = URL(string: "https://i.ytimg.com/vi/\(trailerId)/hqdefault.jpg")
+            {
+                Button {
+                    openURL(url)
+                } label: {
+                    KFImage
+                        .url(thumbnail)
+                        .alternativeSources([.network(fallbackThumbnail)])
+                        .placeholder {
+                            Color.gray.shimmering()
                         }
-                    }
-                }
-                .aspectRatio(16 / 9, contentMode: .fit)
-                .frame(maxWidth: .infinity)
-                .contentShape(.rect(cornerRadius: 6))
-                .clipShape(.rect(cornerRadius: 6))
-                .snowSurface(in: .rect(cornerRadius: 6))
-                .onScrollVisibilityChange { isVisible in
-                    if !isVisible, trailer.isPlaying {
-                        Task { @MainActor in
-                            try? await trailer.pause()
+                        .resizable()
+                        .loadTransition(.blurReplace(.downUp), animation: .bouncy)
+                        .cancelOnDisappear(true)
+                        .retry(NetworkRetryStrategy())
+                        .imageFill(16 / 9)
+                        .overlay {
+                            Image(systemName: "play.fill")
+                                .font(.title)
+                                .foregroundStyle(.white)
+                                .frame(width: 68, height: 48)
+                                .background(Color(red: 1, green: 0, blue: 0), in: .rect(cornerRadius: 14))
+                                .shadow(color: .black.opacity(0.3), radius: 8, y: 2)
                         }
-                    }
+                        .contentShape(.rect(cornerRadius: 6))
+                        .clipShape(.rect(cornerRadius: 6))
+                        .snowSurface(in: .rect(cornerRadius: 6))
                 }
+                .buttonStyle(.plain)
             }
         }
         .padding(.horizontal, 36)
-        .onChange(of: trailerId, initial: true) {
-            trailer = trailerId.map(makeTrailer)
-        }
-    }
-
-    private func makeTrailer(id: String) -> YouTubePlayer {
-        #if DEBUG
-            let isLoggingEnabled = true
-        #else
-            let isLoggingEnabled = false
-        #endif
-
-        return YouTubePlayer(
-            source: .video(id: id),
-            parameters: .init(
-                autoPlay: false,
-                loopEnabled: true,
-                showControls: true,
-                showFullscreenButton: true
-            ),
-            configuration: .init(
-                openURLAction: .init { url, _ in
-                    openURL(url)
-                }
-            ),
-            isLoggingEnabled: isLoggingEnabled
-        )
     }
 }
 

@@ -57,7 +57,7 @@ struct DetailsFeature {
         }
     }
 
-    private enum CancelID { case load, rate }
+    private enum CancelID { case load, trailer, rate }
 
     @Dependency(\.getMovieDetailsUseCase) private var getMovieDetailsUseCase
     @Dependency(\.getMovieTrailerIdUseCase) private var getMovieTrailerIdUseCase
@@ -82,26 +82,21 @@ struct DetailsFeature {
                 return .run { [id = state.id] send in
                     let result = await Result { try await getMovieDetailsUseCase(movieId: id) }
 
-                    guard case let .success(details) = result, let movieId = details.movieId.id else {
-                        await send(.detailsLoaded(result), animation: .easeInOut)
-
-                        return
-                    }
-
-                    async let trailerId = getMovieTrailerIdUseCase(movieId: movieId)
-
-                    await send(.detailsLoaded(result), awaitingAnimation: .easeInOut)
-
-                    if let trailerId = try? await trailerId {
-                        await send(.trailerLoaded(trailerId), animation: .easeInOut)
-                    }
+                    await send(.detailsLoaded(result), animation: .easeInOut)
                 }
                 .cancellable(id: CancelID.load, cancelInFlight: true)
 
             case let .detailsLoaded(.success(details)):
                 state.details = .data(details)
 
-                return .none
+                guard state.trailerId == nil, let movieId = details.movieId.id else { return .none }
+
+                return .run { send in
+                    guard let trailerId = try? await getMovieTrailerIdUseCase(movieId: movieId) else { return }
+
+                    await send(.trailerLoaded(trailerId), animation: .easeInOut)
+                }
+                .cancellable(id: CancelID.trailer, cancelInFlight: true)
 
             case let .detailsLoaded(.failure(error)):
                 state.details = .error(error)

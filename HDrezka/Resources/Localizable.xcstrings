@@ -7945,28 +7945,6 @@
         }
       }
     },
-    "key.youtube.error" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "YouTube player couldn't be loaded"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не удалось загрузить проигрыватель YouTube"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не вдалося завантажити програвач YouTube"
-          }
-        }
-      }
-    },
     "library.branch-%@" : {
       "localizations" : {
         "en" : {
