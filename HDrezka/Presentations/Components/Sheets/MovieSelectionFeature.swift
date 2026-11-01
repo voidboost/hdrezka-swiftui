@@ -44,10 +44,8 @@ struct MovieSelectionFeature {
         case video
     }
 
-    @Dependency(\.getMovieDetailsUseCase) private var getMovieDetailsUseCase
-    @Dependency(\.getMovieVideoUseCase) private var getMovieVideoUseCase
-    @Dependency(\.getSeriesSeasonsUseCase) private var getSeriesSeasonsUseCase
-    @Dependency(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
+    @Dependency(\.movieDetailsClient) private var movieDetailsClient
+    @Dependency(\.accountClient) private var accountClient
     @Dependency(\.defaultDatabase) private var database
     @Dependency(\.appRouter) private var appRouter
     @Dependency(\.dismiss) private var dismiss
@@ -74,7 +72,7 @@ struct MovieSelectionFeature {
 
                 return .run { [id = state.id] send in
                     let result = await Result {
-                        let details = try await getMovieDetailsUseCase(movieId: id)
+                        let details = try await movieDetailsClient.getMovieDetails(movieId: id)
 
                         let selectPosition: SelectPosition? = if let movieId = details.movieId.id {
                             try? await database.read { db in
@@ -163,7 +161,7 @@ struct MovieSelectionFeature {
 
                 return .run { [selectedSeason = state.selectedSeason, selectedEpisode = state.selectedEpisode, subtitles = state.selectedSubtitles?.lang.replacingOccurrences(of: "ua", with: "uk")] _ in
                     if Defaults[.isLoggedIn] {
-                        try? await saveWatchingStateUseCase(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode)
+                        try? await accountClient.saveWatchingState(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode)
                     }
 
                     try? await database.write { db in
@@ -209,7 +207,7 @@ struct MovieSelectionFeature {
         return .concatenate(
             cancel,
             .run { send in
-                let result = await Result { try await getSeriesSeasonsUseCase(movieId: movieId, voiceActing: selectedActing, favs: details.favs) }
+                let result = await Result { try await movieDetailsClient.getSeriesSeasons(movieId: movieId, voiceActing: selectedActing, favs: details.favs) }
 
                 await send(.seasonsLoaded(result), animation: .easeInOut)
             }
@@ -248,7 +246,7 @@ struct MovieSelectionFeature {
 
     private func loadVideo(details: MovieDetailed, acting: MovieVoiceActing, season: MovieSeason?, episode: MovieEpisode?) -> Effect<Action> {
         .run { send in
-            let result = await Result { try await getMovieVideoUseCase(voiceActing: acting, season: season, episode: episode, favs: details.favs) }
+            let result = await Result { try await movieDetailsClient.getMovieVideo(voiceActing: acting, season: season, episode: episode, favs: details.favs) }
 
             await send(.videoLoaded(result), animation: .easeInOut)
         }

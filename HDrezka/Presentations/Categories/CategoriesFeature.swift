@@ -16,7 +16,7 @@ struct CategoriesFeature {
 
     private enum CancelID { case load }
 
-    @Dependency(\.categoriesUseCase) private var categoriesUseCase
+    @Dependency(\.searchClient) private var searchClient
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -30,7 +30,7 @@ struct CategoriesFeature {
                 state.types = .loading
 
                 return .run { send in
-                    let result = await Result { try await categoriesUseCase() }
+                    let result = await Result { try await searchClient.categories() }
 
                     await send(.typesLoaded(result), animation: .easeInOut)
                 }

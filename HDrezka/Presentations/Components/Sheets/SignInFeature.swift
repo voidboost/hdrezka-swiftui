@@ -32,7 +32,7 @@ struct SignInFeature {
 
     private enum CancelID { case request }
 
-    @Dependency(\.signInUseCase) private var signInUseCase
+    @Dependency(\.accountClient) private var accountClient
     @Dependency(\.dismiss) private var dismiss
 
     var body: some ReducerOf<Self> {
@@ -49,7 +49,7 @@ struct SignInFeature {
                 state.status = .loading
 
                 return .run { [username = state.username, password = state.password] send in
-                    let result = await Result { try await signInUseCase(login: username, password: password) }
+                    let result = await Result { try await accountClient.signIn(login: username, password: password) }
 
                     await send(.signedIn(result), animation: .easeInOut)
                 }

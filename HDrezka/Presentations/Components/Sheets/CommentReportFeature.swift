@@ -26,7 +26,7 @@ struct CommentReportFeature {
 
     private enum CancelID { case request }
 
-    @Dependency(\.reportCommentUseCase) private var reportCommentUseCase
+    @Dependency(\.movieDetailsClient) private var movieDetailsClient
     @Dependency(\.dismiss) private var dismiss
 
     var body: some ReducerOf<Self> {
@@ -51,7 +51,7 @@ struct CommentReportFeature {
                 }
 
                 return .run { [id = state.comment.commentId, text = issue == 0 ? state.message : ""] send in
-                    let result = await Result { try await reportCommentUseCase(id: id, issue: issue, text: text) }
+                    let result = await Result { try await movieDetailsClient.reportComment(id: id, issue: issue, text: text) }
 
                     await send(.reported(result), animation: .easeInOut)
                 }

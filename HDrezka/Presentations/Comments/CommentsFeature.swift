@@ -74,12 +74,7 @@ struct CommentsFeature {
         case likes(String)
     }
 
-    @Dependency(\.getCommentsPageUseCase) private var getCommentsPageUseCase
-    @Dependency(\.getCommentUseCase) private var getCommentUseCase
-    @Dependency(\.toggleLikeCommentUseCase) private var toggleLikeCommentUseCase
-    @Dependency(\.deleteCommentUseCase) private var deleteCommentUseCase
-    @Dependency(\.sendCommentUseCase) private var sendCommentUseCase
-    @Dependency(\.getLikesUseCase) private var getLikesUseCase
+    @Dependency(\.movieDetailsClient) private var movieDetailsClient
     @Dependency(\.appRouter) private var appRouter
 
     var body: some ReducerOf<Self> {
@@ -138,7 +133,7 @@ struct CommentsFeature {
                 }
 
                 return .run { send in
-                    let result = await Result { try await getCommentUseCase(movieId: movieId, commentId: commentId) }
+                    let result = await Result { try await movieDetailsClient.getComment(movieId: movieId, commentId: commentId) }
 
                     await send(.linkedCommentLoaded(result), animation: .easeInOut)
                 }
@@ -156,7 +151,7 @@ struct CommentsFeature {
 
             case let .likeTapped(comment):
                 return .run { send in
-                    let result = await Result { try await toggleLikeCommentUseCase(id: comment.commentId) }
+                    let result = await Result { try await movieDetailsClient.toggleLikeComment(id: comment.commentId) }
 
                     await send(.likeToggled(comment, result), animation: .easeInOut)
                 }
@@ -193,7 +188,7 @@ struct CommentsFeature {
                 state.likes[comment.commentId] = .init()
 
                 return .run { send in
-                    let result = await Result { try await getLikesUseCase(id: comment.commentId) }
+                    let result = await Result { try await movieDetailsClient.getLikes(id: comment.commentId) }
 
                     await send(.likesLoaded(commentId: comment.commentId, result))
                 }
@@ -224,7 +219,7 @@ struct CommentsFeature {
 
                 return .run { [reply = state.reply, adb = state.adb, type = state.type] send in
                     let result = await Result {
-                        try await sendCommentUseCase(id: reply, postId: postId, name: name, text: text, adb: adb, type: type)
+                        try await movieDetailsClient.sendComment(id: reply, postId: postId, name: name, text: text, adb: adb, type: type)
                     }
 
                     await send(.commentSent(result))
@@ -273,7 +268,7 @@ struct CommentsFeature {
                 }
 
                 return .run { send in
-                    let result = await Result { try await deleteCommentUseCase(id: comment.commentId, hash: hash) }
+                    let result = await Result { try await movieDetailsClient.deleteComment(id: comment.commentId, hash: hash) }
 
                     await send(.commentDeleted(comment, result), animation: .easeInOut)
                 }
@@ -312,7 +307,7 @@ struct CommentsFeature {
 
     private func load(movieId: String, page: Int, isInitial: Bool) -> Effect<Action> {
         .run { send in
-            let result = await Result { try await getCommentsPageUseCase(movieId: movieId, page: page) }
+            let result = await Result { try await movieDetailsClient.getCommentsPage(movieId: movieId, page: page) }
 
             await send(.commentsLoaded(isInitial: isInitial, result), animation: .easeInOut)
         }

@@ -59,9 +59,7 @@ struct DetailsFeature {
 
     private enum CancelID { case load, trailer, rate }
 
-    @Dependency(\.getMovieDetailsUseCase) private var getMovieDetailsUseCase
-    @Dependency(\.getMovieTrailerIdUseCase) private var getMovieTrailerIdUseCase
-    @Dependency(\.rateUseCase) private var rateUseCase
+    @Dependency(\.movieDetailsClient) private var movieDetailsClient
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -80,7 +78,7 @@ struct DetailsFeature {
                 state.details = .loading
 
                 return .run { [id = state.id] send in
-                    let result = await Result { try await getMovieDetailsUseCase(movieId: id) }
+                    let result = await Result { try await movieDetailsClient.getMovieDetails(movieId: id) }
 
                     await send(.detailsLoaded(result), animation: .easeInOut)
                 }
@@ -92,7 +90,7 @@ struct DetailsFeature {
                 guard state.trailerId == nil, let movieId = details.movieId.id else { return .none }
 
                 return .run { send in
-                    guard let trailerId = try? await getMovieTrailerIdUseCase(movieId: movieId) else { return }
+                    guard let trailerId = try? await movieDetailsClient.getMovieTrailerId(movieId: movieId) else { return }
 
                     await send(.trailerLoaded(trailerId), animation: .easeInOut)
                 }
@@ -112,7 +110,7 @@ struct DetailsFeature {
                 guard let id = state.id.id else { return .none }
 
                 return .run { send in
-                    let result = await Result { try await rateUseCase(id: id, rating: rating) }
+                    let result = await Result { try await movieDetailsClient.rate(id: id, rating: rating) }
 
                     await send(.rated(result), animation: .easeInOut)
                 }

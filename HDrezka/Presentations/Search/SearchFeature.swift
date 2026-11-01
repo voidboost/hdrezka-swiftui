@@ -29,7 +29,7 @@ struct SearchFeature {
         case load
     }
 
-    @Dependency(\.searchUseCase) private var searchUseCase
+    @Dependency(\.searchClient) private var searchClient
     @Dependency(\.continuousClock) private var clock
 
     var body: some ReducerOf<Self> {
@@ -98,7 +98,7 @@ struct SearchFeature {
 
     private func load(query: String, page: Int, isInitial: Bool) -> Effect<Action> {
         .run { send in
-            let result = await Result { try await searchUseCase(query: query, page: page) }
+            let result = await Result { try await searchClient.search(query: query, page: page) }
 
             await send(.moviesLoaded(isInitial: isInitial, result), animation: .easeInOut)
         }

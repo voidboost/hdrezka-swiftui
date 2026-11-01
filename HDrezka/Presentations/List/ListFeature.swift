@@ -79,14 +79,8 @@ struct ListFeature {
 
     private enum CancelID { case load }
 
-//    @Dependency(\.getFeaturedMoviesUseCase) private var getFeaturedMoviesUseCase
-    @Dependency(\.getHotMoviesUseCase) private var getHotMoviesUseCase
-    @Dependency(\.getMovieListUseCase) private var getMovieListUseCase
-    @Dependency(\.getMoviesByCountryUseCase) private var getMoviesByCountryUseCase
-    @Dependency(\.getMoviesByGenreUseCase) private var getMoviesByGenreUseCase
-    @Dependency(\.getMoviesInCollectionUseCase) private var getMoviesInCollectionUseCase
-    @Dependency(\.getMoviesUseCase) private var getMoviesUseCase
-    @Dependency(\.getNewestMoviesUseCase) private var getNewestMoviesUseCase
+    @Dependency(\.movieListsClient) private var movieListsClient
+    @Dependency(\.collectionsClient) private var collectionsClient
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -144,34 +138,34 @@ struct ListFeature {
         case let .movies(movies, _):
             return (nil, movies)
         case let .list(list):
-            return try await getMovieListUseCase(listId: list.listId, page: page)
+            return try await movieListsClient.getMovieList(listId: list.listId, page: page)
         case let .country(country):
-            return try await (nil, getMoviesByCountryUseCase(countryId: country.countryId, filter: filter, genre: filterGenre.genreCode, page: page))
+            return try await (nil, movieListsClient.getMoviesByCountry(countryId: country.countryId, filter: filter, genre: filterGenre.genreCode, page: page))
         case let .genre(genre):
-            return try await (nil, getMoviesByGenreUseCase(genreId: genre.genreId, filter: filter, page: page))
+            return try await (nil, movieListsClient.getMoviesByGenre(genreId: genre.genreId, filter: filter, page: page))
         case let .category(category):
             return try await (nil, movies(category: category, page: page, filterGenre: filterGenre, newFilter: newFilter))
         case let .collection(collection):
-            return try await (nil, getMoviesInCollectionUseCase(collectionId: collection.collectionId, filter: filter, page: page))
+            return try await (nil, collectionsClient.getMoviesInCollection(collectionId: collection.collectionId, filter: filter, page: page))
         }
     }
 
     private func movies(category: Categories, page: Int, filterGenre: Genres, newFilter: NewFilters) async throws -> [MovieSimple] {
         switch category {
         case .hot:
-            try await getHotMoviesUseCase(genre: filterGenre.genreCode)
+            try await movieListsClient.getHotMovies(genre: filterGenre.genreCode)
 //        case .featured:
-//            try await getFeaturedMoviesUseCase(page: page, genre: filterGenre.genreCode)
+//            try await movieListsClient.getFeaturedMovies(page: page, genre: filterGenre.genreCode)
         case .watchingNow:
-            try await getMoviesUseCase(filter: .watching, genre: filterGenre.genreCode, page: page)
+            try await movieListsClient.getMovies(filter: .watching, genre: filterGenre.genreCode, page: page)
         case .newest:
-            try await getNewestMoviesUseCase(filter: newFilter, genre: filterGenre.genreCode, page: page)
+            try await movieListsClient.getNewestMovies(filter: newFilter, genre: filterGenre.genreCode, page: page)
         case .latest:
-            try await getMoviesUseCase(filter: .latest, genre: filterGenre.genreCode, page: page)
+            try await movieListsClient.getMovies(filter: .latest, genre: filterGenre.genreCode, page: page)
         case .popular:
-            try await getMoviesUseCase(filter: .popular, genre: filterGenre.genreCode, page: page)
+            try await movieListsClient.getMovies(filter: .popular, genre: filterGenre.genreCode, page: page)
         case .soon:
-            try await getMoviesUseCase(filter: .soon, genre: filterGenre.genreCode, page: page)
+            try await movieListsClient.getMovies(filter: .soon, genre: filterGenre.genreCode, page: page)
         }
     }
 }

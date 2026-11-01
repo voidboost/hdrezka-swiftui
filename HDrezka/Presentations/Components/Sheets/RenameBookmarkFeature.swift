@@ -30,7 +30,7 @@ struct RenameBookmarkFeature {
 
     private enum CancelID { case request }
 
-    @Dependency(\.changeBookmarksCategoryNameUseCase) private var changeBookmarksCategoryNameUseCase
+    @Dependency(\.accountClient) private var accountClient
     @Dependency(\.dismiss) private var dismiss
 
     var body: some ReducerOf<Self> {
@@ -47,7 +47,7 @@ struct RenameBookmarkFeature {
                 state.status = .loading
 
                 return .run { [id = state.bookmark.bookmarkId, name = state.name.trim()] send in
-                    let result = await Result { try await changeBookmarksCategoryNameUseCase(id: id, newName: name) }
+                    let result = await Result { try await accountClient.changeBookmarksCategoryName(id: id, newName: name) }
 
                     await send(.renamed(result), animation: .easeInOut)
                 }

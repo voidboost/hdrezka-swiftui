@@ -33,9 +33,8 @@ struct BookmarksSheetFeature {
 
     private enum CancelID { case load }
 
-    @Dependency(\.addToBookmarksUseCase) private var addToBookmarksUseCase
-    @Dependency(\.removeFromBookmarksUseCase) private var removeFromBookmarksUseCase
-    @Dependency(\.getMovieBookmarksUseCase) private var getMovieBookmarksUseCase
+    @Dependency(\.accountClient) private var accountClient
+    @Dependency(\.movieDetailsClient) private var movieDetailsClient
     @Dependency(\.dismiss) private var dismiss
 
     var body: some ReducerOf<Self> {
@@ -67,9 +66,9 @@ struct BookmarksSheetFeature {
                 return .run { send in
                     let result = await Result {
                         if isChecked {
-                            try await removeFromBookmarksUseCase(movies: [movieId], bookmarkUserCategory: bookmark.bookmarkId)
+                            try await accountClient.removeFromBookmarks(movies: [movieId], bookmarkUserCategory: bookmark.bookmarkId)
                         } else {
-                            try await addToBookmarksUseCase(movieId: movieId, bookmarkUserCategory: bookmark.bookmarkId)
+                            try await accountClient.addToBookmarks(movieId: movieId, bookmarkUserCategory: bookmark.bookmarkId)
                         }
                     }
 
@@ -113,7 +112,7 @@ struct BookmarksSheetFeature {
 
     private func load(id: String) -> Effect<Action> {
         .run { send in
-            let result = await Result { try await getMovieBookmarksUseCase(movieId: id) }
+            let result = await Result { try await movieDetailsClient.getMovieBookmarks(movieId: id) }
 
             await send(.bookmarksLoaded(result), animation: .easeInOut)
         }

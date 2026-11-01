@@ -54,12 +54,7 @@ struct BookmarksFeature {
         case movies
     }
 
-    @Dependency(\.getBookmarksUseCase) private var getBookmarksUseCase
-    @Dependency(\.getBookmarksByCategoryUseCase) private var getBookmarksByCategoryUseCase
-    @Dependency(\.deleteBookmarksCategoryUseCase) private var deleteBookmarksCategoryUseCase
-    @Dependency(\.moveBetweenBookmarksUseCase) private var moveBetweenBookmarksUseCase
-    @Dependency(\.reorderBookmarksCategoriesUseCase) private var reorderBookmarksCategoriesUseCase
-    @Dependency(\.removeFromBookmarksUseCase) private var removeFromBookmarksUseCase
+    @Dependency(\.accountClient) private var accountClient
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -110,7 +105,7 @@ struct BookmarksFeature {
                 return .merge(
                     .cancel(id: CancelID.movies),
                     .run { send in
-                        let result = await Result { try await getBookmarksUseCase() }
+                        let result = await Result { try await accountClient.getBookmarks() }
 
                         await send(.bookmarksLoaded(result), animation: .easeInOut)
                     }
@@ -148,7 +143,7 @@ struct BookmarksFeature {
 
             case let .deleteBookmark(bookmark):
                 return .run { send in
-                    let result = await Result { try await deleteBookmarksCategoryUseCase(id: bookmark.bookmarkId) }
+                    let result = await Result { try await accountClient.deleteBookmarksCategory(id: bookmark.bookmarkId) }
 
                     await send(.bookmarkDeleted(bookmark, result), animation: .easeInOut)
                 }
@@ -173,7 +168,7 @@ struct BookmarksFeature {
 
                 return .run { send in
                     let result = await Result {
-                        try await moveBetweenBookmarksUseCase(movies: movies.compactMap(\.movieId.id), fromBookmarkUserCategory: fromBookmark, toBookmarkUserCategory: toBookmark.bookmarkId)
+                        try await accountClient.moveBetweenBookmarks(movies: movies.compactMap(\.movieId.id), fromBookmarkUserCategory: fromBookmark, toBookmarkUserCategory: toBookmark.bookmarkId)
                     }
 
                     await send(.moviesMoved(movies, from: fromBookmark, to: toBookmark, result), animation: .easeInOut)
@@ -213,7 +208,7 @@ struct BookmarksFeature {
                 guard newOrder != bookmarks else { return .none }
 
                 return .run { [newOrder] send in
-                    let result = await Result { try await reorderBookmarksCategoriesUseCase(newOrder: newOrder) }
+                    let result = await Result { try await accountClient.reorderBookmarksCategories(newOrder: newOrder) }
 
                     await send(.bookmarksReordered(newOrder, result), animation: .easeInOut)
                 }
@@ -227,7 +222,7 @@ struct BookmarksFeature {
                 guard let selectedBookmark = state.selectedBookmark else { return .none }
 
                 return .run { send in
-                    let result = await Result { try await removeFromBookmarksUseCase(movies: ids, bookmarkUserCategory: selectedBookmark) }
+                    let result = await Result { try await accountClient.removeFromBookmarks(movies: ids, bookmarkUserCategory: selectedBookmark) }
 
                     await send(.moviesRemoved(ids, from: selectedBookmark, result), animation: .easeInOut)
                 }
@@ -272,7 +267,7 @@ struct BookmarksFeature {
     private func loadMovies(id: Int, state: State, isInitial: Bool) -> Effect<Action> {
         .run { [filter = state.filter, genre = state.genre.genreCode, page = state.pagination.page] send in
             let result = await Result {
-                try await getBookmarksByCategoryUseCase(id: id, filter: filter, genre: genre, page: page)
+                try await accountClient.getBookmarksByCategory(id: id, filter: filter, genre: genre, page: page)
             }
 
             await send(.moviesLoaded(isInitial: isInitial, result), animation: .easeInOut)

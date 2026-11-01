@@ -29,10 +29,7 @@ struct HomeFeature {
 
     private enum CancelID { case load }
 
-    @Dependency(\.getHotMoviesUseCase) private var getHotMoviesUseCase
-//    @Dependency(\.getFeaturedMoviesUseCase) private var getFeaturedMoviesUseCase
-    @Dependency(\.getMoviesUseCase) private var getMoviesUseCase
-    @Dependency(\.getNewestMoviesUseCase) private var getNewestMoviesUseCase
+    @Dependency(\.movieListsClient) private var movieListsClient
     @Dependency(\.uuid) private var uuid
 
     var body: some ReducerOf<Self> {
@@ -104,13 +101,13 @@ struct HomeFeature {
 
     private func movies(_ category: Categories) async throws -> [MovieSimple] {
         switch category {
-        case .hot: try await getHotMoviesUseCase(genre: 0)
-//        case .featured: try await getFeaturedMoviesUseCase(page: 1, genre: 0)
-        case .watchingNow: try await getMoviesUseCase(filter: .watching, genre: 0, page: 1)
-        case .latest: try await getMoviesUseCase(filter: .latest, genre: 0, page: 1)
-        case .newest: try await getNewestMoviesUseCase(filter: .latest, genre: 0, page: 1)
-        case .popular: try await getMoviesUseCase(filter: .popular, genre: 0, page: 1)
-        case .soon: try await getMoviesUseCase(filter: .soon, genre: 0, page: 1)
+        case .hot: try await movieListsClient.getHotMovies(genre: 0)
+//        case .featured: try await movieListsClient.getFeaturedMovies(page: 1, genre: 0)
+        case .watchingNow: try await movieListsClient.getMovies(filter: .watching, genre: 0, page: 1)
+        case .latest: try await movieListsClient.getMovies(filter: .latest, genre: 0, page: 1)
+        case .newest: try await movieListsClient.getNewestMovies(filter: .latest, genre: 0, page: 1)
+        case .popular: try await movieListsClient.getMovies(filter: .popular, genre: 0, page: 1)
+        case .soon: try await movieListsClient.getMovies(filter: .soon, genre: 0, page: 1)
         }
     }
 }

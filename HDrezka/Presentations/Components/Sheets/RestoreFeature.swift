@@ -27,7 +27,7 @@ struct RestoreFeature {
 
     private enum CancelID { case request }
 
-    @Dependency(\.restoreUseCase) private var restoreUseCase
+    @Dependency(\.accountClient) private var accountClient
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -41,7 +41,7 @@ struct RestoreFeature {
                 state.status = .loading
 
                 return .run { [login = state.login] send in
-                    let result = await Result { try await restoreUseCase(login: login) }
+                    let result = await Result { try await accountClient.restore(login: login) }
 
                     await send(.restored(result), animation: .easeInOut)
                 }

@@ -75,8 +75,7 @@ struct AppFeature {
     @Dependency(\.appRouter) private var appRouter
     @Dependency(\.sessionEvents) private var sessionEvents
     @Dependency(\.cookiesClient) private var cookiesClient
-    @Dependency(\.getVersionUseCase) private var getVersionUseCase
-    @Dependency(\.logoutUseCase) private var logoutUseCase
+    @Dependency(\.accountClient) private var accountClient
     @Dependency(\.date.now) private var now
     @Dependency(\.calendar) private var calendar
 
@@ -132,7 +131,7 @@ struct AppFeature {
                         }
                     },
                     .run { _ in
-                        let version = try await getVersionUseCase()
+                        let version = try await accountClient.getVersion()
 
                         Defaults[.lastHdrezkaAppVersion] = version
                     }
@@ -159,7 +158,7 @@ struct AppFeature {
 
             case .signOutConfirmed:
                 return .run { send in
-                    let result = await Result { try await logoutUseCase() }
+                    let result = await Result { try await accountClient.logout() }
 
                     await send(.loggedOut(result))
                 }

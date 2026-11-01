@@ -181,9 +181,8 @@ struct PlayerFeature {
     let engine: PlayerEngine
 
     @Dependency(\.appRouter) var appRouter
-    @Dependency(\.saveWatchingStateUseCase) var saveWatchingStateUseCase
-    @Dependency(\.getMovieThumbnailsUseCase) var getMovieThumbnailsUseCase
-    @Dependency(\.getMovieVideoUseCase) var getMovieVideoUseCase
+    @Dependency(\.accountClient) var accountClient
+    @Dependency(\.movieDetailsClient) var movieDetailsClient
     @Dependency(\.defaultDatabase) var database
     @Dependency(\.continuousClock) var clock
 

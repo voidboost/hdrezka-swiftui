@@ -11,10 +11,9 @@ class Downloader {
 
     @ObservationIgnored private var pollingTask: Task<Void, Never>?
 
-    @ObservationIgnored @Dependency(\.saveWatchingStateUseCase) private var saveWatchingStateUseCase
-    @ObservationIgnored @Dependency(\.getMovieVideoUseCase) private var getMovieVideoUseCase
-    @ObservationIgnored @Dependency(\.callUseCase) private var callUseCase
-    @ObservationIgnored @Dependency(\.multicallUseCase) private var multicallUseCase
+    @ObservationIgnored @Dependency(\.accountClient) private var accountClient
+    @ObservationIgnored @Dependency(\.movieDetailsClient) private var movieDetailsClient
+    @ObservationIgnored @Dependency(\.aria2Client) private var aria2Client
 
     @ObservationIgnored @Dependency(\.defaultDatabase) private var database
 
@@ -113,7 +112,7 @@ class Downloader {
     private func poll() async {
         guard !downloads.isEmpty else { return }
 
-        guard let response: Aria2Response<GlobalStatusResult> = try? await callUseCase(
+        guard let response: Aria2Response<GlobalStatusResult> = try? await aria2Client.call(
             data: Aria2Request(
                 method: .getGlobalStat,
                 params: EmptyTokenParams(
@@ -178,7 +177,7 @@ class Downloader {
             )
         }
 
-        guard let responses: [Aria2Response<[StatusResult]>] = try? await multicallUseCase(data: data) else { return }
+        guard let responses: [Aria2Response<[StatusResult]>] = try? await aria2Client.multicall(data: data) else { return }
 
         for response in responses {
             guard let statuses = response.result else { continue }
@@ -328,7 +327,7 @@ class Downloader {
         let movie: MovieVideo
 
         do {
-            movie = try await getMovieVideoUseCase(voiceActing: data.acting, season: season, episode: episode, favs: data.details.favs)
+            movie = try await movieDetailsClient.getMovieVideo(voiceActing: data.acting, season: season, episode: episode, favs: data.details.favs)
         } catch {
             notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.localizedDescription)"), "retry", ["data": retryData])
 
@@ -343,7 +342,7 @@ class Downloader {
 
         if Defaults[.isLoggedIn] {
             Task {
-                try? await saveWatchingStateUseCase(voiceActing: data.acting, season: season, episode: episode)
+                try? await accountClient.saveWatchingState(voiceActing: data.acting, season: season, episode: episode)
             }
         }
 
@@ -380,7 +379,7 @@ class Downloader {
            let subtitlesUrl = URL(string: sub.link)
         {
             Task {
-                let _: Aria2Response<String>? = try? await callUseCase(
+                let _: Aria2Response<String>? = try? await aria2Client.call(
                     data: Aria2Request(
                         method: .addUri,
                         params: AddUriParams(
@@ -396,7 +395,7 @@ class Downloader {
             }
         }
 
-        let response: Aria2Response<String>? = try? await callUseCase(
+        let response: Aria2Response<String>? = try? await aria2Client.call(
             data: Aria2Request(
                 method: .addUri,
                 params: AddUriParams(
@@ -436,7 +435,7 @@ class Downloader {
 
     func maxConcurrentDownloadsChange() {
         Task {
-            let _: Aria2Response<String>? = try? await callUseCase(
+            let _: Aria2Response<String>? = try? await aria2Client.call(
                 data: Aria2Request(
                     method: .changeGlobalOption,
                     params: OptionsParams(
@@ -452,7 +451,7 @@ class Downloader {
 
     func remove(_ gid: String) {
         Task {
-            guard let response: Aria2Response<String> = try? await callUseCase(
+            guard let response: Aria2Response<String> = try? await aria2Client.call(
                 data: Aria2Request(
                     method: .remove,
                     params: GidParams(
@@ -480,7 +479,7 @@ class Downloader {
 
     func pause(_ gid: String) {
         Task {
-            guard let response: Aria2Response<String> = try? await callUseCase(
+            guard let response: Aria2Response<String> = try? await aria2Client.call(
                 data: Aria2Request(
                     method: .pause,
                     params: GidParams(
@@ -501,7 +500,7 @@ class Downloader {
 
     func unpause(_ gid: String) {
         Task {
-            guard let response: Aria2Response<String> = try? await callUseCase(
+            guard let response: Aria2Response<String> = try? await aria2Client.call(
                 data: Aria2Request(
                     method: .unpause,
                     params: GidParams(
@@ -522,7 +521,7 @@ class Downloader {
 
     private func removeDownloadResult(_ gid: String) {
         Task {
-            let _: Aria2Response<String>? = try? await callUseCase(
+            let _: Aria2Response<String>? = try? await aria2Client.call(
                 data: Aria2Request(
                     method: .removeDownloadResult,
                     params: GidParams(

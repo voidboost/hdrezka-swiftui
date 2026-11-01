@@ -24,7 +24,7 @@ struct PersonFeature {
 
     private enum CancelID { case load }
 
-    @Dependency(\.getPersonDetailsUseCase) private var getPersonDetailsUseCase
+    @Dependency(\.peopleClient) private var peopleClient
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -38,7 +38,7 @@ struct PersonFeature {
                 state.details = .loading
 
                 return .run { [id = state.id] send in
-                    let result = await Result { try await getPersonDetailsUseCase(id: id) }
+                    let result = await Result { try await peopleClient.getPersonDetails(id: id) }
 
                     await send(.detailsLoaded(result), animation: .easeInOut)
                 }

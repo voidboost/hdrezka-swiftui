@@ -41,7 +41,7 @@ struct SignUpFeature {
 
     private enum CancelID { case request }
 
-    @Dependency(\.signUpUseCase) private var signUpUseCase
+    @Dependency(\.accountClient) private var accountClient
     @Dependency(\.dismiss) private var dismiss
 
     var body: some ReducerOf<Self> {
@@ -57,7 +57,7 @@ struct SignUpFeature {
 
                 return .run { [state] send in
                     let result = await Result {
-                        try await signUpUseCase(email: state.email, login: state.username, password: state.password1, verifyCode: state.verifyCode, step: state.step.rawValue)
+                        try await accountClient.signUp(email: state.email, login: state.username, password: state.password1, verifyCode: state.verifyCode, step: state.step.rawValue)
                     }
 
                     await send(.signedUp(result), animation: .easeInOut)

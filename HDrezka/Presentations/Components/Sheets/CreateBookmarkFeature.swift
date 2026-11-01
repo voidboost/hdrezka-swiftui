@@ -23,7 +23,7 @@ struct CreateBookmarkFeature {
 
     private enum CancelID { case request }
 
-    @Dependency(\.createBookmarksCategoryUseCase) private var createBookmarksCategoryUseCase
+    @Dependency(\.accountClient) private var accountClient
     @Dependency(\.dismiss) private var dismiss
 
     var body: some ReducerOf<Self> {
@@ -40,7 +40,7 @@ struct CreateBookmarkFeature {
                 state.status = .loading
 
                 return .run { [name = state.name.trim()] send in
-                    let result = await Result { try await createBookmarksCategoryUseCase(name: name) }
+                    let result = await Result { try await accountClient.createBookmarksCategory(name: name) }
 
                     await send(.created(result), animation: .easeInOut)
                 }

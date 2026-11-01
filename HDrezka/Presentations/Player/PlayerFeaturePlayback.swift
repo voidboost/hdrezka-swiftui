@@ -37,7 +37,7 @@ extension PlayerFeature {
         if let path = state.movie.thumbnails {
             effects.append(
                 .run { send in
-                    guard let thumbnails = try? await getMovieThumbnailsUseCase(path: path) else { return }
+                    guard let thumbnails = try? await movieDetailsClient.getMovieThumbnails(path: path) else { return }
 
                     await send(.thumbnailsLoaded(thumbnails))
                 }
@@ -80,7 +80,7 @@ extension PlayerFeature {
         return .run { [engine, voiceActing = state.voiceActing, favs = state.favs] send in
             await engine.reset()
 
-            let result = await Result { try await getMovieVideoUseCase(voiceActing: voiceActing, season: season, episode: episode, favs: favs) }
+            let result = await Result { try await movieDetailsClient.getMovieVideo(voiceActing: voiceActing, season: season, episode: episode, favs: favs) }
 
             await send(.trackLoaded(season, episode, result))
         }

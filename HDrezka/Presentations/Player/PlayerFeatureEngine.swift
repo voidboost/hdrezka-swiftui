@@ -40,7 +40,7 @@ extension PlayerFeature {
             return .merge(
                 .run { [voiceActing = state.voiceActing, season = state.season, episode = state.episode, subtitles = state.subtitles] _ in
                     if Defaults[.isLoggedIn] {
-                        try? await saveWatchingStateUseCase(voiceActing: voiceActing, season: season, episode: episode)
+                        try? await accountClient.saveWatchingState(voiceActing: voiceActing, season: season, episode: episode)
                     }
 
                     try? await database.write { db in

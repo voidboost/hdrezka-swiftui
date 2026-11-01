@@ -21,7 +21,7 @@ struct SeriesUpdatesFeature {
 
     private enum CancelID { case load }
 
-    @Dependency(\.getSeriesUpdatesUseCase) private var getSeriesUpdatesUseCase
+    @Dependency(\.accountClient) private var accountClient
     @Dependency(\.dismiss) private var dismiss
 
     var body: some ReducerOf<Self> {
@@ -31,7 +31,7 @@ struct SeriesUpdatesFeature {
                 state.seriesUpdates = .loading
 
                 return .run { send in
-                    let result = await Result { try await getSeriesUpdatesUseCase() }
+                    let result = await Result { try await accountClient.getSeriesUpdates() }
 
                     await send(.seriesUpdatesLoaded(result), animation: .easeInOut)
                 }

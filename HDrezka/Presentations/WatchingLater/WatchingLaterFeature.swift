@@ -26,9 +26,7 @@ struct WatchingLaterFeature {
 
     private enum CancelID { case load }
 
-    @Dependency(\.getWatchingLaterMoviesUseCase) private var getWatchingLaterMoviesUseCase
-    @Dependency(\.switchWatchedItemUseCase) private var switchWatchedItemUseCase
-    @Dependency(\.removeWatchingItemUseCase) private var removeWatchingItemUseCase
+    @Dependency(\.accountClient) private var accountClient
     @Dependency(\.defaultDatabase) private var database
 
     var body: some ReducerOf<Self> {
@@ -43,7 +41,7 @@ struct WatchingLaterFeature {
                 state.movies = .loading
 
                 return .run { send in
-                    let result = await Result { try await getWatchingLaterMoviesUseCase() }
+                    let result = await Result { try await accountClient.getWatchingLaterMovies() }
 
                     await send(.moviesLoaded(result), animation: .easeInOut)
                 }
@@ -61,7 +59,7 @@ struct WatchingLaterFeature {
 
             case let .switchWatched(movie):
                 return .run { send in
-                    let result = await Result { try await switchWatchedItemUseCase(item: movie) }
+                    let result = await Result { try await accountClient.switchWatchedItem(item: movie) }
 
                     await send(.watchedSwitched(movie, result), animation: .easeInOut)
                 }
@@ -81,7 +79,7 @@ struct WatchingLaterFeature {
 
             case let .remove(movie):
                 return .run { send in
-                    let result = await Result { try await removeWatchingItemUseCase(item: movie) }
+                    let result = await Result { try await accountClient.removeWatchingItem(item: movie) }
 
                     await send(.removed(movie, result), animation: .easeInOut)
                 }

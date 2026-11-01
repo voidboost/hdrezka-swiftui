@@ -18,7 +18,7 @@ struct CollectionsFeature {
 
     private enum CancelID { case load }
 
-    @Dependency(\.getCollectionsUseCase) private var getCollectionsUseCase
+    @Dependency(\.collectionsClient) private var collectionsClient
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -50,7 +50,7 @@ struct CollectionsFeature {
 
     private func load(page: Int, isInitial: Bool) -> Effect<Action> {
         .run { send in
-            let result = await Result { try await getCollectionsUseCase(page: page) }
+            let result = await Result { try await collectionsClient.getCollections(page: page) }
 
             await send(.collectionsLoaded(isInitial: isInitial, result), animation: .easeInOut)
         }
