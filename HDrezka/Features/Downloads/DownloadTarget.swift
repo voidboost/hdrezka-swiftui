@@ -21,20 +21,14 @@ extension DownloadData {
         guard let folder = resolvedFolder else { return nil }
 
         let name = details.nameRussian
-        let actingName = acting.name.isEmpty ? "" : " [\(acting.name)]"
-        let qualityName = quality.isEmpty ? "" : " [\(quality)]"
-        let suffixLength = actingName.count + qualityName.count
 
-        guard let season, let episode else {
-            let file = name.count > 255 - 4 - suffixLength ? "\(name.prefix(255 - 8 - suffixLength))... \(qualityName)\(actingName).mp4" : "\(name)\(qualityName)\(actingName).mp4"
+        guard let season, let episode, let seasonName, let episodeName else {
+            let file = name.count > 255 - 4 - suffix.count ? "\(name.prefix(255 - 8 - suffix.count))... \(suffix).mp4" : "\(name)\(suffix).mp4"
 
             return DownloadTarget(folder: folder, directory: folder, fileName: file.fileSystemSafe, season: nil, episode: nil)
         }
 
-        let seasonName = String(localized: "key.season-\(season.name.contains(/^\d/) ? season.name : season.seasonId)")
-        let episodeName = String(localized: "key.episode-\(episode.name.contains(/^\d/) ? episode.name : episode.episodeId)")
-
-        let movieFolder = name.count > 255 - suffixLength ? "\(name.prefix(255 - suffixLength - 4))... \(qualityName)\(actingName)" : "\(name)\(qualityName)\(actingName)"
+        let movieFolder = name.count > 255 - suffix.count ? "\(name.prefix(255 - suffix.count - 4))... \(suffix)" : "\(name)\(suffix)"
         let seasonFolder = seasonName.count > 255 ? "\(seasonName.prefix(255 - 3))..." : seasonName
         let file = episodeName.count > 255 - 4 ? "\(episodeName.prefix(255 - 8))... .mp4" : "\(episodeName).mp4"
 

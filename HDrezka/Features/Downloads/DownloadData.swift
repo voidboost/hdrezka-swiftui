@@ -55,30 +55,26 @@ extension DownloadData {
     }
 
     var name: String {
-        let name = details.nameRussian
-
-        let actingName = if !acting.name.isEmpty {
-            " [\(acting.name)]"
+        if let seasonName, let episodeName {
+            "\(details.nameRussian) \(seasonName) \(episodeName)\(suffix)"
         } else {
-            ""
+            "\(details.nameRussian)\(suffix)"
         }
+    }
 
-        let qualityName = if !quality.isEmpty {
-            " [\(quality)]"
-        } else {
-            ""
-        }
+    var suffix: String {
+        let qualityName = quality.isEmpty ? "" : " [\(quality)]"
+        let actingName = acting.name.isEmpty ? "" : " [\(acting.name)]"
 
-        if let season, let episode {
-            let (seasonName, episodeName) = (
-                String(localized: "key.season-\(season.name.contains(/^\d/) ? season.name : season.seasonId)"),
-                String(localized: "key.episode-\(episode.name.contains(/^\d/) ? episode.name : episode.episodeId)"),
-            )
+        return "\(qualityName)\(actingName)"
+    }
 
-            return "\(name) \(seasonName) \(episodeName)\(qualityName)\(actingName)"
-        } else {
-            return "\(name)\(qualityName)\(actingName)"
-        }
+    var seasonName: String? {
+        season.map { String(localized: "key.season-\($0.name.contains(/^\d/) ? $0.name : $0.seasonId)") }
+    }
+
+    var episodeName: String? {
+        episode.map { String(localized: "key.episode-\($0.name.contains(/^\d/) ? $0.name : $0.episodeId)") }
     }
 
     var retryData: Data? {
