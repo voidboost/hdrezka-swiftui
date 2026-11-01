@@ -150,8 +150,7 @@ jobs:
               echo "Removing release: $tag"
               gh release delete "$tag" \
               --repo "${GITHUB_REPOSITORY}" \
-              --yes \
-              --cleanup-tag
+              --yes
             fi
           done
 
