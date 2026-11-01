@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct Comment: Identifiable, Hashable {
+struct Comment: Identifiable, Hashable, Sendable {
     let commentId: String
     let date: String
     let author: String
