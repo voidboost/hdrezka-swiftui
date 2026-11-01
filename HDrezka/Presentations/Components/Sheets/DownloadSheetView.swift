@@ -88,8 +88,10 @@ struct DownloadSheetView: View {
                 }))
             }
         }
-        .fileImporter(isPresented: $isFolderImporterPresented, allowedContentTypes: [.folder]) { result in
-            guard let pendingDownload, case let .success(url) = result else { return }
+        .fileImporter(isPresented: $isFolderImporterPresented, allowedContentTypes: [.folder], allowsMultipleSelection: false) { result in
+            defer { self.pendingDownload = nil }
+
+            guard let pendingDownload, case let .success(urls) = result, let url = urls.first else { return }
 
             let isAccessing = url.startAccessingSecurityScopedResource()
 
@@ -102,6 +104,8 @@ struct DownloadSheetView: View {
             guard let folder = try? url.bookmarkData(options: .withSecurityScope) else { return }
 
             downloader.download(pendingDownload.withFolder(folder))
+        } onCancellation: {
+            pendingDownload = nil
         }
         .fileDialogDefaultDirectory(FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.resolvingSymlinksInPath())
         .fileDialogMessage(pendingDownload.map { Text("key.download.folder-\($0.details.nameRussian)") })
