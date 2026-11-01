@@ -185,35 +185,52 @@ class Downloader {
 
             for status in statuses {
                 if status.status == .complete || status.status == .removed || status.status == .error {
-                    if status.status == .complete,
-                       let download = downloads.first(where: { $0.gid == status.gid })
-                    {
-                        notificate(download.data.notificationId, String(localized: "key.download.success"), String(localized: "key.download.success.notification-\(download.data.name)"), "open", ["url": download.fileURL.absoluteString])
+                    if let download = finish(status.gid) {
+                        switch status.status {
+                        case .complete:
+                            notificate(download.data.notificationId, String(localized: "key.download.success"), String(localized: "key.download.success.notification-\(download.data.name)"), "open", ["url": download.fileURL.absoluteString])
 
-                        if download.data.all, let episode = download.data.episode, let nextEpisode = download.data.season?.episodes.element(after: episode) {
-                            self.download(download.data.newEpisede(nextEpisode))
-                        }
-                    }
+                            if download.data.all, let episode = download.data.episode, let nextEpisode = download.data.season?.episodes.element(after: episode) {
+                                self.download(download.data.newEpisede(nextEpisode))
+                            }
+                        case .error:
+                            let errorCode = status.errorCode.flatMap(Aria2ErrorCode.init(rawValue:)) ?? .unknownError
 
-                    if status.status == .error,
-                       let download = downloads.first(where: { $0.gid == status.gid })
-                    {
-                        let errorCode = status.errorCode.flatMap(Aria2ErrorCode.init(rawValue:)) ?? .unknownError
-
-                        if let retryData = download.data.retryData {
-                            notificate(download.data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(download.data.name)-\(errorCode.description)"), "retry", ["data": retryData])
-                        } else {
-                            notificate(download.data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(download.data.name)-\(errorCode.description)"))
+                            if let retryData = download.data.retryData {
+                                notificate(download.data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(download.data.name)-\(errorCode.description)"), "retry", ["data": retryData])
+                            } else {
+                                notificate(download.data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(download.data.name)-\(errorCode.description)"))
+                            }
+                        default:
+                            break
                         }
                     }
 
                     removeDownloadResult(status.gid)
-
-                    downloads.removeAll(where: { $0.gid == status.gid })
                 } else if let index = downloads.firstIndex(where: { $0.gid == status.gid }), downloads[index].status != status {
                     downloads[index].updateStatus(status)
                 }
             }
+        }
+    }
+
+    private func finish(_ gid: String) -> Download? {
+        guard let index = downloads.firstIndex(where: { $0.gid == gid }) else { return nil }
+
+        let download = downloads.remove(at: index)
+
+        download.folder.stopAccessingSecurityScopedResource()
+
+        return download
+    }
+
+    private func folder(_ data: DownloadData) -> URL? {
+        if let bookmark = data.folder {
+            var isStale = false
+
+            return try? URL(resolvingBookmarkData: bookmark, options: .withSecurityScope, bookmarkDataIsStale: &isStale)
+        } else {
+            return FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.appending(path: "HDrezka", directoryHint: .isDirectory)
         }
     }
 
@@ -277,39 +294,37 @@ class Downloader {
                 episodeName.count > 255 - 4 ? "\(episodeName.prefix(255 - 8))... .mp4" : "\(episodeName).mp4"
             )
 
-            guard let movieDestination = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?
-                .appending(path: "HDrezka", directoryHint: .isDirectory)
-                .appending(path: movieFolder.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .isDirectory)
-                .appending(path: seasonFolder.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .isDirectory)
-            else {
+            guard let folder = folder(data) else {
                 notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
 
                 return
             }
 
+            let movieDestination = folder
+                .appending(path: movieFolder.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .isDirectory)
+                .appending(path: seasonFolder.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":"), directoryHint: .isDirectory)
+
             Task {
-                await start(data, retryData: retryData, season: season, episode: episode, destination: movieDestination, file: movieFile)
+                await start(data, retryData: retryData, season: season, episode: episode, folder: folder, destination: movieDestination, file: movieFile)
             }
         } else if let season = data.season, let episode = season.episodes.first {
             download(data.newEpisede(episode))
         } else {
             let file = name.count > 255 - 4 - actingName.count - qualityName.count ? "\(name.prefix(255 - 8 - actingName.count - qualityName.count))... \(qualityName)\(actingName).mp4" : "\(name)\(qualityName)\(actingName).mp4"
 
-            guard let movieDestination = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?
-                .appending(path: "HDrezka", directoryHint: .isDirectory)
-            else {
+            guard let folder = folder(data) else {
                 notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
 
                 return
             }
 
             Task {
-                await start(data, retryData: retryData, season: nil, episode: nil, destination: movieDestination, file: file)
+                await start(data, retryData: retryData, season: nil, episode: nil, folder: folder, destination: folder, file: file)
             }
         }
     }
 
-    private func start(_ data: DownloadData, retryData: Data, season: MovieSeason?, episode: MovieEpisode?, destination: URL, file: String) async {
+    private func start(_ data: DownloadData, retryData: Data, season: MovieSeason?, episode: MovieEpisode?, folder: URL, destination: URL, file: String) async {
         let movie: MovieVideo
 
         do {
@@ -358,6 +373,8 @@ class Downloader {
 
         let out = file.replacingOccurrences(of: ":", with: ".").replacingOccurrences(of: "/", with: ":")
 
+        _ = folder.startAccessingSecurityScopedResource()
+
         if let subtitles = data.subtitles,
            let sub = movie.subtitles.first(where: { $0.name == subtitles.name }),
            let subtitlesUrl = URL(string: sub.link)
@@ -379,7 +396,7 @@ class Downloader {
             }
         }
 
-        guard let response: Aria2Response<String> = try? await callUseCase(
+        let response: Aria2Response<String>? = try? await callUseCase(
             data: Aria2Request(
                 method: .addUri,
                 params: AddUriParams(
@@ -391,25 +408,30 @@ class Downloader {
                     ]
                 )
             )
-        ) else {
+        )
+
+        guard let gid = response?.result else {
+            folder.stopAccessingSecurityScopedResource()
+
+            if let error = response?.error {
+                notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.code.description)"), "retry", ["data": retryData])
+            } else {
+                notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
+            }
+
             return
         }
 
-        if let gid = response.result {
-            downloads.append(
-                .init(
-                    gid: gid,
-                    data: data,
-                    fileURL: destination.appending(path: out, directoryHint: .notDirectory)
-                )
+        downloads.append(
+            .init(
+                gid: gid,
+                data: data,
+                folder: folder,
+                fileURL: destination.appending(path: out, directoryHint: .notDirectory)
             )
+        )
 
-            notificate(data.notificationId, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(data.name)"), "cancel", ["gid": gid])
-        } else if let error = response.error {
-            notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)-\(error.code.description)"), "retry", ["data": retryData])
-        } else {
-            notificate(data.notificationId, String(localized: "key.download.failed"), String(localized: "key.download.failed.notification-\(data.name)"), "retry", ["data": retryData])
-        }
+        notificate(data.notificationId, String(localized: "key.download.downloading"), String(localized: "key.download.downloading.notification-\(data.name)"), "cancel", ["gid": gid])
     }
 
     func maxConcurrentDownloadsChange() {
@@ -444,15 +466,13 @@ class Downloader {
                 return
             }
 
-            if let download = downloads.first(where: { $0.gid == gid }) {
+            if let download = finish(gid) {
                 if let retryData = download.data.retryData {
                     notificate(download.data.notificationId, String(localized: "key.download.canceled"), String(localized: "key.download.canceled.notification-\(download.data.name)"), "retry", ["data": retryData])
                 } else {
                     notificate(download.data.notificationId, String(localized: "key.download.canceled"), String(localized: "key.download.canceled.notification-\(download.data.name)"))
                 }
             }
-
-            downloads.removeAll(where: { $0.gid == gid })
 
             removeDownloadResult(gid)
         }

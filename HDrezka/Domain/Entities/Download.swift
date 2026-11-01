@@ -5,12 +5,14 @@ struct Download: Hashable {
     let gid: String
     private(set) var status: StatusResult?
     let data: DownloadData
+    let folder: URL
     let fileURL: URL
 
-    init(gid: String, data: DownloadData, fileURL: URL) {
+    init(gid: String, data: DownloadData, folder: URL, fileURL: URL) {
         self.gid = gid
         status = nil
         self.data = data
+        self.folder = folder
         self.fileURL = fileURL
     }
 }

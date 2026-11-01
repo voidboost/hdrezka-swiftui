@@ -8,6 +8,7 @@ struct DownloadData: Identifiable, Codable, Hashable {
     let quality: String
     let subtitles: MovieSubtitles?
     let all: Bool
+    private(set) var folder: Data?
     let id: UUID
 
     init(details: MovieDetailed, acting: MovieVoiceActing, season: MovieSeason? = nil, episode: MovieEpisode? = nil, quality: String, subtitles: MovieSubtitles? = nil, all: Bool = false, id: UUID = .init()) {
@@ -18,6 +19,7 @@ struct DownloadData: Identifiable, Codable, Hashable {
         self.quality = quality
         self.subtitles = subtitles
         self.all = all
+        folder = nil
         self.id = id
     }
 }
@@ -26,6 +28,13 @@ extension DownloadData {
     func newEpisede(_ episode: MovieEpisode) -> DownloadData {
         var data = self
         data.episode = episode
+
+        return data
+    }
+
+    func withFolder(_ folder: Data) -> DownloadData {
+        var data = self
+        data.folder = folder
 
         return data
     }

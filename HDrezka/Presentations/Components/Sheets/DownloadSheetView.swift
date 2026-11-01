@@ -17,11 +17,16 @@ struct DownloadSheetView: View {
     @Environment(\.openURL) private var openURL
     @Environment(Downloader.self) private var downloader
 
+    @State private var pendingDownload: DownloadData?
+    @State private var isFolderImporterPresented: Bool = false
+
     var body: some View {
         MovieSelectionSheet(store: store, icon: "arrow.down.circle", description: "key.download.description", showsSubtitles: true) {
             MovieSelectionActionButton("key.download", isActive: selectedQuality != nil) {
                 if let details, let selectedActing, let selectedQuality {
-                    downloader.download(.init(details: details, acting: selectedActing, season: selectedSeason, episode: selectedEpisode, quality: selectedQuality, subtitles: selectedSubtitles))
+                    pendingDownload = .init(details: details, acting: selectedActing, season: selectedSeason, episode: selectedEpisode, quality: selectedQuality, subtitles: selectedSubtitles)
+
+                    isFolderImporterPresented = true
                 }
             }
             .disabled(downloader.downloads.contains(where: {
@@ -73,13 +78,30 @@ struct DownloadSheetView: View {
             if let details, details.series != nil {
                 MovieSelectionActionButton("key.download.season", isActive: selectedQuality != nil) {
                     if let selectedActing, let selectedQuality, let selectedSeason {
-                        downloader.download(.init(details: details, acting: selectedActing, season: selectedSeason, episode: selectedEpisode, quality: selectedQuality, subtitles: selectedSubtitles, all: true))
+                        pendingDownload = .init(details: details, acting: selectedActing, season: selectedSeason, episode: selectedEpisode, quality: selectedQuality, subtitles: selectedSubtitles, all: true)
+
+                        isFolderImporterPresented = true
                     }
                 }
                 .disabled(downloader.downloads.contains(where: {
                     $0.data.notificationId == "\(details.movieId)\(selectedSeason?.seasonId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded
                 }))
             }
+        }
+        .fileImporter(isPresented: $isFolderImporterPresented, allowedContentTypes: [.folder]) { result in
+            guard let pendingDownload, case let .success(url) = result else { return }
+
+            let isAccessing = url.startAccessingSecurityScopedResource()
+
+            defer {
+                if isAccessing {
+                    url.stopAccessingSecurityScopedResource()
+                }
+            }
+
+            guard let folder = try? url.bookmarkData(options: .withSecurityScope) else { return }
+
+            downloader.download(pendingDownload.withFolder(folder))
         }
         .onChange(of: downloader.isRunning) {
             if !downloader.isRunning {
