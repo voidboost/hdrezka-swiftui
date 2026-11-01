@@ -39,23 +39,7 @@ extension PlayerFeature {
 
             return .merge(
                 .run { [voiceActing = state.voiceActing, season = state.season, episode = state.episode, subtitles = state.subtitles] _ in
-                    if Defaults[.isLoggedIn] {
-                        try? await accountClient.saveWatchingState(voiceActing: voiceActing, season: season, episode: episode)
-                    }
-
-                    try? await database.write { db in
-                        try SelectPosition
-                            .upsert {
-                                SelectPosition.Draft(
-                                    id: voiceActing.voiceId,
-                                    acting: voiceActing.translatorId,
-                                    season: season?.seasonId,
-                                    episode: episode?.episodeId,
-                                    subtitles: subtitles
-                                )
-                            }
-                            .execute(db)
-                    }
+                    await selectionHistory.remember(acting: voiceActing, season: season, episode: episode, subtitles: subtitles)
                 },
                 .run { [engine, subtitles = state.subtitles] send in
                     let options = await engine.subtitleOptions(selecting: subtitles)

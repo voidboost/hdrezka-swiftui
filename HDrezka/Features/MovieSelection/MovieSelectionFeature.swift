@@ -46,7 +46,7 @@ struct MovieSelectionFeature {
     }
 
     @Dependency(\.movieDetailsClient) private var movieDetailsClient
-    @Dependency(\.accountClient) private var accountClient
+    @Dependency(\.selectionHistory) private var selectionHistory
     @Dependency(\.defaultDatabase) private var database
     @Dependency(\.appRouter) private var appRouter
     @Dependency(\.downloadCommands) private var downloadCommands
@@ -164,24 +164,8 @@ struct MovieSelectionFeature {
             case .rememberSelection:
                 guard let selectedActing = state.selectedActing else { return .none }
 
-                return .run { [selectedSeason = state.selectedSeason, selectedEpisode = state.selectedEpisode, subtitles = state.selectedSubtitles?.lang.replacingOccurrences(of: "ua", with: "uk")] _ in
-                    if Defaults[.isLoggedIn] {
-                        try? await accountClient.saveWatchingState(voiceActing: selectedActing, season: selectedSeason, episode: selectedEpisode)
-                    }
-
-                    try? await database.write { db in
-                        try SelectPosition
-                            .upsert {
-                                SelectPosition.Draft(
-                                    id: selectedActing.voiceId,
-                                    acting: selectedActing.translatorId,
-                                    season: selectedSeason?.seasonId,
-                                    episode: selectedEpisode?.episodeId,
-                                    subtitles: subtitles
-                                )
-                            }
-                            .execute(db)
-                    }
+                return .run { [selectedSeason = state.selectedSeason, selectedEpisode = state.selectedEpisode, subtitles = state.selectedSubtitles?.languageCode] _ in
+                    await selectionHistory.remember(acting: selectedActing, season: selectedSeason, episode: selectedEpisode, subtitles: subtitles)
                 }
             }
         }

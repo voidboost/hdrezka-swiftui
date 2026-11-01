@@ -181,7 +181,7 @@ struct PlayerFeature {
     let engine: PlayerEngine
 
     @Dependency(\.appRouter) var appRouter
-    @Dependency(\.accountClient) var accountClient
+    @Dependency(\.selectionHistory) var selectionHistory
     @Dependency(\.movieDetailsClient) var movieDetailsClient
     @Dependency(\.defaultDatabase) var database
     @Dependency(\.continuousClock) var clock
@@ -343,19 +343,7 @@ struct PlayerFeature {
                 return perform { [voiceActing = state.voiceActing, season = state.season, episode = state.episode] engine in
                     guard await engine.selectSubtitles(language) else { return }
 
-                    try? await database.write { db in
-                        try SelectPosition
-                            .upsert {
-                                SelectPosition.Draft(
-                                    id: voiceActing.voiceId,
-                                    acting: voiceActing.translatorId,
-                                    season: season?.seasonId,
-                                    episode: episode?.episodeId,
-                                    subtitles: language
-                                )
-                            }
-                            .execute(db)
-                    }
+                    await selectionHistory.save(acting: voiceActing, season: season, episode: episode, subtitles: language)
                 }
 
             case let .timerSelected(timer):

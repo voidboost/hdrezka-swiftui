@@ -6,3 +6,9 @@ struct MovieSubtitles: Identifiable, Codable, Hashable {
     let lang: String
     var id = UUID()
 }
+
+extension MovieSubtitles {
+    var languageCode: String {
+        lang.replacingOccurrences(of: "ua", with: "uk")
+    }
+}

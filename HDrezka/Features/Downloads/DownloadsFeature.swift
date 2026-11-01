@@ -1,6 +1,5 @@
 import ComposableArchitecture
 import Defaults
-import SQLiteData
 import SwiftUI
 
 @Reducer
@@ -32,10 +31,9 @@ struct DownloadsFeature {
 
     @Dependency(\.aria2Client) private var aria2Client
     @Dependency(\.movieDetailsClient) private var movieDetailsClient
-    @Dependency(\.accountClient) private var accountClient
+    @Dependency(\.selectionHistory) private var selectionHistory
     @Dependency(\.downloadCommands) private var downloadCommands
     @Dependency(\.downloadNotifications) private var notifications
-    @Dependency(\.defaultDatabase) private var database
     @Dependency(\.continuousClock) private var clock
 
     var body: some ReducerOf<Self> {
@@ -188,7 +186,7 @@ struct DownloadsFeature {
                 return
             }
 
-            await rememberSelection(data, target: target)
+            await selectionHistory.remember(acting: data.acting, season: target.season, episode: target.episode, subtitles: data.subtitles?.languageCode)
 
             guard let urls = movie.getClosestTo(quality: data.quality) else { return }
 
@@ -253,26 +251,6 @@ struct DownloadsFeature {
         state.$hasDownloads.withLock { $0 = hasDownloads }
 
         return download
-    }
-
-    private func rememberSelection(_ data: DownloadData, target: DownloadTarget) async {
-        if Defaults[.isLoggedIn] {
-            try? await accountClient.saveWatchingState(voiceActing: data.acting, season: target.season, episode: target.episode)
-        }
-
-        try? await database.write { db in
-            try SelectPosition
-                .upsert {
-                    SelectPosition.Draft(
-                        id: data.acting.voiceId,
-                        acting: data.acting.translatorId,
-                        season: target.season?.seasonId,
-                        episode: target.episode?.episodeId,
-                        subtitles: data.subtitles?.lang.replacingOccurrences(of: "ua", with: "uk")
-                    )
-                }
-                .execute(db)
-        }
     }
 }
 
