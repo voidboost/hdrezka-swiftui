@@ -18,7 +18,7 @@ enum MovieDetailsService {
     case reportComment(id: String, issue: Int, text: String)
     case deleteComment(id: String, hash: String)
     case sendComment(id: String?, postId: String, name: String?, text: String, adb: String?, type: String?)
-    case getlikes(id: String)
+    case getLikes(id: String)
     case rate(id: String, rating: Int)
 }
 
@@ -54,7 +54,7 @@ extension MovieDetailsService: Endpoint {
             "engine/ajax/deletecomments.php"
         case .sendComment:
             "ajax/add_comment/"
-        case .getlikes:
+        case .getLikes:
             "ajax/comments_likes/"
         case .rate:
             "engine/ajax/rating.php"
@@ -63,7 +63,7 @@ extension MovieDetailsService: Endpoint {
 
     var method: HTTPMethod {
         switch self {
-        case .getMovieTrailer, .toggleCommentLike, .reportComment, .sendComment, .getlikes, .rate:
+        case .getMovieTrailer, .toggleCommentLike, .reportComment, .sendComment, .getLikes, .rate:
             .post
         case .getMovieVideo, .getSeriesSeasons:
             directPath == nil ? .post : .get
@@ -132,7 +132,7 @@ extension MovieDetailsService: Endpoint {
             params["type"] = type
 
             return try request.body(params)
-        case let .getlikes(id):
+        case let .getLikes(id):
             return try request.body(["comment_id": id])
         case let .rate(id, rating):
             return try request.body(["news_id": id, "go_rate": rating, "skin": "hdrezka"])

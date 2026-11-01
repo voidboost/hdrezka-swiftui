@@ -96,7 +96,7 @@ extension MovieDetailsClient: DependencyKey {
                 }
             },
             getLikes: { id in
-                try await session.json(MovieDetailsService.getlikes(id: id), function: "getLikes") { json in
+                try await session.json(MovieDetailsService.getLikes(id: id), function: "getLikes") { json in
                     try MovieDetailsParser.parseLikes(from: json.require("message"))
                 }
             },
