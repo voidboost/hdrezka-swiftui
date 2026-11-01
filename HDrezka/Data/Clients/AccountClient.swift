@@ -103,8 +103,6 @@ extension AccountClient: DependencyKey {
             }
         )
     }()
-
-    static let testValue = Self()
 }
 
 extension DependencyValues {

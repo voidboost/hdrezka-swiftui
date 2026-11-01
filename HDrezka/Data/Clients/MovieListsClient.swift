@@ -65,8 +65,6 @@ extension MovieListsClient: DependencyKey {
             }
         )
     }()
-
-    static let testValue = Self()
 }
 
 extension DependencyValues {

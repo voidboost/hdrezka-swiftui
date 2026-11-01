@@ -22,8 +22,6 @@ extension SearchClient: DependencyKey {
             }
         )
     }()
-
-    static let testValue = Self()
 }
 
 extension DependencyValues {

@@ -116,8 +116,6 @@ extension MovieDetailsClient: DependencyKey {
             }
         )
     }()
-
-    static let testValue = Self()
 }
 
 extension DependencyValues {
