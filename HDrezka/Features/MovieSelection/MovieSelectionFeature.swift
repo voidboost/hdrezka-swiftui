@@ -35,6 +35,7 @@ struct MovieSelectionFeature {
         case seasonsLoaded(Result<[MovieSeason], any Error>)
         case videoLoaded(Result<MovieVideo, any Error>)
         case rememberSelection
+        case downloadRequested(DownloadData)
         case showError(any Error)
     }
 
@@ -48,6 +49,7 @@ struct MovieSelectionFeature {
     @Dependency(\.accountClient) private var accountClient
     @Dependency(\.defaultDatabase) private var database
     @Dependency(\.appRouter) private var appRouter
+    @Dependency(\.downloadCommands) private var downloadCommands
     @Dependency(\.dismiss) private var dismiss
 
     var body: some ReducerOf<Self> {
@@ -155,6 +157,9 @@ struct MovieSelectionFeature {
                 state.isErrorPresented = true
 
                 return .none
+
+            case let .downloadRequested(data):
+                return .run { _ in downloadCommands.send(.download(data)) }
 
             case .rememberSelection:
                 guard let selectedActing = state.selectedActing else { return .none }

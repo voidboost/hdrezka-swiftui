@@ -15,7 +15,8 @@ struct DownloadSheetView: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
-    @Environment(Downloader.self) private var downloader
+    @SharedReader(.downloads) private var downloads
+    @SharedReader(.isDownloaderRunning) private var isDownloaderRunning
 
     @State private var pendingDownload: DownloadData?
     @State private var isFolderImporterPresented: Bool = false
@@ -29,7 +30,7 @@ struct DownloadSheetView: View {
                     isFolderImporterPresented = true
                 }
             }
-            .disabled(downloader.downloads.contains(where: {
+            .disabled(downloads.contains(where: {
                 $0.data.notificationId == "\(details?.movieId ?? "")\(selectedSeason?.seasonId ?? "")\(selectedEpisode?.episodeId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded || $0.data.notificationId == "\(details?.movieId ?? "")\(selectedSeason?.seasonId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded
             }))
 
@@ -83,7 +84,7 @@ struct DownloadSheetView: View {
                         isFolderImporterPresented = true
                     }
                 }
-                .disabled(downloader.downloads.contains(where: {
+                .disabled(downloads.contains(where: {
                     $0.data.notificationId == "\(details.movieId)\(selectedSeason?.seasonId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded
                 }))
             }
@@ -103,7 +104,7 @@ struct DownloadSheetView: View {
 
             guard let folder = try? url.bookmarkData(options: .withSecurityScope) else { return }
 
-            downloader.download(pendingDownload.withFolder(folder))
+            store.send(.downloadRequested(pendingDownload.withFolder(folder)))
         } onCancellation: {
             pendingDownload = nil
         }
@@ -111,8 +112,8 @@ struct DownloadSheetView: View {
         .fileDialogMessage(pendingDownload.map { Text("key.download.folder-\($0.details.nameRussian)") })
         .fileDialogConfirmationLabel(Text("key.download"))
         .fileDialogCustomizationID("download")
-        .onChange(of: downloader.isRunning) {
-            if !downloader.isRunning {
+        .onChange(of: isDownloaderRunning) {
+            if !isDownloaderRunning {
                 dismiss()
             }
         }

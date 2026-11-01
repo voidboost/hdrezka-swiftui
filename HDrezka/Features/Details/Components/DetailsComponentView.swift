@@ -135,7 +135,7 @@ private struct DetailsActionsView: View {
     let comingSoon: Bool
 
     @Environment(StoreOf<DetailsFeature>.self) private var store
-    @Environment(Downloader.self) private var downloader
+    @SharedReader(.isDownloaderRunning) private var isDownloaderRunning
 
     @State private var hasExternalPlayer: Bool = false
 
@@ -162,7 +162,7 @@ private struct DetailsActionsView: View {
                     WatchSheetView(store: store)
                 }
 
-                if downloader.isRunning {
+                if isDownloaderRunning {
                     Button {
                         store.send(.downloadTapped)
                     } label: {

@@ -31,7 +31,7 @@ struct Aria2Response<D: Decodable>: Decodable {
     let error: Aria2Error?
 }
 
-struct Aria2Error: Decodable {
+struct Aria2Error: Decodable, Error {
     let code: Aria2ErrorCode
 }
 
@@ -170,12 +170,6 @@ extension KeysParams {
     }
 }
 
-struct EmptyTokenParams: TokenParams {
-    let token: String
-
-    func encodeAdditional(to _: inout UnkeyedEncodingContainer) throws {}
-}
-
 struct AddUriParams<E: Encodable>: TokenParams {
     let token: String
     let uris: [String]
@@ -236,24 +230,6 @@ struct OptionsParams<E: Encodable>: TokenParams {
 
     func encodeAdditional(to container: inout UnkeyedEncodingContainer) throws {
         try container.encode(options)
-    }
-}
-
-struct GlobalStatusResult: Decodable {
-    let numActive: Int
-    let numWaiting: Int
-    let numStopped: Int
-
-    enum CodingKeys: String, CodingKey {
-        case numActive, numWaiting, numStopped
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-
-        numActive = try Int(container.decode(String.self, forKey: .numActive)).orThrow()
-        numWaiting = try Int(container.decode(String.self, forKey: .numWaiting)).orThrow()
-        numStopped = try Int(container.decode(String.self, forKey: .numStopped)).orThrow()
     }
 }
 
@@ -320,15 +296,12 @@ enum Aria2Method: String, Encodable {
     case addUri = "aria2.addUri"
     case remove = "aria2.remove"
     case pause = "aria2.pause"
-    case pauseAll = "aria2.pauseAll"
     case unpause = "aria2.unpause"
-    case unpauseAll = "aria2.unpauseAll"
     case tellActive = "aria2.tellActive"
     case tellWaiting = "aria2.tellWaiting"
     case tellStopped = "aria2.tellStopped"
     case changeGlobalOption = "aria2.changeGlobalOption"
     case removeDownloadResult = "aria2.removeDownloadResult"
-    case getGlobalStat = "aria2.getGlobalStat"
 }
 
 extension Aria2Request: Sendable where E: Sendable {}

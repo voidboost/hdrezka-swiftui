@@ -25,7 +25,7 @@ struct DownloadData: Identifiable, Codable, Hashable {
 }
 
 extension DownloadData {
-    func newEpisede(_ episode: MovieEpisode) -> DownloadData {
+    func withEpisode(_ episode: MovieEpisode) -> DownloadData {
         var data = self
         data.episode = episode
 

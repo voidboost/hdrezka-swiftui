@@ -37,6 +37,7 @@ struct AppFeature {
         var collections = CollectionsFeature.State()
         var watchingLater = WatchingLaterFeature.State()
         var bookmarks = BookmarksFeature.State()
+        var downloads = DownloadsFeature.State()
 
         var isSignOutPresented = false
         var isPremiumPresented = false
@@ -57,6 +58,7 @@ struct AppFeature {
         case collections(CollectionsFeature.Action)
         case watchingLater(WatchingLaterFeature.Action)
         case bookmarks(BookmarksFeature.Action)
+        case downloads(DownloadsFeature.Action)
         case appLaunched
         case routeReceived(AppRoute)
         case sessionEventReceived(SessionEvent)
@@ -95,6 +97,7 @@ struct AppFeature {
         Scope(state: \.collections, action: \.collections) { CollectionsFeature() }
         Scope(state: \.watchingLater, action: \.watchingLater) { WatchingLaterFeature() }
         Scope(state: \.bookmarks, action: \.bookmarks) { BookmarksFeature() }
+        Scope(state: \.downloads, action: \.downloads) { DownloadsFeature() }
 
         Reduce { state, action in
             switch action {
@@ -112,6 +115,7 @@ struct AppFeature {
 
             case .appLaunched:
                 return .merge(
+                    .send(.downloads(.launch)),
                     .run { send in
                         for await route in appRouter.routes() {
                             await send(.routeReceived(route))
@@ -212,7 +216,7 @@ struct AppFeature {
 
                 return .none
 
-            case .binding, .path, .home, .search, .categories, .collections, .watchingLater, .bookmarks, .destination, .alert:
+            case .binding, .path, .home, .search, .categories, .collections, .watchingLater, .bookmarks, .downloads, .destination, .alert:
                 return .none
             }
         }

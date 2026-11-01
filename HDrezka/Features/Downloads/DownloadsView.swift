@@ -1,15 +1,16 @@
+import ComposableArchitecture
 import SwiftUI
 
 struct DownloadsView: View {
-    @Environment(Downloader.self) private var downloader
+    let store: StoreOf<DownloadsFeature>
 
     var body: some View {
         ScrollView(.vertical) {
             LazyVStack(alignment: .center, spacing: 5) {
-                if downloader.downloads.isEmpty {
+                if store.downloads.isEmpty {
                     Text("key.downloads.empty")
                 } else {
-                    ForEach(downloader.downloads, id: \.gid) { download in
+                    ForEach(store.downloads) { download in
                         HStack(alignment: .center, spacing: 15) {
                             ProgressView(download.progress)
                                 .progressViewStyle(.linear)
@@ -17,9 +18,9 @@ struct DownloadsView: View {
                             if let status = download.status {
                                 Button {
                                     if status.status == .paused {
-                                        downloader.unpause(download.gid)
+                                        store.send(.unpauseTapped(gid: download.gid))
                                     } else {
-                                        downloader.pause(download.gid)
+                                        store.send(.pauseTapped(gid: download.gid))
                                     }
                                 } label: {
                                     Image(systemName: status.status == .paused ? "play.circle.fill" : "pause.circle.fill")
@@ -30,7 +31,7 @@ struct DownloadsView: View {
                             }
 
                             Button {
-                                downloader.remove(download.gid)
+                                store.send(.removeTapped(gid: download.gid))
                             } label: {
                                 Image(systemName: "xmark.circle.fill")
                                     .foregroundStyle(Color.accentColor)
@@ -39,14 +40,14 @@ struct DownloadsView: View {
                             .buttonStyle(.plain)
                         }
 
-                        if download != downloader.downloads.last {
+                        if download != store.downloads.last {
                             Divider()
                         }
                     }
                 }
             }
             .padding(15)
-            .animation(.easeInOut, value: downloader.downloads)
+            .animation(.easeInOut, value: store.downloads)
         }
         .scrollIndicators(.visible, axes: .vertical)
         .frame(minHeight: 100, maxHeight: 200)

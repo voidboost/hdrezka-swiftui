@@ -15,6 +15,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private nonisolated let updateNotificationIdentifier = "UpdateCheck".base64Decoded
     var updaterController: SPUStandardUpdaterController!
 
+    @SharedReader(.hasDownloads) private var hasDownloads
+    @Dependency(\.aria2Client) private var aria2Client
+    @Dependency(\.downloadCommands) private var downloadCommands
+
     override init() {
         super.init()
 
@@ -44,11 +48,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
-        Downloader.shared.downloads.isEmpty
+        !hasDownloads
     }
 
     func applicationWillTerminate(_: Notification) {
-        if !Downloader.shared.downloads.isEmpty {
+        if hasDownloads {
             UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
                 UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: requests.filter { $0.content.categoryIdentifier == "cancel" }.map(\.identifier))
             }
@@ -58,7 +62,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
-        Downloader.shared.terminate()
+        aria2Client.terminate()
     }
 }
 
@@ -79,7 +83,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             case "cancel":
                 if let gid = userInfo["gid"] as? String {
                     Task { @MainActor in
-                        Downloader.shared.remove(gid)
+                        self.downloadCommands.send(.remove(gid: gid))
                     }
                 }
             case "open":
@@ -89,7 +93,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
             case "retry":
                 if let retryData = userInfo["data"] as? Data, let data = try? JSONDecoder().decode(DownloadData.self, from: retryData) {
                     Task { @MainActor in
-                        Downloader.shared.download(data)
+                        self.downloadCommands.send(.download(data))
                     }
                 }
             case "need_premium":
@@ -141,7 +145,7 @@ extension AppDelegate: SPUUpdaterDelegate, SPUStandardUserDriverDelegate {
 struct HDrezkaApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @State private var store: StoreOf<AppFeature>
-    @State private var downloader: Downloader = .shared
+    @SharedReader(.hasDownloads) private var hasDownloads
     @Environment(\.openWindow) private var openWindow
 
     @Default(.theme) private var theme
@@ -175,7 +179,6 @@ struct HDrezkaApp: App {
     var body: some Scene {
         WindowGroup(id: Windows.hdrezka.id) {
             ContentView(store: store)
-                .environment(downloader)
                 .preferredColorScheme(theme.scheme)
         }
         .windowResizability(.contentMinSize)
@@ -224,7 +227,6 @@ struct HDrezkaApp: App {
 
         Settings {
             SettingsView(updater: delegate.updaterController.updater)
-                .environment(downloader)
                 .preferredColorScheme(theme.scheme)
                 .analyticsScreen(name: "settings", class: "SettingsView")
         }
@@ -235,10 +237,9 @@ struct HDrezkaApp: App {
         .commands(content: removed)
 
         MenuBarExtra(isInserted: Binding {
-            downloader.hasDownloads
+            hasDownloads
         } set: { _ in }) {
-            DownloadsView()
-                .environment(downloader)
+            DownloadsView(store: store.scope(state: \.downloads, action: \.downloads))
                 .preferredColorScheme(theme.scheme)
                 .analyticsScreen(name: "downloads", class: "DownloadsView")
         } label: {

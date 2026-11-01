@@ -23,7 +23,6 @@ struct SettingsView: View {
     @Default(.snowOnSurfaces) private var snowOnSurfaces
     @Default(.mediaControlButtonIsSeeking) private var mediaControlButtonIsSeeking
 
-    @Environment(Downloader.self) private var downloader
 
     @Dependency(\.cookiesClient) private var cookiesClient
     @Dependency(\.defaultDatabase) private var database
@@ -224,10 +223,6 @@ struct SettingsView: View {
                             Text(verbatim: "1")
                         } maximumValueLabel: {
                             Text(verbatim: "10")
-                        } onEditingChanged: { isEditing in
-                            if !isEditing {
-                                downloader.maxConcurrentDownloadsChange()
-                            }
                         }
                         .labelsHidden()
                         .controlSize(.large)

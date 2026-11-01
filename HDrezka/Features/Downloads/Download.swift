@@ -1,7 +1,7 @@
 import Alamofire
 import Foundation
 
-struct Download: Hashable {
+struct Download: Identifiable, Hashable {
     let gid: String
     private(set) var status: StatusResult?
     let data: DownloadData
@@ -18,6 +18,10 @@ struct Download: Hashable {
 }
 
 extension Download {
+    var id: String {
+        gid
+    }
+
     mutating func updateStatus(_ status: StatusResult) {
         self.status = status
     }
