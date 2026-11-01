@@ -2235,6 +2235,28 @@
         }
       }
     },
+    "key.download.folder-%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a folder to download \"%@\" to"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выберите папку, в которую скачать «%@»"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Виберіть теку, до якої завантажити «%@»"
+          }
+        }
+      }
+    },
     "key.download.folx" : {
       "localizations" : {
         "en" : {
@@ -6256,7 +6278,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Result for «%@»"
+            "value" : "Result for \"%@\""
           }
         },
         "ru" : {

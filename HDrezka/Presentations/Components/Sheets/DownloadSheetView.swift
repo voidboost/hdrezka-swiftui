@@ -103,6 +103,10 @@ struct DownloadSheetView: View {
 
             downloader.download(pendingDownload.withFolder(folder))
         }
+        .fileDialogDefaultDirectory(FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.resolvingSymlinksInPath())
+        .fileDialogMessage(pendingDownload.map { Text("key.download.folder-\($0.details.nameRussian)") })
+        .fileDialogConfirmationLabel(Text("key.download"))
+        .fileDialogCustomizationID("download")
         .onChange(of: downloader.isRunning) {
             if !downloader.isRunning {
                 dismiss()
