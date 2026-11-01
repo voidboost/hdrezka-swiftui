@@ -104,8 +104,7 @@ struct BookmarksSheetView: View {
                         .scrollIndicators(.visible, axes: .vertical)
                         .frame(maxWidth: .infinity)
                         .frame(height: scrollViewContentSize.height > 140 ? 140 : scrollViewContentSize.height)
-                        .background(.quinary, in: .rect(cornerRadius: 6))
-                        .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                        .cardStyle()
                     }
                 } else {
                     ProgressView()

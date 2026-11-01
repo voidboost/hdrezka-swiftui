@@ -15,6 +15,11 @@ extension View {
     ) -> some View {
         body(self)
     }
+
+    func cardStyle() -> some View {
+        background(.quinary, in: .rect(cornerRadius: 6))
+            .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+    }
 }
 
 extension View {

@@ -14,8 +14,7 @@ struct LicensesView: View {
                 }
             }
             .padding(.horizontal, 15)
-            .background(.quinary, in: .rect(cornerRadius: 6))
-            .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+            .cardStyle()
             .padding(25)
             .background(.background)
         }

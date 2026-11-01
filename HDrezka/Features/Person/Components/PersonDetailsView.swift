@@ -117,8 +117,7 @@ struct PersonDetailsView: View {
                         }
                     }
                     .padding(.horizontal, 10)
-                    .background(.quinary, in: .rect(cornerRadius: 6))
-                    .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                    .cardStyle()
                     .snowSurface(in: .rect(cornerRadius: 6))
                 }
             }

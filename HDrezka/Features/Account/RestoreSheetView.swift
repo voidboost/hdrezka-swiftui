@@ -53,8 +53,7 @@ struct RestoreSheetView: View {
                         }
                         .padding(.horizontal, 15)
                         .padding(.vertical, 5)
-                        .background(.quinary, in: .rect(cornerRadius: 6))
-                        .overlay(.tertiary, in: .rect(cornerRadius: 6).stroke(lineWidth: 1))
+                        .cardStyle()
                     }
 
                     VStack(alignment: .center, spacing: 10) {
