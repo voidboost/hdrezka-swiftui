@@ -4,7 +4,7 @@ import Dependencies
 import SwiftUI
 
 struct ActingPicker: View {
-    @Bindable var store: StoreOf<MovieSelectionFeature>
+    let store: StoreOf<MovieSelectionFeature>
     let acting: [MovieVoiceActing]
     let rating: [MovieVoiceActingRating]
 
@@ -81,7 +81,7 @@ struct ActingPicker: View {
         .popover(isPresented: $showRating, arrowEdge: .trailing) {
             ScrollView(.vertical) {
                 LazyVStack(alignment: .leading, spacing: 5) {
-                    ForEach(rating) { rate in
+                    ForEach(rating.sorted { $0.percent > $1.percent }) { rate in
                         ProgressView(value: rate.percent / 100.0) {
                             Text(rate.name)
                         } currentValueLabel: {
@@ -100,7 +100,7 @@ struct ActingPicker: View {
 }
 
 struct SeasonPicker: View {
-    @Bindable var store: StoreOf<MovieSelectionFeature>
+    let store: StoreOf<MovieSelectionFeature>
 
     var body: some View {
         let seasons = store.seasons ?? []
@@ -112,7 +112,7 @@ struct SeasonPicker: View {
                         store.selectedSeason = season
                     }
                 } label: {
-                    Text(season.name.contains(/^\d/) ? String(localized: "key.season-\(season.name)") : season.name)
+                    Text(season.title)
                 }
             }
         }
@@ -121,16 +121,12 @@ struct SeasonPicker: View {
     private var value: String {
         guard let selectedSeason = store.selectedSeason else { return String(localized: "key.season.select") }
 
-        if selectedSeason.name.isEmpty {
-            return String(localized: "key.season-\(1)")
-        }
-
-        return selectedSeason.name.contains(/^\d/) ? String(localized: "key.season-\(selectedSeason.name)") : selectedSeason.name
+        return selectedSeason.name.isEmpty ? String(localized: "key.season-\(1)") : selectedSeason.title
     }
 }
 
 struct EpisodePicker: View {
-    @Bindable var store: StoreOf<MovieSelectionFeature>
+    let store: StoreOf<MovieSelectionFeature>
 
     var body: some View {
         let episodes = store.selectedSeason?.episodes ?? []
@@ -142,7 +138,7 @@ struct EpisodePicker: View {
                         store.selectedEpisode = episode
                     }
                 } label: {
-                    Text(episode.name.contains(/^\d/) ? String(localized: "key.episode-\(episode.name)") : episode.name)
+                    Text(episode.title)
                 }
             }
         }
@@ -151,16 +147,12 @@ struct EpisodePicker: View {
     private var value: String {
         guard let selectedEpisode = store.selectedEpisode else { return String(localized: "key.episode.select") }
 
-        if selectedEpisode.name.isEmpty {
-            return String(localized: "key.episode-\(1)")
-        }
-
-        return selectedEpisode.name.contains(/^\d/) ? String(localized: "key.episode-\(selectedEpisode.name)") : selectedEpisode.name
+        return selectedEpisode.name.isEmpty ? String(localized: "key.episode-\(1)") : selectedEpisode.title
     }
 }
 
 struct QualityPicker: View {
-    @Bindable var store: StoreOf<MovieSelectionFeature>
+    let store: StoreOf<MovieSelectionFeature>
     @Binding var isLoginPresented: Bool
 
     @Environment(\.dismiss) private var dismiss
@@ -256,7 +248,7 @@ struct QualityPicker: View {
 }
 
 struct SubtitlesPicker: View {
-    @Bindable var store: StoreOf<MovieSelectionFeature>
+    let store: StoreOf<MovieSelectionFeature>
     let subtitles: [MovieSubtitles]
 
     var body: some View {
@@ -291,6 +283,18 @@ struct SubtitlesPicker: View {
         guard let selectedSubtitles = store.selectedSubtitles else { return String(localized: "key.subtitles.select") }
 
         return selectedSubtitles.name.isEmpty ? String(localized: "key.default") : selectedSubtitles.name
+    }
+}
+
+private extension MovieSeason {
+    var title: String {
+        name.contains(/^\d/) ? String(localized: "key.season-\(name)") : name
+    }
+}
+
+private extension MovieEpisode {
+    var title: String {
+        name.contains(/^\d/) ? String(localized: "key.episode-\(name)") : name
     }
 }
 

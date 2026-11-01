@@ -148,16 +148,7 @@ private struct GeneralSection: View {
 
     var body: some View {
         SettingsGroup {
-            SettingsRow("key.theme") {
-                Picker("key.theme", selection: $theme) {
-                    ForEach(Theme.allCases) { theme in
-                        Text(theme.localizedKey)
-                            .tag(theme)
-                    }
-                }
-                .labelsHidden()
-                .pickerStyle(.menu)
-            }
+            SettingsPicker("key.theme", selection: $theme, label: \.localizedKey)
 
             Divider()
 
@@ -169,29 +160,11 @@ private struct GeneralSection: View {
 
             Divider()
 
-            SettingsRow("key.spatialAudio") {
-                Picker("key.spatialAudio", selection: $spatialAudio) {
-                    ForEach(SpatialAudio.allCases) { format in
-                        Text(format.localizedKey)
-                            .tag(format)
-                    }
-                }
-                .labelsHidden()
-                .pickerStyle(.menu)
-            }
+            SettingsPicker("key.spatialAudio", selection: $spatialAudio, label: \.localizedKey)
 
             Divider()
 
-            SettingsRow("key.defaultQuality") {
-                Picker("key.defaultQuality", selection: $defaultQuality) {
-                    ForEach(DefaultQuality.allCases) { quality in
-                        Text(quality.localizedKey)
-                            .tag(quality)
-                    }
-                }
-                .labelsHidden()
-                .pickerStyle(.menu)
-            }
+            SettingsPicker("key.defaultQuality", selection: $defaultQuality, label: \.localizedKey)
 
             Divider()
 
@@ -260,19 +233,10 @@ private struct GeneralSection: View {
 
             Divider()
 
-            SettingsRow("key.cache") {
-                Picker("key.cache", selection: $cache) {
-                    ForEach(Cache.allCases) { cache in
-                        Text(cache.localizedKey)
-                            .tag(cache)
-                    }
+            SettingsPicker("key.cache", selection: $cache, label: \.localizedKey)
+                .onChange(of: cache) {
+                    applyCache()
                 }
-                .labelsHidden()
-                .pickerStyle(.menu)
-            }
-            .onChange(of: cache) {
-                applyCache()
-            }
         }
     }
 
@@ -447,6 +411,31 @@ private struct SettingsRow<Label: View, Content: View>: View {
 extension SettingsRow where Label == Text {
     init(_ title: LocalizedStringKey, @ViewBuilder content: () -> Content) {
         self.init(label: { Text(title) }, content: content)
+    }
+}
+
+private struct SettingsPicker<Option: CaseIterable & Identifiable & Hashable>: View where Option.AllCases: RandomAccessCollection {
+    private let title: LocalizedStringKey
+    @Binding private var selection: Option
+    private let label: (Option) -> LocalizedStringKey
+
+    init(_ title: LocalizedStringKey, selection: Binding<Option>, label: @escaping (Option) -> LocalizedStringKey) {
+        self.title = title
+        _selection = selection
+        self.label = label
+    }
+
+    var body: some View {
+        SettingsRow(title) {
+            Picker(title, selection: $selection) {
+                ForEach(Option.allCases) { option in
+                    Text(label(option))
+                        .tag(option)
+                }
+            }
+            .labelsHidden()
+            .pickerStyle(.menu)
+        }
     }
 }
 

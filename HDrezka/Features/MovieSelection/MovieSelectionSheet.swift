@@ -112,7 +112,7 @@ struct MovieSelectionSheet<Actions: View>: View {
                 if details.series != nil || hasNamedActing {
                     VStack(spacing: 2.5) {
                         if hasNamedActing {
-                            ActingPicker(store: store, acting: acting, rating: details.voiceActingRating?.sorted { $0.percent > $1.percent } ?? [])
+                            ActingPicker(store: store, acting: acting, rating: details.voiceActingRating ?? [])
                                 .padding(.vertical, 10)
                         }
 
