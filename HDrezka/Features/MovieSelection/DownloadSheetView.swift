@@ -24,15 +24,9 @@ struct DownloadSheetView: View {
     var body: some View {
         MovieSelectionSheet(store: store, icon: "arrow.down.circle", description: "key.download.description", showsSubtitles: true) {
             MovieSelectionActionButton("key.download", isActive: selectedQuality != nil) {
-                if let details, let selectedActing, let selectedQuality {
-                    pendingDownload = .init(details: details, acting: selectedActing, season: selectedSeason, episode: selectedEpisode, quality: selectedQuality, subtitles: selectedSubtitles)
-
-                    isFolderImporterPresented = true
-                }
+                requestFolder(for: selection(all: false))
             }
-            .disabled(downloads.contains(where: {
-                $0.data.notificationId == "\(details?.movieId ?? "")\(selectedSeason?.seasonId ?? "")\(selectedEpisode?.episodeId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded || $0.data.notificationId == "\(details?.movieId ?? "")\(selectedSeason?.seasonId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded
-            }))
+            .disabled(isDownloading(selection(all: false)))
 
             if NSWorkspace.shared.urlForApplication(toOpen: ExternalDownloaders.folx.url) != nil {
                 MovieSelectionActionButton(ExternalDownloaders.folx.localizedKey, isActive: selectedQuality != nil) {
@@ -78,15 +72,9 @@ struct DownloadSheetView: View {
 
             if let details, details.series != nil {
                 MovieSelectionActionButton("key.download.season", isActive: selectedQuality != nil) {
-                    if let selectedActing, let selectedQuality, let selectedSeason {
-                        pendingDownload = .init(details: details, acting: selectedActing, season: selectedSeason, episode: selectedEpisode, quality: selectedQuality, subtitles: selectedSubtitles, all: true)
-
-                        isFolderImporterPresented = true
-                    }
+                    requestFolder(for: selection(all: true))
                 }
-                .disabled(downloads.contains(where: {
-                    $0.data.notificationId == "\(details.movieId)\(selectedSeason?.seasonId ?? "")\(selectedActing?.translatorId ?? "")\(selectedQuality ?? "")".base64Encoded
-                }))
+                .disabled(isDownloadingSeason(selection(all: true)))
             }
         }
         .fileImporter(isPresented: $isFolderImporterPresented, allowedContentTypes: [.folder], allowsMultipleSelection: false) { result in
@@ -118,5 +106,32 @@ struct DownloadSheetView: View {
             }
         }
         .analyticsScreen(name: "download_sheet", class: "DownloadSheetView")
+    }
+
+    private func selection(all: Bool) -> DownloadData? {
+        guard let details, let selectedActing, let selectedQuality else { return nil }
+
+        if all, selectedSeason == nil { return nil }
+
+        return DownloadData(details: details, acting: selectedActing, season: selectedSeason, episode: selectedEpisode, quality: selectedQuality, subtitles: selectedSubtitles, all: all)
+    }
+
+    private func requestFolder(for data: DownloadData?) {
+        guard let data else { return }
+
+        pendingDownload = data
+        isFolderImporterPresented = true
+    }
+
+    private func isDownloading(_ data: DownloadData?) -> Bool {
+        guard let data else { return false }
+
+        return downloads.contains { $0.data.notificationId == data.notificationId }
+    }
+
+    private func isDownloadingSeason(_ data: DownloadData?) -> Bool {
+        guard let data else { return false }
+
+        return downloads.contains { $0.data.all && $0.data.isSameSeason(as: data) }
     }
 }

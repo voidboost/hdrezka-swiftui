@@ -39,6 +39,13 @@ extension DownloadData {
         return data
     }
 
+    func isSameSeason(as other: DownloadData) -> Bool {
+        details.movieId == other.details.movieId
+            && season?.seasonId == other.season?.seasonId
+            && acting.translatorId == other.acting.translatorId
+            && quality == other.quality
+    }
+
     var notificationId: String {
         if let season, let episode {
             "\(details.movieId)\(season.seasonId)\(episode.episodeId)\(acting.translatorId)\(quality)".base64Encoded
