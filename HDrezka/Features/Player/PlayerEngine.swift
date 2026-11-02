@@ -80,6 +80,7 @@ final class PlayerEngine {
     @ObservationIgnored private let remoteCommandCenter = MPRemoteCommandCenter.shared()
     @ObservationIgnored private let routeDetector = AVRouteDetector()
     @ObservationIgnored private let glowRenderer = GlowRenderer()
+    @ObservationIgnored private lazy var pictureInPictureController = AVPictureInPictureController(playerLayer: playerLayer)
 
     @ObservationIgnored private var continuation: AsyncStream<PlayerEvent>.Continuation?
     @ObservationIgnored private var observations: [Task<Void, Never>] = []
@@ -106,7 +107,7 @@ final class PlayerEngine {
 
         rate = configuration.rate
 
-        let pipController = AVPictureInPictureController(playerLayer: playerLayer)
+        let pipController = pictureInPictureController
 
         setAmbientLight(configuration.ambientLight, item: currentItem)
 
