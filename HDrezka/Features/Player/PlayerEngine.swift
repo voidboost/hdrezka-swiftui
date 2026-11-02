@@ -71,7 +71,6 @@ final class PlayerEngine {
     @ObservationIgnored let playerLayer = AVPlayerLayer()
 
     private(set) var player: AVPlayer?
-    private(set) var pipController: AVPictureInPictureController?
     private(set) var glow: GlowRenderer.Frame?
 
     @ObservationIgnored @Dependency(\.notificationCenter) private var notificationCenter
@@ -80,7 +79,7 @@ final class PlayerEngine {
     @ObservationIgnored private let remoteCommandCenter = MPRemoteCommandCenter.shared()
     @ObservationIgnored private let routeDetector = AVRouteDetector()
     @ObservationIgnored private let glowRenderer = GlowRenderer()
-    @ObservationIgnored private lazy var pictureInPictureController = AVPictureInPictureController(playerLayer: playerLayer)
+    @ObservationIgnored private(set) lazy var pipController = AVPictureInPictureController(playerLayer: playerLayer)
 
     @ObservationIgnored private var continuation: AsyncStream<PlayerEvent>.Continuation?
     @ObservationIgnored private var observations: [Task<Void, Never>] = []
@@ -106,8 +105,6 @@ final class PlayerEngine {
         self.continuation = continuation
 
         rate = configuration.rate
-
-        let pipController = pictureInPictureController
 
         setAmbientLight(configuration.ambientLight, item: currentItem)
 
@@ -207,7 +204,6 @@ final class PlayerEngine {
         withAnimation(.easeInOut) {
             playerLayer.player = player
             self.player = player
-            self.pipController = pipController
         }
 
         return stream
@@ -258,7 +254,6 @@ final class PlayerEngine {
         withAnimation(.easeInOut) {
             playerLayer.player = nil
             player = nil
-            pipController = nil
             glow = nil
         }
     }
