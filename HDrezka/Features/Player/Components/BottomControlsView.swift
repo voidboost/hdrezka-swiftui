@@ -39,6 +39,27 @@ struct BottomControlsView: View {
                 Spacer()
 
                 HStack(alignment: .center, spacing: 12) {
+                    if let seasons = store.seasons, store.isSeries {
+                        Menu {
+                            if seasons.count == 1, let season = seasons.first {
+                                episodesPicker(season)
+                                    .pickerStyle(.inline)
+                            } else {
+                                ForEach(seasons) { season in
+                                    episodesPicker(season)
+                                        .pickerStyle(.menu)
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "rectangle.stack.badge.play")
+                                .font(.title2)
+                                .contentShape(.circle)
+                        }
+                        .menuStyle(.button)
+                        .menuIndicator(.hidden)
+                        .maskLocking(store)
+                    }
+
                     if !store.subtitlesOptions.isEmpty {
                         Menu {
                             Picker("key.subtitles", selection: Binding {
@@ -58,16 +79,7 @@ struct BottomControlsView: View {
                                 .font(.title2)
                                 .contentShape(.circle)
                         }
-                        .buttonStyle(
-                            OnPressButtonStyle { isPressed in
-                                if isPressed {
-                                    store.send(.lockMask(true), animation: .easeInOut)
-                                } else {
-                                    store.send(.unlockMask(true), animation: .easeInOut)
-                                }
-                            },
-                        )
-                        .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+                        .maskLocking(store)
                     }
 
                     Menu {
@@ -141,16 +153,7 @@ struct BottomControlsView: View {
                     }
                     .menuStyle(.button)
                     .menuIndicator(.hidden)
-                    .buttonStyle(
-                        OnPressButtonStyle { isPressed in
-                            if isPressed {
-                                store.send(.lockMask(true), animation: .easeInOut)
-                            } else {
-                                store.send(.unlockMask(true), animation: .easeInOut)
-                            }
-                        },
-                    )
-                    .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
+                    .maskLocking(store)
                 }
             }
 
@@ -160,5 +163,34 @@ struct BottomControlsView: View {
         .padding(.bottom, 36)
         .opacity(store.isMaskShow ? 1 : 0)
         .animation(.easeInOut, value: store.isMaskShow)
+    }
+
+    private func episodesPicker(_ season: MovieSeason) -> some View {
+        Picker(season.title, selection: Binding {
+            season.seasonId == store.season?.seasonId ? store.episode?.episodeId : nil
+        } set: { episodeId in
+            guard let episode = season.episodes.first(where: { $0.episodeId == episodeId }) else { return }
+
+            store.send(.episodeSelected(season, episode))
+        }) {
+            ForEach(season.episodes) { episode in
+                Text(episode.title).tag(episode.episodeId as String?)
+            }
+        }
+    }
+}
+
+private extension View {
+    func maskLocking(_ store: StoreOf<PlayerFeature>) -> some View {
+        buttonStyle(
+            OnPressButtonStyle { isPressed in
+                if isPressed {
+                    store.send(.lockMask(true), animation: .easeInOut)
+                } else {
+                    store.send(.unlockMask(true), animation: .easeInOut)
+                }
+            },
+        )
+        .shadow(color: .black.opacity(0.5), radius: 4, y: 2)
     }
 }

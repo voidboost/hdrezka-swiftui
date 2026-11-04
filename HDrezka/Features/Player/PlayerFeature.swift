@@ -144,6 +144,7 @@ struct PlayerFeature {
         case moveCommand(MoveDirection)
         case previousTrackTapped
         case nextTrackTapped
+        case episodeSelected(MovieSeason, MovieEpisode)
         case trackLoaded(MovieSeason, MovieEpisode, Result<MovieVideo, any Error>)
         case qualitySelected(String)
         case subtitlesSelected(String?)
@@ -306,6 +307,11 @@ struct PlayerFeature {
 
             case .nextTrackTapped:
                 guard let (season, episode) = state.nextEpisode else { return .none }
+
+                return switchTrack(to: season, episode, &state)
+
+            case let .episodeSelected(season, episode):
+                guard season.seasonId != state.season?.seasonId || episode.episodeId != state.episode?.episodeId else { return .none }
 
                 return switchTrack(to: season, episode, &state)
 

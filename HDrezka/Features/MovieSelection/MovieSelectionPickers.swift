@@ -286,13 +286,13 @@ struct SubtitlesPicker: View {
     }
 }
 
-private extension MovieSeason {
+extension MovieSeason {
     var title: String {
         name.contains(/^\d/) ? String(localized: "key.season-\(name)") : name
     }
 }
 
-private extension MovieEpisode {
+extension MovieEpisode {
     var title: String {
         name.contains(/^\d/) ? String(localized: "key.episode-\(name)") : name
     }
