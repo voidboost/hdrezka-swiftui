@@ -102,3 +102,11 @@
 <p>
     <a href="./LICENSE" target="_blank">MIT License</a>
 </p>
+<h2>⭐️ История звёзд</h2>
+<a href="https://www.star-history.com/?repos=voidboost%2Fhdrezka-swiftui&type=date&legend=bottom-right">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=voidboost/hdrezka-swiftui&type=date&theme=dark&legend=bottom-right" />
+        <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=voidboost/hdrezka-swiftui&type=date&legend=bottom-right" />
+        <img alt="История звёзд" src="https://api.star-history.com/chart?repos=voidboost/hdrezka-swiftui&type=date&legend=bottom-right" />
+    </picture>
+</a>
