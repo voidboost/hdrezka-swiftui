@@ -7,8 +7,6 @@ struct RestoreSheetView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-
-
     private enum FocusedField {
         case login
     }

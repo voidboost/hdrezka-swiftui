@@ -4,7 +4,7 @@ import DependenciesMacros
 import SQLiteData
 
 @DependencyClient
-struct SelectionHistoryClient: Sendable {
+struct SelectionHistoryClient {
     var remember: @Sendable (_ acting: MovieVoiceActing, _ season: MovieSeason?, _ episode: MovieEpisode?, _ subtitles: String?) async -> Void
     var save: @Sendable (_ acting: MovieVoiceActing, _ season: MovieSeason?, _ episode: MovieEpisode?, _ subtitles: String?) async -> Void
 }
@@ -23,7 +23,7 @@ extension SelectionHistoryClient: DependencyKey {
                             acting: acting.translatorId,
                             season: season?.seasonId,
                             episode: episode?.episodeId,
-                            subtitles: subtitles
+                            subtitles: subtitles,
                         )
                     }
                     .execute(db)
@@ -38,7 +38,7 @@ extension SelectionHistoryClient: DependencyKey {
 
                 await save(acting, season, episode, subtitles)
             },
-            save: save
+            save: save,
         )
     }()
 }

@@ -639,7 +639,7 @@ private extension SwiftSoup.Document {
 
 private extension String {
     func getMovieVideo() throws -> MovieVideo {
-        guard let jsonObject = self.jsonObject ?? substringAfter("{\"id\":", includeSeparator: true).substringBefore("); });").jsonObject else {
+        guard let jsonObject = jsonObject ?? substringAfter("{\"id\":", includeSeparator: true).substringBefore("); });").jsonObject else {
             throw HDrezkaError.parseJson("json", "getMovieVideo")
         }
 

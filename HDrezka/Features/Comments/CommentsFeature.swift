@@ -320,7 +320,7 @@ extension AlertState where Action == CommentsFeature.Action.Alert {
         Self(
             title: { TextState("key.comments.success") },
             actions: { ButtonState(role: .cancel) { TextState("key.ok") } },
-            message: message.map { message in { TextState(message) } }
+            message: message.map { message in { TextState(message) } },
         )
     }
 }

@@ -1695,6 +1695,116 @@
         }
       }
     },
+    "key.crash.issue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create an issue"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Создать issue"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Створити issue"
+          }
+        }
+      }
+    },
+    "key.crash.later" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not now"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не сейчас"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не зараз"
+          }
+        }
+      }
+    },
+    "key.crash.message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The app crashed during its previous run. Please describe what you were doing before the crash in a GitHub issue or a message to the developer on Telegram."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Во время предыдущего запуска произошёл сбой. Опишите, что вы делали перед сбоем, в issue на GitHub или в сообщении разработчику в Telegram."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Під час попереднього запуску стався збій. Опишіть, що ви робили перед збоєм, в issue на GitHub або в повідомленні розробнику в Telegram."
+          }
+        }
+      }
+    },
+    "key.crash.telegram" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Message on Telegram"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Написать в Telegram"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Написати в Telegram"
+          }
+        }
+      }
+    },
+    "key.crash.title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HDrezka closed unexpectedly"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HDrezka неожиданно завершила работу"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HDrezka несподівано завершила роботу"
+          }
+        }
+      }
+    },
     "key.create" : {
       "localizations" : {
         "en" : {
@@ -7990,5 +8100,5 @@
       }
     }
   },
-  "version" : "1.1"
+  "version" : "1.3"
 }

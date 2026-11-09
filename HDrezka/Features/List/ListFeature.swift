@@ -37,27 +37,51 @@ struct ListFeature {
             case let .movies(_, title): title
             }
 
-            self.title = if let title, !title.isEmpty { title } else { String(localized: "key.list") }
+            self.title = if let title, !title.isEmpty {
+                title
+            } else {
+                String(localized: "key.list")
+            }
         }
 
         var isCustomMovies: Bool {
-            if case .movies = source { true } else { false }
+            if case .movies = source {
+                true
+            } else {
+                false
+            }
         }
 
         var isList: Bool {
-            if case .list = source { true } else { false }
+            if case .list = source {
+                true
+            } else {
+                false
+            }
         }
 
         var isCountry: Bool {
-            if case .country = source { true } else { false }
+            if case .country = source {
+                true
+            } else {
+                false
+            }
         }
 
         var isGenre: Bool {
-            if case .genre = source { true } else { false }
+            if case .genre = source {
+                true
+            } else {
+                false
+            }
         }
 
         var isCategory: Bool {
-            if case .category = source { true } else { false }
+            if case .category = source {
+                true
+            } else {
+                false
+            }
         }
 
         func isCategory(_ category: Categories) -> Bool {
@@ -65,7 +89,11 @@ struct ListFeature {
         }
 
         var isCollection: Bool {
-            if case .collection = source { true } else { false }
+            if case .collection = source {
+                true
+            } else {
+                false
+            }
         }
     }
 
@@ -136,17 +164,17 @@ struct ListFeature {
     private func movies(source: Source, page: Int, filterGenre: Genres, filter: Filters, newFilter: NewFilters) async throws -> (String?, [MovieSimple]) {
         switch source {
         case let .movies(movies, _):
-            return (nil, movies)
+            (nil, movies)
         case let .list(list):
-            return try await movieListsClient.getMovieList(listId: list.listId, page: page)
+            try await movieListsClient.getMovieList(listId: list.listId, page: page)
         case let .country(country):
-            return try await (nil, movieListsClient.getMoviesByCountry(countryId: country.countryId, filter: filter, genre: filterGenre.genreCode, page: page))
+            try await (nil, movieListsClient.getMoviesByCountry(countryId: country.countryId, filter: filter, genre: filterGenre.genreCode, page: page))
         case let .genre(genre):
-            return try await (nil, movieListsClient.getMoviesByGenre(genreId: genre.genreId, filter: filter, page: page))
+            try await (nil, movieListsClient.getMoviesByGenre(genreId: genre.genreId, filter: filter, page: page))
         case let .category(category):
-            return try await (nil, movies(category: category, page: page, filterGenre: filterGenre, newFilter: newFilter))
+            try await (nil, movies(category: category, page: page, filterGenre: filterGenre, newFilter: newFilter))
         case let .collection(collection):
-            return try await (nil, collectionsClient.getMoviesInCollection(collectionId: collection.collectionId, filter: filter, page: page))
+            try await (nil, collectionsClient.getMoviesInCollection(collectionId: collection.collectionId, filter: filter, page: page))
         }
     }
 

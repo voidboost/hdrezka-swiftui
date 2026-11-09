@@ -8,7 +8,6 @@ struct SignUpSheetView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-
     private enum FocusedField {
         case email, username, password1, password2, verifyCode
     }
@@ -21,7 +20,6 @@ struct SignUpSheetView: View {
     @State private var passwordIsEmpty: Bool = true
     @State private var showConfirmPassword: Bool = false
     @State private var confirmPasswordIsEmpty: Bool = true
-
 
     @State private var showPremiumWarning: Bool = true
 
@@ -164,7 +162,7 @@ struct SignUpSheetView: View {
                                                         } completion: {
                                                             focusedField = .password1
                                                         }
-                                                    }
+                                                    },
                                             )
                                     }
                                 }
@@ -234,7 +232,7 @@ struct SignUpSheetView: View {
                                                         } completion: {
                                                             focusedField = .password2
                                                         }
-                                                    }
+                                                    },
                                             )
                                     }
                                 }

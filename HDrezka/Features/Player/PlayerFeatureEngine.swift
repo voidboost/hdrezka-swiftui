@@ -23,9 +23,9 @@ extension PlayerFeature {
                                     id: voiceActing.voiceId,
                                     acting: voiceActing.translatorId,
                                     season: season?.seasonId,
-                                    episode: episode?.episodeId
+                                    episode: episode?.episodeId,
                                 ),
-                                position: seconds
+                                position: seconds,
                             )
                         }
                         .execute(db)
@@ -47,7 +47,7 @@ extension PlayerFeature {
                     await send(.subtitleOptionsLoaded(options), animation: .easeInOut(duration: 0.15))
                 },
                 perform { [mode = state.trackCommandMode] engine in engine.configureTrackCommands(mode) },
-                startPlayback(state)
+                startPlayback(state),
             )
 
         case .status:
@@ -76,7 +76,7 @@ extension PlayerFeature {
             return .merge(
                 .run { _ in Defaults[.isMuted] = isMuted },
                 showCursor(),
-                setMask(!state.isPictureInPictureActive, &state)
+                setMask(!state.isPictureInPictureActive, &state),
             )
 
         case let .volume(volume):
@@ -89,7 +89,7 @@ extension PlayerFeature {
                     engine.setMuted(Defaults[.isMuted])
                 },
                 showCursor(),
-                setMask(!state.isPictureInPictureActive, &state)
+                setMask(!state.isPictureInPictureActive, &state),
             )
 
         case let .duration(duration):
@@ -135,7 +135,7 @@ extension PlayerFeature {
             return .merge(
                 showCursor(),
                 setMask(!isActive, &state),
-                perform { [isVisible = state.isAmbientLightVisible] engine in engine.setAmbientLight(isVisible) }
+                perform { [isVisible = state.isAmbientLightVisible] engine in engine.setAmbientLight(isVisible) },
             )
 
         case let .pictureInPicturePossible(isPossible):

@@ -5,7 +5,7 @@ import Foundation
 import SwiftSoup
 
 @DependencyClient
-struct MovieDetailsClient: Sendable {
+struct MovieDetailsClient {
     var getMovieDetails: @Sendable (_ movieId: String) async throws -> MovieDetailed
     var getMovieBookmarks: @Sendable (_ movieId: String) async throws -> [Bookmark]
     var getMovieVideo: @Sendable (_ voiceActing: MovieVoiceActing, _ season: MovieSeason?, _ episode: MovieEpisode?, _ favs: String) async throws -> MovieVideo
@@ -113,7 +113,7 @@ extension MovieDetailsClient: DependencyKey {
 
                     return (Float(num ?? ""), votes?.shortNumber)
                 }
-            }
+            },
         )
     }()
 }

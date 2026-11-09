@@ -17,7 +17,7 @@ struct WatchSheetView: View {
 
                     openWindow(
                         id: Windows.player.id,
-                        value: PlayerData(details: details, selectedActing: selectedActing, seasons: store.seasons, selectedSeason: store.selectedSeason, selectedEpisode: store.selectedEpisode, selectedQuality: selectedQuality, movie: movie)
+                        value: PlayerData(details: details, selectedActing: selectedActing, seasons: store.seasons, selectedSeason: store.selectedSeason, selectedEpisode: store.selectedEpisode, selectedQuality: selectedQuality, movie: movie),
                     )
 
                     dismiss()

@@ -18,8 +18,13 @@ struct MovieSelectionSheet<Actions: View>: View {
         self.actions = actions()
     }
 
-    private var details: MovieDetailed? { store.details }
-    private var error: (any Error)? { store.error?.base }
+    private var details: MovieDetailed? {
+        store.details
+    }
+
+    private var error: any Error? {
+        store.error?.base
+    }
 
     @Environment(\.dismiss) private var dismiss
 

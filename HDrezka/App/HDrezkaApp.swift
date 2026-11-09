@@ -2,8 +2,6 @@ import ComposableArchitecture
 import Defaults
 import Dependencies
 import FirebaseAnalytics
-import FirebaseCore
-import FirebaseCrashlytics
 import Kingfisher
 import Sparkle
 import SQLiteData
@@ -16,6 +14,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var updaterController: SPUStandardUpdaterController!
 
     @SharedReader(.hasDownloads) private var hasDownloads
+    @Dependency(\.crashlyticsClient) private var crashlyticsClient
     @Dependency(\.aria2Client) private var aria2Client
     @Dependency(\.downloadCommands) private var downloadCommands
 
@@ -30,21 +29,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         NSWindow.allowsAutomaticWindowTabbing = false
 
-        UserDefaults.standard.register(
-            defaults: ["NSApplicationCrashOnExceptions": true]
-        )
-
-        FirebaseApp.configure()
-        Crashlytics.crashlytics().setUserID(Const.deviceUUID)
-        Analytics.setUserID(Const.deviceUUID)
-
-        #if DEBUG
-            Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(false)
-            FirebaseConfiguration.shared.setLoggerLevel(.min)
-            Analytics.setAnalyticsCollectionEnabled(false)
-        #endif
-
-        LaunchErrors.flush()
+        crashlyticsClient.configure()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_: NSApplication) -> Bool {
@@ -343,7 +328,7 @@ struct HDrezkaApp: App {
 
             return database
         } catch {
-            LaunchErrors.record(error)
+            recordToCrashlytics(error)
         }
 
         do {

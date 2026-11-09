@@ -4,7 +4,7 @@ import DependenciesMacros
 import Foundation
 
 @DependencyClient
-struct PeopleClient: Sendable {
+struct PeopleClient {
     var getPersonDetails: @Sendable (_ id: String) async throws -> PersonDetailed
 }
 
@@ -15,7 +15,7 @@ extension PeopleClient: DependencyKey {
         return Self(
             getPersonDetails: { id in
                 try await session.page(PeopleService.getPersonDetails(id: id.replacingOccurrences(of: "person/", with: "").replacingOccurrences(of: "/", with: "")), parse: PeopleParser.parse)
-            }
+            },
         )
     }()
 }

@@ -1,11 +1,11 @@
 import ComposableArchitecture
 import Foundation
 
-enum SessionEvent: Equatable, Sendable {
+enum SessionEvent: Equatable {
     case loginRequired
 }
 
-struct SessionEvents: Sendable {
+struct SessionEvents {
     var send: @Sendable (SessionEvent) -> Void
     var events: @Sendable () -> AsyncStream<SessionEvent>
 }
@@ -16,7 +16,7 @@ extension SessionEvents: DependencyKey {
 
         return Self(
             send: { continuation.yield($0) },
-            events: { stream }
+            events: { stream },
         )
     }()
 }

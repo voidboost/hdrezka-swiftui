@@ -5,7 +5,7 @@ import Foundation
 import SwiftSoup
 
 @DependencyClient
-struct AccountClient: Sendable {
+struct AccountClient {
     var signIn: @Sendable (_ login: String, _ password: String) async throws -> Void
     var signUp: @Sendable (_ email: String, _ login: String, _ password: String, _ verifyCode: String, _ step: Int) async throws -> Void
     var restore: @Sendable (_ login: String) async throws -> String?
@@ -100,7 +100,7 @@ extension AccountClient: DependencyKey {
                 try await session.json(AccountService.getVersion, function: "getVersion") { json in
                     try json.require("version")
                 }
-            }
+            },
         )
     }()
 }

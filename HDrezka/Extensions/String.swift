@@ -17,12 +17,8 @@ extension String {
         let labels = lowercased.components(separatedBy: ".")
 
         guard labels.count >= 2,
-              labels.allSatisfy({ !$0.isEmpty && $0.count <= 63 && !$0.hasPrefix("-") && !$0.hasSuffix("-") })
-        else {
-            return false
-        }
-
-        guard let tld = labels.last,
+              labels.allSatisfy({ !$0.isEmpty && $0.count <= 63 && !$0.hasPrefix("-") && !$0.hasSuffix("-") }),
+              let tld = labels.last,
               tld.count >= 2,
               tld.allSatisfy(\.isLetter)
         else {

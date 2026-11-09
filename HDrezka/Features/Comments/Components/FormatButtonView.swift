@@ -12,7 +12,7 @@ struct FormatButtonView: View {
         selection: Binding<TextSelection?>,
         prefix: String,
         suffix: String,
-        icon: String? = nil
+        icon: String? = nil,
     ) {
         _feedback = feedback
         _selection = selection
@@ -20,11 +20,11 @@ struct FormatButtonView: View {
         self.suffix = suffix
         self.icon = icon
     }
-    
+
     private func isValid(_ range: Range<String.Index>, in text: String) -> Bool {
         range.lowerBound >= text.startIndex &&
-        range.upperBound <= text.endIndex &&
-        range.lowerBound <= range.upperBound
+            range.upperBound <= text.endIndex &&
+            range.lowerBound <= range.upperBound
     }
 
     var body: some View {

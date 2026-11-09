@@ -32,7 +32,7 @@ struct BookmarksMoviesView: View {
             store.movies,
             empty: store.selectedBookmark == nil ? String(localized: "key.bookmarks.select") : String(localized: "key.bookmarks.empty"),
             retriesWhenEmpty: store.selectedBookmark != nil,
-            padding: EdgeInsets(top: 18, leading: 18, bottom: 18, trailing: 18)
+            padding: EdgeInsets(top: 18, leading: 18, bottom: 18, trailing: 18),
         ) {
             store.send(.reloadMovies)
         }

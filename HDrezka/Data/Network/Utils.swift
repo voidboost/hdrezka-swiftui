@@ -2,7 +2,6 @@ import Alamofire
 import AVFoundation
 import Defaults
 import Dependencies
-import FirebaseCrashlytics
 import Foundation
 import SwiftSoup
 
@@ -125,11 +124,11 @@ extension Optional {
     func orThrow(
         functionName: String = #function,
         lineNumber: Int = #line,
-        columnNumber: Int = #column
+        columnNumber: Int = #column,
     ) throws -> Wrapped {
         guard let self else {
             let error = HDrezkaError.null(functionName, lineNumber, columnNumber)
-            Crashlytics.crashlytics().record(error: error)
+            recordToCrashlytics(error)
             throw error
         }
 
@@ -180,24 +179,7 @@ func handleError(_ error: Error) -> Error {
     return error
 }
 
-private func recordToCrashlytics(_ error: Error) {
-    Crashlytics.crashlytics().record(error: error)
-}
-
-@MainActor
-enum LaunchErrors {
-    private static var pending: [any Error]? = []
-
-    static func record(_ error: any Error) {
-        if pending != nil {
-            pending?.append(error)
-        } else {
-            Crashlytics.crashlytics().record(error: error)
-        }
-    }
-
-    static func flush() {
-        pending?.forEach { Crashlytics.crashlytics().record(error: $0) }
-        pending = nil
-    }
+func recordToCrashlytics(_ error: Error) {
+    @Dependency(\.crashlyticsClient) var crashlyticsClient
+    crashlyticsClient.record(error)
 }

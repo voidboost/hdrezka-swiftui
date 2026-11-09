@@ -1,13 +1,13 @@
 import ComposableArchitecture
 import Foundation
 
-enum AppRoute: Equatable, Sendable {
+enum AppRoute: Equatable {
     case signIn
     case premium
     case commentsRules
 }
 
-struct AppRouter: Sendable {
+struct AppRouter {
     var present: @Sendable (AppRoute) -> Void
     var routes: @Sendable () -> AsyncStream<AppRoute>
 }
@@ -18,7 +18,7 @@ extension AppRouter: DependencyKey {
 
         return Self(
             present: { continuation.yield($0) },
-            routes: { stream }
+            routes: { stream },
         )
     }()
 }

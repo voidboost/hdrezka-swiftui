@@ -85,7 +85,7 @@ struct BookmarksSheetView: View {
                                                 Text(verbatim: bookmarks[index].firstState != true ? "+1" : "-1")
                                                 Text(verbatim: bookmarks[index].firstState != true ? "-1" : "+1")
                                             },
-                                            value: bookmark.count
+                                            value: bookmark.count,
                                         )
                                         .disabled(store.id.id == nil)
                                         .flexibility(.natural)

@@ -46,7 +46,7 @@ struct SliderWithTextView<T: BinaryFloatingPoint>: View {
     }
 
     var body: some View {
-        let progress = self.progress
+        let progress = progress
 
         ZStack(alignment: .center) {
             VStack {

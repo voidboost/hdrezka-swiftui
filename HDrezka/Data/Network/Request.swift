@@ -99,7 +99,7 @@ func handlingErrors<T>(_ operation: () async throws -> T) async throws -> T {
 func invalidInput(
     functionName: String = #function,
     lineNumber: Int = #line,
-    columnNumber: Int = #column
+    columnNumber: Int = #column,
 ) -> Error {
     handleError(HDrezkaError.null(functionName, lineNumber, columnNumber))
 }

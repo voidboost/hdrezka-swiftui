@@ -5,13 +5,33 @@ import SwiftUI
 struct DownloadSheetView: View {
     @Bindable var store: StoreOf<MovieSelectionFeature>
 
-    private var details: MovieDetailed? { store.details }
-    private var movie: MovieVideo? { store.movie }
-    private var selectedActing: MovieVoiceActing? { store.selectedActing }
-    private var selectedSeason: MovieSeason? { store.selectedSeason }
-    private var selectedEpisode: MovieEpisode? { store.selectedEpisode }
-    private var selectedQuality: String? { store.selectedQuality }
-    private var selectedSubtitles: MovieSubtitles? { store.selectedSubtitles }
+    private var details: MovieDetailed? {
+        store.details
+    }
+
+    private var movie: MovieVideo? {
+        store.movie
+    }
+
+    private var selectedActing: MovieVoiceActing? {
+        store.selectedActing
+    }
+
+    private var selectedSeason: MovieSeason? {
+        store.selectedSeason
+    }
+
+    private var selectedEpisode: MovieEpisode? {
+        store.selectedEpisode
+    }
+
+    private var selectedQuality: String? {
+        store.selectedQuality
+    }
+
+    private var selectedSubtitles: MovieSubtitles? {
+        store.selectedSubtitles
+    }
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
@@ -37,14 +57,14 @@ struct DownloadSheetView: View {
                             ExternalDownloaders.folx.url.appending(queryItems: [
                                 .init(name: "urls", value: "\(movieURL.absoluteString)||\(subtitlesURL.absoluteString)"),
                                 .init(name: "urlsCount", value: "2"),
-                            ])
+                            ]),
                         )
                     } else if let selectedQuality, let movie, let movieURL = movie.getClosestTo(quality: selectedQuality)?.first {
                         openURL(
                             ExternalDownloaders.folx.url.appending(queryItems: [
                                 .init(name: "urls", value: movieURL.absoluteString),
                                 .init(name: "urlsCount", value: "1"),
-                            ])
+                            ]),
                         )
                     }
                 }
@@ -58,13 +78,13 @@ struct DownloadSheetView: View {
                         openURL(
                             ExternalDownloaders.motrix.url.appending(queryItems: [
                                 .init(name: "uris", value: "\(movieURL.absoluteString)\n\(subtitlesURL.absoluteString)"),
-                            ])
+                            ]),
                         )
                     } else if let selectedQuality, let movie, let movieURL = movie.getClosestTo(quality: selectedQuality)?.first {
                         openURL(
                             ExternalDownloaders.motrix.url.appending(queryItems: [
                                 .init(name: "uri", value: movieURL.absoluteString),
-                            ])
+                            ]),
                         )
                     }
                 }
@@ -111,7 +131,9 @@ struct DownloadSheetView: View {
     private func selection(all: Bool) -> DownloadData? {
         guard let details, let selectedActing, let selectedQuality else { return nil }
 
-        if all, selectedSeason == nil { return nil }
+        if all, selectedSeason == nil {
+            return nil
+        }
 
         return DownloadData(details: details, acting: selectedActing, season: selectedSeason, episode: selectedEpisode, quality: selectedQuality, subtitles: selectedSubtitles, all: all)
     }

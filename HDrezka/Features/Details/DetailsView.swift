@@ -20,7 +20,7 @@ struct DetailsView: View {
                         details: details,
                         trailerId: store.trailerId,
                         topSafeAreaInset: topSafeAreaInset,
-                        isSchedulePresented: $isSchedulePresented
+                        isSchedulePresented: $isSchedulePresented,
                     )
                     .environment(store)
                 }

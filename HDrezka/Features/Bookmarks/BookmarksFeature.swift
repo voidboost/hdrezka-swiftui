@@ -109,7 +109,7 @@ struct BookmarksFeature {
 
                         await send(.bookmarksLoaded(result), animation: .easeInOut)
                     }
-                    .cancellable(id: CancelID.bookmarks, cancelInFlight: true)
+                    .cancellable(id: CancelID.bookmarks, cancelInFlight: true),
                 )
 
             case let .bookmarksLoaded(.success(bookmarks)):

@@ -92,7 +92,7 @@ struct BookmarksSheetFeature {
                 state.alert = AlertState(
                     title: { TextState("key.ops") },
                     actions: { ButtonState(role: .cancel, action: .dismiss) { TextState("key.ok") } },
-                    message: { TextState(error.localizedDescription) }
+                    message: { TextState(error.localizedDescription) },
                 )
 
                 return .none

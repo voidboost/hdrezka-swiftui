@@ -11,6 +11,8 @@ class Const {
 
     static let github = URL(string: "https://github.com/voidboost/hdrezka-swiftui")!
 
+    static let telegram = URL(string: "https://t.me/voidboost")!
+
     static let helpUkraine = URL(string: "https://u24.gov.ua/")!
 
     static let fakeUpdate = URL(string: "https://api.hdrezka.tech/")!
@@ -69,7 +71,7 @@ class Const {
                 .init(name: "X-Hdrezka-Android-App", value: "1"),
                 .init(name: "X-Hdrezka-Android-App-Version", value: Defaults[.lastHdrezkaAppVersion]),
                 .userAgent(userAgent),
-            ] : [.userAgent(userAgent)]
+            ] : [.userAgent(userAgent)],
         )
     }
 
@@ -105,7 +107,7 @@ class Const {
                 for: .applicationSupportDirectory,
                 in: .userDomainMask,
                 appropriateFor: nil,
-                create: true
+                create: true,
             )
 
             return applicationSupportDirectory.appending(path: "HDrezka.db", directoryHint: .notDirectory).absoluteString

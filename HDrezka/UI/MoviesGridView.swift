@@ -16,7 +16,7 @@ struct MoviesGridView<Card: View>: View {
         pagination: DataPaginationState,
         padding: EdgeInsets = EdgeInsets(top: 18, leading: 36, bottom: 18, trailing: 36),
         loadMore: @escaping () -> Void,
-        @ViewBuilder card: @escaping (MovieSimple) -> Card
+        @ViewBuilder card: @escaping (MovieSimple) -> Card,
     ) {
         self.movies = movies
         self.pagination = pagination

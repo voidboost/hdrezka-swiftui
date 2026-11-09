@@ -46,7 +46,7 @@ struct PlayerView: View {
                                 TapGesture(count: 1)
                                     .onEnded {
                                         store.send(.videoTapped)
-                                    })
+                                    }),
                     )
                     .overlay(alignment: .top) {
                         TopControlsView(player: player)

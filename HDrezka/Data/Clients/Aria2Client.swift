@@ -5,7 +5,7 @@ import DependenciesMacros
 import Foundation
 
 @DependencyClient
-struct Aria2Client: Sendable {
+struct Aria2Client {
     var start: @Sendable () throws -> Void
     var waitUntilExit: @Sendable () async -> Void
     var terminate: @Sendable () -> Void
@@ -78,8 +78,8 @@ extension Aria2Client: DependencyKey {
                         options: [
                             "dir": directory.path(percentEncoded: false),
                             "out": fileName,
-                        ]
-                    )
+                        ],
+                    ),
                 )
             },
             statuses: {
@@ -107,7 +107,7 @@ extension Aria2Client: DependencyKey {
             },
             setMaxConcurrentDownloads: { count in
                 let _: String = try await session.aria2(.changeGlobalOption, OptionsParams(token: Const.token, options: ["max-concurrent-downloads": count]))
-            }
+            },
         )
     }()
 }

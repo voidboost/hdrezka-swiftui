@@ -17,7 +17,7 @@ extension DownloadCommands: DependencyKey {
 
         return Self(
             send: { continuation.yield($0) },
-            commands: { stream }
+            commands: { stream },
         )
     }()
 }

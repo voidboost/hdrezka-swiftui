@@ -20,7 +20,7 @@ extension PlayerFeature {
             ambientLight: state.isAmbientLightVisible,
             volume: state.volume,
             isMuted: state.isMuted,
-            rate: state.rate
+            rate: state.rate,
         )
 
         var effects: [Effect<Action>] = [
@@ -40,7 +40,7 @@ extension PlayerFeature {
                     guard let thumbnails = try? await movieDetailsClient.getMovieThumbnails(path: path) else { return }
 
                     await send(.thumbnailsLoaded(thumbnails))
-                }
+                },
             )
         }
 

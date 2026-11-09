@@ -66,9 +66,9 @@ struct ContentView: View {
                     .conditionalEffect(
                         .repeat(
                             .glow(color: .init(red: 138.0 / 255.0, green: 0.0, blue: 173.0 / 255.0), radius: 10),
-                            every: 5
+                            every: 5,
                         ),
-                        condition: isUserPremium <= 3
+                        condition: isUserPremium <= 3,
                     )
                 }
                 .buttonStyle(.plain)
@@ -120,58 +120,58 @@ struct ContentView: View {
 
     var body: some View {
         tabs
-        .onChange(of: isLoggedIn) {
-            store.send(.loggedInChanged(isLoggedIn))
-        }
-        .sheet(item: $store.scope(state: \.destination?.signIn, action: \.destination.signIn)) { store in
-            SignInSheetView(store: store)
-        }
-        .sheet(item: $store.scope(state: \.destination?.signUp, action: \.destination.signUp)) { store in
-            SignUpSheetView(store: store)
-        }
-        .sheet(item: $store.scope(state: \.destination?.restore, action: \.destination.restore)) { store in
-            RestoreSheetView(store: store)
-        }
-        .confirmationDialog("key.sign_out.label", isPresented: $store.isSignOutPresented) {
-            Button(role: .destructive) {
-                store.send(.signOutConfirmed)
-            } label: {
-                Text("key.yes")
+            .onChange(of: isLoggedIn) {
+                store.send(.loggedInChanged(isLoggedIn))
             }
-        } message: {
-            Text("key.sign_out.q")
-        }
-        .dialogSeverity(.critical)
-        .alert($store.scope(state: \.alert, action: \.alert))
-        .confirmationDialog("key.premium_content", isPresented: $store.isPremiumPresented) {
-            Link("key.buy", destination: (!_mirror.isDefaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
-        } message: {
-            Text("key.premium.description")
-        }
-        .sheet(isPresented: $store.isCommentsRulesPresented) {
-            CommentsRulesSheetView()
-        }
-        .alert("key.disclaimer", isPresented: $isFirstLaunch) {
-            Link(destination: (!_mirror.isDefaultValue ? mirror : Const.redirectMirror).appending(path: "rules/", directoryHint: .notDirectory)) {
-                Text("key.site.rules")
+            .sheet(item: $store.scope(state: \.destination?.signIn, action: \.destination.signIn)) { store in
+                SignInSheetView(store: store)
             }
-
-            Button(role: .cancel) {} label: {
-                Text("key.ok")
+            .sheet(item: $store.scope(state: \.destination?.signUp, action: \.destination.signUp)) { store in
+                SignUpSheetView(store: store)
             }
-        } message: {
-            Text("key.disclaimer.description")
-        }
-        .dialogSeverity(.critical)
-        .overlay {
-            if isSnowShown {
-                SnowView(snowSurfaces: snowOnSurfaces ? snowSurfaces : nil, isEnabled: store.snow == .falling) {
-                    store.send(.snowSettled)
+            .sheet(item: $store.scope(state: \.destination?.restore, action: \.destination.restore)) { store in
+                RestoreSheetView(store: store)
+            }
+            .confirmationDialog("key.sign_out.label", isPresented: $store.isSignOutPresented) {
+                Button(role: .destructive) {
+                    store.send(.signOutConfirmed)
+                } label: {
+                    Text("key.yes")
                 }
-                .allowsHitTesting(false)
-                .ignoresSafeArea()
+            } message: {
+                Text("key.sign_out.q")
             }
-        }
+            .dialogSeverity(.critical)
+            .alert($store.scope(state: \.alert, action: \.alert))
+            .confirmationDialog("key.premium_content", isPresented: $store.isPremiumPresented) {
+                Link("key.buy", destination: (!_mirror.isDefaultValue ? mirror : Const.redirectMirror).appending(path: "payments", directoryHint: .notDirectory))
+            } message: {
+                Text("key.premium.description")
+            }
+            .sheet(isPresented: $store.isCommentsRulesPresented) {
+                CommentsRulesSheetView()
+            }
+            .alert("key.disclaimer", isPresented: $isFirstLaunch) {
+                Link(destination: (!_mirror.isDefaultValue ? mirror : Const.redirectMirror).appending(path: "rules/", directoryHint: .notDirectory)) {
+                    Text("key.site.rules")
+                }
+
+                Button(role: .cancel) {} label: {
+                    Text("key.ok")
+                }
+            } message: {
+                Text("key.disclaimer.description")
+            }
+            .dialogSeverity(.critical)
+            .overlay {
+                if isSnowShown {
+                    SnowView(snowSurfaces: snowOnSurfaces ? snowSurfaces : nil, isEnabled: store.snow == .falling) {
+                        store.send(.snowSettled)
+                    }
+                    .allowsHitTesting(false)
+                    .ignoresSafeArea()
+                }
+            }
     }
 
     private func stack(for tab: Tabs) -> some View {

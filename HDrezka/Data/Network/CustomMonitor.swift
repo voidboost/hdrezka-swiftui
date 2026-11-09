@@ -1,6 +1,6 @@
 import Alamofire
 import Defaults
-import FirebaseCrashlytics
+import Dependencies
 import Foundation
 
 final class CustomMonitor: EventMonitor {
@@ -8,7 +8,8 @@ final class CustomMonitor: EventMonitor {
         #if DEBUG
             print(response.customDebugDescription)
         #else
-            Crashlytics.crashlytics().log(response.customDebugDescription)
+            @Dependency(\.crashlyticsClient) var crashlyticsClient
+            crashlyticsClient.log(response.customDebugDescription)
         #endif
     }
 }

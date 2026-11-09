@@ -195,7 +195,7 @@ private class CueTextParser {
     }
 
     func parseImageUrl() -> String? {
-        guard let imageNameText = text.components(separatedBy: "#").filter({ !$0.isEmpty }).first else {
+        guard let imageNameText = text.components(separatedBy: "#").first(where: { !$0.isEmpty }) else {
             return nil
         }
 

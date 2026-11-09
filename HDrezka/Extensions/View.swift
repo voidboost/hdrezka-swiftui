@@ -3,7 +3,7 @@ import SwiftUI
 
 extension View {
     func imageFill(
-        _ ratio: CGFloat? = nil
+        _ ratio: CGFloat? = nil,
     ) -> some View {
         aspectRatio(contentMode: .fill)
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
@@ -11,7 +11,7 @@ extension View {
     }
 
     func viewModifier(
-        @ViewBuilder body: (_ content: Self) -> some View
+        @ViewBuilder body: (_ content: Self) -> some View,
     ) -> some View {
         body(self)
     }
@@ -27,7 +27,7 @@ extension View {
         of items: [Item]?,
         threshold: Int = 1,
         isEnabled: Bool,
-        perform action: @escaping () -> Void
+        perform action: @escaping () -> Void,
     ) -> some View {
         onScrollTargetVisibilityChange(idType: Item.ID.self) { visibleIds in
             if isEnabled, let items, items.suffix(threshold).contains(where: { visibleIds.contains($0.id) }) {

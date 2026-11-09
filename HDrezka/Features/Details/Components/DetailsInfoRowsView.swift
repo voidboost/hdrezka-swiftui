@@ -57,7 +57,7 @@ struct DetailsInfoRowsView: View {
                     DetailsInfoRowWithButtonsView(
                         String(localized: "key.info.country"),
                         String(localized: "key.info.country.description"),
-                        countries
+                        countries,
                     )
                 }
 
@@ -69,7 +69,7 @@ struct DetailsInfoRowsView: View {
                     DetailsInfoRowWithButtonsView(
                         String(localized: "key.info.genres"),
                         String(localized: "key.info.genres.description"),
-                        genres
+                        genres,
                     )
                 }
 
@@ -81,7 +81,7 @@ struct DetailsInfoRowsView: View {
                     DetailsInfoRowWithButtonsView(
                         String(localized: "key.info.producer"),
                         String(localized: "key.info.producer.description"),
-                        producer
+                        producer,
                     )
                 }
 
@@ -93,7 +93,7 @@ struct DetailsInfoRowsView: View {
                     DetailsInfoRowWithButtonsView(
                         String(localized: "key.info.actors"),
                         String(localized: "key.info.actors.description"),
-                        actors
+                        actors,
                     )
                 }
 
@@ -105,7 +105,7 @@ struct DetailsInfoRowsView: View {
                     DetailsInfoRowWithButtonsView(
                         String(localized: "key.info.lists"),
                         String(localized: "key.info.lists.description"),
-                        lists
+                        lists,
                     )
                 }
 
@@ -117,7 +117,7 @@ struct DetailsInfoRowsView: View {
                     DetailsInfoRowWithButtonsView(
                         String(localized: "key.info.collections"),
                         String(localized: "key.info.collections.description"),
-                        collections
+                        collections,
                     )
                 }
 

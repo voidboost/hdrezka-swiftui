@@ -204,7 +204,7 @@ struct PlayerFeature {
                         }
 
                         await send(.selectPositionLoaded(subtitles: position?.subtitles))
-                    }
+                    },
                 )
 
             case .disappeared:
@@ -215,7 +215,7 @@ struct PlayerFeature {
                     .cancel(id: CancelID.defaults),
                     .cancel(id: CancelID.track),
                     .cancel(id: CancelID.hideMask),
-                    .cancel(id: CancelID.sleepTimer)
+                    .cancel(id: CancelID.sleepTimer),
                 )
 
             case let .selectPositionLoaded(subtitles):
@@ -371,7 +371,7 @@ struct PlayerFeature {
                 return .merge(
                     resetSleepTimer(&state),
                     showCursor(),
-                    setMask(isMaskShown, &state)
+                    setMask(isMaskShown, &state),
                 )
 
             case let .lockMask(isMaskShown):

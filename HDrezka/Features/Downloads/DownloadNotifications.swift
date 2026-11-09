@@ -89,7 +89,7 @@ extension DownloadNotificationsClient: DependencyKey {
         },
         post: { notification in
             await post(UNNotificationRequest(identifier: notification.data.notificationId, content: notification.content, trigger: nil))
-        }
+        },
     )
 
     private static func post(_ request: UNNotificationRequest) async {
@@ -99,7 +99,7 @@ extension DownloadNotificationsClient: DependencyKey {
         case .authorized, .provisional:
             try? await center.add(request)
         case .notDetermined:
-            if (try? await center.requestAuthorization(options: [.alert, .badge, .sound])) == true {
+            if await (try? center.requestAuthorization(options: [.alert, .badge, .sound])) == true {
                 try? await center.add(request)
             }
         default:

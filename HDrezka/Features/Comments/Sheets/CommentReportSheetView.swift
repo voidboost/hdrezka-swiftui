@@ -143,7 +143,7 @@ struct CommentReportSheetView: View {
         init(tag: Reports, selection: Binding<Reports?>, message: Binding<String>, label: LocalizedStringKey) {
             _isSelected = Binding(
                 get: { selection.wrappedValue == tag },
-                set: { _ in selection.wrappedValue = tag }
+                set: { _ in selection.wrappedValue = tag },
             )
             _message = message
             self.tag = tag

@@ -1,13 +1,13 @@
 import SwiftUI
 
 extension View {
-    func dataStateOverlay<T: Collection & Equatable>(
-        _ state: DataState<T>,
+    func dataStateOverlay(
+        _ state: DataState<some Collection & Equatable>,
         empty description: String,
         _ subdescription: String? = nil,
         retriesWhenEmpty: Bool = true,
         padding: EdgeInsets = EdgeInsets(top: 18, leading: 36, bottom: 18, trailing: 36),
-        retry: @escaping () -> Void
+        retry: @escaping () -> Void,
     ) -> some View {
         overlay {
             Group {

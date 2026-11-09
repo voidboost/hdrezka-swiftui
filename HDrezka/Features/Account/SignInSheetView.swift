@@ -8,7 +8,6 @@ struct SignInSheetView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-
     @State private var showPassword: Bool = false
     @State private var passwordIsEmpty: Bool = true
 

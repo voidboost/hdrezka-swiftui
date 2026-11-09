@@ -64,6 +64,7 @@ struct AppFeature {
         case sessionEventReceived(SessionEvent)
         case signInTapped
         case signOutConfirmed
+        case presentCrashReportingAlert
         case loggedOut(Result<Void, any Error>)
         case loggedInChanged(Bool)
         case snowSettingsChanged(isEnabled: Bool, isForced: Bool)
@@ -71,9 +72,12 @@ struct AppFeature {
         case destination(PresentationAction<Destination.Action>)
         case alert(PresentationAction<Alert>)
 
-        enum Alert: Equatable {}
+        enum Alert: Equatable {
+            case openURL(URL)
+        }
     }
 
+    @Dependency(\.crashlyticsClient) private var crashlyticsClient
     @Dependency(\.appRouter) private var appRouter
     @Dependency(\.sessionEvents) private var sessionEvents
     @Dependency(\.cookiesClient) private var cookiesClient
@@ -117,6 +121,11 @@ struct AppFeature {
                 return .merge(
                     .send(.downloads(.launch)),
                     .run { send in
+                        if try await crashlyticsClient.didCrashDuringPreviousExecution() {
+                            await send(.presentCrashReportingAlert)
+                        }
+                    },
+                    .run { send in
                         for await route in appRouter.routes() {
                             await send(.routeReceived(route))
                         }
@@ -138,7 +147,7 @@ struct AppFeature {
                         let version = try await accountClient.getVersion()
 
                         Defaults[.lastHdrezkaAppVersion] = version
-                    }
+                    },
                 )
 
             case .routeReceived(.signIn), .sessionEventReceived(.loginRequired), .signInTapped:
@@ -165,6 +174,32 @@ struct AppFeature {
                     let result = await Result { try await accountClient.logout() }
 
                     await send(.loggedOut(result))
+                }
+
+            case .presentCrashReportingAlert:
+                state.alert = AlertState {
+                    TextState("key.crash.title")
+                } actions: {
+                    ButtonState(action: .openURL(Const.github.appending(path: "issues/new", directoryHint: .notDirectory))) {
+                        TextState("key.crash.issue")
+                    }
+
+                    ButtonState(action: .openURL(Const.telegram)) {
+                        TextState("key.crash.telegram")
+                    }
+
+                    ButtonState(role: .cancel) {
+                        TextState("key.crash.later")
+                    }
+                } message: {
+                    TextState("key.crash.message")
+                }
+
+                return .none
+
+            case let .alert(.presented(.openURL(url))):
+                return .run { _ in
+                    _ = await MainActor.run { NSWorkspace.shared.open(url) }
                 }
 
             case .loggedOut(.success):
@@ -216,7 +251,7 @@ struct AppFeature {
 
                 return .none
 
-            case .binding, .path, .home, .search, .categories, .collections, .watchingLater, .bookmarks, .downloads, .destination, .alert:
+            case .binding, .path, .home, .search, .categories, .collections, .watchingLater, .bookmarks, .downloads, .destination, .alert(.dismiss):
                 return .none
             }
         }

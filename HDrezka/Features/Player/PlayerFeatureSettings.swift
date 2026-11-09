@@ -53,14 +53,30 @@ extension PlayerFeature {
     func observeDefaults() -> Effect<Action> {
         .run { send in
             await withTaskGroup(of: Void.self) { group in
-                group.addTask { for await value in Defaults.updates(.rate, initial: false) { await send(.defaultsChanged(.rate(value))) } }
-                group.addTask { for await value in Defaults.updates(.isMuted, initial: false) { await send(.defaultsChanged(.isMuted(value)), animation: .easeInOut(duration: 0.15)) } }
-                group.addTask { for await value in Defaults.updates(.volume, initial: false) { await send(.defaultsChanged(.volume(value)), animation: .easeInOut(duration: 0.15)) } }
-                group.addTask { for await value in Defaults.updates(.spatialAudio, initial: false) { await send(.defaultsChanged(.spatialAudio(value))) } }
-                group.addTask { for await value in Defaults.updates(.playerFullscreen, initial: false) { await send(.defaultsChanged(.playerFullscreen(value))) } }
-                group.addTask { for await value in Defaults.updates(.videoGravity, initial: false) { await send(.defaultsChanged(.videoGravity(value))) } }
-                group.addTask { for await value in Defaults.updates(.ambientLight, initial: false) { await send(.defaultsChanged(.ambientLight(value))) } }
-                group.addTask { for await value in Defaults.updates(.mediaControlButtonIsSeeking, initial: false) { await send(.defaultsChanged(.mediaControlButtonIsSeeking(value))) } }
+                group.addTask { for await value in Defaults.updates(.rate, initial: false) {
+                    await send(.defaultsChanged(.rate(value)))
+                } }
+                group.addTask { for await value in Defaults.updates(.isMuted, initial: false) {
+                    await send(.defaultsChanged(.isMuted(value)), animation: .easeInOut(duration: 0.15))
+                } }
+                group.addTask { for await value in Defaults.updates(.volume, initial: false) {
+                    await send(.defaultsChanged(.volume(value)), animation: .easeInOut(duration: 0.15))
+                } }
+                group.addTask { for await value in Defaults.updates(.spatialAudio, initial: false) {
+                    await send(.defaultsChanged(.spatialAudio(value)))
+                } }
+                group.addTask { for await value in Defaults.updates(.playerFullscreen, initial: false) {
+                    await send(.defaultsChanged(.playerFullscreen(value)))
+                } }
+                group.addTask { for await value in Defaults.updates(.videoGravity, initial: false) {
+                    await send(.defaultsChanged(.videoGravity(value)))
+                } }
+                group.addTask { for await value in Defaults.updates(.ambientLight, initial: false) {
+                    await send(.defaultsChanged(.ambientLight(value)))
+                } }
+                group.addTask { for await value in Defaults.updates(.mediaControlButtonIsSeeking, initial: false) {
+                    await send(.defaultsChanged(.mediaControlButtonIsSeeking(value)))
+                } }
             }
         }
         .cancellable(id: CancelID.defaults, cancelInFlight: true)

@@ -13,7 +13,7 @@ private enum SessionKey: DependencyKey {
 
             return newRequest
         },
-        eventMonitors: [CustomMonitor()]
+        eventMonitors: [CustomMonitor()],
     )
 }
 

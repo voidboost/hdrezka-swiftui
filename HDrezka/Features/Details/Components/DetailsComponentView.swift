@@ -515,11 +515,7 @@ private struct DetailsWatchAlsoView: View {
     }
 }
 
-extension DetailsWatchAlsoView: Equatable {
-    nonisolated static func == (lhs: DetailsWatchAlsoView, rhs: DetailsWatchAlsoView) -> Bool {
-        lhs.movies == rhs.movies
-    }
-}
+extension DetailsWatchAlsoView: Equatable {}
 
 @Observable
 @MainActor

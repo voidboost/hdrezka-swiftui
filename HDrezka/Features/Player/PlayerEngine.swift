@@ -115,14 +115,14 @@ final class PlayerEngine {
         routeDetector.isRouteDetectionEnabled = true
 
         glowRenderer.onFrame = { [weak self] frame in
-            guard let self, self.isAmbientLightVisible, self.playerLayer.player != nil else { return }
+            guard let self, isAmbientLightVisible, playerLayer.player != nil else { return }
 
-            if self.glow == nil {
+            if glow == nil {
                 withAnimation(.easeInOut(duration: 0.3)) {
                     self.glow = frame
                 }
             } else {
-                self.glow = frame
+                glow = frame
             }
         }
 
@@ -148,7 +148,7 @@ final class PlayerEngine {
 
         observe(
             currentItem.publisher(for: \.duration)
-                .filter { $0.isValid && !$0.isIndefinite && !$0.isNegativeInfinity && !$0.isPositiveInfinity && $0.seconds > 0 }
+                .filter { $0.isValid && !$0.isIndefinite && !$0.isNegativeInfinity && !$0.isPositiveInfinity && $0.seconds > 0 },
         ) { [weak self] continuation, duration in
             self?.nowPlayingInfoCenter.nowPlayingInfo?[MPMediaItemPropertyPlaybackDuration] = duration.seconds
 
@@ -191,7 +191,7 @@ final class PlayerEngine {
             for await _ in notificationCenter.notifications(named: .AVRouteDetectorMultipleRoutesDetectedDidChange) {
                 guard let self else { return }
 
-                self.continuation?.yield(.routesDetected(self.routeDetector.multipleRoutesDetected))
+                self.continuation?.yield(.routesDetected(routeDetector.multipleRoutesDetected))
             }
         })
 

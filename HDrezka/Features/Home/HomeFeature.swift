@@ -68,7 +68,7 @@ struct HomeFeature {
 
                 state.paginationState = state.categories.receivePage(
                     result.map { [Category(category: category, title: category.localized, movies: $0, id: uuid())] },
-                    isInitial: isInitial
+                    isInitial: isInitial,
                 )
 
                 return .none

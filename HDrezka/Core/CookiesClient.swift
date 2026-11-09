@@ -2,7 +2,7 @@ import Defaults
 import Dependencies
 import Foundation
 
-struct CookiesClient: Sendable {
+struct CookiesClient {
     var observe: @Sendable () async -> Void
     var setMirror: @Sendable (URL) -> Void
     var allowComments: @Sendable () -> Void
@@ -71,7 +71,7 @@ extension CookiesClient: DependencyKey {
             }
 
             HTTPCookieStorage.shared.setCookie(cookie)
-        }
+        },
     )
 }
 

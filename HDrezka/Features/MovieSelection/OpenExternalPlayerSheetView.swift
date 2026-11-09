@@ -5,9 +5,17 @@ import SwiftUI
 struct OpenExternalPlayerSheetView: View {
     @Bindable var store: StoreOf<MovieSelectionFeature>
 
-    private var movie: MovieVideo? { store.movie }
-    private var selectedQuality: String? { store.selectedQuality }
-    private var selectedSubtitles: MovieSubtitles? { store.selectedSubtitles }
+    private var movie: MovieVideo? {
+        store.movie
+    }
+
+    private var selectedQuality: String? {
+        store.selectedQuality
+    }
+
+    private var selectedSubtitles: MovieSubtitles? {
+        store.selectedSubtitles
+    }
 
     @Environment(\.openURL) private var openURL
 
@@ -24,14 +32,14 @@ struct OpenExternalPlayerSheetView: View {
                                     .init(name: "url", value: movieURL.absoluteString),
                                     .init(name: "mpv_sub-files", value: subtitlesURL.absoluteString.replacingOccurrences(of: ":", with: "\\:")),
                                     .init(name: "new_window", value: "1"),
-                                ])
+                                ]),
                             )
                         } else if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality)?.first?.hls {
                             openURL(
                                 ExternalPlayers.iina.url.appending(queryItems: [
                                     .init(name: "url", value: movieURL.absoluteString),
                                     .init(name: "new_window", value: "1"),
-                                ])
+                                ]),
                             )
                         }
                     }
@@ -46,13 +54,13 @@ struct OpenExternalPlayerSheetView: View {
                                 ExternalPlayers.infuse.url.appending(queryItems: [
                                     .init(name: "url", value: movieURL.absoluteString),
                                     .init(name: "sub", value: subtitlesURL.absoluteString),
-                                ])
+                                ]),
                             )
                         } else if let movie, let selectedQuality, let movieURL = movie.getClosestTo(quality: selectedQuality)?.first {
                             openURL(
                                 ExternalPlayers.infuse.url.appending(queryItems: [
                                     .init(name: "url", value: movieURL.absoluteString),
-                                ])
+                                ]),
                             )
                         }
                     }
@@ -96,7 +104,7 @@ struct OpenExternalPlayerSheetView: View {
         do {
             try Process.run(
                 appURL.appending(path: "Contents", directoryHint: .isDirectory).appending(path: "MacOS", directoryHint: .isDirectory).appending(path: appURL.deletingPathExtension().lastPathComponent, directoryHint: .notDirectory),
-                arguments: arguments
+                arguments: arguments,
             )
         } catch {
             store.send(.showError(error))

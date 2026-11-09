@@ -51,7 +51,7 @@ struct DownloadsFeature {
                             await send(.runningChanged(true), animation: .easeInOut)
                             await aria2Client.waitUntilExit()
                         } catch {
-                            await LaunchErrors.record(error)
+                            recordToCrashlytics(error)
                         }
 
                         await send(.runningChanged(false), animation: .easeInOut)
@@ -65,7 +65,7 @@ struct DownloadsFeature {
                         for await count in Defaults.updates(.maxConcurrentDownloads, initial: false) {
                             try? await aria2Client.setMaxConcurrentDownloads(count: count)
                         }
-                    }
+                    },
                 )
 
             case let .runningChanged(isRunning):
@@ -105,7 +105,7 @@ struct DownloadsFeature {
                     .run { _ in
                         await notifications.post(.downloading(download.data, gid: download.gid))
                     },
-                    isFirst ? polling(state.$downloads) : .none
+                    isFirst ? polling(state.$downloads) : .none,
                 )
 
             case let .pauseTapped(gid):
@@ -152,7 +152,7 @@ struct DownloadsFeature {
 
     private func perform(_ operation: @escaping @Sendable () async throws -> Void, then action: Action) -> Effect<Action> {
         .run { send in
-            guard (try? await operation()) != nil else { return }
+            guard await (try? operation()) != nil else { return }
 
             await send(action)
         }

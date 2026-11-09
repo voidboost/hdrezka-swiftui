@@ -103,7 +103,7 @@ struct MovieSelectionFeature {
                     saved: Defaults[.isLoggedIn] ? nil : selectPosition?.acting,
                     series: details.series?.acting,
                     id: \.translatorId,
-                    isSelected: \.isSelected
+                    isSelected: \.isSelected,
                 ) ?? acting.first
 
                 return actingChanged(&state)
@@ -115,7 +115,7 @@ struct MovieSelectionFeature {
                     saved: Defaults[.isLoggedIn] ? nil : state.selectPosition?.season,
                     series: state.details?.series?.season,
                     id: \.seasonId,
-                    isSelected: \.isSelected
+                    isSelected: \.isSelected,
                 )
 
                 return seasonChanged(&state)
@@ -200,7 +200,7 @@ struct MovieSelectionFeature {
 
                 await send(.seasonsLoaded(result), animation: .easeInOut)
             }
-            .cancellable(id: CancelID.seasons, cancelInFlight: true)
+            .cancellable(id: CancelID.seasons, cancelInFlight: true),
         )
     }
 
@@ -212,7 +212,7 @@ struct MovieSelectionFeature {
             saved: Defaults[.isLoggedIn] ? nil : state.selectPosition?.episode,
             series: state.details?.series?.episode,
             id: \.episodeId,
-            isSelected: \.isSelected
+            isSelected: \.isSelected,
         )
 
         return episodeChanged(&state)

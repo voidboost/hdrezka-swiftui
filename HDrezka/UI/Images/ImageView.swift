@@ -23,7 +23,7 @@ struct ImageView: View {
             .scaledToFit()
             .zoomable(
                 maxZoomScale: 5,
-                doubleTapZoomScale: 3
+                doubleTapZoomScale: 3,
             )
             .navigationTitle("key.imageViewer")
             .toolbar(.hidden)
@@ -73,7 +73,7 @@ struct ImageView: View {
                                 TapGesture(count: 1)
                                     .onEnded {
                                         dismiss()
-                                    }))
+                                    })),
             )
             .overlay(alignment: .bottomTrailing) {
                 ShareLink(item: url) {

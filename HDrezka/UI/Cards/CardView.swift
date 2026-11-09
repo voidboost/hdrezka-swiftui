@@ -102,6 +102,6 @@ struct CardView: View {
 
 extension CardView: Equatable {
     nonisolated static func == (lhs: CardView, rhs: CardView) -> Bool {
-        return lhs.movie.id == rhs.movie.id
+        lhs.movie.id == rhs.movie.id
     }
 }

@@ -4,7 +4,7 @@ import DependenciesMacros
 import Foundation
 
 @DependencyClient
-struct CollectionsClient: Sendable {
+struct CollectionsClient {
     var getCollections: @Sendable (_ page: Int) async throws -> [MoviesCollection]
     var getMoviesInCollection: @Sendable (_ collectionId: String, _ filter: Filters, _ page: Int) async throws -> [MovieSimple]
 }
@@ -19,7 +19,7 @@ extension CollectionsClient: DependencyKey {
             },
             getMoviesInCollection: { collectionId, filter, page in
                 try await session.page(CollectionsService.getMoviesInCollectionWithFilter(collectionId: collectionId, page: page, filter: filter.query), parse: MovieListsParser.parseMovies)
-            }
+            },
         )
     }()
 }

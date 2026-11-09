@@ -4,7 +4,7 @@ import DependenciesMacros
 import Foundation
 
 @DependencyClient
-struct SearchClient: Sendable {
+struct SearchClient {
     var search: @Sendable (_ query: String, _ page: Int) async throws -> [MovieSimple]
     var categories: @Sendable () async throws -> [MovieType]
 }
@@ -19,7 +19,7 @@ extension SearchClient: DependencyKey {
             },
             categories: {
                 try await session.page(SearchService.categories, parse: SearchParser.parseCategories)
-            }
+            },
         )
     }()
 }

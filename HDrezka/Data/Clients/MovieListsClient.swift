@@ -4,7 +4,7 @@ import DependenciesMacros
 import Foundation
 
 @DependencyClient
-struct MovieListsClient: Sendable {
+struct MovieListsClient {
     var getMovies: @Sendable (_ filter: Filters, _ genre: Int, _ page: Int) async throws -> [MovieSimple]
 //    var getFeaturedMovies: @Sendable (_ page: Int, _ genre: Int) async throws -> [MovieSimple]
     var getHotMovies: @Sendable (_ genre: Int) async throws -> [MovieSimple]
@@ -62,7 +62,7 @@ extension MovieListsClient: DependencyKey {
             },
             getNewestMovies: { filter, genre, page in
                 try await session.movies(.getNewestMovies(page: page, filter: filter.query, genre: genre))
-            }
+            },
         )
     }()
 }
